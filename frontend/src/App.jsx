@@ -1,5 +1,5 @@
-import LandingPage from "./pages/public/landingpage";
-import Navbar from "./pages/public/navbar";
+import LandingPage from "./pages/public/landingpage.jsx";
+import Navbar from "./pages/public/navbar.jsx";
 
 function App() {
     return (

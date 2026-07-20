@@ -1,10 +1,10 @@
 import React from "react";
-import Start from "./Start";
-import Phone from "./Phone";
-import Services from "./Services";
-import Steps from "./Steps";
-import Hours from "./Hours";
-import Footer from "./Footer";
+import Start from "./Start.jsx";
+import Phone from "./Phone.jsx";
+import Services from "./Services.jsx";
+import Steps from "./Steps.jsx";
+import Hours from "./Hours.jsx";
+import Footer from "./Footer.jsx";
 
 export default function LandingPage() {
   return (
