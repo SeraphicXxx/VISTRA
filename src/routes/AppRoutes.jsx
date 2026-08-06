@@ -1,31 +1,43 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Layouts
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-// Public Pages
 import LandingPage from "../pages/public/landingpage";
 
-// Admin Pages
 import AdminHome from "../pages/admin/home";
+import AdminLoginPage from "../pages/admin/login";
+
+import OverviewTab from "../pages/admin/overview/overview";
+import MedicalTab from "../pages/admin/medical/medicalTab";
+import DentalTab from "../pages/admin/dental/dentalTab";
+import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 
 function AppRoutes() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                {/* Public Routes */}
-                <Route element={<PublicLayout />}>
-                    <Route path="/" element={<LandingPage />} />
-                </Route>
+  return (
+    <BrowserRouter>
+      <Routes>
+        
+        {/* user */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LandingPage />} />
+        </Route>
 
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminHome />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+        {/* Admin Login */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminHome />} />
+
+          <Route path="overview/overview" element={<OverviewTab />} />
+          <Route path="medical/medical" element={<MedicalTab />} />
+          <Route path="dental/dental" element={<DentalTab />} />
+          <Route path="appointments/appointments" element={<AppointmentsTab />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default AppRoutes;
