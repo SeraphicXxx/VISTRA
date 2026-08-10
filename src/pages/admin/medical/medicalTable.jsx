@@ -99,14 +99,15 @@ export default function MedicalTable({ medicalRecords }) {
                 <td className="border-b border-border py-3 pr-4">
                   <StatusBadge status={record.status} />
                 </td>
+              
                 <td className="border-b border-border py-3 text-right">
-                  <button
-                    type="button"
+                  
+                    <a href="/admin/medical/records/viewrecord"
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
                   >
                     View
                     <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
-                  </button>
+                  </a>
                 </td>
               </tr>
             );
