@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Lock,
   User,
@@ -10,48 +11,32 @@ import {
 } from "lucide-react";
 import Footer from "../public/Footer";
 
-const STAFF_ID_PLACEHOLDER = "e.g. UCC-2481";
-const SUBMIT_DELAY_MS = 900;
-
-function validateLoginFields(staffId, password) {
-  if (!staffId.trim() || !password) {
-    return "Enter your staff ID and password to continue.";
-  }
-  return "";
-}
-
 export default function AdminLoginPage() {
+  const navigate = useNavigate();
+
   const [staffId, setStaffId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    setError("");
 
-    const validationError = validateLoginFields(staffId, password);
-    if (validationError) {
-      setError(validationError);
+    if (!staffId.trim() || !password) {
+      setError("Enter your staff ID and password to continue.");
       return;
     }
 
-    setIsSubmitting(true);
-
-    setTimeout(() => setIsSubmitting(false), SUBMIT_DELAY_MS);
-  };
-
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+    setError("");
+    navigate("/admin/overview/overview");
+  }
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background font-sans text-textPrimary selection:bg-primary/20">
-      <main className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-        <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_60%_70%_at_50%_40%,black,transparent)]" />
-
+    <div className="min-h-screen bg-background">
+      <main className="flex min-h-screen items-center justify-center py-10">
         <div className="relative w-full max-w-md px-6">
           <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-            <div className="h-1 w-full bg-primary" aria-hidden="true" />
+            <div className="h-1 w-full bg-primary" aria-hidden="true"></div>
 
             <div className="flex flex-col items-center px-8 pt-8 text-center">
               <a href="/admin">
@@ -61,21 +46,23 @@ export default function AdminLoginPage() {
                   className="h-11 w-auto object-contain"
                 />
               </a>
+
               <h1 className="mt-6 font-heading text-2xl font-semibold leading-tight tracking-tight text-textPrimary">
                 Clinical Staff Login
               </h1>
+
               <p className="mt-2 max-w-xs text-xs leading-relaxed text-textSecondary">
                 Sign in with your Staff ID to access appointments, queues, and student medical records.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="relative p-8">
-              {error && (
+              {error ? (
                 <div className="mb-5 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} />
                   <span>{error}</span>
                 </div>
-              )}
+              ) : null}
 
               <div>
                 <label
@@ -84,6 +71,7 @@ export default function AdminLoginPage() {
                 >
                   Staff ID
                 </label>
+
                 <div className="relative">
                   <User
                     className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
@@ -95,7 +83,7 @@ export default function AdminLoginPage() {
                     autoComplete="username"
                     value={staffId}
                     onChange={(e) => setStaffId(e.target.value)}
-                    placeholder={STAFF_ID_PLACEHOLDER}
+                    placeholder="e.g. UCC-2481"
                     className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
@@ -109,13 +97,14 @@ export default function AdminLoginPage() {
                   >
                     Password
                   </label>
-                  <a
-                    href="#forgot-password"
+                  
+                    <a href="#forgot-password"
                     className="text-xs font-medium text-primary transition-colors duration-200 hover:text-primaryDark"
                   >
                     Forgot password?
                   </a>
                 </div>
+
                 <div className="relative">
                   <Lock
                     className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
@@ -132,7 +121,7 @@ export default function AdminLoginPage() {
                   />
                   <button
                     type="button"
-                    onClick={togglePasswordVisibility}
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted transition-colors duration-200 hover:text-textSecondary"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -155,11 +144,10 @@ export default function AdminLoginPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-70"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark"
               >
-                {isSubmitting ? "Signing in…" : "Sign in"}
-                {!isSubmitting && <ArrowRight className="h-4 w-4" />}
+                Sign in
+                <ArrowRight className="h-4 w-4" />
               </button>
 
               <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-textMuted">
@@ -170,8 +158,7 @@ export default function AdminLoginPage() {
           </div>
 
           <p className="mt-6 text-center text-xs text-textMuted">
-            Access is limited to registered clinic staff. Contact your
-            administrator if you need an account.
+            Access is limited to registered clinic staff. Contact your administrator if you need an account.
           </p>
         </div>
       </main>

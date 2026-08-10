@@ -17,19 +17,18 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        
         {/* user */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
         </Route>
 
-        {/* Admin Login */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
+
+   
+        <Route path="/admin" element={<AdminHome />} />
 
         {/* Admin */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminHome />} />
-
           <Route path="overview/overview" element={<OverviewTab />} />
           <Route path="medical/medical" element={<MedicalTab />} />
           <Route path="dental/dental" element={<DentalTab />} />

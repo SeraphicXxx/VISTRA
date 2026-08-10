@@ -1,37 +1,60 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
-import { statusStyles, statusLabels } from "./appointmentsData";
+import { getInitials, avatarColor } from "../../../utils/avatar";
+import { StatusBadge } from "../../../utils/statusbadge";
 
-function StatusBadge({ status }) {
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyles[status]}`}>
-      {statusLabels[status]}
-    </span>
-  );
-}
+const defaultColumns = [
+  {
+    key: "student",
+    label: "Student",
+    render: (appointment) => (
+      <div className="flex items-center gap-2.5">
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(
+            appointment.student
+          )}`}
+        >
+          {getInitials(appointment.student)}
+        </span>
+        <span className="text-sm font-medium text-textPrimary">{appointment.student}</span>
+      </div>
+    ),
+  },
+  { key: "course", label: "Course" },
+  { key: "time", label: "Time" },
+  { key: "type", label: "Type" },
+  {
+    key: "status",
+    label: "Status",
+    render: (appointment) => <StatusBadge status={appointment.status} />,
+  },
+];
 
-export default function AppointmentsTable({ appointments }) {
+export default function AppointmentsTable({ appointments, columns = defaultColumns }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border text-left">
-            <th className="pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted">Student</th>
-            <th className="pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted">Time</th>
-            <th className="pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted">Type</th>
-            <th className="pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted">Status</th>
-            <th className="pb-2" />
+          <tr className="text-left">
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                className="border-b border-border pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted"
+              >
+                {col.label}
+              </th>
+            ))}
+            <th className="border-b border-border pb-2" />
           </tr>
         </thead>
         <tbody>
           {appointments.map((appointment) => (
             <tr key={appointment.id} className="border-b border-border last:border-b-0">
-              <td className="py-3 pr-4 text-sm font-medium text-textPrimary">{appointment.student}</td>
-              <td className="py-3 pr-4 text-sm text-textSecondary">{appointment.time}</td>
-              <td className="py-3 pr-4 text-sm text-textSecondary">{appointment.type}</td>
-              <td className="py-3 pr-4">
-                <StatusBadge status={appointment.status} />
-              </td>
+              {columns.map((col) => (
+                <td key={col.key} className="py-3 pr-4 text-sm text-textSecondary">
+                  {col.render ? col.render(appointment) : appointment[col.key]}
+                </td>
+              ))}
               <td className="py-3 text-right">
                 <button
                   type="button"
@@ -45,7 +68,7 @@ export default function AppointmentsTable({ appointments }) {
           ))}
           {appointments.length === 0 && (
             <tr>
-              <td colSpan={5} className="py-6 text-center text-sm text-textMuted">
+              <td colSpan={columns.length} className="py-6 text-center text-sm text-textMuted">
                 No appointments match your search.
               </td>
             </tr>

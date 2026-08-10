@@ -1,70 +1,99 @@
 import React, { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Plus, FileText } from "lucide-react";
+import { FileText, Stethoscope, CalendarClock, ClipboardList } from "lucide-react";
 import StatsGrid from "./stats";
 import { APPOINTMENTS, filterByQuery } from "../appointments/appointmentsData";
 import AppointmentsTable from "../appointments/appointmentsTable";
+import { StatusBadge } from "../../../utils/statusbadge";
+import PanelHeader from "../../../utils/OverviewHeader.jsx";
+import {
+  buildClinicalRecords,
+  parseTimeToday,
+  DepartmentBadge,
+  combinedStatusLabels,
+  recordLimit,
+} from "../../../components/overviewcmp.jsx";
 
-const clinicalRec = [
-  { id: "MED-201", student: "Ella Ramos", checkedInAt: "9:52 AM", reason: "Walk-in, fever", department: "Medical", recordUpdate: "New record created" },
-  { id: "MED-202", student: "Diego Torres", checkedInAt: "10:05 AM", reason: "Prescription refill", department: "Medical", recordUpdate: "Record updated" },
-  { id: "MED-203", student: "Mia Fernandez", checkedInAt: "10:11 AM", reason: "Sports clearance", department: "Medical", recordUpdate: "Record updated" },
-  { id: "DENT-204", student: "Carlos Bautista", checkedInAt: "10:20 AM", reason: "Toothache, cavity check", department: "Dental", recordUpdate: "New record created" },
+
+const scheduleColumns = [
+  {
+    key: "student",
+    label: "Student",
+    render: (appointment) => (
+      <div className="flex items-center gap-2.5">
+        <span className="text-sm font-medium text-textPrimary">{appointment.student}</span>
+      </div>
+    ),
+  },
+  { key: "time", label: "Time" },
+  { key: "type", label: "Type" },
+  {
+    key: "status",
+    label: "Status",
+    render: (appointment) => <StatusBadge status={appointment.status} />,
+  },
 ];
 
-const clinicalDesign = {
-  Medical: "border-primary/30 bg-primary/10 text-primary",
-  Dental: "border-heartRate/30 bg-heartRate/10 text-heartRate",
-};
-
-function PanelHeader({ title, action }) {
+function ConsultationRow({ entry, isLast }) {
   return (
-    <div className="flex items-center justify-between">
-      <h2 className="font-heading text-base font-semibold text-textPrimary">{title}</h2>
-      {action}
+    <div className={`flex gap-3 ${isLast ? "" : "pb-3"}`}>
+      <div className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-3 transition-colors hover:border-primary/30 sm:px-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate text-sm font-medium text-textPrimary">{entry.student}</p>
+              <DepartmentBadge department={entry.department} />
+            </div>
+            <p className="mt-0.5 break-words text-xs text-textMuted">{entry.type}</p>
+          </div>
+          <span className="shrink-0 whitespace-nowrap text-xs font-medium text-textSecondary">{entry.time}</span>
+        </div>
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-primary">
+          <FileText className="h-3.5 w-3.5" strokeWidth={2} />
+          {combinedStatusLabels[entry.status] ?? entry.status}
+        </div>
+      </div>
     </div>
   );
 }
 
-function DepartmentBadge({ department }) {
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${clinicalDesign[department]}`}>
-      {department}
-    </span>
-  );
-}
-
 function ConsultationsList({ entries }) {
+  if (entries.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-10 text-center">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Stethoscope className="h-5 w-5" strokeWidth={2} />
+        </span>
+        <p className="text-sm font-medium text-textPrimary">No consultations yet</p>
+        <p className="text-xs text-textMuted">Walk-ins and clinic visits will show up here as they're checked in.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-3">
-      {entries.map((entry) => (
-        <div key={entry.id} className="rounded-xl border border-border bg-background px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-medium text-textPrimary">{entry.student}</p>
-              <DepartmentBadge department={entry.department} />
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-semibold uppercase tracking-wide text-textMuted">Checked in</p>
-              <p className="mt-0.5 text-sm text-textSecondary">{entry.checkedInAt}</p>
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-textMuted">{entry.reason}</p>
-          <div className="mt-2 flex items-center gap-1.5 text-xs text-primary">
-            <FileText className="h-3.5 w-3.5" strokeWidth={2} />
-            {entry.recordUpdate}
-          </div>
-        </div>
+    <div className="flex flex-col">
+      {entries.map((entry, index) => (
+        <ConsultationRow key={entry.id} entry={entry} isLast={index === entries.length - 1} />
       ))}
-      {entries.length === 0 && (
-        <p className="py-6 text-center text-sm text-textMuted">No consultations today.</p>
-      )}
     </div>
   );
 }
 
 export default function OverviewTab() {
   const { searchQuery } = useOutletContext();
+
+  const clinicalRecords = useMemo(() => buildClinicalRecords(), []);
+
+  const recentRecords = useMemo(() => {
+    return [...clinicalRecords]
+      .sort((a, b) => parseTimeToday(a.time) - parseTimeToday(b.time))
+      .slice(0, recordLimit);
+  }, [clinicalRecords]);
+
+  const filteredRecords = useMemo(
+    () => filterByQuery(recentRecords, searchQuery, ["student", "course", "type", "id"]),
+    [searchQuery, recentRecords]
+  );
 
   const filteredAppointments = useMemo(
     () => filterByQuery(APPOINTMENTS, searchQuery, ["student", "type", "id"]),
@@ -78,21 +107,38 @@ export default function OverviewTab() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
           <PanelHeader
+            icon={Stethoscope}
             title="Medical & Dental Consultations"
+            subtitle="Live check-in feed"
             action={
               <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                {clinicalRec.length} today
+                {filteredRecords.length} recent
               </span>
             }
           />
-          <div className="mt-4">
-            <ConsultationsList entries={clinicalRec} />
+          <div className="mt-5">
+            <ConsultationsList entries={filteredRecords} />
           </div>
         </div>
 
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <div className="mt-4">
-            <AppointmentsTable appointments={filteredAppointments} />
+          <PanelHeader
+            icon={CalendarClock}
+            title="Today's Schedule"
+            subtitle={`${filteredAppointments.length} appointment${filteredAppointments.length === 1 ? "" : "s"}`}
+          />
+          <div className="mt-5">
+            {filteredAppointments.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <ClipboardList className="h-5 w-5" strokeWidth={2} />
+                </span>
+                <p className="text-sm font-medium text-textPrimary">No appointments found</p>
+                <p className="text-xs text-textMuted">Try a different search, or check back once new bookings come in.</p>
+              </div>
+            ) : (
+              <AppointmentsTable appointments={filteredAppointments} columns={scheduleColumns} />
+            )}
           </div>
         </div>
       </div>
