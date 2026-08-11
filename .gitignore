@@ -12,10 +12,10 @@ node_modules/
 frontend/node_modules/
 
 # Environment files
+venv/
 .env
-.env.*
-backend/.env
-!.env.example
+__pycache__/
+*.pyc
 
 # Build output
 dist/
