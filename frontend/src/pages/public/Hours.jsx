@@ -7,7 +7,7 @@ export default function Hours() {
   return (
     <section id="hours" className="border-t border-border">
       <motion.div
-        className="mx-auto grid max-w-6xl gap-6 px-6 py-20 md:grid-cols-3"
+          className="mx-auto grid max-w-6xl gap-6 px-6 py-20 md:grid-cols-3"
         variants={stagger}
         initial="hidden"
         whileInView="visible"
