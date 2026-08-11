@@ -30,7 +30,7 @@ export default {
 
         temperature: "#f97316",
 
-        heartRate: "#f43f5e",
+        heartRate: "#f43f5e",   
 
         spo2: "#06b6d4",
 
@@ -43,6 +43,8 @@ export default {
         danger: "#ef4444",
 
         info: "#3b82f6",
+
+        treatment: "#8b5cf6",
 
       },
 

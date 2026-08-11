@@ -1,14 +1,7 @@
-import LandingPage from "./pages/public/landingpage.jsx";
-import Navbar from "./pages/public/navbar.jsx";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-    return (
-        <>
-    
-            <Navbar />
-            <LandingPage />
-        </>
-    );
+    return <AppRoutes />;
 }
 
 export default App;

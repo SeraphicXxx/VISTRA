@@ -98,7 +98,7 @@ export default function Navbar() {
         }`}
       >
            <div className="flex items-center gap-3">
-            <a href="/landingpage">
+            <a href="http://localhost:5174/">
               <img
                 src="/Vistralogo.png"
                 alt="Vistra Logo"
