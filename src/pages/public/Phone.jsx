@@ -2,9 +2,9 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Download, Smartphone } from "lucide-react";
 import { Reveal, Floating, fadeUp, scaleIn, stagger } from "../../components/landinganim.jsx"
-import { LiveDot, PhoneStatusBar } from "./Shared.jsx";
+import { LiveDot, PhoneStatusBar } from "./Shared";
 import PhoneScreens from "../../components/Phonescreens.jsx";
-import { appFeatures } from "./data.jsx";
+import { appFeatures } from "./data";
 
 export default function Phone() {
   return (
