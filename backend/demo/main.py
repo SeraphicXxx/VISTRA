@@ -36,7 +36,7 @@ def supabase_test():
     try:
         response = (
             supabase
-            .table("PATIENT")
+            .table("patient")
             .select("*")
             .limit(1)
             .execute()
