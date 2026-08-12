@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Reveal, fadeUp, fadeRight, stagger } from "../../components/landinganim.jsx";
-import { LiveDot } from "./Shared";
+import { LiveDot } from "./Shared.jsx";
 import { vitals, vitalStyles } from "./data.jsx";
 
 export default function Start() {
