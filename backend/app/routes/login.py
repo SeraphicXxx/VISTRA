@@ -4,12 +4,17 @@ from app.schemas.auth import LoginRequest
 from app.services.auth import user_login
 
 
-router = APIRouter(
+admin_auth_router = APIRouter(
     prefix="/admin/auth",
-    tags=["admin"]
+    tags=["Admin Authentication"]
 )
 
+admin_router = APIRouter(
+    prefix="/admin",
+    tags=["Admin"]
+)
 
-@router.post("/login")
+# TODO: Refactor this function to once patient login is done
+@admin_auth_router.post("/login")
 def login(request: LoginRequest):
     return user_login(request)

@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.LOCAL_API_URL}admin/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_LOCAL_API_URL}admin/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
       console.log("Logged in user:", data.user);
       console.log("Access token:", data.access_token);
 
-      navigate("/admin/overview/overview");
+      navigate("/admin/dashboard/overview");
 
     } catch (error) {
       console.error(error);
