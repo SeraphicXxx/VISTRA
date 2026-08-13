@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!staffId.trim() || !password) {
@@ -28,7 +28,36 @@ export default function AdminLoginPage() {
     }
 
     setError("");
-    navigate("/admin/overview/overview");
+
+    try {
+      const response = await fetch(`${import.meta.env.LOCAL_API_URL}admin/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: staffId,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setError(data.message || "Invalid staff ID or password.");
+        return;
+      }
+
+      // Login successful
+      console.log("Logged in user:", data.user);
+      console.log("Access token:", data.access_token);
+
+      navigate("/admin/overview/overview");
+
+    } catch (error) {
+      console.error(error);
+      setError("Unable to connect to the server.");
+    }
   }
 
   return (

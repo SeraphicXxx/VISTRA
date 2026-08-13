@@ -12,3 +12,4 @@ if not url or not key:
     raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY in environment.")
 
 supabase: Client = create_client(url, key)
+ 
