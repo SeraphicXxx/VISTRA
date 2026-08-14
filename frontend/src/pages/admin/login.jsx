@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { sessionManager } from "../../utils/SessionManager"
 import {
   Lock,
   User,
@@ -30,7 +31,7 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_LOCAL_API_URL}admin/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_LOCAL_API_URL}staff/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,8 +50,10 @@ export default function AdminLoginPage() {
       }
 
       // Login successful
-      console.log("Logged in user:", data.user);
-      console.log("Access token:", data.access_token);
+      sessionManager.setLogin(
+          data.access_token,
+          data.user
+      );
 
       navigate("/admin/dashboard/overview");
 

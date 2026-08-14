@@ -1,9 +1,10 @@
 from app.database.DataBaseClient import  supabase
+from app.utils.email_utils import add_ucc_domain
 
 def staff_login(request):
     try:
         auth_response = supabase.auth.sign_in_with_password({
-            "email": request.email,
+            "email": add_ucc_domain(request.email),
             "password": request.password
         })
 
