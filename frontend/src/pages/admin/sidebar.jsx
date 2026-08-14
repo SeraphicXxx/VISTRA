@@ -1,46 +1,12 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  ClipboardList,
-  Settings,
   LogOut,
-  Stethoscope,
-  HeartPulse,
   Menu,
   X,
 } from "lucide-react";
 import {sessionManager} from "../../utils/SessionManager.js";
-
-
-
-const navTabs = [
-  {
-    path: "/admin/dashboard/overview",
-    label: "Overview",
-    icon: LayoutDashboard,
-    activePath: "/admin/dashboard/overview",
-  },
-  {
-    path: "/admin/dashboard/medical",
-    label: "Medical Consultation",
-    icon: HeartPulse,
-    activePaths: [ "/admin/dashboard/medical", "/admin/medical", ],
-  },
-  {
-    path: "/admin/dashboard/dental",
-    label: "Dental Consultation",
-    icon: Stethoscope,
-    activePath: "/admin/dashboard/dental",
-  },
-  {
-    path: "/admin/dashboard/appointments",
-    label: "Appointments",
-    icon: CalendarDays,
-    activePath: "/admin/dashboard/appointments",
-  },
-];
+import { AdminRoutes } from "../../config/Routes.js";
 
 const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
   const Icon = item.icon;
@@ -154,7 +120,7 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4">
-          {navTabs.map((item, index) => (
+          {AdminRoutes.map((item, index) => (
             <SidebarLink
               key={item.path}
               item={item}
