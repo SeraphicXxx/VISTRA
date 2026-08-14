@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
+import { useSidebar } from "../../hooks/UseSidebar.js";
 import { Logo } from "../../components/Logo";
 import {
   LogOut,
@@ -35,45 +36,12 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const handleLogout = () => {
     sessionManager.logout();
-    setIsOpen(false);
+    close();
     navigate("/admin/login");
   };
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
   const firstLinkRef = useRef(null);
+  const { isOpen, open, close } = useSidebar(firstLinkRef);
 
-  useEffect(() => {
-    const mql = window.matchMedia("(min-width: 1024px)");
-    const handleChange = (e) => {
-      if (e.matches) setIsOpen(false);
-    };
-    mql.addEventListener("change", handleChange);
-    return () => mql.removeEventListener("change", handleChange);
-  }, []);
-
-
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    firstLinkRef.current?.focus();
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
 
   return (
     <>
@@ -82,7 +50,7 @@ export default function Sidebar() {
         <Logo className="h-7" />
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={() => open()}
           aria-label="Open navigation menu"
           aria-expanded={isOpen}
           aria-controls="mobile-sidebar"
@@ -97,7 +65,7 @@ export default function Sidebar() {
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 lg:hidden ${
           isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
-        onClick={() => setIsOpen(false)}
+        onClick={() => close()}
         aria-hidden="true"
       />
 
@@ -112,7 +80,7 @@ export default function Sidebar() {
 
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={() => close()}
             aria-label="Close navigation menu"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-textSecondary transition-colors hover:bg-background hover:text-textPrimary lg:hidden"
           >
@@ -125,7 +93,7 @@ export default function Sidebar() {
             <SidebarLink
               key={item.path}
               item={item}
-              onNavigate={() => setIsOpen(false)}
+              onNavigate={() => close()}
               ref={index === 0 ? firstLinkRef : undefined}
             />
           ))}
