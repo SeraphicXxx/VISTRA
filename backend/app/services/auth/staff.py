@@ -1,7 +1,6 @@
-
 from app.database.DataBaseClient import  supabase
 
-def user_login(request):
+def staff_login(request):
     try:
         auth_response = supabase.auth.sign_in_with_password({
             "email": request.email,

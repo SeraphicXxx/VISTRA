@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 
 from app.schemas.auth import LoginRequest
-from app.services.auth import user_login
+from app.services.auth.staff import staff_login
 
 
-admin_auth_router = APIRouter(
-    prefix="/admin/auth",
-    tags=["Admin Authentication"]
+staff_auth_router = APIRouter(
+    prefix="/staff/auth",
+    tags=["Staff Authentication"]
 )
 
 admin_router = APIRouter(
@@ -14,7 +14,6 @@ admin_router = APIRouter(
     tags=["Admin"]
 )
 
-# TODO: Refactor this function to once patient login is done
-@admin_auth_router.post("/login")
+@staff_auth_router.post("/login")
 def login(request: LoginRequest):
-    return user_login(request)
+    return staff_login(request)
