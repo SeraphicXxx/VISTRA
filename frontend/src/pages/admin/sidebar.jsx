@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -11,6 +11,9 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import {sessionManager} from "../../utils/SessionManager.js";
+
+
 
 const navTabs = [
   {
@@ -62,6 +65,12 @@ const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
 });
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    sessionManager.logout();
+    setIsOpen(false);
+    navigate("/admin/login");
+  };
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const firstLinkRef = useRef(null);
@@ -158,6 +167,7 @@ export default function Sidebar() {
         <div className="border-t border-border p-4">
           <button
             type="button"
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-danger"
           >
             <LogOut className="h-4 w-4 shrink-0" strokeWidth={2} />

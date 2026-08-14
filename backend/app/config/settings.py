@@ -34,8 +34,7 @@ class Config:
     def validate(cls):
         required = {
             "SUPABASE_URL": cls.SUPABASE_URL,
-            "SUPABASE_KEY": cls.SUPABASE_KEY,
-            "SUPABASE_PRIVILEGE_KEY": cls.SUPABASE_PRIVILEGE_KEY,
+            "SUPABASE_KEY": cls.SUPABASE_KEY
         }
 
         missing = [
