@@ -7,6 +7,7 @@ load_dotenv()
 class Config:
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+    SUPABASE_PRIVILEGE_KEY = os.getenv("SUPABASE_PRIVILEGE_KEY")
 
     IS_PROD = os.getenv("IS_PROD", "false").lower() == "true"
 
@@ -22,19 +23,31 @@ class Config:
         )
 
         if not url:
+            environment = "PROD" if cls.IS_PROD else "LOCAL"
             raise ValueError(
-                "Frontend URL is missing"
+                f"Frontend URL is missing for {environment} environment"
             )
 
         return url
 
     @classmethod
     def validate(cls):
-        if not cls.SUPABASE_URL:
-            raise ValueError("SUPABASE_URL is missing")
+        required = {
+            "SUPABASE_URL": cls.SUPABASE_URL,
+            "SUPABASE_KEY": cls.SUPABASE_KEY,
+            "SUPABASE_PRIVILEGE_KEY": cls.SUPABASE_PRIVILEGE_KEY,
+        }
 
-        if not cls.SUPABASE_KEY:
-            raise ValueError("SUPABASE_KEY is missing")
+        missing = [
+            name for name, value in required.items()
+            if not value
+        ]
+
+        if missing:
+            raise ValueError(
+                f"Missing required environment variables: "
+                f"{', '.join(missing)}"
+            )
 
         cls.frontend_url()
 

@@ -2,12 +2,12 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import Config
-from app.routes import health, login
+from app.routes import health, login, staff
 
 
 app = FastAPI(
     title="VISTRA API",
-    version="2.0.0"
+    version="2.0.1"
 )
 app.add_middleware(
     CORSMiddleware,
@@ -19,3 +19,4 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(login.staff_auth_router)
+app.include_router(staff.create_staff_router)
