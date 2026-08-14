@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
+import { Logo } from "../../components/Logo";
 import {
   LogOut,
   Menu,
@@ -78,7 +79,7 @@ export default function Sidebar() {
     <>
     
       <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
-        <img src="/Vistralogo.png" alt="Vistra Logo" className="h-7 w-auto object-contain" />
+        <Logo className="h-7" />
         <button
           type="button"
           onClick={() => setIsOpen(true)}
@@ -107,7 +108,7 @@ export default function Sidebar() {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between gap-2.5 px-6 py-6">
-          <img src="/Vistralogo.png" alt="Vistra Logo" className="h-8 w-auto object-contain" />
+          <Logo />
 
           <button
             type="button"
