@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { ADMIN_ROUTES } from "../config/RoutePaths";
+import { ROUTES } from "../config/RoutePaths";
 
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
@@ -27,19 +27,19 @@ function AppRoutes() {
         </Route>
 
         {/* Admin Showcase / Login */}
-        <Route path={ADMIN_ROUTES.ADMIN_HOME} element={<AdminHome />} />
-        <Route path={ADMIN_ROUTES.ADMIN_LOGIN_PAGE} element={<AdminLoginPage />} />
+        <Route path={ROUTES.admin.home} element={<AdminHome />} />
+        <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
 
         {/* Admin */}
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
-            <Route path={ADMIN_ROUTES.OVERVIEW} element={<OverviewTab />} />
-            <Route path={ADMIN_ROUTES.MEDICAL} element={<MedicalTab />} />
-            <Route path={ADMIN_ROUTES.MEDICAL_RECORD_FORM} element={<PatientRecordForm />} />
-            <Route path={ADMIN_ROUTES.MEDICAL_RECORD_VIEW} element={<PatientRecordView />} />
-            <Route path={ADMIN_ROUTES.DENTAL} element={<DentalTab />} />
-            <Route path={ADMIN_ROUTES.APPOINTMENTS} element={<AppointmentsTab />} />
+            <Route path={ROUTES.admin.dashboard.overview} element={<OverviewTab />} />
+            <Route path={ROUTES.admin.dashboard.medical} element={<MedicalTab />} />
+            <Route path={ROUTES.admin.medical.recordForm} element={<PatientRecordForm />} />
+            <Route path={ROUTES.admin.medical.viewRecord} element={<PatientRecordView />} />
+            <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
+            <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
           </Route>
         </Route>
       </Routes>

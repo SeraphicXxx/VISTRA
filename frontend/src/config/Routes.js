@@ -1,4 +1,4 @@
-import { ADMIN_ROUTES } from "./RoutePaths";
+import { ROUTES } from "./RoutePaths";
 import {
     LayoutDashboard,
     CalendarDays,
@@ -8,25 +8,25 @@ import {
 
 export const AdminRoutes = [
     {
-        path: ADMIN_ROUTES.OVERVIEW,
+        path: ROUTES.admin.dashboard.overview,
         label: "Overview",
         icon: LayoutDashboard,
         component: "overview",
     },
     {
-        path: ADMIN_ROUTES.MEDICAL,
+        path: ROUTES.admin.dashboard.medical,
         label: "Medical Consultation",
         icon: HeartPulse,
         component: "medical",
     },
     {
-        path: ADMIN_ROUTES.DENTAL,
+        path: ROUTES.admin.dashboard.dental,
         label: "Dental Consultation",
         icon: Stethoscope,
         component: "dental",
     },
     {
-        path: ADMIN_ROUTES.APPOINTMENTS,
+        path: ROUTES.admin.dashboard.appointments,
         label: "Appointments",
         icon: CalendarDays,
         component: "appointments",

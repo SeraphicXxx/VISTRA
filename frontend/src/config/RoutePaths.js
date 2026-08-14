@@ -1,12 +1,22 @@
-export const ADMIN_ROUTES = {
-    ADMIN_HOME: "admin",
-    ADMIN_LOGIN_PAGE: "admin/login",
+export const ROUTES = {
+    public: {
+        home: "/",
+    },
 
-    OVERVIEW: "/admin/dashboard/overview",
-    MEDICAL: "/admin/dashboard/medical",
-    DENTAL: "/admin/dashboard/dental",
-    APPOINTMENTS: "/admin/dashboard/appointments",
+    admin: {
+        home: "/admin",
+        login: "/admin/login",
 
-    MEDICAL_RECORD_FORM: "/admin/medical/medical-record-form",
-    MEDICAL_RECORD_VIEW: "/admin/medical/records/viewrecord",
+        dashboard: {
+            overview: "/admin/dashboard/overview",
+            medical: "/admin/dashboard/medical",
+            dental: "/admin/dashboard/dental",
+            appointments: "/admin/dashboard/appointments",
+        },
+
+        medical: {
+            recordForm: "/admin/medical/medical-record-form",
+            viewRecord: "/admin/medical/records/viewrecord",
+        },
+    },
 };
