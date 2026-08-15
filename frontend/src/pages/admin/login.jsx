@@ -2,26 +2,46 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sessionManager } from "../../utils/SessionManager"
 import {
-  Lock,
-  User,
+  AlertCircle,
   ArrowRight,
-  ShieldCheck,
   Eye,
   EyeOff,
-  AlertCircle,
+  Lock,
+  LoaderCircle,
+  ShieldCheck,
+  User,
 } from "lucide-react";
 import Footer from "../public/Footer";
+import {ROUTES} from "../../config/RoutePaths.js";
+import {Logo} from "../../components/Logo.jsx";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
 
-  const [staffId, setStaffId] = useState("");
-  const [password, setPassword] = useState("");
+  // Form state
+  const [credentials, setCredentials] = useState({
+    staffId: "",
+    password: "",
+  });
+
+  // UI state
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const { staffId, password } = credentials;
 
     if (!staffId.trim() || !password) {
       setError("Enter your staff ID and password to continue.");
@@ -29,18 +49,22 @@ export default function AdminLoginPage() {
     }
 
     setError("");
+    setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_LOCAL_API_URL}staff/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: staffId,
-          password: password,
-        }),
-      });
+      const response = await fetch(
+          `${import.meta.env.VITE_LOCAL_API_URL}staff/auth/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: staffId,
+              password,
+            }),
+          }
+      );
 
       const data = await response.json();
 
@@ -49,19 +73,22 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // Login successful
       sessionManager.setLogin(
           data.access_token,
           data.user
       );
 
-      navigate("/admin/dashboard/overview");
+      navigate(ROUTES.admin.dashboard.overview);
 
     } catch (error) {
       console.error(error);
       setError("Unable to connect to the server.");
+
+    } finally {
+      setIsLoading(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -71,12 +98,8 @@ export default function AdminLoginPage() {
             <div className="h-1 w-full bg-primary" aria-hidden="true"></div>
 
             <div className="flex flex-col items-center px-8 pt-8 text-center">
-              <a href="/admin">
-                <img
-                  src="/Vistralogo.png"
-                  alt="Vistra Logo"
-                  className="h-11 w-auto object-contain"
-                />
+              <a href={ROUTES.admin.dashboard.overview}>
+                <Logo className="h-11" />
               </a>
 
               <h1 className="mt-6 font-heading text-2xl font-semibold leading-tight tracking-tight text-textPrimary">
@@ -110,13 +133,14 @@ export default function AdminLoginPage() {
                     strokeWidth={2}
                   />
                   <input
-                    id="staffId"
-                    type="text"
-                    autoComplete="username"
-                    value={staffId}
-                    onChange={(e) => setStaffId(e.target.value)}
-                    placeholder="e.g. UCC-2481"
-                    className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      id="staffId"
+                      name="staffId"
+                      type="text"
+                      autoComplete="username"
+                      value={credentials.staffId}
+                      onChange={handleChange}
+                      placeholder="e.g. UCC-2481"
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -129,7 +153,7 @@ export default function AdminLoginPage() {
                   >
                     Password
                   </label>
-                  
+
                     <a href="#forgot-password"
                     className="text-xs font-medium text-primary transition-colors duration-200 hover:text-primaryDark"
                   >
@@ -143,24 +167,25 @@ export default function AdminLoginPage() {
                     strokeWidth={2}
                   />
                   <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-10 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      value={credentials.password}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-10 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted transition-colors duration-200 hover:text-textSecondary"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted transition-colors duration-200 hover:text-textSecondary"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" strokeWidth={2} />
+                        <EyeOff className="h-4 w-4" strokeWidth={2} />
                     ) : (
-                      <Eye className="h-4 w-4" strokeWidth={2} />
+                        <Eye className="h-4 w-4" strokeWidth={2} />
                     )}
                   </button>
                 </div>
@@ -175,11 +200,17 @@ export default function AdminLoginPage() {
               </label>
 
               <button
-                type="submit"
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark"
+                  type="submit"
+                  disabled={isLoading}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Sign in
-                <ArrowRight className="h-4 w-4" />
+                {isLoading ? "Signing in..." : "Sign in"}
+
+                {isLoading ? (
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                    <ArrowRight className="h-4 w-4" />
+                )}
               </button>
 
               <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-textMuted">

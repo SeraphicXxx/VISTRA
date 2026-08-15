@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import {sessionManager} from "../../utils/SessionManager.js";
 import { AdminRoutes } from "../../config/Routes.js";
+import {ROUTES} from "../../config/RoutePaths.js";
 
 const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
   const Icon = item.icon;
@@ -37,7 +38,7 @@ export default function Sidebar() {
   const handleLogout = () => {
     sessionManager.logout();
     close();
-    navigate("/admin/login");
+    navigate(ROUTES.public.home);
   };
   const firstLinkRef = useRef(null);
   const { isOpen, open, close } = useSidebar(firstLinkRef);
