@@ -1,4 +1,4 @@
-from app.database.DataBaseClient import  supabase
+from app.database.database_client import  supabase
 from app.utils.email_utils import add_ucc_domain
 
 def staff_login(request):

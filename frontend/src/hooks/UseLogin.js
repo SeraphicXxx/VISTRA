@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sessionManager } from "../utils/SessionManager";
 import {ROUTES} from "../config/RoutePaths.js";
+import {loginStaff} from "../api/auth.api.js";
 
 export function useLoginForm() {
     const [credentials, setCredentials] = useState({
@@ -41,21 +42,7 @@ export function useLogin() {
         setIsLoading(true);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_LOCAL_API_URL}staff/auth/login`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        email: staffId,
-                        password,
-                    }),
-                }
-            );
-
-            const data = await response.json();
+            const { data } = await loginStaff(credentials);
 
             if (!data.success) {
                 setError(data.message || "Invalid staff ID or password.");

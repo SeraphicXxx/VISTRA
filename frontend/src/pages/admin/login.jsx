@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { sessionManager } from "../../utils/SessionManager"
 import {
   AlertCircle,
   ArrowRight,
@@ -11,7 +9,6 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import Footer from "../public/Footer";
 import {ROUTES} from "../../config/RoutePaths.js";
 import {Logo} from "../../components/Logo.jsx";
 import {useLogin, useLoginForm} from "../../hooks/UseLogin.js";

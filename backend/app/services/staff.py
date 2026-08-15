@@ -7,7 +7,7 @@ staff_delete()
 
 FIXME: phone is nulled
 """
-from app.database.DataBaseClient import supabase_admin, supabase
+from app.database.database_client import supabase_admin, supabase
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 from app.schemas.staff import StaffData
 
