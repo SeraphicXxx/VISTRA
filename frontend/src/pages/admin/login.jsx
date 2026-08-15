@@ -14,82 +14,22 @@ import {
 import Footer from "../public/Footer";
 import {ROUTES} from "../../config/RoutePaths.js";
 import {Logo} from "../../components/Logo.jsx";
+import {useLogin, useLoginForm} from "../../hooks/UseLogin.js";
 
 export default function AdminLoginPage() {
-  const navigate = useNavigate();
+  const { credentials, handleChange } = useLoginForm()
+  const {
+    login,
+    isLoading,
+    error
+  } = useLogin()
 
-  // Form state
-  const [credentials, setCredentials] = useState({
-    staffId: "",
-    password: "",
-  });
-
-  // UI state
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setCredentials((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { staffId, password } = credentials;
-
-    if (!staffId.trim() || !password) {
-      setError("Enter your staff ID and password to continue.");
-      return;
-    }
-
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(
-          `${import.meta.env.VITE_LOCAL_API_URL}staff/auth/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: staffId,
-              password,
-            }),
-          }
-      );
-
-      const data = await response.json();
-
-      if (!data.success) {
-        setError(data.message || "Invalid staff ID or password.");
-        return;
-      }
-
-      sessionManager.setLogin(
-          data.access_token,
-          data.user
-      );
-
-      navigate(ROUTES.admin.dashboard.overview);
-
-    } catch (error) {
-      console.error(error);
-      setError("Unable to connect to the server.");
-
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-
+    await login(credentials);
+  };
   return (
     <div className="min-h-screen bg-background">
       <main className="flex min-h-screen items-center justify-center py-10">
