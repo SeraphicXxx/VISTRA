@@ -1,4 +1,4 @@
-import { statusStyles, statusLabels } from "../pages/admin/appointments/appointmentsData";
+import { statusStyles, statusLabels } from "../pages/admin/appointments/appointmentsData.js";
 
 export function StatusBadge({ status }) {
   return (

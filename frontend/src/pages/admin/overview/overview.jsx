@@ -4,8 +4,8 @@ import { FileText, Stethoscope, CalendarClock, ClipboardList } from "lucide-reac
 import StatsGrid from "./stats";
 import { APPOINTMENTS, filterByQuery } from "../appointments/appointmentsData";
 import AppointmentsTable from "../appointments/appointmentsTable";
-import { StatusBadge } from "../../../utils/statusbadge";
-import PanelHeader from "../../../utils/OverviewHeader.jsx";
+import { StatusBadge } from "../../../components/statusbadge.jsx";
+import PanelHeader from "../../../components/OverviewHeader.jsx";
 import {
   buildClinicalRecords,
   parseTimeToday,
