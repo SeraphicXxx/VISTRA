@@ -14,6 +14,8 @@ import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 import PatientRecordForm from "../pages/admin/medical/medicalRecForm";
 import PatientRecordView from "../pages/admin/medical/medicalViewRec";
 
+import DentalRecordForm from "../pages/admin/dental/dentalForm";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -31,9 +33,10 @@ function AppRoutes() {
         <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard/overview" element={<OverviewTab />} />
           <Route path="/admin/dashboard/medical" element={<MedicalTab />} />
-          <Route path="/admin/medical/medical-record-form" element={<PatientRecordForm />} />
-          <Route path="/admin/medical/records/viewrecord" element={<PatientRecordView />} />
+          <Route path="/admin/medical/new" element={<PatientRecordForm />} />
+          <Route path="/admin/medical/records/view" element={<PatientRecordView />} />
           <Route path="/admin/dashboard/dental" element={<DentalTab />} />
+          <Route path="/admin/dental/new" element={<DentalRecordForm />} />
           <Route path="/admin/dashboard/appointments" element={<AppointmentsTab />} />
         </Route>
       </Routes>

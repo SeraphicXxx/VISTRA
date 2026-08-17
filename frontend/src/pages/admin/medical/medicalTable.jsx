@@ -102,7 +102,7 @@ export default function MedicalTable({ medicalRecords }) {
               
                 <td className="border-b border-border py-3 text-right">
                   
-                    <a href="/admin/medical/records/viewrecord"
+                    <a href="/admin/medical/records/view"
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
                   >
                     View
