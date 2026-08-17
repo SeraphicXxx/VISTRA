@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { ROUTES } from "../config/RoutePaths";
+
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
@@ -13,8 +15,7 @@ import DentalTab from "../pages/admin/dental/dentalTab";
 import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 import PatientRecordForm from "../pages/admin/medical/medicalRecForm";
 import PatientRecordView from "../pages/admin/medical/medicalViewRec";
-
-import DentalRecordForm from "../pages/admin/dental/dentalForm";
+import ProtectedRoute from "../components/ProtectedRoute.jsx"
 
 function AppRoutes() {
   return (
@@ -26,18 +27,20 @@ function AppRoutes() {
         </Route>
 
         {/* Admin Showcase / Login */}
-        <Route path="/admin" element={<AdminHome />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path={ROUTES.admin.home} element={<AdminHome />} />
+        <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
 
         {/* Admin */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard/overview" element={<OverviewTab />} />
-          <Route path="/admin/dashboard/medical" element={<MedicalTab />} />
-          <Route path="/admin/medical/new" element={<PatientRecordForm />} />
-          <Route path="/admin/medical/records/view" element={<PatientRecordView />} />
-          <Route path="/admin/dashboard/dental" element={<DentalTab />} />
-          <Route path="/admin/dental/new" element={<DentalRecordForm />} />
-          <Route path="/admin/dashboard/appointments" element={<AppointmentsTab />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path={ROUTES.admin.dashboard.overview} element={<OverviewTab />} />
+            <Route path={ROUTES.admin.dashboard.medical} element={<MedicalTab />} />
+            <Route path={ROUTES.admin.medical.recordForm} element={<PatientRecordForm />} />
+            <Route path={ROUTES.admin.medical.viewRecord} element={<PatientRecordView />} />
+            <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
+            <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

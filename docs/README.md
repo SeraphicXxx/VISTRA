@@ -42,6 +42,64 @@ npm install
 
 ---
 
+## Running the Backend FastAPI Server
+
+### Prerequisites
+
+- Python 3.7 or higher
+- pip (Python package manager)
+
+### Installation Steps
+
+1. **Navigate to the backend directory:**
+   ```bash
+   cd VISTRA/backend
+   ```
+
+2. **Create a virtual environment (optional but recommended):**
+   ```bash
+   # On Windows (PowerShell)
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   
+   # On Windows (Command Prompt)
+   python -m venv venv
+   venv\Scripts\activate.bat
+   
+   # On macOS/Linux
+   python -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Running the Server
+
+**Start the FastAPI development server:**
+```bash
+uvicorn app.main:app --reload
+```
+
+The server will start on `http://localhost:8000` by default.
+
+**To access the API documentation:**
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+**Custom host and port (if needed):**
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Environment Variables
+
+Make sure to set up any required environment variables. Create a `.env` file in the `backend` directory with necessary configurations (check `app/config/settings.py` for required variables).
+
+---
+
 ### Adding New Dependencies
 
 If you install a new library or module, update the project's dependency file before committing your changes so that everyone else can install the new dependency.

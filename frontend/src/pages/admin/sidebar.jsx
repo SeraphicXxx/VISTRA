@@ -1,43 +1,15 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import {NavLink, useLocation, useNavigate} from "react-router-dom";
+import { useSidebar } from "../../hooks/UseSidebar.js";
+import { Logo } from "../../components/Logo";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  ClipboardList,
-  Settings,
   LogOut,
-  Stethoscope,
-  HeartPulse,
   Menu,
   X,
 } from "lucide-react";
-
-const navTabs = [
-  {
-    path: "/admin/dashboard/overview",
-    label: "Overview",
-    icon: LayoutDashboard,
-    activePath: "/admin/dashboard/overview",
-  },
-  {
-    path: "/admin/dashboard/medical",
-    label: "Medical Consultation",
-    icon: HeartPulse,
-    activePaths: [ "/admin/dashboard/medical", "/admin/medical", ],
-  },
-  {
-    path: "/admin/dashboard/dental",
-    label: "Dental Consultation",
-    icon: Stethoscope,
-    activePath: "/admin/dashboard/dental",
-  },
-  {
-    path: "/admin/dashboard/appointments",
-    label: "Appointments",
-    icon: CalendarDays,
-    activePath: "/admin/dashboard/appointments",
-  },
-];
+import {sessionManager} from "../../utils/SessionManager.js";
+import { AdminRoutes } from "../../config/Routes.js";
+import {ROUTES} from "../../config/RoutePaths.js";
 
 const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
   const Icon = item.icon;
@@ -62,51 +34,24 @@ const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
 });
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    sessionManager.logout();
+    close();
+    navigate(ROUTES.public.home);
+  };
   const firstLinkRef = useRef(null);
+  const { isOpen, open, close } = useSidebar(firstLinkRef);
 
-  useEffect(() => {
-    const mql = window.matchMedia("(min-width: 1024px)");
-    const handleChange = (e) => {
-      if (e.matches) setIsOpen(false);
-    };
-    mql.addEventListener("change", handleChange);
-    return () => mql.removeEventListener("change", handleChange);
-  }, []);
-
-
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    firstLinkRef.current?.focus();
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
 
   return (
     <>
     
       <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
-        <img src="/Vistralogo.png" alt="Vistra Logo" className="h-7 w-auto object-contain" />
+        <Logo className="h-7" />
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={() => open()}
           aria-label="Open navigation menu"
           aria-expanded={isOpen}
           aria-controls="mobile-sidebar"
@@ -121,7 +66,7 @@ export default function Sidebar() {
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 lg:hidden ${
           isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
-        onClick={() => setIsOpen(false)}
+        onClick={() => close()}
         aria-hidden="true"
       />
 
@@ -132,11 +77,11 @@ export default function Sidebar() {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between gap-2.5 px-6 py-6">
-          <img src="/Vistralogo.png" alt="Vistra Logo" className="h-8 w-auto object-contain" />
+          <Logo />
 
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={() => close()}
             aria-label="Close navigation menu"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-textSecondary transition-colors hover:bg-background hover:text-textPrimary lg:hidden"
           >
@@ -145,11 +90,11 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4">
-          {navTabs.map((item, index) => (
+          {AdminRoutes.map((item, index) => (
             <SidebarLink
               key={item.path}
               item={item}
-              onNavigate={() => setIsOpen(false)}
+              onNavigate={() => close()}
               ref={index === 0 ? firstLinkRef : undefined}
             />
           ))}
@@ -158,6 +103,7 @@ export default function Sidebar() {
         <div className="border-t border-border p-4">
           <button
             type="button"
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-danger"
           >
             <LogOut className="h-4 w-4 shrink-0" strokeWidth={2} />

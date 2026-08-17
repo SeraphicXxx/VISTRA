@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
-import { getInitials, avatarColor } from "../../../utils/avatar";
-import { StatusBadge } from "../../../utils/statusbadge";
+import { getInitials, avatarColor } from "../../../components/avatar.jsx";
+import { StatusBadge } from "../../../components/statusbadge.jsx";
 
 const defaultColumns = [
   {
