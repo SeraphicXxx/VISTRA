@@ -2,10 +2,11 @@ import React, { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { FileText, Stethoscope, CalendarClock, ClipboardList } from "lucide-react";
 import StatsGrid from "./stats";
-import { APPOINTMENTS, filterByQuery } from "../appointments/appointmentsData";
+import { APPOINTMENTS } from "../appointments/appointmentsData";
+import { filterByQuery } from "../../../utils/FilterByQuery.js"
 import AppointmentsTable from "../appointments/appointmentsTable";
-import { StatusBadge } from "../../../utils/statusbadge";
-import PanelHeader from "../../../utils/OverviewHeader.jsx";
+import { StatusBadge } from "../../../components/statusbadge.jsx";
+import PanelHeader from "../../../components/OverviewHeader.jsx";
 import {
   buildClinicalRecords,
   parseTimeToday,

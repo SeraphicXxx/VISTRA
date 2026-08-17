@@ -1,7 +1,7 @@
 export const medRecords = [
   { id: "MED-1042", student: "Kenji Chua", course: "BS Computer Science", time: "9:00 AM", type: "Medical Consultation", status: "cleared" },
   { id: "MED-1043", student: "Ivan Mejorada", course: "BS Nursing", time: "9:30 AM", type: "Follow-up", status: "secondOpinion" },
-  { id: "MED-1044", student: "Cjay Gonzales", course: "BS Architecture", time: "10:00 AM", type: "Medical Consultation", status: "recovered" },
+  { id: "MED-1044", student: "Cjay Gonzales", course: "BS Architecture", time: "10:00 AM", type: "Dental Consultation", status: "recovered" },
   { id: "MED-1045", student: "Joshua Lapitan", course: "BS Civil Engineering", time: "10:15 AM", type: "Medical Consultation", status: "referred" },
   { id: "MED-1046", student: "Rosh Ingel", course: "BS Accountancy", time: "10:45 AM", type: "Medical Consultation", status: "ongoingTreatment" },
 ];

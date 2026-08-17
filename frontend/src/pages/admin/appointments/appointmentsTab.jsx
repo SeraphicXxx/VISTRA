@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { APPOINTMENTS, filterByQuery } from "./appointmentsData";
+import { APPOINTMENTS } from "./appointmentsData";
 import AppointmentsTable from "./appointmentsTable";
-import PanelHeader from "../../../utils/PanelHeader.jsx";
+import PanelHeader from "../../../components/PanelHeader.jsx";
+import { filterByQuery } from "../../../utils/FilterByQuery.js";
 
 export default function AppointmentsTab() {
   const { searchQuery } = useOutletContext();

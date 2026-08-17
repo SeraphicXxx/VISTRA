@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Stethoscope } from "lucide-react";
-import { medRecords, filterByQuery } from "./medicalData";
+import { medRecords } from "./medicalData";
 import MedicalTable from "./medicalTable";
-import PanelHeader from "../../../utils/PanelHeader.jsx";
+import PanelHeader from "../../../components/PanelHeader.jsx";
+import { filterByQuery } from "../../../utils/FilterByQuery.js";
 
 export default function MedicalTab({ searchQuery }) {
   const filteredMedicalRecords = useMemo(

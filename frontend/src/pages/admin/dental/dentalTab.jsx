@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { denRecords, filterByQuery } from "./dentalData";
+import { denRecords } from "./dentalData";
+import { filterByQuery } from "../../../utils/FilterByQuery.js";
 import DentalTable from "./dentalTable";
-import PanelHeader from "../../../utils/PanelHeader.jsx";
+import PanelHeader from "../../../components/PanelHeader.jsx";
 
 export default function DentalTab({ searchQuery }) {
   const filteredDentalRecords = useMemo(
