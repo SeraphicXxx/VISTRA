@@ -1,10 +1,9 @@
 import React, { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
-import { FileText, Stethoscope, CalendarClock, ClipboardList } from "lucide-react";
+import { FileText, Stethoscope, CalendarClock } from "lucide-react";
 import StatsGrid from "./stats";
 import { APPOINTMENTS } from "../appointments/appointmentsData";
 import { filterByQuery } from "../../../utils/FilterByQuery.js"
-import { StatusBadge } from "../../../components/statusbadge.jsx";
 import PanelHeader from "../../../components/OverviewHeader.jsx";
 import {
   buildClinicalRecords,

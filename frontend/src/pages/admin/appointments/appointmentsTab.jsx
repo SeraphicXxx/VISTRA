@@ -5,8 +5,6 @@ import {ROUTES} from "../../../config/RoutePaths.js";
 import {getTableColumns} from "../../../utils/TableUtils.js";
 
 export default function AppointmentsTab() {
-
-
  return (
      <RecordsTablePanel
          name="Appointments"

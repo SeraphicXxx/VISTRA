@@ -1,6 +1,6 @@
-import {ChevronRight, FileText, FileX2, Stethoscope} from "lucide-react";
+import {ChevronRight, FileX2} from "lucide-react";
 import React, {useMemo} from "react";
-import {StatusBadge, statusLabels} from "./statusbadge.jsx";
+import {StatusBadge} from "./statusbadge.jsx";
 import {avatarColor, getInitials, getTypeIcon} from "./avatar.jsx";
 import {useOutletContext} from "react-router-dom";
 import {filterByQuery} from "../utils/FilterByQuery.js";
