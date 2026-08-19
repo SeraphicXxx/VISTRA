@@ -10,11 +10,17 @@ import AdminHome from "../pages/admin/home";
 import AdminLoginPage from "../pages/admin/login";
 
 import OverviewTab from "../pages/admin/overview/overview";
+
 import MedicalTab from "../pages/admin/medical/medicalTab";
-import DentalTab from "../pages/admin/dental/dentalTab";
-import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 import PatientRecordForm from "../pages/admin/medical/medicalRecForm";
 import PatientRecordView from "../pages/admin/medical/medicalViewRec";
+
+import DentalTab from "../pages/admin/dental/dentalTab";
+import DentalRecordForm from "../pages/admin/dental/dentalForm";
+
+import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
+
+
 import ProtectedRoute from "../components/ProtectedRoute.jsx"
 
 function AppRoutes() {
@@ -36,9 +42,12 @@ function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route path={ROUTES.admin.dashboard.overview} element={<OverviewTab />} />
             <Route path={ROUTES.admin.dashboard.medical} element={<MedicalTab />} />
-            <Route path={ROUTES.admin.medical.recordForm} element={<PatientRecordForm />} />
-            <Route path={ROUTES.admin.medical.viewRecord} element={<PatientRecordView />} />
+            <Route path={ROUTES.admin.medical.new} element={<PatientRecordForm />} />
+            <Route path={ROUTES.admin.medical.view} element={<PatientRecordView />} />
+
             <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
+            <Route path={ROUTES.admin.dental.new} element={<DentalRecordForm />} />
+
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
           </Route>
         </Route>
