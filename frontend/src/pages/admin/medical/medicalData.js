@@ -6,22 +6,6 @@ export const medRecords = [
   { id: "MED-1046", student: "Rosh Ingel", course: "BS Accountancy", time: "10:45 AM", type: "Medical Consultation", status: "ongoingTreatment" },
 ];
 
-export const statusStyles = {
-  cleared: "border-success/30 bg-success/10 text-success",
-  secondOpinion: "border-warning/30 bg-warning/10 text-warning",
-  recovered: "border-primary/30 bg-primary/10 text-primary",
-  referred: "border-info/30 bg-info/10 text-info",
-  ongoingTreatment: "border-treatment/30 bg-treatment/10 text-treatment",
-};
-
-export const statusLabels = {
-  cleared: "Cleared",
-  secondOpinion: "Second Opinion",
-  recovered: "Recovered",
-  referred: "Referred",
-  ongoingTreatment: "Ongoing Treatment",
-};
-
 export const students = [
   {
     id: "MED-1042",
@@ -91,6 +75,7 @@ export const students = [
 ];
 
 export const civilstatus = ["Single", "Married", "Widowed", "Separated", "Divorced"];
+
 export const type = ["Medical Consultation", "Follow up"];
 
 export const emptyDetails = {
@@ -107,10 +92,3 @@ export const emptyDetails = {
 };
 
 
-export function filterByQuery(items, query, fields) {
-  const normalized = (query ?? "").trim().toLowerCase();
-  if (!normalized) return items;
-  return items.filter((item) =>
-    fields.some((field) => String(item[field]).toLowerCase().includes(normalized))
-  );
-}
