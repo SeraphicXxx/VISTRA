@@ -3,7 +3,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Search, Bell } from "lucide-react";
 
 import Sidebar from "../pages/admin/sidebar";
-
+import {formatDisplayDate, getClinicOperationState, getGreeting} from "../utils/Formatters.js";
+const CLINIC_OPERATION_STATES = [
+    { value: "open", label: "Open" },
+    { value: "closed", label: "Closed" },
+    { value: "break", label: "On Break" },
+    { value: "emergency_only", label: "Emergency Only" },
+    { value: "appointment_only", label: "Appointment Only" },
+];
 const hiddenheader = ["/admin/medical/medical-record-form"];
 const hiddenheaderview = ["/admin/medical/records/viewrecord"];
 
@@ -22,10 +29,10 @@ export default function AdminLayout() {
             <div className="flex items-center justify-between gap-3 lg:justify-start">
               <div className="min-w-0">
                 <h1 className="truncate font-heading text-lg font-semibold text-textPrimary sm:text-xl">
-                  Good morning, Dr. Fiesta
+                    {getGreeting()}, Dr. Fiesta
                 </h1>
                 <p className="mt-0.5 text-xs text-textMuted">
-                  Tuesday, August 4 · Clinic Operations
+                    {formatDisplayDate()} · Clinic {getClinicOperationState()}
                 </p>
               </div>
 
