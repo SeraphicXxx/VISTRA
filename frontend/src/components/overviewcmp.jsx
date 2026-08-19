@@ -1,11 +1,11 @@
 import { medRecords } from "../pages/admin/medical/medicalData";
-import { denRecords } from "../pages/admin/dental/dentalData";
+import { dentalRecords } from "../pages/admin/dental/dentalData";
 
 export const recordLimit = 8;
 
 export function buildClinicalRecords() {
   const medical = medRecords.map((record) => ({ ...record, department: "Medical" }));
-  const dental = denRecords.map((record) => ({ ...record, department: "Dental" }));
+  const dental = dentalRecords.map((record) => ({ ...record, department: "Dental" }));
   return [...medical, ...dental];
 }
 

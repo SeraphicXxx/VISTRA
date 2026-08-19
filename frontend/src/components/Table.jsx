@@ -1,11 +1,62 @@
-import {ChevronRight, FileX2} from "lucide-react";
-import React from "react";
+import {ChevronRight, FileX2, Plus} from "lucide-react";
+import React, {useMemo} from "react";
 import {StatusBadge} from "./statusbadge.jsx";
 import {avatarColor, getInitials, getTypeIcon} from "./avatar.jsx";
+import {Link, useOutletContext} from "react-router-dom";
+import {filterByQuery} from "../utils/FilterByQuery.js";
+import PanelHeader from "./PanelHeader.jsx";
+import {ROUTES} from "../config/RoutePaths.js";
 
-export const GenericTableTab = ({}) => {
+    export const RecordsTablePanel = ({name, data, columns, createRoute}) => {
+    const { searchQuery } = useOutletContext();
 
-}
+    const filteredData = useMemo(
+        () => filterByQuery(data, searchQuery, columns),
+        [data, searchQuery, columns]
+    );
+
+    return (
+        <div className="rounded-2xl border border-border bg-surface shadow-card">
+            <div className="p-6">
+                <div className="flex items-start gap-3">
+                    <div className="min-w-0 flex-1">
+                        <PanelHeader
+                            title={`${name} Records`}
+                            action={
+                                <Link
+                                    to={createRoute}
+                                    className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primaryDark hover:shadow-md active:translate-y-0"
+                                >
+                                    <Plus
+                                        className="h-3.5 w-3.5"
+                                        strokeWidth={2}
+                                    />
+                                    New {name} Record
+                                </Link>
+                            }
+                        />
+
+                        <p className="mt-0.5 text-xs text-textMuted">
+                            {filteredData.length}{" "}
+                            {filteredData.length === 1 ? "record" : "records"}
+                            {searchQuery
+                                ? ` matching "${searchQuery}"`
+                                : " on file"}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="mt-5 border-t border-border pt-4">
+                    <GenericTable
+                        data={filteredData}
+                        columns={columns}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export const GenericTable = ({ data, columns }) => {
     return (
         <table className="w-full border-separate border-spacing-0">

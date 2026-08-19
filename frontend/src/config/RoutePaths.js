@@ -17,6 +17,13 @@ export const ROUTES = {
         medical: {
             recordForm: "/admin/medical/medical-record-form",
             viewRecord: "/admin/medical/records/view",
+            createNewRecord:"/admin/medical/new",
+        },
+        appointment: {
+            createNewRecord: "/admin/appointment/new",
+        },
+        dental: {
+            createNewRecord: "/admin/dental/new",
         },
     },
 };
