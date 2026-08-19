@@ -4,7 +4,6 @@ import { FileText, Stethoscope, CalendarClock, ClipboardList } from "lucide-reac
 import StatsGrid from "./stats";
 import { APPOINTMENTS } from "../appointments/appointmentsData";
 import { filterByQuery } from "../../../utils/FilterByQuery.js"
-import AppointmentsTable from "../appointments/appointmentsTable";
 import { StatusBadge } from "../../../components/statusbadge.jsx";
 import PanelHeader from "../../../components/OverviewHeader.jsx";
 import {
@@ -14,25 +13,10 @@ import {
   recordLimit,
 } from "../../../components/overviewcmp.jsx";
 import { statusLabels} from "../../../components/statusbadge.jsx";
+import {RecordsTablePanel} from "../../../components/Table.jsx";
+import {ROUTES} from "../../../config/RoutePaths.js";
+import {getTableColumns} from "../../../utils/TableUtils.js";
 
-const scheduleColumns = [
-  {
-    key: "student",
-    label: "Student",
-    render: (appointment) => (
-      <div className="flex items-center gap-2.5">
-        <span className="text-sm font-medium text-textPrimary">{appointment.student}</span>
-      </div>
-    ),
-  },
-  { key: "time", label: "Time" },
-  { key: "type", label: "Type" },
-  {
-    key: "status",
-    label: "Status",
-    render: (appointment) => <StatusBadge status={appointment.status} />,
-  },
-];
 
 function ConsultationRow({ entry, isLast }) {
   return (
@@ -121,26 +105,15 @@ export default function OverviewTab() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <PanelHeader
-            icon={CalendarClock}
-            title="Today's Schedule"
-            subtitle={`${filteredAppointments.length} appointment${filteredAppointments.length === 1 ? "" : "s"}`}
-          />
-          <div className="mt-5">
-            {filteredAppointments.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-center">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <ClipboardList className="h-5 w-5" strokeWidth={2} />
-                </span>
-                <p className="text-sm font-medium text-textPrimary">No appointments found</p>
-                <p className="text-xs text-textMuted">Try a different search, or check back once new bookings come in.</p>
-              </div>
-            ) : (
-              <AppointmentsTable appointments={filteredAppointments} columns={scheduleColumns} />
-            )}
-          </div>
-        </div>
+       <RecordsTablePanel
+          name="Appointment"
+          data={filteredAppointments}
+          columns={getTableColumns(filteredAppointments, ["id"])}
+          createRecordPath={ROUTES.admin.appointment.createNewRecord}
+          icon={CalendarClock}
+          createDisabled={true}
+          showCreate={false}
+       />
       </div>
     </>
   );

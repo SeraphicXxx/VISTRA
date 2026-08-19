@@ -12,7 +12,7 @@ export default function AppointmentsTab() {
          name="Appointments"
          data={APPOINTMENTS}
          columns={getTableColumns(APPOINTMENTS, ["id"])}
-         createRoute={ROUTES.admin.appointment.createNewRecord}
+         createRecordPath={ROUTES.admin.appointment.createNewRecord}
      />
     );
 }

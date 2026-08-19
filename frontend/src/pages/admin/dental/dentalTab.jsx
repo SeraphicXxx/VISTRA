@@ -10,7 +10,7 @@ export default function DentalTab() {
         name="Dental"
         data={dentalRecords}
         columns={getTableColumns(dentalRecords, ["id"])}
-        createRoute={ROUTES.admin.dental.createNewRecord}
+        createRecordPath={ROUTES.admin.dental.createNewRecord}
     />
     );
 }

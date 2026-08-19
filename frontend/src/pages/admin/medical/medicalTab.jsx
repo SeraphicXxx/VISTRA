@@ -10,7 +10,7 @@ export default function MedicalTab() {
             name="Medical"
             data={medRecords}
             columns={getTableColumns(medRecords, ["id"])}
-            createRoute={ROUTES.admin.medical.createNewRecord}
+            createRecordPath={ROUTES.admin.medical.createNewRecord}
         />
   );
 }
