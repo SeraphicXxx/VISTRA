@@ -6,17 +6,5 @@ export const denRecords = [
   { id: "DEN-1046", student: "Rosh Ingel", course: "BS Accountancy", time: "10:45 AM", type: "Dental Consultation", status: "ongoingTreatment" },
 ];
 
-export const statusStyles = {
-  completed: "border-success/30 bg-success/10 text-success",
-  followUp: "border-warning/30 bg-warning/10 text-warning",
-  referred: "border-info/30 bg-info/10 text-info",
-  ongoingTreatment: "border-treatment/30 bg-treatment/10 text-treatment",
-};
 
-export const statusLabels = {
-  completed: "Completed",
-  followUp: "Follow-up",
-  referred: "Referred",
-  ongoingTreatment: "Ongoing Treatment",
-};
 

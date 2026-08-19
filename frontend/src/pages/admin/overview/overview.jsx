@@ -11,10 +11,9 @@ import {
   buildClinicalRecords,
   parseTimeToday,
   DepartmentBadge,
-  combinedStatusLabels,
   recordLimit,
 } from "../../../components/overviewcmp.jsx";
-
+import { statusLabels} from "../../../components/statusbadge.jsx";
 
 const scheduleColumns = [
   {
@@ -51,7 +50,7 @@ function ConsultationRow({ entry, isLast }) {
         </div>
         <div className="mt-2 flex items-center gap-1.5 text-xs text-primary">
           <FileText className="h-3.5 w-3.5" strokeWidth={2} />
-          {combinedStatusLabels[entry.status] ?? entry.status}
+          {statusLabels[entry.status] ?? entry.status}
         </div>
       </div>
     </div>

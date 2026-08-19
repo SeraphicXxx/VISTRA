@@ -1,8 +1,5 @@
-import { medRecords, statusLabels as medicalStatusLabels } from "../pages/admin/medical/medicalData";
-import { denRecords, statusLabels as dentalStatusLabels } from "../pages/admin/dental/dentalData";
-
-
-export const combinedStatusLabels = { ...medicalStatusLabels, ...dentalStatusLabels };
+import { medRecords } from "../pages/admin/medical/medicalData";
+import { denRecords } from "../pages/admin/dental/dentalData";
 
 export const recordLimit = 8;
 

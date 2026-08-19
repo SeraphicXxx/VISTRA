@@ -1,12 +1,13 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Plus, Stethoscope } from "lucide-react";
+import {Link, useOutletContext} from "react-router-dom";
+import { Plus } from "lucide-react";
 import { medRecords } from "./medicalData";
 import MedicalTable from "./medicalTable";
 import PanelHeader from "../../../components/PanelHeader.jsx";
 import { filterByQuery } from "../../../utils/FilterByQuery.js";
 
-export default function MedicalTab({ searchQuery }) {
+export default function MedicalTab() {
+  const { searchQuery } = useOutletContext();
   const filteredMedicalRecords = useMemo(
     () => filterByQuery(medRecords, searchQuery, ["student", "course", "type", "id"]),
     [searchQuery]

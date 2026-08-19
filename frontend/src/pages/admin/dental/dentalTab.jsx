@@ -1,12 +1,13 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import {Link, useOutletContext} from "react-router-dom";
 import { Plus } from "lucide-react";
 import { denRecords } from "./dentalData";
 import { filterByQuery } from "../../../utils/FilterByQuery.js";
 import DentalTable from "./dentalTable";
 import PanelHeader from "../../../components/PanelHeader.jsx";
 
-export default function DentalTab({ searchQuery }) {
+export default function DentalTab() {
+    const { searchQuery } = useOutletContext();
   const filteredDentalRecords = useMemo(
     () => filterByQuery(denRecords, searchQuery, ["student", "course", "type", "id"]),
     [searchQuery]
