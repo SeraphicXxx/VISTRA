@@ -7,6 +7,7 @@ staff_delete()
 
 FIXME: phone is nulled
 """
+from app.config.security import get_current_user
 from app.database.database_client import supabase_admin, supabase
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 from app.schemas.staff import StaffData
@@ -14,9 +15,10 @@ from app.schemas.staff import StaffData
 def create_staff(request):
     staff_id = remove_ucc_domain(request.staff_id)
     staff_auth_email = add_ucc_domain(request.staff_id)
+    print(get_current_user)
     try:
 
-        auth_response = supabase.auth.admin.create_user({
+        auth_response = supabase_admin.auth.admin.create_user({
             "email": staff_auth_email,
             "password": request.password,
             "email_confirm": True,
@@ -29,6 +31,9 @@ def create_staff(request):
                 "specialty": request.specialty,
                 "phone": request.phone,
                 "email": request.email
+            },
+            "app_metadata": {
+                "role": "staff"
             }
         })
 
@@ -90,7 +95,7 @@ def insert_staff_into_db(staff_data : StaffData):
         }
 def delete_staff(staff_id: str):
     try:
-        response = supabase.auth.admin.delete_user(staff_id)
+        response = supabase_admin.auth.admin.delete_user(staff_id)
 
         return {
             "success": True,
@@ -104,20 +109,28 @@ def delete_staff(staff_id: str):
         }
 def get_staff_by_id(staff_id: str):
     try:
-        response = (supabase.table("STAFF")
-                    .select("*")
-                    .eq("id", staff_id)
-                    .execute())
+        response = (
+            supabase
+            .table("STAFF")
+            .select("*")
+            .eq("staff_id", staff_id)
+            .execute()
+        )
+
+        print("staff_id:", repr(staff_id))
+        print("response.data:", response.data)
+
         if response.data:
             return {
                 "success": True,
                 "data": response.data[0]
             }
-        else:
-            return {
-                "success": False,
-                "message": "Staff not found"
-            }
+
+        return {
+            "success": False,
+            "message": f"Staff not found for {staff_id}"
+        }
+
     except Exception as e:
         return {
             "success": False,

@@ -17,7 +17,13 @@ export function formatDisplayDate(date = new Date()) {
         day: "numeric",
     }).format(date);
 }
+export function extractStaffCode(email) {
+    if (!email || typeof email !== "string") {
+        return "";
+    }
 
+    return email.split("@")[0].toUpperCase();
+}
 export function getClinicOperationState(date = new Date()) {
     const day = date.getDay();
 

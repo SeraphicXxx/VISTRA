@@ -8,13 +8,16 @@ export const getApiUrl = () => {
 
 export const API_ENDPOINTS = {
     public: {
-        health_check: "/api/health"
+        health_check: "/api/health",
     },
+
     admin: {
         login: "/staff/auth/login",
         create_staff: "/staff/",
+        getStaffById: (staffId) => `/staff/${staffId}/`,
     },
+
     patient: {
-        //WIP
-    }
-}
+        // WIP
+    },
+};
