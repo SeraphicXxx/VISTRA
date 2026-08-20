@@ -88,7 +88,6 @@ def insert_staff_into_db(staff_data : StaffData):
             "success": False,
             "message": str(e)
         }
-
 def delete_staff(staff_id: str):
     try:
         response = supabase.auth.admin.delete_user(staff_id)
@@ -98,6 +97,27 @@ def delete_staff(staff_id: str):
             "data": response
         }
 
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
+def get_staff_by_id(staff_id: str):
+    try:
+        response = (supabase.table("STAFF")
+                    .select("*")
+                    .eq("id", staff_id)
+                    .execute())
+        if response.data:
+            return {
+                "success": True,
+                "data": response.data[0]
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Staff not found"
+            }
     except Exception as e:
         return {
             "success": False,
