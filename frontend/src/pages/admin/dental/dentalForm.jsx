@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft, Save, Stethoscope } from "lucide-react";
-import { FieldLabel } from "../../../utils/FieldLabel";
 
-const upperTeeth = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
-const lowerTeeth = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
+import { FieldLabel } from "../../../utils/FieldLabel.jsx";
+import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
+import { TextField } from "../../../utils/TextField.jsx";
+import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
+
 
 const medicalHistoryItems = [
   "Allergy",
@@ -35,58 +37,34 @@ const oralStatusRows = [
 ];
 
 
-function TextField({ id, label, type = "text", placeholder }) {
-  return (
-    <div>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <input id={id} type={type} placeholder={placeholder} className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" />
-    </div>
-  );
-}
-
-function ToothBox({ number }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] font-medium text-textMuted">{number}</span>
-      <svg viewBox="0 0 32 40" className="h-11 w-9 shrink-0" fill="none">
-        <path
-          d="M16 3
-             C 10 3, 5 6, 5 12
-             C 5 17, 6.5 20, 8 25
-             C 8.8 28, 10 33, 11.5 35.5
-             C 12.3 37, 13.5 37, 14 35
-             C 14.5 32, 15 29, 16 29
-             C 17 29, 17.5 32, 18 35
-             C 18.5 37, 19.7 37, 20.5 35.5
-             C 22 33, 23.2 28, 24 25
-             C 25.5 20, 27 17, 27 12
-             C 27 6, 22 3, 16 3 Z"
-          className="fill-background stroke-textSecondary"
-          strokeWidth="1.25"
-        />
-        <line x1="7" y1="10" x2="25" y2="22" className="stroke-textSecondary" strokeWidth="0.75" />
-        <line x1="25" y1="10" x2="7" y2="22" className="stroke-textSecondary" strokeWidth="0.75" />
-      </svg>
-    </div>
-  );
-}
-
-function CheckboxRow({ label }) {
-  return (
-    <label className="flex items-center gap-2 text-sm text-textPrimary">
-      <input type="checkbox" className="h-4 w-4 rounded border-border text-primary focus:ring-primary/30" />
-      {label}
-    </label>
-  );
-}
 
 export default function DentalRecordForm({ onBack }) {
+  const [selectedTooth, setSelectedTooth] = useState(null);
+  const [toothRecords, setToothRecords] = useState({});
+
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else if (typeof window !== "undefined") {
       window.history.back();
     }
+  };
+
+  const openTooth = (number) => setSelectedTooth(number);
+  const closeModal = () => setSelectedTooth(null);
+
+  const saveTooth = (data) => {
+    setToothRecords((prev) => ({ ...prev, [selectedTooth]: data }));
+    setSelectedTooth(null);
+  };
+
+  const clearTooth = () => {
+    setToothRecords((prev) => {
+      const next = { ...prev };
+      delete next[selectedTooth];
+      return next;
+    });
+    setSelectedTooth(null);
   };
 
   return (
@@ -152,18 +130,16 @@ export default function DentalRecordForm({ onBack }) {
         </div>
 
       <div className="mt-8 border-t border-border pt-6">
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-primaryDark">Odontogram</h2>
+        <h2 className="mb-1 text-sm font-bold uppercase tracking-wide text-primaryDark">Odontogram</h2>
+        <p className="mb-4 text-xs text-textMuted">Click a tooth to record its dentition, condition, and notes.</p>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-background/40 p-4">
-          <div className="mb-3 flex min-w-max justify-center gap-1.5">
-            {upperTeeth.map((n) => (
-              <ToothBox key={n} number={n} />
-            ))}
+        <div className="overflow-x-auto rounded-xl border border-border bg-background/40 p-6">
+          <div className="mb-2 flex justify-center">
+            <ToothArch teeth={upperTeeth} flip={false} records={toothRecords} onToothClick={openTooth} />
           </div>
-          <div className="flex min-w-max justify-center gap-1.5">
-            {lowerTeeth.map((n) => (
-              <ToothBox key={n} number={n} />
-            ))}
+          <div className="mx-auto my-3 h-px w-full max-w-2xl bg-border" />
+          <div className="mt-2 flex justify-center">
+            <ToothArch teeth={lowerTeeth} flip={true} records={toothRecords} onToothClick={openTooth} />
           </div>
         </div>
 
@@ -256,10 +232,10 @@ export default function DentalRecordForm({ onBack }) {
               {oralStatusRows.map((row, index) => (
                 <tr key={row} className={`border-b border-border last:border-b-0 ${index % 2 === 1 ? "bg-background/40" : ""}`}>
                   <td className="p-3 text-sm text-textPrimary">{row}</td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
+                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
+                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
+                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
+                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
                 </tr>
               ))}
             </tbody>
@@ -278,6 +254,16 @@ export default function DentalRecordForm({ onBack }) {
           Save Record
         </button>
       </div>
+
+      {selectedTooth !== null && (
+        <ToothNoteModal
+          toothNumber={selectedTooth}
+          initialRecord={toothRecords[selectedTooth]}
+          onSave={saveTooth}
+          onClear={clearTooth}
+          onClose={closeModal}
+        />
+      )}
     </form>
   );
 }

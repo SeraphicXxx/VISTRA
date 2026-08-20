@@ -46,7 +46,7 @@ function AppRoutes() {
             <Route path={ROUTES.admin.medical.view} element={<PatientRecordView />} />
 
             <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
-            <Route path={ROUTES.admin.dental.new} element={<DentalRecordForm />} />
+            <Route path={ROUTES.admin.dental.createNewRecord} element={<DentalRecordForm />} />
 
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
           </Route>
