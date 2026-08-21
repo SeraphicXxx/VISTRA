@@ -5,7 +5,7 @@ export const ROUTES = {
 
     admin: {
         home: "/admin",
-        login: "/admin/login",
+        login: "/login",
 
         dashboard: {
             overview: "/admin/dashboard/overview",
