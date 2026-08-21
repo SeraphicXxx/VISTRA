@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ROUTES } from "../config/RoutePaths";
 
 import PublicLayout from "../layouts/PublicLayout";
-import AdminLayout from "../layouts/AdminLayout";
+import AdminLayout from "../layouts/AdminLayout.tsx";
 
 import LandingPage from "../pages/public/landingpage";
-import AdminHome from "../pages/admin/home";
-import AdminLoginPage from "../pages/admin/login";
+import StaffLandingPage from "../pages/admin/home";
+import StaffLoginPage from "../pages/admin/login";
 
 import OverviewTab from "../pages/admin/overview/overview";
 
@@ -33,8 +33,8 @@ function AppRoutes() {
         </Route>
 
         {/* Admin Showcase / Login */}
-        <Route path={ROUTES.admin.home} element={<AdminHome />} />
-        <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
+        <Route path={ROUTES.admin.home} element={<StaffLandingPage />} />
+        <Route path={ROUTES.admin.login} element={<StaffLoginPage />} />
 
         {/* Admin */}
 

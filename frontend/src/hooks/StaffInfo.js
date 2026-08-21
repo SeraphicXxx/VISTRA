@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {getStaffById} from "../api/staff.api.js";
 
-
 export function useStaffInfo(staffId) {
     const [staffData, setStaffData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);

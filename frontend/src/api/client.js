@@ -14,7 +14,11 @@ export const apiClient = async (endpoint, options = {}) => {
         ...options,
     });
 
-    const data = await response.json();
+    const contentType = response.headers.get("content-type");
+
+    const data = contentType?.includes("application/json")
+        ? await response.json()
+        : await response.text();
 
     return {
         response,
