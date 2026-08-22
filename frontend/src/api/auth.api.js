@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient } from "./client.ts";
 import {API_ENDPOINTS} from "../config/ApiConfig.js";
 
 

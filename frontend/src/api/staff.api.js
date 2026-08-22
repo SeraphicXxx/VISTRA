@@ -1,4 +1,4 @@
-import {apiClient} from "./client.js";
+import {apiClient} from "./client.ts";
 import {API_ENDPOINTS} from "../config/ApiConfig.js";
 import {StaffModel} from "../repository/StaffModel.js";
 
