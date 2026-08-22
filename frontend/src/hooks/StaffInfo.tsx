@@ -6,37 +6,48 @@ interface UseStaffInfoResult {
     isLoading: boolean;
     error: string;
 }
-
-export function useStaffInfo(staffId: string | null): UseStaffInfoResult {
+export function useStaffInfo(staffId: string) {
     const [staffData, setStaffData] = useState<StaffModel | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>("");
-
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+    console.log(staffData)
     useEffect(() => {
-        if (!staffId) {
-            setStaffData(null);
-            setIsLoading(false);
-            return;
-        }
+        const controller = new AbortController();
 
-        void (async () => {
+        const loadStaff = async () => {
             try {
                 setIsLoading(true);
                 setError("");
 
-                const data = await getStaffById(staffId);
+                const data = await getStaffById(
+                    staffId,
+                    controller.signal
+                );
+
                 setStaffData(data);
-            } catch (err: unknown) {
+            } catch (err) {
+
+                if (err instanceof DOMException && err.name === "AbortError") {
+                    return;
+                }
+
                 setError(
                     err instanceof Error
                         ? err.message
                         : "Failed to load staff"
                 );
-                setStaffData(null);
             } finally {
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
-        })();
+        };
+
+        void loadStaff();
+
+        return () => {
+            controller.abort();
+        };
     }, [staffId]);
 
     return {
