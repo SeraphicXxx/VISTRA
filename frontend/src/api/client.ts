@@ -1,9 +1,9 @@
-import { sessionManager } from "../utils/SessionManager.js";
+import { sessionManager } from "../utils/SessionManager";
 
 const API_URL: string = import.meta.env.VITE_LOCAL_API_URL;
 
 export const apiClient = async <T = unknown>(
-        endpoint: string,
+    endpoint: string,
     options: RequestInit = {}
 ): Promise<{
     response: Response;

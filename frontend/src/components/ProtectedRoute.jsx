@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { sessionManager  } from "../utils/SessionManager.js";
+import { sessionManager  } from "../utils/SessionManager.ts";
 
 export default function ProtectedRoute() {
     if (!sessionManager.isAuthenticated()) {

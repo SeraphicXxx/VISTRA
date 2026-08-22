@@ -6,7 +6,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import {sessionManager} from "../../utils/SessionManager.js";
+import {sessionManager} from "../../utils/SessionManager.ts";
 import { AdminRoutes } from "../../config/Routes.js";
 import {ROUTES} from "../../config/RoutePaths.js";
 import {LogoClickable} from "../../hooks/Clickables.jsx";

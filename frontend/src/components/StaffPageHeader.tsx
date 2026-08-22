@@ -1,5 +1,6 @@
 import { Bell, Search } from "lucide-react";
-import {formatDisplayDate, getClinicOperationState, getGreeting} from "../utils/Formatters.js";
+import {formatDisplayDate, getClinicOperationState, getGreeting} from "../utils/Formatters";
+import { useStaffInfo } from "../hooks/StaffInfo";
 
 const CLINIC_OPERATION_STATES = [
     { value: "open", label: "Open" },
@@ -10,11 +11,15 @@ const CLINIC_OPERATION_STATES = [
 ];
 
 interface StaffPageHeaderProps {
+    staffId: string;
     searchQuery: string;
     setSearchQuery: (value: string) => void;
 }
+interface HeaderActionsProps {
+    staffInitials: string | null;
+}
 
-function HeaderActions() {
+function HeaderActions({ staffInitials }: HeaderActionsProps) {
     return (
         <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
             <button
@@ -26,23 +31,33 @@ function HeaderActions() {
             </button>
 
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
-                LMF
+                { staffInitials || "--"}
             </div>
         </div>
     );
 }
 
 export default function StaffPageHeader({
+                                            staffId,
                                             searchQuery,
                                             setSearchQuery,
                                         }: StaffPageHeaderProps) {
+
+    const {
+        staffData,
+        isLoading,
+        error,
+    } = useStaffInfo(staffId);
     return (
         <header className="flex flex-col gap-3 border-b border-border bg-surface px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
 
             <div className="flex items-center justify-between gap-3 lg:justify-start">
                 <div className="min-w-0">
                     <h1 className="truncate font-heading text-lg font-semibold text-textPrimary sm:text-xl">
-                        {getGreeting()}, Dr. Fiesta
+                        {getGreeting()},{" "}
+                        {isLoading
+                            ? "Loading..."
+                            : `Dr. ${staffData?.getDisplayName() ?? "Staff"}`}
                     </h1>
 
                     <p className="mt-0.5 text-xs text-textMuted">
@@ -52,7 +67,7 @@ export default function StaffPageHeader({
                 </div>
 
                 <div className="lg:hidden">
-                    <HeaderActions />
+                    <HeaderActions staffInitials={isLoading ? "..." : staffData?.getInitials()} />
                 </div>
             </div>
 
@@ -76,7 +91,7 @@ export default function StaffPageHeader({
                 </div>
 
                 <div className="hidden lg:block">
-                    <HeaderActions />
+                    <HeaderActions staffInitials={isLoading ? "..." : staffData?.getInitials()} />
                 </div>
             </div>
         </header>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../pages/admin/sidebar";
 import StaffPageHeader from "../components/StaffPageHeader";
+import { sessionManager } from "../utils/SessionManager";
 
 const HIDDEN_HEADER_PATHS =
     [
@@ -22,6 +23,7 @@ export default function AdminLayout() {
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
                 {!hideHeader && (
                     <StaffPageHeader
+                        staffId={sessionManager.getUser()?.staff_id || ""}
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />
