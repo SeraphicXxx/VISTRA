@@ -1,13 +1,17 @@
 import React from "react";
-import {GenericTable} from "../../../components/Table.jsx";
-import {getTableColumns} from "../../../utils/TableUtils.js";
+import { GenericTable, GenericRow } from "../../../components/Table.jsx";
+import { getTableColumns } from "../../../utils/TableUtils.js";
+import { ROUTES } from "../../../config/RoutePaths";
 
 export default function MedicalTable({ medicalRecords }) {
   return (
     <div className="overflow-x-auto">
       <GenericTable
-          data={medicalRecords}
-          columns={getTableColumns(medicalRecords, ["id"])}
+        data={medicalRecords}
+        columns={getTableColumns(medicalRecords, ["id"])}
+        renderRow={(record) => (
+          <GenericRow data={record} viewRecordPath={ROUTES.admin.medical.viewRecord} />
+        )}
       />
     </div>
   );

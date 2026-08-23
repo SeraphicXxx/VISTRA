@@ -17,6 +17,7 @@ import PatientRecordView from "../pages/admin/medical/medicalViewRec";
 
 import DentalTab from "../pages/admin/dental/dentalTab";
 import DentalRecordForm from "../pages/admin/dental/dentalForm";
+import DentalRecordView from "../pages/admin/dental/dentalViewRec";
 
 import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 
@@ -42,11 +43,12 @@ function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route path={ROUTES.admin.dashboard.overview} element={<OverviewTab />} />
             <Route path={ROUTES.admin.dashboard.medical} element={<MedicalTab />} />
-            <Route path={ROUTES.admin.medical.new} element={<PatientRecordForm />} />
-            <Route path={ROUTES.admin.medical.view} element={<PatientRecordView />} />
+            <Route path={ROUTES.admin.medical.createNewRecord} element={<PatientRecordForm />} />
+            <Route path={ROUTES.admin.medical.viewRecord} element={<PatientRecordView />} />
 
             <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
             <Route path={ROUTES.admin.dental.createNewRecord} element={<DentalRecordForm />} />
+            <Route path={ROUTES.admin.dental.viewRecord} element={<DentalRecordView />} />
 
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
           </Route>

@@ -1,8 +1,8 @@
 import {ChevronRight, FileX2} from "lucide-react";
 import React, {useMemo} from "react";
+import {useNavigate, useOutletContext} from "react-router-dom";
 import {StatusBadge} from "./statusbadge.jsx";
 import {avatarColor, getInitials, getTypeIcon} from "./avatar.jsx";
-import {useOutletContext} from "react-router-dom";
 import {filterByQuery} from "../utils/FilterByQuery.js";
 import PanelHeader from "./PanelHeader.jsx";
 import {LinkButton} from "./Button.jsx";
@@ -45,34 +45,29 @@ export const RecordsTablePanel = ({
 
                         <p className="mt-0.5 text-xs text-textMuted">
                             {filteredData.length}{" "}
-                            {filteredData.length === 1
-                                ? "record"
-                                : "records"}
-                            {searchQuery
-                                ? ` matching "${searchQuery}"`
-                                : " on file"}
+                            {filteredData.length === 1 ? "record" : "records"}
+                            {searchQuery ? ` matching "${searchQuery}"` : " on file"}
                         </p>
                     </div>
                 </div>
 
                 <div className="mt-5 border-t border-border pt-4">
-                    <GenericTable
-                        data={filteredData}
-                        columns={columns}
-                        renderRow={renderRow}
-                    />
+                    <div className="overflow-x-auto">
+                        <GenericTable
+                            data={filteredData}
+                            columns={columns}
+                            renderRow={renderRow}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-export const GenericTable = ({
-                                 data,
-                                 columns,
-                                 renderRow,
-                             }) => {
+
+export const GenericTable = ({ data, columns, renderRow }) => {
     return (
-        <table className="w-full border-separate border-spacing-0">
+        <table className="w-full min-w-[640px] border-separate border-spacing-0">
             <GenericTableHeader columns={columns} />
             <GenericTableBody
                 data={data}
@@ -81,12 +76,8 @@ export const GenericTable = ({
                 emptyState={
                     <div className="flex flex-col items-center gap-2">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-textMuted/10 text-textMuted">
-                            <FileX2
-                                className="h-5 w-5"
-                                strokeWidth={1.75}
-                            />
+                            <FileX2 className="h-5 w-5" strokeWidth={1.75} />
                         </span>
-
                         <p className="text-sm text-textMuted">
                             No records match your search.
                         </p>
@@ -96,19 +87,13 @@ export const GenericTable = ({
         </table>
     );
 };
-export const GenericTableBody = ({
-                                     data,
-                                     colSpan,
-                                     renderRow,
-                                     emptyState,
-                                 }) => {
+
+export const GenericTableBody = ({ data, colSpan, renderRow, emptyState }) => {
     if (data.length === 0) {
         return (
             <tbody>
             <tr>
-                <td colSpan={colSpan}>
-                    {emptyState}
-                </td>
+                <td colSpan={colSpan}>{emptyState}</td>
             </tr>
             </tbody>
         );
@@ -124,6 +109,7 @@ export const GenericTableBody = ({
         </tbody>
     );
 };
+
 const GenericTableHeader = ({ columns }) => {
     return (
         <thead>
@@ -139,9 +125,12 @@ const GenericTableHeader = ({ columns }) => {
             <th className="border-b border-border pb-2" />
         </tr>
         </thead>
-    )
-}
-function GenericRow({ data }) {
+    );
+};
+
+
+export function GenericRow({ data, viewRecordPath }) {
+    const navigate = useNavigate();
     const TypeIcon = getTypeIcon(data.type);
 
     return (
@@ -155,7 +144,6 @@ function GenericRow({ data }) {
                     >
                         {getInitials(data.student)}
                     </span>
-
                     <span className="text-sm font-medium text-textPrimary">
                         {data.student}
                     </span>
@@ -172,10 +160,7 @@ function GenericRow({ data }) {
 
             <td className="border-b border-border py-3 pr-4">
                 <div className="flex items-center gap-1.5 text-sm text-textSecondary">
-                    <TypeIcon
-                        className="h-3.5 w-3.5 shrink-0 text-textMuted"
-                        strokeWidth={2}
-                    />
+                    <TypeIcon className="h-3.5 w-3.5 shrink-0 text-textMuted" strokeWidth={2} />
                     {data.type}
                 </div>
             </td>
@@ -187,16 +172,13 @@ function GenericRow({ data }) {
             <td className="border-b border-border py-3 text-right">
                 <button
                     type="button"
+                    onClick={() => navigate(viewRecordPath)}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
                 >
                     View
-                    <ChevronRight
-                        className="h-3.5 w-3.5"
-                        strokeWidth={2}
-                    />
+                    <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
                 </button>
             </td>
         </tr>
     );
 }
-
