@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getStaffById } from "../api/staff.api.ts";
-import type { StaffModel } from "../models/staff.model.ts";
+import { getStaffById } from "../api/staff.api";
+import type { StaffModel } from "../repository/StaffModel";
 interface UseStaffInfoResult {
     staffData: StaffModel | null;
     isLoading: boolean;

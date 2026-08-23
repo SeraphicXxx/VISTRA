@@ -1,21 +1,26 @@
-import { apiClient } from "./client.ts";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "../config/ApiConfig.js";
 import { StaffModel } from "../repository/StaffModel.js";
+
+interface ApiResponse<T> {
+    success: boolean;
+    data: T;
+}
 
 export const getStaffById = async (
     staffId: string,
     signal?: AbortSignal
 ): Promise<StaffModel> => {
-    const { data } = await apiClient(
+    const { data: apiResponse } = await apiClient<ApiResponse<StaffModel>>(
         API_ENDPOINTS.admin.getStaffById(staffId),
         {
             method: "GET",
             signal,
         }
     );
-    if (!data || data.length === 0) {
+    if (!apiResponse) {
         throw new Error("Staff member not found");
     }
 
-    return new StaffModel(data.data);
+    return new StaffModel(apiResponse.data);
 };
