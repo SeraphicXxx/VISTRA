@@ -1,4 +1,4 @@
-import { apiClient } from "./client.ts";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "../config/ApiConfig.js";
 
 interface LoginStaffParams {

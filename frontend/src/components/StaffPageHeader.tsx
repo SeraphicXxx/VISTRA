@@ -16,7 +16,7 @@ interface StaffPageHeaderProps {
     setSearchQuery: (value: string) => void;
 }
 interface HeaderActionsProps {
-    staffInitials: string | null;
+    staffInitials: string | null | undefined;
 }
 
 function HeaderActions({ staffInitials }: HeaderActionsProps) {
