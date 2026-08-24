@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
 import { FieldLabel } from "../utils/FieldLabel.jsx";
+import { Modal } from "./Modal.jsx";
 
 export const upperTeeth = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
 export const lowerTeeth = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
@@ -15,7 +15,7 @@ const conditionOptions = [
   { value: "supernumerary", label: "Supernumerary (Sn)" },
 ];
 
-const conditionDesign = {
+export const conditionDesign = {
   sound: { fill: "fill-background", stroke: "stroke-textSecondary" },
   decayed: { fill: "fill-red-100", stroke: "stroke-red-500" },
   filled: { fill: "fill-blue-100", stroke: "stroke-blue-500" },
@@ -167,73 +167,11 @@ export function ToothNoteModal({ toothNumber, initialRecord, onSave, onClear, on
   const [notes, setNotes] = useState(initialRecord?.notes || "");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={onClose}>
-      <div
-        className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-5 flex items-center justify-between">
-          <h3 className="font-heading text-base font-semibold text-primaryDark">Tooth {toothNumber}</h3>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 text-textMuted transition-colors hover:bg-background hover:text-textPrimary">
-            <X className="h-4 w-4" strokeWidth={2} />
-          </button>
-        </div>
-
-        <div className="mb-5">
-          <FieldLabel>Dentition</FieldLabel>
-          <div className="mt-1 flex gap-4">
-            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-              <input
-                type="radio"
-                name="dentition"
-                checked={dentition === "permanent"}
-                onChange={() => setDentition("permanent")}
-                className="h-4 w-4 border-border text-primary focus:ring-primary/30"
-              />
-              Permanent
-            </label>
-            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-              <input
-                type="radio"
-                name="dentition"
-                checked={dentition === "temporary"}
-                onChange={() => setDentition("temporary")}
-                className="h-4 w-4 border-border text-primary focus:ring-primary/30"
-              />
-              Temporary
-            </label>
-          </div>
-        </div>
-
-        <div className="mb-5">
-          <FieldLabel htmlFor="tooth-condition">Condition</FieldLabel>
-          <select
-            id="tooth-condition"
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            {conditionOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-6">
-          <FieldLabel htmlFor="tooth-notes">Notes</FieldLabel>
-          <textarea
-            id="tooth-notes"
-            rows={3}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Optional remarks for this tooth"
-            className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
+    <Modal
+      title={`Tooth ${toothNumber}`}
+      onClose={onClose}
+      footer={
+        <>
           <button
             type="button"
             onClick={onClear}
@@ -257,8 +195,62 @@ export function ToothNoteModal({ toothNumber, initialRecord, onSave, onClear, on
               Save
             </button>
           </div>
+        </>
+      }
+    >
+      <div className="mb-5">
+        <FieldLabel>Dentition</FieldLabel>
+        <div className="mt-1 flex gap-4">
+          <label className="flex items-center gap-1.5 text-sm text-textPrimary">
+            <input
+              type="radio"
+              name="dentition"
+              checked={dentition === "permanent"}
+              onChange={() => setDentition("permanent")}
+              className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+            />
+            Permanent
+          </label>
+          <label className="flex items-center gap-1.5 text-sm text-textPrimary">
+            <input
+              type="radio"
+              name="dentition"
+              checked={dentition === "temporary"}
+              onChange={() => setDentition("temporary")}
+              className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+            />
+            Temporary
+          </label>
         </div>
       </div>
-    </div>
+
+      <div className="mb-5">
+        <FieldLabel htmlFor="tooth-condition">Condition</FieldLabel>
+        <select
+          id="tooth-condition"
+          value={condition}
+          onChange={(e) => setCondition(e.target.value)}
+          className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          {conditionOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <FieldLabel htmlFor="tooth-notes">Notes</FieldLabel>
+        <textarea
+          id="tooth-notes"
+          rows={3}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Optional remarks for this tooth"
+          className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+        />
+      </div>
+    </Modal>
   );
 }

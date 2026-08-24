@@ -4,6 +4,7 @@ import {
     CalendarDays,
     HeartPulse,
     Stethoscope,
+    UsersRound,
 } from "lucide-react";
 
 export const AdminRoutes = [
@@ -30,5 +31,11 @@ export const AdminRoutes = [
         label: "Appointments",
         icon: CalendarDays,
         component: "appointments",
+    },
+    {
+        path: ROUTES.admin.dashboard.patients,
+        label: "Patient Management",
+        icon: UsersRound,
+        component: "patients"
     },
 ];

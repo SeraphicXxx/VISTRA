@@ -5,7 +5,8 @@ import { FieldLabel } from "../../../utils/FieldLabel.jsx";
 import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
 import { TextField } from "../../../utils/TextField.jsx";
 import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
-
+import { StudentInfoSection } from "../../../components/StudentInfoSection.jsx";
+import { students } from "../medical/medicalData";
 
 const medicalHistoryItems = [
   "Allergy",
@@ -36,9 +37,14 @@ const oralStatusRows = [
   "No. of Temporary Teeth Present",
 ];
 
-
+const dentalStudentFields = [
+  { id: "age", label: "Age" },
+  { id: "sex", label: "Gender" },
+  { id: "yearSection", label: "Year and section / course", span: "sm:col-span-3" },
+];
 
 export default function DentalRecordForm({ onBack }) {
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedTooth, setSelectedTooth] = useState(null);
   const [toothRecords, setToothRecords] = useState({});
 
@@ -80,54 +86,52 @@ export default function DentalRecordForm({ onBack }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div className="sm:col-span-2">
-          <TextField id="name" label="Name" placeholder="Last name, First name, Middle name" />
-        </div>
-        <TextField id="age" label="Age" type="number" />
-        <TextField id="gender" label="Gender" placeholder="Male / Female" />
-        <div className="sm:col-span-3">
-          <TextField id="yearSection" label="Year and section / course" placeholder="e.g. BSCS 4B" />
-        </div>
+        <StudentInfoSection
+          students={students}
+          selectedStudent={selectedStudent}
+          onSelect={setSelectedStudent}
+          fields={dentalStudentFields}
+        />
         <TextField id="date" label="Date" type="date" />
       </div>
 
-    <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-3">
-  <div>
-    <FieldLabel htmlFor="lastVisit">When was the last time you visited a dentist?</FieldLabel>
-    <input
-      id="lastVisit"
-      type="text"
-      placeholder="e.g. 6 months ago"
-      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-    />
-  </div>
-
+      <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-3">
         <div>
-            <FieldLabel htmlFor="floss">Do you floss?</FieldLabel>
-            <div className="flex items-center gap-4 pt-1">
-            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-                <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
-                Yes
-            </label>
-            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-                <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
-                No
-            </label>
-            </div>
+          <FieldLabel htmlFor="lastVisit">When was the last time you visited a dentist?</FieldLabel>
+          <input
+            id="lastVisit"
+            type="text"
+            placeholder="e.g. 6 months ago"
+            className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div>
-            <FieldLabel>How often do you brush your teeth?</FieldLabel>
-            <div className="flex flex-wrap items-center gap-4 pt-1">
+          <FieldLabel htmlFor="floss">Do you floss?</FieldLabel>
+          <div className="flex items-center gap-4 pt-1">
+            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
+              <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              Yes
+            </label>
+            <label className="flex items-center gap-1.5 text-sm text-textPrimary">
+              <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              No
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <FieldLabel>How often do you brush your teeth?</FieldLabel>
+          <div className="flex flex-wrap items-center gap-4 pt-1">
             {["1x", "2x", "3-4x/day"].map((option) => (
-                <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
+              <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
                 <input type="radio" name="brushFrequency" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
                 {option}
-                </label>
+              </label>
             ))}
-            </div>
+          </div>
         </div>
-        </div>
+      </div>
 
       <div className="mt-8 border-t border-border pt-6">
         <h2 className="mb-1 text-sm font-bold uppercase tracking-wide text-primaryDark">Odontogram</h2>
@@ -143,47 +147,47 @@ export default function DentalRecordForm({ onBack }) {
           </div>
         </div>
 
-       <div className="mt-4 grid grid-cols-2 gap-6 rounded-xl border border-border p-4 text-xs">
-  <div>
-    <p className="mb-4 font-semibold uppercase tracking-wide text-primary">Permanent</p>
-    <ul className="space-y-1 text-textPrimary">
-      <li>/ — Sound</li>
-      <li>D — Decayed</li>
-      <li>F — Filled</li>
-      <li>M — Missing</li>
-      <li>X — Indicated for extraction</li>
-      <li>Un — Unerupted</li>
-      <li>Sn — Supernumerary tooth</li>
-      <li>JC — Jacket crown</li>
-      <li>P — Pontic</li>
-    </ul>
-    <div className="mt-4 space-y-0.5 text-textSecondary">
-      <p>Decayed — red</p>
-      <p>Perm. filling — blue</p>
-    </div>
-  </div>
+        <div className="mt-4 grid grid-cols-2 gap-6 rounded-xl border border-border p-4 text-xs">
+          <div>
+            <p className="mb-4 font-semibold uppercase tracking-wide text-primary">Permanent</p>
+            <ul className="space-y-1 text-textPrimary">
+              <li>/ — Sound</li>
+              <li>D — Decayed</li>
+              <li>F — Filled</li>
+              <li>M — Missing</li>
+              <li>X — Indicated for extraction</li>
+              <li>Un — Unerupted</li>
+              <li>Sn — Supernumerary tooth</li>
+              <li>JC — Jacket crown</li>
+              <li>P — Pontic</li>
+            </ul>
+            <div className="mt-4 space-y-0.5 text-textSecondary">
+              <p>Decayed — red</p>
+              <p>Perm. filling — blue</p>
+            </div>
+          </div>
 
-  <div>
-    <p className="mb-4 font-semibold uppercase tracking-wide text-primary   ">Temporary</p>
-    <ul className="space-y-1 text-textPrimary">
-      <li>/</li>
-      <li>d</li>
-      <li>f</li>
-      <li>m</li>
-      <li>x</li>
-      <li>un</li>
-      <li>s</li>
-      <li>jc</li>
-      <li>p</li>
-    </ul>
-    <div className="mt-4 space-y-0.5 text-textSecondary">
-      <p>S — Sealant</p>
-      <p>PF — Permanent fill</p>
-      <p>TF — Temporary fill</p>
-      <p>X — Extracted</p>
-    </div>
-  </div>
-</div>
+          <div>
+            <p className="mb-4 font-semibold uppercase tracking-wide text-primary   ">Temporary</p>
+            <ul className="space-y-1 text-textPrimary">
+              <li>/</li>
+              <li>d</li>
+              <li>f</li>
+              <li>m</li>
+              <li>x</li>
+              <li>un</li>
+              <li>s</li>
+              <li>jc</li>
+              <li>p</li>
+            </ul>
+            <div className="mt-4 space-y-0.5 text-textSecondary">
+              <p>S — Sealant</p>
+              <p>PF — Permanent fill</p>
+              <p>TF — Temporary fill</p>
+              <p>X — Extracted</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-2">
@@ -249,7 +253,11 @@ export default function DentalRecordForm({ onBack }) {
           Back
         </button>
 
-        <button type="submit" disabled className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white opacity-40 shadow-sm transition-all duration-200 disabled:cursor-not-allowed">
+        <button
+          type="submit"
+          disabled={!selectedStudent}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-primary"
+        >
           <Save className="h-4 w-4" strokeWidth={2} />
           Save Record
         </button>
