@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.schemas.auth import LoginRequest
+from app.schemas.auth import LoginRequest, RefreshTokenRequest
 from app.services.auth.staff import staff_login, auth_refresh_token
 
 

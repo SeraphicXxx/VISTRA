@@ -1,5 +1,7 @@
 from app.database.database_client import  supabase
 from app.utils.email_utils import add_ucc_domain, staff_id_format
+from fastapi import HTTPException
+from supabase_auth.errors import AuthApiError
 
 def staff_login(request):
     try:
@@ -22,20 +24,40 @@ def staff_login(request):
             "refresh_token": session.refresh_token
         }
 
-    except Exception:
+    except Exception as e:
+        print(f"Staff login error: {e}")
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+def auth_refresh_token(request):
+    try:
+        auth_response = supabase.auth.refresh_session(
+            request.refresh_token
+        )
+
+        session = auth_response.session
+
+        if not session:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid or expired refresh token"
+            )
+
         return {
-            "success": False,
-            "message": "Invalid email or password"
+            "access_token": session.access_token,
+            "refresh_token": session.refresh_token
         }
 
-def auth_refresh_token(request: RefreshTokenRequest):
-    auth_response = supabase.auth.refresh_session(
-        request.refresh_token
-    )
+    except HTTPException:
+        raise
 
-    session = auth_response.session
+    except Exception as e:
+        print(f"Token refresh error: {e}")
 
-    return {
-        "access_token": session.access_token,
-        "refresh_token": session.refresh_token
-    }
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token"
+        )
