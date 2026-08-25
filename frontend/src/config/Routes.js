@@ -33,7 +33,7 @@ export const AdminRoutes = [
         component: "appointments",
     },
     {
-        path: ROUTES.admin.dashboard.patients,
+        path: ROUTES.admin.dashboard.patient,
         label: "Patient Management",
         icon: UsersRound,
         component: "patients"

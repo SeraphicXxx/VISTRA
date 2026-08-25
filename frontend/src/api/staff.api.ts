@@ -12,7 +12,7 @@ export const getStaffById = async (
     signal?: AbortSignal
 ): Promise<StaffModel> => {
     const { data: apiResponse } = await apiClient<ApiResponse<StaffModel>>(
-        API_ENDPOINTS.admin.getStaffById(staffId),
+        API_ENDPOINTS.staff.getStaffById(staffId),
         {
             method: "GET",
             signal,

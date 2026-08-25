@@ -10,13 +10,14 @@ export const API_ENDPOINTS = {
     public: {
         health_check: "/api/health",
     },
-
-    admin: {
+    auth:{
+        refresh_token: "/staff/auth/refresh",
+    },
+    staff: {
         login: "/staff/auth/login",
         create_staff: "/staff/",
         getStaffById: (staffId) => `/staff/${staffId}/`,
     },
-
     patient: {
         // WIP
     },

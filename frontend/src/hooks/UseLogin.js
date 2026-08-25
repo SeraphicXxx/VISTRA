@@ -45,12 +45,13 @@ export function useLogin() {
             const { data } = await loginStaff(credentials);
 
             if (!data.success) {
-                setError(data.message || "Invalid staff ID or password.");
+                setError("Invalid staff ID or password.");
                 return;
             }
 
             sessionManager.setLogin(
                 data.access_token,
+                data.refresh_token,
                 data.user
             );
 
