@@ -15,7 +15,6 @@ from app.schemas.staff import StaffData
 def create_staff(request):
     staff_id = remove_ucc_domain(request.staff_id)
     staff_auth_email = add_ucc_domain(request.staff_id)
-    print(get_current_user)
     try:
 
         auth_response = supabase_admin.auth.admin.create_user({
