@@ -1,9 +1,6 @@
 """
 TODO: Implement staff management functions using Supabase Admin API.
-staff_create() / 
-staff_get()
 staff_update()
-staff_delete()
 
 FIXME: phone is nulled
 """

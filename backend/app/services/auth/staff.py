@@ -18,7 +18,8 @@ def staff_login(request):
                 "staff_id": staff_id_format(user.email),
                 "email": user.email
             },
-            "access_token": session.access_token
+            "access_token": session.access_token,
+            "refresh_token": session.refresh_token
         }
 
     except Exception:
@@ -26,3 +27,15 @@ def staff_login(request):
             "success": False,
             "message": "Invalid email or password"
         }
+
+def auth_refresh_token(request: RefreshTokenRequest):
+    auth_response = supabase.auth.refresh_session(
+        request.refresh_token
+    )
+
+    session = auth_response.session
+
+    return {
+        "access_token": session.access_token,
+        "refresh_token": session.refresh_token
+    }
