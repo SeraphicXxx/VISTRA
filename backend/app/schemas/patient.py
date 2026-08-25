@@ -1,8 +1,6 @@
 from datetime import date, datetime
 from uuid import UUID
-
 from pydantic import BaseModel
-
 
 class Patient(BaseModel):
     id: UUID
@@ -10,8 +8,6 @@ class Patient(BaseModel):
     created_at: datetime
     updated_at: datetime
     created_by: str
-
-
 class PatientProfile(BaseModel):
     id: int
     patient_id: str
@@ -28,8 +24,6 @@ class PatientProfile(BaseModel):
     course: str | None = None
     contact_no: str | None = None
     school_year: str | None = None
-
-
 class PatientMedicalHistory(BaseModel):
     id: int
     patient_id: str
@@ -43,8 +37,6 @@ class PatientMedicalHistory(BaseModel):
     alcohol_intake: bool | None = None
     last_menstrual_period: str | None = "N/A"
     family_planning_method: str | None = None
-
-
 class PatientVitalSigns(BaseModel):
     id: int
     patient_id: str
@@ -54,8 +46,6 @@ class PatientVitalSigns(BaseModel):
     respiratory_rate: float | None = None
     eyes: float | None = None
     recorded_at: date | None = None
-
-
 class PatientFamilyMedicalHistory(BaseModel):
     id: int
     patient_id: str
