@@ -7,10 +7,10 @@ staff_delete()
 
 FIXME: phone is nulled
 """
-from app.config.security import get_current_user
 from app.database.database_client import supabase_admin, supabase
-from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 from app.schemas.staff import StaffData
+from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
+
 
 def create_staff(request):
     staff_id = remove_ucc_domain(request.staff_id)
@@ -37,15 +37,9 @@ def create_staff(request):
         })
 
         staff_data = StaffData(
-            id= auth_response.user.id,
+            id=auth_user_id,
             staff_id=staff_id,
-            first_name=request.first_name,
-            last_name=request.last_name,
-            middle_name=request.middle_name,
-            position=request.position,
-            specialty=request.specialty,
-            phone=request.phone,
-            email=request.email
+            **request.model_dump(exclude={"staff_id", "password"})
         )
 
         db_response = insert_staff_into_db(staff_data)
