@@ -21,16 +21,6 @@ def create_staff(request):
             "email": staff_auth_email,
             "password": request.password,
             "email_confirm": True,
-            "user_metadata": {
-                "staff_id": staff_id,
-                "first_name": request.first_name,
-                "position": request.position,
-                "last_name": request.last_name,
-                "middle_name": request.middle_name,
-                "specialty": request.specialty,
-                "phone": request.phone,
-                "email": request.email
-            },
             "app_metadata": {
                 "role": "staff"
             }
@@ -71,7 +61,6 @@ def create_staff(request):
             "success": False,
             "message": str(e)
         }
-
 def insert_staff_into_db(staff_data : StaffData):
     try:
         response = (supabase.table("STAFF")
