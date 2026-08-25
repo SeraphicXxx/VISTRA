@@ -6,8 +6,8 @@ import { sessionManager } from "../utils/SessionManager";
 
 const HIDDEN_HEADER_PATHS =
     [
-        "/admin/medical/medical-record-form",
-        "/admin/medical/records/viewrecord",
+        "/staff/medical/medical-record-form",
+        "/staff/medical/records/viewrecord",
     ];
 
 

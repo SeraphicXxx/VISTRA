@@ -1,8 +1,6 @@
 """
 TODO: Implement staff management functions using Supabase Admin API.
 staff_update()
-
-FIXME: phone is nulled
 """
 from app.database.database_client import supabase_admin, supabase
 from app.schemas.staff import StaffData
