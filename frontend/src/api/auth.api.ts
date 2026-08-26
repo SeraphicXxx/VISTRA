@@ -1,5 +1,5 @@
-import { apiClient } from "./client";
-import { API_ENDPOINTS } from "../config/ApiConfig.js";
+import { apiClient } from "/@/api/client";
+import { API_ENDPOINTS } from "/@/config/ApiConfig";
 
 interface LoginStaffParams {
     staffId: string;

@@ -1,5 +1,5 @@
-import { sessionManager } from "../utils/SessionManager";
-import {API_ENDPOINTS} from "../config/ApiConfig";
+import { sessionManager } from "/@/utils/SessionManager";
+import {API_ENDPOINTS} from "/@/config/ApiConfig";
 
 const API_URL: string = import.meta.env.VITE_LOCAL_API_URL;
 let refreshPromise: Promise<string> | null = null;

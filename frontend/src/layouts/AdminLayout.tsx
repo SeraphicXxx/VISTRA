@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import Sidebar from "../pages/admin/sidebar";
-import StaffPageHeader from "../components/StaffPageHeader";
-import { sessionManager } from "../utils/SessionManager";
+import Sidebar from "/@/pages/admin/sidebar";
+import StaffPageHeader from "/@/components/StaffPageHeader";
+import { sessionManager } from "/@/utils/SessionManager";
 
 const HIDDEN_HEADER_PATHS =
     [

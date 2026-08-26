@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import {LogoClickable} from "../../components/Clickables.jsx";
+import {LogoClickable} from "/@/components/Clickables.jsx";
 
 const NAV_LINKS = [
     { href: "#app", label: "Mobile App" },

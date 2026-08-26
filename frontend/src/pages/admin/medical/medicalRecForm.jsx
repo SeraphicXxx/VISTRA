@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Save, ArrowLeft, User, ClipboardList, Info } from "lucide-react";
 import { students, emptyDetails, civilstatus, type as visitTypeOptions } from "./medicalData";
-import { ReadOnlyField } from "../../../utils/ReadOnlyField";
-import { StudentCombobox } from "../../../utils/StudentComboBox";
-import { FieldLabel } from "../../../utils/FieldLabel";
-import { EditableRowsTable } from "../../../utils/EditableRowsTable";
-import { useEditableRows } from "../../../utils/useEditableRows";
+import { ReadOnlyField } from "/@/utils/ReadOnlyField.jsx";
+import { StudentCombobox } from "/@/utils/StudentComboBox.jsx";
+import { FieldLabel } from "/@/utils/FieldLabel.jsx";
+import { EditableRowsTable } from "/@/utils/EditableRowsTable.jsx";
+import { useEditableRows } from "/@/utils/useEditableRows.js";
 
 const visitLogColumns = [
   { key: "date", header: "Date", type: "date", width: "w-40" },
