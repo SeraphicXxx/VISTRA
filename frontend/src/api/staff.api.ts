@@ -1,10 +1,10 @@
-import { apiClient } from "./client";
-import { API_ENDPOINTS } from "../config/ApiConfig.js";
-import { StaffModel } from "../repository/StaffModel.js";
+import { apiClient } from "/@/api/client";
+import { API_ENDPOINTS } from "/@/config/ApiConfig.js";
+import { StaffModel } from "/@/repository/StaffModel.js";
 
 interface ApiResponse<T> {
     success: boolean;
-    data: T;
+    data: Array<T>;
 }
 
 export const getStaffById = async (
@@ -21,6 +21,6 @@ export const getStaffById = async (
     if (!apiResponse) {
         throw new Error("Staff member not found");
     }
-
-    return new StaffModel(apiResponse.data);
+    console.log(apiResponse);
+    return new StaffModel(apiResponse.data[0]);
 };

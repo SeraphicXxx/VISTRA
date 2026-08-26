@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sessionManager } from "../utils/SessionManager.ts";
-import {ROUTES} from "../config/RoutePaths.js";
-import {loginStaff} from "../api/auth.api.ts";
+import { sessionManager } from "/@/utils/SessionManager.ts";
+import {ROUTES} from "/@/config/RoutePaths.js";
+import {loginStaff} from "/@/api/auth.api.ts";
 
 export function useLoginForm() {
     const [credentials, setCredentials] = useState({

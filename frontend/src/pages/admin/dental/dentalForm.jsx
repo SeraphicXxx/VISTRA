@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { ArrowLeft, Save, Stethoscope } from "lucide-react";
 
-import { FieldLabel } from "../../../utils/FieldLabel.jsx";
-import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
-import { TextField } from "../../../utils/TextField.jsx";
-import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
-import { StudentInfoSection } from "../../../components/StudentInfoSection.jsx";
+import { FieldLabel } from "/@/utils/FieldLabel.jsx";
+import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "/@/components/teethDesign.jsx";
+import { TextField } from "/@/utils/TextField.jsx";
+import { CheckboxRow } from "/@/utils/CheckboxRow.jsx";
+import { StudentInfoSection } from "/@/components/StudentInfoSection.jsx";
 import { students } from "../medical/medicalData";
 
 const medicalHistoryItems = [

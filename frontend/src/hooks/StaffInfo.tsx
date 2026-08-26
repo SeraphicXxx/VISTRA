@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
-import { getStaffById } from "../api/staff.api";
-import type { StaffModel } from "../repository/StaffModel";
-interface UseStaffInfoResult {
-    staffData: StaffModel | null;
-    isLoading: boolean;
-    error: string;
-}
+import { getStaffById } from "/@/api/staff.api";
+import type { StaffModel } from "/@/repository/StaffModel";
 export function useStaffInfo(staffId: string) {
     const [staffData, setStaffData] = useState<StaffModel | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-    console.log(staffData)
+
     useEffect(() => {
         const controller = new AbortController();
 
@@ -23,7 +18,7 @@ export function useStaffInfo(staffId: string) {
                     staffId,
                     controller.signal
                 );
-
+                console.log(data)
                 setStaffData(data);
             } catch (err) {
 
@@ -44,7 +39,6 @@ export function useStaffInfo(staffId: string) {
         };
 
         void loadStaff();
-
         return () => {
             controller.abort();
         };

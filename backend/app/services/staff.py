@@ -3,6 +3,7 @@ TODO: Implement staff management functions using Supabase Admin API.
 staff_update()
 """
 from app.database.database_client import supabase_admin, supabase
+from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 
@@ -58,9 +59,9 @@ def create_staff(request):
         }
 def insert_staff_into_db(staff_data : StaffData):
     try:
-        response = (supabase.table("STAFF")
-                    .insert(staff_data.model_dump())
-                    .execute())
+        staff_repo = StaffRepository(supabase)
+        response = staff_repo.create(staff_data)
+
         return {
             "success": True,
             "data": response.data
@@ -70,6 +71,7 @@ def insert_staff_into_db(staff_data : StaffData):
             "success": False,
             "message": str(e)
         }
+
 def delete_staff(staff_id: str):
     try:
         response = supabase_admin.auth.admin.delete_user(staff_id)
@@ -84,23 +86,19 @@ def delete_staff(staff_id: str):
             "success": False,
             "message": str(e)
         }
+
 def get_staff_by_id(staff_id: str):
     try:
-        response = (
-            supabase
-            .table("STAFF")
-            .select("*")
-            .eq("staff_id", staff_id)
-            .execute()
-        )
+        staff_repo = StaffRepository(supabase)
+        response = staff_repo.get_by_id(staff_id)
 
         print("staff_id:", repr(staff_id))
-        print("response.data:", response.data)
+        print("response:", response)
 
-        if response.data:
+        if response:
             return {
                 "success": True,
-                "data": response.data[0]
+                "data": response
             }
 
         return {

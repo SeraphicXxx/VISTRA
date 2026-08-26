@@ -8,7 +8,7 @@ import Sidebar from "./sidebar";
 import AppointmentsTab from "./appointments/appointmentsTab";
 import OverviewTab from "./overview/overview";
 import MedicalTab from "./medical/medicalTab";
-import { filterByQuery } from "../../utils/FilterByQuery.js";
+import { filterByQuery } from "/@/utils/FilterByQuery.js";
 const RECORDS = [
   { id: "REC-3391", student: "Miguel Santos", lastUpdated: "Aug 3, 2026", updatedBy: "Dr. Villanueva" },
   { id: "REC-3392", student: "Ana Reyes", lastUpdated: "Aug 3, 2026", updatedBy: "Nurse Ibarra" },
