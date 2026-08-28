@@ -21,6 +21,8 @@ import DentalRecordView from "../pages/admin/dental/dentalViewRec";
 
 import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
 
+import PatientsTab from "../pages/admin/patients/patientsTab.jsx"
+import NewPatientRecordForm from "../pages/admin/patients/patientNewRec.jsx"
 
 import ProtectedRoute from "../components/ProtectedRoute.jsx"
 
@@ -51,6 +53,9 @@ function AppRoutes() {
             <Route path={ROUTES.admin.dental.viewRecord} element={<DentalRecordView />} />
 
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
+
+            <Route path={ROUTES.admin.dashboard.patients} element={<PatientsTab/>}/>
+            <Route path={ROUTES.admin.patient.createNewRecord} element={<NewPatientRecordForm/>} />
           </Route>
         </Route>
       </Routes>

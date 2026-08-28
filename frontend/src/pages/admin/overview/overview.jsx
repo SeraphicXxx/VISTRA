@@ -84,7 +84,7 @@ function ConsultationPanel({filteredRecords}){
               </span>
             }
         />
-        <div className="mt-5">
+        <div className="mt-5 overflow-x-auto max-h-96">
           <ConsultationsList entries={filteredRecords} />
         </div>
       </div>

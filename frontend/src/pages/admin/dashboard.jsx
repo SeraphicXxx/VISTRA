@@ -120,7 +120,7 @@ function RecordsTab({ searchQuery }) {
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
       <PanelHeader title="Student Records" />
-      <div className="mt-4">
+      <div className="mt-4 ">
         <RecordsTable records={filteredRecords} />
       </div>
     </div>

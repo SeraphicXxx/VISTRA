@@ -9,6 +9,8 @@ const NO_HEADER_ROUTES = [
   "/admin/medical/records/view",
   "/admin/dental/new",
   "/admin/dental/records/view",
+  "/admin/patient/new"
+  ,
 ];
 
 export default function AdminLayout() {
