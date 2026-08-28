@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import Config
-from app.routes import health, auth, staff
+from app.routes import health, auth, staff, patient
 
 
 app = FastAPI(
@@ -21,3 +21,4 @@ app.include_router(health.router)
 app.include_router(auth.staff_auth_router)
 app.include_router(staff.create_staff_router)
 app.include_router(staff.get_staff_by_id_router)
+app.include_router(patient.get_all_patients_router)
