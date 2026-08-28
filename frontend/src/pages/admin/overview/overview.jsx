@@ -120,7 +120,6 @@ export default function OverviewTab() {
             name="Appointment"
             data={filteredAppointments}
             columns={getTableColumns(filteredAppointments, ["id"])}
-            createRecordPath={ROUTES.admin.appointment.createNewRecord}
             icon={CalendarClock}
             createDisabled={true}
             showCreate={false}
