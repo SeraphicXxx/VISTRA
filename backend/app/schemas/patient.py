@@ -51,3 +51,12 @@ class PatientFamilyMedicalHistory(BaseModel):
     patient_id: str
     condition: str | None = "NONE"
     other_condition: str | None = "NONE"
+class CreatePatientRequest(BaseModel): #caller -> backend shi
+    patient_id: str
+    email: str
+    password: str
+    created_by: str
+class PatientData(BaseModel): #service -> repo -> DB shi
+    id: UUID
+    patient_id: str
+    created_by: str
