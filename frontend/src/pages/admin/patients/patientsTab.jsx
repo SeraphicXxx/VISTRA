@@ -16,7 +16,7 @@ export default function PatientsTab() {
             renderRow={(record) => (
                 <PatientRow
                     data={record}
-                    viewRecordPath={ROUTES.admin.medical.viewRecord}
+                    viewRecordPath={ROUTES.admin.patient.patientRecordTab}
                 />
             )}
         />

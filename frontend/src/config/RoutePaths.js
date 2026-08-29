@@ -1,3 +1,5 @@
+import { students } from "../pages/admin/medical/medicalData";
+
 export const ROUTES = {
     public: {
         home: "/",
@@ -27,7 +29,9 @@ export const ROUTES = {
         },
         patient: {
             createNewRecord: "/admin/patient/new",
-            viewRecord: "/admin/patient/records/view"
+            patientRecordTab: "/admin/patient/record/view",
+            viewRecord: "/admin/patient/records/allrecords",
+
         },
     },
 };
