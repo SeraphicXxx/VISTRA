@@ -3,60 +3,58 @@ TODO: Implement staff management functions using Supabase Admin API.
 staff_update()
 """
 from app.database.database_client import supabase_admin, supabase
+from app.services.auth.user import create_auth_user,delete_auth_user
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 
 
-def create_staff(request):
+def create_staff(request: CreateStaffRequest):
     staff_id = remove_ucc_domain(request.staff_id)
-    staff_auth_email = add_ucc_domain(request.staff_id)
-    try:
 
-        auth_response = supabase_admin.auth.admin.create_user({
-            "email": staff_auth_email,
-            "password": request.password,
-            "email_confirm": True,
-            "app_metadata": {
-                "role": "staff"
-            }
-        })
+    auth_response = create_auth_user(
+        user_id=staff_id,
+        password=request.password,
+        role="staff"
+    )
 
-        staff_data = StaffData(
-            id=auth_user_id,
-            staff_id=staff_id,
-            **request.model_dump(exclude={"staff_id", "password"})
+    if not auth_response["success"]:
+        return auth_response
+
+    user = auth_response["user"]
+
+    staff_data = StaffData(
+        id=user.id,
+        staff_id=staff_id,
+        **request.model_dump(
+            exclude={"staff_id", "password"}
         )
+    )
 
-        db_response = insert_staff_into_db(staff_data)
+    db_response = insert_staff_into_db(staff_data)
 
-        if db_response["success"]:
-            return {
-                "success": True,
-                "user": staff_data.model_dump()
-            }
+    if db_response["success"]:
+        return {
+            "success": True,
+            "user": staff_data.model_dump()
+        }
+    
+    delete_response = delete_auth_user(user.id)
 
-        delete_response = delete_staff(auth_response.user.id)
-
-        if delete_response["success"]:
-            return {
-                "success": False,
-                "message": db_response["message"]
-            }
-
+    if delete_response["success"]:
         return {
             "success": False,
-            "message": (
-                "Failed to insert staff into database and failed to delete "
-                f"user from auth: {delete_response['message']}"
-            )
+            "message": db_response["message"]
         }
 
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": False,
+        "message": (
+            "Failed to insert staff into database and failed to delete "
+            f"user from auth: {delete_response['message']}"
+        )
+    }
+
 def insert_staff_into_db(staff_data : StaffData):
     try:
         staff_repo = StaffRepository(supabase)
@@ -66,21 +64,6 @@ def insert_staff_into_db(staff_data : StaffData):
             "success": True,
             "data": response.data
         }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
-
-def delete_staff(staff_id: str):
-    try:
-        response = supabase_admin.auth.admin.delete_user(staff_id)
-
-        return {
-            "success": True,
-            "data": response
-        }
-
     except Exception as e:
         return {
             "success": False,
