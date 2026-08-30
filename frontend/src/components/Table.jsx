@@ -6,7 +6,6 @@ import { avatarColor, getInitials, getTypeIcon } from "./avatar.jsx";
 import { filterByQuery } from "../utils/FilterByQuery.js";
 import PanelHeader from "./PanelHeader.jsx";
 import { LinkButton } from "./Button.jsx";
-import { DepartmentBadge } from "./overviewcmp.jsx";
 
 export const RecordsTablePanel = ({
   name,
@@ -47,7 +46,9 @@ export const RecordsTablePanel = ({
             <p className="mt-0.5 text-xs text-textMuted">
               {filteredData.length}{" "}
               {filteredData.length === 1 ? "record" : "records"}
-              {searchQuery ? ` matching "${searchQuery}"` : " on file"}
+              {searchQuery
+                ? ` matching "${searchQuery}"`
+                : " on file"}
             </p>
           </div>
         </div>
@@ -70,15 +71,17 @@ export const GenericTable = ({ data, columns, renderRow }) => {
   return (
     <table className="w-full min-w-[640px] border-separate border-spacing-0">
       <GenericTableHeader columns={columns} />
+
       <GenericTableBody
         data={data}
-        colSpan={columns.length}
+        colSpan={columns.length + 1}
         renderRow={renderRow}
         emptyState={
           <div className="flex flex-col items-center gap-2">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-textMuted/10 text-textMuted">
               <FileX2 className="h-5 w-5" strokeWidth={1.75} />
             </span>
+
             <p className="text-sm text-textMuted">
               No records match your search.
             </p>
@@ -89,7 +92,12 @@ export const GenericTable = ({ data, columns, renderRow }) => {
   );
 };
 
-export const GenericTableBody = ({ data, colSpan, renderRow, emptyState }) => {
+export const GenericTableBody = ({
+  data,
+  colSpan,
+  renderRow,
+  emptyState,
+}) => {
   if (data.length === 0) {
     return (
       <tbody>
@@ -103,7 +111,9 @@ export const GenericTableBody = ({ data, colSpan, renderRow, emptyState }) => {
   return (
     <tbody>
       {data.map((record) => (
-        <React.Fragment key={record.id}>{renderRow(record)}</React.Fragment>
+        <React.Fragment key={record.id}>
+          {renderRow(record)}
+        </React.Fragment>
       ))}
     </tbody>
   );
@@ -121,6 +131,7 @@ const GenericTableHeader = ({ columns }) => {
             {col}
           </th>
         ))}
+
         <th className="border-b border-border pb-2" />
       </tr>
     </thead>
@@ -142,6 +153,7 @@ export function GenericRow({ data, viewRecordPath }) {
           >
             {getInitials(data.student)}
           </span>
+
           <span className="text-sm font-medium text-textPrimary">
             {data.student}
           </span>
@@ -177,7 +189,10 @@ export function GenericRow({ data, viewRecordPath }) {
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
         >
           View
-          <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
+          <ChevronRight
+            className="h-3.5 w-3.5"
+            strokeWidth={2}
+          />
         </button>
       </td>
     </tr>
@@ -224,16 +239,22 @@ export function PatientRow({ data, viewRecordPath }) {
       <td className="border-b border-border py-3 pr-4 text-sm text-textSecondary">
         {data.lastVisit}
       </td>
-        <td className="border-b border-border py-3 text-right">
+
+      <td className="border-b border-border py-3 text-right">
         <button
-            type="button"
-            onClick={() => navigate(`${viewRecordPath}/${data.id}`)}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
+          type="button"
+          onClick={() =>
+            navigate(`${viewRecordPath}/${data.id}`)
+          }
+          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
         >
-            View
-            <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
+          View
+          <ChevronRight
+            className="h-3.5 w-3.5"
+            strokeWidth={2}
+          />
         </button>
-        </td>
+      </td>
     </tr>
   );
 }

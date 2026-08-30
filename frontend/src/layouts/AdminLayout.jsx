@@ -9,14 +9,17 @@ const NO_HEADER_ROUTES = [
   "/admin/medical/records/view",
   "/admin/dental/new",
   "/admin/dental/records/view",
-  "/admin/patient/new"
-  ,
+  "/admin/patient/new",
+  "/admin/appointments/view",
+  "/admin/patient/record/view",
 ];
 
 export default function AdminLayout() {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-  const hideHeader = NO_HEADER_ROUTES.includes(location.pathname);
+  const hideHeader = NO_HEADER_ROUTES.some((route) =>
+  location.pathname.startsWith(route)
+);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background font-sans text-textPrimary selection:bg-primary/20">

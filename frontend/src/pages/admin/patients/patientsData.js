@@ -2,8 +2,8 @@ export const patientRecords = [
   {
     id: "PAT-1001",
     name: "Kenji Chua",
-    userType: "Student",
     userId: "20230786-S",
+    userType: "Student",
     course: "BS Computer Science",
     yearSection: "4th Year, Section A",
     lastVisit: "August 27, 2026",
@@ -11,8 +11,8 @@ export const patientRecords = [
   {
     id: "PAT-1002",
     name: "Ivan Mejorada",
-    userType: "Student",
     userId: "20230792-M",
+    userType: "Student",
     course: "BS Nursing",
     yearSection: "3rd Year, Section B",
     lastVisit: "August 26, 2026",
@@ -20,8 +20,8 @@ export const patientRecords = [
   {
     id: "PAT-1003",
     name: "Cjay Gonzales",
+    userId: "20240841-M",
     userType: "Student",
-    userId: "20240841-G",
     course: "BS Architecture",
     yearSection: "5th Year, Section A",
     lastVisit: "August 25, 2026",
@@ -29,8 +29,8 @@ export const patientRecords = [
   {
     id: "PAT-1004",
     name: "Joshua Lapitan",
+    userId: "20220653-C",
     userType: "Student",
-    userId: "20220653-L",
     course: "BS Civil Engineering",
     yearSection: "4th Year, Section C",
     lastVisit: "August 24, 2026",
@@ -38,8 +38,8 @@ export const patientRecords = [
   {
     id: "PAT-1005",
     name: "Rosh Ingel",
+    userId: "20240917-S",
     userType: "Student",
-    userId: "20240917-I",
     course: "BS Accountancy",
     yearSection: "2nd Year, Section B",
     lastVisit: "August 23, 2026",
@@ -47,8 +47,8 @@ export const patientRecords = [
   {
     id: "PAT-1006",
     name: "Maria Santos",
-    userType: "Student",
     userId: "20231524-S",
+    userType: "Student",
     course: "BS Psychology",
     yearSection: "3rd Year, Section A",
     lastVisit: "August 22, 2026",
@@ -56,8 +56,8 @@ export const patientRecords = [
   {
     id: "PAT-1007",
     name: "Daniel Reyes",
+    userId: "20220738-C",
     userType: "Student",
-    userId: "20220738-R",
     course: "BS Information Technology",
     yearSection: "4th Year, Section B",
     lastVisit: "August 21, 2026",
@@ -65,8 +65,8 @@ export const patientRecords = [
   {
     id: "PAT-1008",
     name: "Sofia Cruz",
-    userType: "Student",
     userId: "20241862-C",
+    userType: "Student",
     course: "BS Education",
     yearSection: "2nd Year, Section A",
     lastVisit: "August 20, 2026",
@@ -74,40 +74,36 @@ export const patientRecords = [
   {
     id: "PAT-1009",
     name: "Angel Bien",
-    userType: "Faculty",
     userId: "F-2023-045",
+    userType: "Faculty",
     department: "College of Computer Studies",
     lastVisit: "August 19, 2026",
   },
   {
     id: "PAT-1010",
     name: "Christian Espinoza",
-    userType: "Professor",
     userId: "F-2023-046",
+    userType: "Professor",
     department: "College of Engineering",
     lastVisit: "August 18, 2026",
   },
   {
     id: "PAT-1011",
     name: "Gillian Marc Lorenzo",
-    userType: "Faculty",
     userId: "F-2024-012",
+    userType: "Faculty",
     department: "College of Business Administration",
     lastVisit: "August 17, 2026",
   },
   {
     id: "PAT-1012",
     name: "Admin User",
-    userType: "Admin",
     userId: "A-2023-045",
+    userType: "Admin",
     department: "University Clinic",
     lastVisit: "August 16, 2026",
   },
 ];
-
-// Mock records for the clinic app, keyed by patient.id (matches patientRecords in patientsData.js).
-// Each patient maps to { medical: [...], dental: [...], appointment: [...] }.
-// Swap this out once a real API/database is wired up — see the note at the bottom.
 
 export const patientRecordsMockData = {
   "PAT-1001": {
@@ -339,7 +335,18 @@ export const patientRecordsMockData = {
     dental: [],
     appointment: [],
   },
+
+  
 };
+
+  export const patientColumns = [
+  "Name",
+  "User ID",
+  "User Type",
+  "Course / Department",
+  "Year & Section",
+  "Last Visit",
+];
 
 // Returns the records for a patient, falling back to empty arrays if the ID isn't in the mock data
 // (keeps the shape identical to what the real API is expected to return).
@@ -352,3 +359,4 @@ export function getMockPatientRecords(patientId) {
     }
   );
 }
+
