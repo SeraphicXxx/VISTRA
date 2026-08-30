@@ -13,7 +13,6 @@ import {
 } from "/@/components/overviewcmp.jsx";
 import { statusLabels} from "/@/components/statusbadge.jsx";
 import {RecordsTablePanel} from "/@/components/Table.jsx";
-import {ROUTES} from "/@/config/RoutePaths.js";
 import {getTableColumns} from "/@/utils/TableUtils.js";
 import {CardList} from "/@/components/CardList.jsx";
 

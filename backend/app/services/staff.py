@@ -2,11 +2,11 @@
 TODO: Implement staff management functions using Supabase Admin API.
 staff_update()
 """
-from app.database.database_client import supabase_admin, supabase
-from app.services.auth.user import create_auth_user,delete_auth_user
+from app.database.database_client import supabase
 from app.repositories.staff_repositories import StaffRepository
-from app.schemas.staff import StaffData,CreateStaffRequest
-from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
+from app.schemas.staff import StaffData, CreateStaffRequest
+from app.services.auth.user import create_auth_user, delete_auth_user
+from app.utils.email_utils import remove_ucc_domain
 
 
 def create_staff(request: CreateStaffRequest):

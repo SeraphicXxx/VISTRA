@@ -1,9 +1,8 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
 import { getInitials, avatarColor } from "/@/components/avatar.jsx";
 import { ROUTES } from "/@/config/RoutePaths";
 import { StatusBadge } from "/@/components/statusbadge.jsx";
-import {GenericTable} from "/@/components/Table.jsx";
+import {GenericRow, GenericTable} from "/@/components/Table.jsx";
 import {getTableColumns} from "/@/utils/TableUtils.js";
 
 const defaultColumns = [
@@ -32,7 +31,7 @@ const defaultColumns = [
     render: (appointment) => <StatusBadge status={appointment.status} />,
   },
 ];
-
+// DEPRECATED
 export default function AppointmentsTable({ appointments, columns = defaultColumns }) {
   return (
     <div className="overflow-x-auto">

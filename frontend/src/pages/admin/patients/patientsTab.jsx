@@ -5,9 +5,9 @@ import { patientRecords, patientColumns} from "./patientsData";
 import {
   RecordsTablePanel,
   PatientRow,
-} from "../../../components/Table.jsx";
+} from "/@/components/Table.jsx";
 
-import { ROUTES } from "../../../config/RoutePaths.js";
+import { ROUTES } from "/@/config/RoutePaths.js";
 
 export default function PatientsTab() {
   return (

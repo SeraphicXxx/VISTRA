@@ -20,6 +20,7 @@ export const ROUTES = {
         },
         appointment: {
             createNewRecord: "/staff/appointment/new",
+            viewAppointment: "/staff/appointment/view"
         },
         dental: {
             createNewRecord: "/staff/dental/new",
