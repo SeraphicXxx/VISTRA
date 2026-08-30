@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import { getInitials, avatarColor } from "/@/components/avatar.jsx";
+import { ROUTES } from "/@/config/RoutePaths";
 import { StatusBadge } from "/@/components/statusbadge.jsx";
 import {GenericTable} from "/@/components/Table.jsx";
 import {getTableColumns} from "/@/utils/TableUtils.js";
@@ -38,6 +39,10 @@ export default function AppointmentsTable({ appointments, columns = defaultColum
       <GenericTable
           data={appointments}
           columns={getTableColumns(appointments, ["id"])}
+           renderRow={(record) => (
+        <GenericRow data={record} viewRecordPath={ROUTES.admin.appointment.viewAppointment} />
+
+      )}
       />
     </div>
   );

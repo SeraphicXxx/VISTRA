@@ -23,6 +23,12 @@ import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/components/ProtectedRoute.jsx"
 
+import PatientsTab from "/@/pages/admin/patients/patientsTab.jsx"
+import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
+import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"
+
+import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -51,6 +57,10 @@ function AppRoutes() {
             <Route path={ROUTES.admin.dental.viewRecord} element={<DentalRecordView />} />
 
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
+            <Route path={ROUTES.admin.appointment.viewAppointment} element={<AppointmentDetailView/>}/>
+            <Route path={ROUTES.admin.dashboard.patients} element={<PatientsTab/>}/>
+            <Route path={ROUTES.admin.patient.createNewRecord} element={<NewPatientRecordForm/>} />
+            <Route path={`${ROUTES.admin.patient.patientRecordTab}/:id`} element={<ViewStudentRecord />} />
           </Route>
         </Route>
       </Routes>

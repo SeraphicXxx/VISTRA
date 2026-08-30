@@ -5,7 +5,7 @@ staff_update()
 from app.database.database_client import supabase_admin, supabase
 from app.services.auth.user import create_auth_user,delete_auth_user
 from app.repositories.staff_repositories import StaffRepository
-from app.schemas.staff import StaffData
+from app.schemas.staff import StaffData,CreateStaffRequest
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 
 

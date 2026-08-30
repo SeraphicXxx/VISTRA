@@ -12,6 +12,7 @@ export const ROUTES = {
             medical: "/staff/dashboard/medical",
             dental: "/staff/dashboard/dental",
             appointments: "/staff/dashboard/appointments",
+            patients: "/staff/dashboard/patients",
         },
        medical: {
             viewRecord: "/staff/medical/records/view",
@@ -26,7 +27,9 @@ export const ROUTES = {
 
         },
         patient: {
+            createNewRecord: "/staff/patient/new",
+            patientRecordTab: "/staff/patient/record/view",
 
-        }
+        },
     },
 };

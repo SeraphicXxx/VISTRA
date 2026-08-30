@@ -84,7 +84,7 @@ function ConsultationPanel({filteredRecords}){
               </span>
             }
         />
-        <div className="mt-5">
+        <div className="mt-5 overflow-x-auto max-h-96">
           <ConsultationsList entries={filteredRecords} />
         </div>
       </div>
@@ -120,7 +120,6 @@ export default function OverviewTab() {
             name="Appointment"
             data={filteredAppointments}
             columns={getTableColumns(filteredAppointments, ["id"])}
-            createRecordPath={ROUTES.admin.appointment.createNewRecord}
             icon={CalendarClock}
             createDisabled={true}
             showCreate={false}
