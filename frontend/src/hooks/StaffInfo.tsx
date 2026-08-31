@@ -18,7 +18,7 @@ export function useStaffInfo(staffId: string) {
                     staffId,
                     controller.signal
                 );
-                console.log(data)
+                console.log(data, "Staff Data");
                 setStaffData(data);
             } catch (err) {
 

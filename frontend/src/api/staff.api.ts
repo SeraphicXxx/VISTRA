@@ -14,12 +14,12 @@ export const getStaffById = async (
             signal,
         }
     );
-
+    console.log(apiResponse);
     if (!apiResponse.success) {
         throw new Error(apiResponse.message || `Staff not found for ${staffId}`);
     }
 
-    if (!apiResponse.data || apiResponse.data.length === 0) {
+    if (!apiResponse.data || apiResponse.data.length === 0 || !apiResponse) {
         throw new Error(`Staff not found for ${staffId}`);
     }
 

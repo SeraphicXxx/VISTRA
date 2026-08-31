@@ -36,7 +36,7 @@ def create_staff(request: CreateStaffRequest):
     if db_response["success"]:
         return {
             "success": True,
-            "user": staff_data.model_dump()
+            "message": "Staff inserted into database"
         }
     
     delete_response = delete_auth_user(user.id)

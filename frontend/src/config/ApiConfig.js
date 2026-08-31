@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
         getStaffById: (staffId) => `/staff/${staffId}/`,
     },
     patient: {
-        // WIP
+        get_patients: "/patient/",
+        create_patient: "/patient/",
+        getPatientById: (patientId) => `/patient/${patientId}`,
     },
 };

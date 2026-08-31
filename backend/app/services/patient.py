@@ -69,7 +69,7 @@ def create_patient(request: CreatePatientRequest):
     if insert_response["success"]:
         return {
             "success": True,
-            "user": patient_data.model_dump()
+            "message": "Patient inserted into database"
         }
 
     delete_response = delete_auth_user(user.id)
