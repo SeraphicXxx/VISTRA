@@ -19,6 +19,5 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(auth.staff_auth_router)
-app.include_router(staff.create_staff_router)
-app.include_router(staff.get_staff_by_id_router)
-app.include_router(patient.patients_router)
+app.include_router(staff.protected_staff_router)
+app.include_router(patient.protected_patients_router)
