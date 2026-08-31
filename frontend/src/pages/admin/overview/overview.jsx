@@ -3,19 +3,18 @@ import { useOutletContext } from "react-router-dom";
 import { FileText, Stethoscope, CalendarClock } from "lucide-react";
 import StatsGrid from "./stats";
 import { APPOINTMENTS } from "../appointments/appointmentsData";
-import { filterByQuery } from "../../../utils/FilterByQuery.js"
-import PanelHeader from "../../../components/OverviewHeader.jsx";
+import { filterByQuery } from "/@/utils/FilterByQuery.js"
+import PanelHeader from "/@/components/OverviewHeader.jsx";
 import {
   buildClinicalRecords,
   parseTimeToday,
   DepartmentBadge,
   recordLimit,
-} from "../../../components/overviewcmp.jsx";
-import { statusLabels} from "../../../components/statusbadge.jsx";
-import {RecordsTablePanel} from "../../../components/Table.jsx";
-import {ROUTES} from "../../../config/RoutePaths.js";
-import {getTableColumns} from "../../../utils/TableUtils.js";
-import {CardList} from "../../../components/CardList.jsx";
+} from "/@/components/overviewcmp.jsx";
+import { statusLabels} from "/@/components/statusbadge.jsx";
+import {RecordsTablePanel} from "/@/components/Table.jsx";
+import {getTableColumns} from "/@/utils/TableUtils.js";
+import {CardList} from "/@/components/CardList.jsx";
 
 
 function ConsultationCard({ entry }) {

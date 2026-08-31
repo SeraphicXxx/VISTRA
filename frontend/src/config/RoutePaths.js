@@ -4,33 +4,32 @@ export const ROUTES = {
     },
 
     admin: {
-        home: "/admin",
+        home: "/staff",
         login: "/login",
 
         dashboard: {
-            overview: "/admin/dashboard/overview",
-            medical: "/admin/dashboard/medical",
-            dental: "/admin/dashboard/dental",
-            appointments: "/admin/dashboard/appointments",
-            patients: "/admin/dashboard/patients"
-            ,
+            overview: "/staff/dashboard/overview",
+            medical: "/staff/dashboard/medical",
+            dental: "/staff/dashboard/dental",
+            appointments: "/staff/dashboard/appointments",
+            patients: "/staff/dashboard/patients",
         },
-
        medical: {
-            viewRecord: "/admin/medical/records/view",
-            createNewRecord: "/admin/medical/new",
-        },
-        dental: {
-            createNewRecord: "/admin/dental/new",
-            viewRecord: "/admin/dental/records/view",
-
+            viewRecord: "/staff/medical/records/view",
+            createNewRecord: "/staff/medical/new",
         },
         appointment: {
-            viewAppointment: "/admin/appointments/view"
+            createNewRecord: "/staff/appointment/new",
+            viewAppointment: "/staff/appointment/view"
+        },
+        dental: {
+            createNewRecord: "/staff/dental/new",
+            viewRecord: "/staff/dental/records/view",
+
         },
         patient: {
-            createNewRecord: "/admin/patient/new",
-            patientRecordTab: "/admin/patient/record/view",
+            createNewRecord: "/staff/patient/new",
+            patientRecordTab: "/staff/patient/record/view",
 
         },
     },

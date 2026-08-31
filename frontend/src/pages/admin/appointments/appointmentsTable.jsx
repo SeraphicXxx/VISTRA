@@ -1,10 +1,9 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
-import { ROUTES } from "../../../config/RoutePaths";
-import { getInitials, avatarColor } from "../../../components/avatar.jsx";
-import { StatusBadge } from "../../../components/statusbadge.jsx";
-import { GenericTable, GenericRow } from "../../../components/Table.jsx";
-import {getTableColumns} from "../../../utils/TableUtils.js";
+import { getInitials, avatarColor } from "/@/components/avatar.jsx";
+import { ROUTES } from "/@/config/RoutePaths";
+import { StatusBadge } from "/@/components/statusbadge.jsx";
+import {GenericRow, GenericTable} from "/@/components/Table.jsx";
+import {getTableColumns} from "/@/utils/TableUtils.js";
 
 const defaultColumns = [
   {
@@ -32,7 +31,7 @@ const defaultColumns = [
     render: (appointment) => <StatusBadge status={appointment.status} />,
   },
 ];
-
+// DEPRECATED
 export default function AppointmentsTable({ appointments, columns = defaultColumns }) {
   return (
     <div className="overflow-x-auto">
@@ -41,7 +40,7 @@ export default function AppointmentsTable({ appointments, columns = defaultColum
           columns={getTableColumns(appointments, ["id"])}
            renderRow={(record) => (
         <GenericRow data={record} viewRecordPath={ROUTES.admin.appointment.viewAppointment} />
-        
+
       )}
       />
     </div>

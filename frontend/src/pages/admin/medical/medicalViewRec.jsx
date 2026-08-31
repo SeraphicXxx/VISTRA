@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowLeft, User, ClipboardList, CheckCircle2, AlertCircle, Phone, MapPin, Printer } from "lucide-react";
-import { InfoField, getInitials } from "../../../utils/RecordInfo.jsx";
+import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 
 function StatusBadge({ status }) {
   const isCleared = status === "Cleared";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, User, ClipboardList, Printer, Stethoscope } from "lucide-react";
-import { ToothArch, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
-import { InfoField, getInitials } from "../../../utils/RecordInfo.jsx";
+import { ToothArch, upperTeeth, lowerTeeth } from "/@/components/teethDesign.jsx";
+import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 import { ToothViewModal } from "./dentalModal.jsx"
 
 const exampleDental = {

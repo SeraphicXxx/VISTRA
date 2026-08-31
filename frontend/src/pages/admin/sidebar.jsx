@@ -1,15 +1,16 @@
 import React, { forwardRef, useRef } from "react";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
-import { useSidebar } from "../../hooks/UseSidebar.js";
-import { Logo } from "../../components/Logo";
+import { useSidebar } from "/@/hooks/UseSidebar.js";
 import {
   LogOut,
   Menu,
   X,
 } from "lucide-react";
-import {sessionManager} from "../../utils/SessionManager.js";
-import { AdminRoutes } from "../../config/Routes.js";
-import {ROUTES} from "../../config/RoutePaths.js";
+import {sessionManager} from "/@/utils/SessionManager.ts";
+import { AdminRoutes } from "/@/config/Routes.js";
+import {ROUTES} from "/@/config/RoutePaths.js";
+
+import {LogoClickable} from "/@/components/Button.jsx";
 
 const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
   const Icon = item.icon;
@@ -48,7 +49,7 @@ export default function Sidebar() {
     <>
     
       <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
-        <Logo className="h-7" />
+        <LogoClickable className="h-7" navigateTo={ROUTES.admin.dashboard.overview} />
         <button
           type="button"
           onClick={() => open()}
@@ -77,7 +78,7 @@ export default function Sidebar() {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between gap-2.5 px-6 py-6">
-          <Logo />
+          <LogoClickable className="h-8" navigateTo={ROUTES.admin.dashboard.overview} />
 
           <button
             type="button"
@@ -91,12 +92,14 @@ export default function Sidebar() {
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4">
           {AdminRoutes.map((item, index) => (
-            <SidebarLink
-              key={item.path}
-              item={item}
-              onNavigate={() => close()}
-              ref={index === 0 ? firstLinkRef : undefined}
-            />
+
+                <SidebarLink
+                    key={item.path}
+                    item={item}
+                    onNavigate={() => close()}
+                    ref={index === 0 ? firstLinkRef : undefined}
+                />
+
           ))}
         </nav>
 

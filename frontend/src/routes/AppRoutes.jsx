@@ -1,33 +1,33 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { ROUTES } from "../config/RoutePaths";
+import { ROUTES } from "/@/config/RoutePaths";
 
-import PublicLayout from "../layouts/PublicLayout";
-import AdminLayout from "../layouts/AdminLayout";
+import PublicLayout from "/@/layouts/PublicLayout";
+import AdminLayout from "/@/layouts/AdminLayout.tsx";
 
-import LandingPage from "../pages/public/landingpage";
-import AdminHome from "../pages/admin/home";
-import AdminLoginPage from "../pages/admin/login";
+import LandingPage from "/@/pages/public/landingpage";
+import StaffLandingPage from "/@/pages/admin/home";
+import StaffLoginPage from "/@/pages/admin/login";
 
-import OverviewTab from "../pages/admin/overview/overview";
+import OverviewTab from "/@/pages/admin/overview/overview";
 
-import MedicalTab from "../pages/admin/medical/medicalTab";
-import PatientRecordForm from "../pages/admin/medical/medicalRecForm";
-import PatientRecordView from "../pages/admin/medical/medicalViewRec";
+import MedicalTab from "/@/pages/admin/medical/medicalTab";
+import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
+import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
 
-import DentalTab from "../pages/admin/dental/dentalTab";
-import DentalRecordForm from "../pages/admin/dental/dentalForm";
-import DentalRecordView from "../pages/admin/dental/dentalViewRec";
+import DentalTab from "/@/pages/admin/dental/dentalTab";
+import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
+import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 
-import AppointmentsTab from "../pages/admin/appointments/appointmentsTab";
+import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
+import PageNotFound from "/@/pages/public/PageNotFound";
+import ProtectedRoute from "/@/components/ProtectedRoute.jsx"
 
-import PatientsTab from "../pages/admin/patients/patientsTab.jsx"
-import NewPatientRecordForm from "../pages/admin/patients/patientNewRec.jsx"
-import ViewStudentRecord from "../pages/admin/patients/ViewStudentRecord.jsx"
+import PatientsTab from "/@/pages/admin/patients/patientsTab.jsx"
+import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
+import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"
 
-import AppointmentDetailView from "../pages/admin/appointments/appointmentView.jsx"
-
-import ProtectedRoute from "../components/ProtectedRoute.jsx"
+import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
 
 function AppRoutes() {
   return (
@@ -36,11 +36,12 @@ function AppRoutes() {
         {/* Public */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<PageNotFound />} />
         </Route>
 
         {/* Admin Showcase / Login */}
-        <Route path={ROUTES.admin.home} element={<AdminHome />} />
-        <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
+        <Route path={ROUTES.admin.home} element={<StaffLandingPage />} />
+        <Route path={ROUTES.admin.login} element={<StaffLoginPage />} />
 
         {/* Admin */}
 

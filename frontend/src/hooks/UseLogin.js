@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sessionManager } from "../utils/SessionManager";
-import {ROUTES} from "../config/RoutePaths.js";
-import {loginStaff} from "../api/auth.api.js";
+import { sessionManager } from "/@/utils/SessionManager.ts";
+import {ROUTES} from "/@/config/RoutePaths.js";
+import {loginStaff} from "/@/api/auth.api.ts";
 
 export function useLoginForm() {
     const [credentials, setCredentials] = useState({
@@ -45,12 +45,13 @@ export function useLogin() {
             const { data } = await loginStaff(credentials);
 
             if (!data.success) {
-                setError(data.message || "Invalid staff ID or password.");
+                setError("Invalid staff ID or password.");
                 return;
             }
 
             sessionManager.setLogin(
                 data.access_token,
+                data.refresh_token,
                 data.user
             );
 
