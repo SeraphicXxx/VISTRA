@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { ArrowLeft, Save, Stethoscope } from "lucide-react";
+import { ArrowLeft, Save, Stethoscope, Info } from "lucide-react";
 
 import { FieldLabel } from "../../../utils/FieldLabel.jsx";
-import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
+import {
+  ToothArch,
+  ToothNoteModal,
+  upperTeeth,
+  lowerTeeth,
+} from "../../../components/teethDesign.jsx";
 import { TextField } from "../../../utils/TextField.jsx";
 import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
 import { StudentInfoSection } from "../../../components/StudentInfoSection.jsx";
@@ -40,7 +45,11 @@ const oralStatusRows = [
 const dentalStudentFields = [
   { id: "age", label: "Age" },
   { id: "sex", label: "Gender" },
-  { id: "yearSection", label: "Year and section / course", span: "sm:col-span-3" },
+  {
+    id: "yearSection",
+    label: "Year and section / course",
+    span: "sm:col-span-3",
+  },
 ];
 
 export default function DentalRecordForm({ onBack }) {
@@ -80,8 +89,13 @@ export default function DentalRecordForm({ onBack }) {
           <Stethoscope className="h-5 w-5 text-primary" strokeWidth={2} />
         </div>
         <div>
-          <h1 className="font-heading text-xl font-semibold text-primaryDark">Dental record chart</h1>
-          <p className="mt-0.5 text-xs text-textMuted">University of Caloocan City — Biglang Awa St., 12th Avenue, Caloocan City</p>
+          <h1 className="font-heading text-xl font-semibold text-primaryDark">
+            Dental record chart
+          </h1>
+          <p className="mt-0.5 text-xs text-textMuted">
+            University of Caloocan City — Biglang Awa St., 12th Avenue, Caloocan
+            City
+          </p>
         </div>
       </div>
 
@@ -97,7 +111,9 @@ export default function DentalRecordForm({ onBack }) {
 
       <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-3">
         <div>
-          <FieldLabel htmlFor="lastVisit">When was the last time you visited a dentist?</FieldLabel>
+          <FieldLabel htmlFor="lastVisit">
+            When was the last time you visited a dentist?
+          </FieldLabel>
           <input
             id="lastVisit"
             type="text"
@@ -110,11 +126,19 @@ export default function DentalRecordForm({ onBack }) {
           <FieldLabel htmlFor="floss">Do you floss?</FieldLabel>
           <div className="flex items-center gap-4 pt-1">
             <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-              <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              <input
+                type="radio"
+                name="floss"
+                className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+              />
               Yes
             </label>
             <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-              <input type="radio" name="floss" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              <input
+                type="radio"
+                name="floss"
+                className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+              />
               No
             </label>
           </div>
@@ -124,8 +148,15 @@ export default function DentalRecordForm({ onBack }) {
           <FieldLabel>How often do you brush your teeth?</FieldLabel>
           <div className="flex flex-wrap items-center gap-4 pt-1">
             {["1x", "2x", "3-4x/day"].map((option) => (
-              <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
-                <input type="radio" name="brushFrequency" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              <label
+                key={option}
+                className="flex items-center gap-1.5 text-sm text-textPrimary"
+              >
+                <input
+                  type="radio"
+                  name="brushFrequency"
+                  className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+                />
                 {option}
               </label>
             ))}
@@ -134,22 +165,38 @@ export default function DentalRecordForm({ onBack }) {
       </div>
 
       <div className="mt-8 border-t border-border pt-6">
-        <h2 className="mb-1 text-sm font-bold uppercase tracking-wide text-primaryDark">Odontogram</h2>
-        <p className="mb-4 text-xs text-textMuted">Click a tooth to record its dentition, condition, and notes.</p>
+        <h2 className="mb-1 text-sm font-bold uppercase tracking-wide text-primaryDark">
+          Odontogram
+        </h2>
+        <p className="mb-4 text-xs text-textMuted">
+          Click a tooth to record its dentition, condition, and notes.
+        </p>
 
         <div className="overflow-x-auto rounded-xl border border-border bg-background/40 p-6">
           <div className="mb-2 flex justify-center">
-            <ToothArch teeth={upperTeeth} flip={false} records={toothRecords} onToothClick={openTooth} />
+            <ToothArch
+              teeth={upperTeeth}
+              flip={false}
+              records={toothRecords}
+              onToothClick={openTooth}
+            />
           </div>
           <div className="mx-auto my-3 h-px w-full max-w-2xl bg-border" />
           <div className="mt-2 flex justify-center">
-            <ToothArch teeth={lowerTeeth} flip={true} records={toothRecords} onToothClick={openTooth} />
+            <ToothArch
+              teeth={lowerTeeth}
+              flip={true}
+              records={toothRecords}
+              onToothClick={openTooth}
+            />
           </div>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-6 rounded-xl border border-border p-4 text-xs">
           <div>
-            <p className="mb-4 font-semibold uppercase tracking-wide text-primary">Permanent</p>
+            <p className="mb-4 font-semibold uppercase tracking-wide text-primary">
+              Permanent
+            </p>
             <ul className="space-y-1 text-textPrimary">
               <li>/ — Sound</li>
               <li>D — Decayed</li>
@@ -168,7 +215,9 @@ export default function DentalRecordForm({ onBack }) {
           </div>
 
           <div>
-            <p className="mb-4 font-semibold uppercase tracking-wide text-primary   ">Temporary</p>
+            <p className="mb-4 font-semibold uppercase tracking-wide text-primary   ">
+              Temporary
+            </p>
             <ul className="space-y-1 text-textPrimary">
               <li>/</li>
               <li>d</li>
@@ -195,23 +244,41 @@ export default function DentalRecordForm({ onBack }) {
           <FieldLabel>Calculus</FieldLabel>
           <div className="flex flex-wrap items-center gap-4 pt-1">
             {["Light", "Moderate", "Heavy"].map((option) => (
-              <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
-                <input type="radio" name="calculus" className="h-4 w-4 border-border text-primary focus:ring-primary/30" />
+              <label
+                key={option}
+                className="flex items-center gap-1.5 text-sm text-textPrimary"
+              >
+                <input
+                  type="radio"
+                  name="calculus"
+                  className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+                />
                 {option}
               </label>
             ))}
           </div>
         </div>
-        <TextField id="medication" label="Medication" placeholder="List current medications" />
+        <TextField
+          id="medication"
+          label="Medication"
+          placeholder="List current medications"
+        />
       </div>
 
       <div className="mt-6">
         <FieldLabel htmlFor="notes">Notes</FieldLabel>
-        <textarea id="notes" rows={3} placeholder="Additional observations" className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" />
+        <textarea
+          id="notes"
+          rows={3}
+          placeholder="Additional observations"
+          className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+        />
       </div>
 
       <div className="mt-8 border-t border-border pt-6">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">Medical history</h2>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
+          Medical history
+        </h2>
         <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
           {medicalHistoryItems.map((item) => (
             <CheckboxRow key={item} label={item} />
@@ -220,26 +287,61 @@ export default function DentalRecordForm({ onBack }) {
       </div>
 
       <div className="mt-8 border-t border-border pt-6">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">Oral health status</h2>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
+          Oral health status
+        </h2>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-border bg-background text-left">
-                <th className="p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Item</th>
-                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
+                <th className="p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+                  Item
+                </th>
+                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+                  Age
+                </th>
+                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+                  Age
+                </th>
+                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+                  Age
+                </th>
+                <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+                  Age
+                </th>
               </tr>
             </thead>
             <tbody>
               {oralStatusRows.map((row, index) => (
-                <tr key={row} className={`border-b border-border last:border-b-0 ${index % 2 === 1 ? "bg-background/40" : ""}`}>
+                <tr
+                  key={row}
+                  className={`border-b border-border last:border-b-0 ${index % 2 === 1 ? "bg-background/40" : ""}`}
+                >
                   <td className="p-3 text-sm text-textPrimary">{row}</td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
-                  <td className="p-3"><input type="text" className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20" /></td>
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -247,8 +349,20 @@ export default function DentalRecordForm({ onBack }) {
         </div>
       </div>
 
+      <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+        <span>
+          Please ensure all information is accurate before saving. This record
+          will be stored in the system for future reference.
+        </span>
+      </div>
+
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
-        <button type="button" onClick={handleBack} className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary"
+        >
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />
           Back
         </button>
