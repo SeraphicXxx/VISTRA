@@ -4,17 +4,23 @@ import Sidebar from "/@/pages/admin/sidebar";
 import StaffPageHeader from "/@/components/StaffPageHeader";
 import { sessionManager } from "/@/utils/SessionManager";
 
-const HIDDEN_HEADER_PATHS =
-    [
-        "/staff/medical/medical-record-form",
-        "/staff/medical/records/viewrecord",
-    ];
-
+const HIDDEN_HEADER_PATHS = [
+    "/staff/medical/new",
+    "/staff/medical/records/view",
+    "/staff/dental/new",
+    "/staff/dental/records/view",
+    "/staff/patient/new",
+    "/staff/appointment/view",
+    "/staff/patient/record/view",
+];
 
 export default function AdminLayout() {
     const [searchQuery, setSearchQuery] = useState("");
     const location = useLocation();
-    const hideHeader = HIDDEN_HEADER_PATHS.includes(location.pathname);
+
+    const hideHeader = HIDDEN_HEADER_PATHS.some((path) =>
+        location.pathname.startsWith(path)
+    );
 
     return (
         <div className="flex h-screen w-full overflow-hidden bg-background font-sans text-textPrimary selection:bg-primary/20">
