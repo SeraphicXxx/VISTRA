@@ -1,6 +1,6 @@
 from app.database.database_client import supabase, supabase_admin
 from app.repositories.patient_repositories import PatientRepository
-from app.schemas.patient import PatientData, CreatePatientRequest
+from app.schemas.patient import Patient, CreatePatientRequest
 from app.services.auth.user import create_auth_user,delete_auth_user
 from app.utils.email_utils import remove_ucc_domain
 
@@ -58,7 +58,7 @@ def create_patient(request: CreatePatientRequest):
 
     user = auth_response["user"]
 
-    patient_data = PatientData(
+    patient_data = Patient(
         id=user.id,
         patient_id=patient_id,
         created_by=request.created_by
@@ -88,7 +88,7 @@ def create_patient(request: CreatePatientRequest):
         )
     }
 
-def insert_patient_into_db(patient_data: PatientData):
+def insert_patient_into_db(patient_data: Patient):
     try:
         patient_repo = PatientRepository(supabase)
         response = patient_repo.create(patient_data)

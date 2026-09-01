@@ -7,7 +7,7 @@ export const createPatientAccount = async  (
     request: CreatePatientSchema,
     signal?: AbortSignal
 ): Promise<ApiMessageResponse> => {
-    const { data: apiResponse } = await apiClient<ApiMessageResponse>(
+    const { data: apiResponse, response } = await apiClient<ApiMessageResponse>(
         API_ENDPOINTS.patient.create_patient,
         {
             method: "POST",
@@ -15,5 +15,11 @@ export const createPatientAccount = async  (
             signal,
         }
     );
+
+
+    if (!response.ok) {
+        throw apiResponse;
+    }
+
     return apiResponse;
 }

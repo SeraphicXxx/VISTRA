@@ -1,17 +1,14 @@
 from datetime import date, datetime
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 class Patient(BaseModel):
     id: UUID
     patient_id: str
-    created_at: datetime
-    updated_at: datetime
     created_by: str
 class PatientProfile(BaseModel):
     id: int
     patient_id: str
-    created_at: datetime
     first_name: str
     middle_name: str | None = None
     last_name: str
@@ -51,12 +48,78 @@ class PatientFamilyMedicalHistory(BaseModel):
     patient_id: str
     condition: str | None = "NONE"
     other_condition: str | None = "NONE"
-class CreatePatientRequest(BaseModel): #caller -> backend shi
-    patient_id: str
-    email: str
-    password: str
-    created_by: str
-class PatientData(BaseModel): #service -> repo -> DB shi
-    id: UUID
-    patient_id: str
-    created_by: str
+
+class CreatePatientRequest(BaseModel):
+    patient_id: str = Field(..., min_length=1, max_length=50)
+    password: str = Field(..., min_length=8, max_length=128)
+    created_by: str = Field(..., min_length=1)
+
+    name: str = Field(..., min_length=2, max_length=150)
+    address: str = Field(..., min_length=1, max_length=255)
+    age: int = Field(..., ge=0, le=150)
+    barangay: str = Field(..., min_length=1, max_length=100)
+    birthday: date
+
+    mobile_number: str = Field(..., min_length=10, max_length=15)
+
+    sex: str
+    civil_status: str
+    classification: str
+
+    course: str | None = None
+    school_year: str | None = None
+    section: str | None = None
+    department: str | None = None
+    position: str | None = None
+
+    @field_validator("name", "address", "barangay")
+    @classmethod
+    def validate_not_blank(cls, value: str):
+        value = value.strip()
+
+        if not value:
+            raise ValueError("Field cannot be blank")
+
+        return value
+
+    @field_validator("mobile_number")
+    @classmethod
+    def validate_mobile_number(cls, value: str):
+        value = value.strip()
+
+        if not value.isdigit():
+            raise ValueError("Mobile number must contain only digits")
+
+        if len(value) not in (10, 11):
+            raise ValueError("Invalid mobile number")
+
+        return value
+
+    @field_validator("sex")
+    @classmethod
+    def validate_sex(cls, value: str):
+        allowed = {"Male", "Female"}
+
+        if value not in allowed:
+            raise ValueError(
+                f"Sex must be one of: {', '.join(allowed)}"
+            )
+
+        return value
+
+    @field_validator("civil_status")
+    @classmethod
+    def validate_civil_status(cls, value: str):
+        allowed = {
+            "Single",
+            "Married",
+            "Widowed",
+            "Separated"
+        }
+
+        if value not in allowed:
+            raise ValueError(
+                f"Civil status must be one of: {', '.join(allowed)}"
+            )
+
+        return value

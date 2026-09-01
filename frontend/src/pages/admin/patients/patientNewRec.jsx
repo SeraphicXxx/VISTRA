@@ -5,12 +5,12 @@ import { TextField } from "/@/utils/TextField.jsx";
 import { SelectField, ClassificationToggle, COURSE_OPTIONS, YEAR_OPTIONS, SECTION_OPTIONS, SEX_OPTIONS, CIVIL_STATUS_OPTIONS, POSITION_OPTIONS, DEPARTMENT_OPTIONS } from "/@/utils/NewPatientUtils.jsx";
 import { STUDENT_ID_PATTERN, FACULTY_ID_PATTERN, ADMIN_ID_PATTERN, validateStudentId, validateFacultyId, validateAdminId } from "/@/utils/NewPatientValidation.jsx";
 
-export default function NewPatientRecordForm({ onBack, onSave }) {
+export default function NewPatientRecordForm({ onBack, onSave, errors }) {
   const [classification, setClassification] = useState("student");
   const [studentIdError, setStudentIdError] = useState("");
   const [facultyIdError, setFacultyIdError] = useState("");
   const [adminIdError, setAdminIdError] = useState("");
-
+  console.log(errors);
   const handleBack = () => {
     if (onBack) onBack();
     else if (typeof window !== "undefined") window.history.back();
@@ -60,7 +60,7 @@ export default function NewPatientRecordForm({ onBack, onSave }) {
                 <div className="pointer-events-none absolute left-5 top-1/2 z-20 w-max -translate-y-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">Format: 8 digits, dash, then a letter — e.g. 20230786-S</div>
               </div>
             </div>
-            <input id="studentId" name="student_id" type="text" required placeholder="20230786-S" pattern={STUDENT_ID_PATTERN} onBlur={handleStudentIdBlur} onChange={() => studentIdError && setStudentIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${studentIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
+            <input id="studentId" name="patient_id" type="text" required placeholder="20230786-S" pattern={STUDENT_ID_PATTERN} onBlur={handleStudentIdBlur} onChange={() => studentIdError && setStudentIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${studentIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
             {studentIdError && <p className="mt-1 text-xs text-red-500">{studentIdError}</p>}
           </div>
         )}
@@ -74,7 +74,7 @@ export default function NewPatientRecordForm({ onBack, onSave }) {
                 <div className="pointer-events-none absolute left-5 top-1/2 z-20 w-max -translate-y-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">Format: F, dash, year, dash, 3-digit no. — e.g. F-2023-045</div>
               </div>
             </div>
-            <input id="facultyId" name="faculty_id" type="text" required placeholder="F-2023-045" pattern={FACULTY_ID_PATTERN} onBlur={handleFacultyIdBlur} onChange={() => facultyIdError && setFacultyIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${facultyIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
+            <input id="facultyId" name="patient_id" type="text" required placeholder="F-2023-045" pattern={FACULTY_ID_PATTERN} onBlur={handleFacultyIdBlur} onChange={() => facultyIdError && setFacultyIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${facultyIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
             {facultyIdError && <p className="mt-1 text-xs text-red-500">{facultyIdError}</p>}
           </div>
         )}
@@ -88,7 +88,7 @@ export default function NewPatientRecordForm({ onBack, onSave }) {
                 <div className="pointer-events-none absolute left-5 top-1/2 z-20 w-max -translate-y-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">Format: A, dash, year, dash, 3-digit no. — e.g. A-2023-045</div>
               </div>
             </div>
-            <input id="adminId" name="admin_id" type="text" required placeholder="A-2023-045" pattern={ADMIN_ID_PATTERN} onBlur={handleAdminIdBlur} onChange={() => adminIdError && setAdminIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${adminIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
+            <input id="adminId" name="patient_id" type="text" required placeholder="A-2023-045" pattern={ADMIN_ID_PATTERN} onBlur={handleAdminIdBlur} onChange={() => adminIdError && setAdminIdError("")} className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:outline-none focus:ring-2 ${adminIdError ? "border-red-400 focus:border-red-400 focus:ring-red-200" : "border-border focus:border-primary/50 focus:ring-primary/20"}`} />
             {adminIdError && <p className="mt-1 text-xs text-red-500">{adminIdError}</p>}
           </div>
         )}
@@ -97,7 +97,7 @@ export default function NewPatientRecordForm({ onBack, onSave }) {
         <TextField id="mobileNumber" name="mobile_number" label="Mobile number" type="tel" placeholder="09XXXXXXXXX" required />
         <TextField id="age" name="age" label="Age" type="number" placeholder="e.g. 20" required />
         <SelectField id="sex" name="sex" label="Sex" options={SEX_OPTIONS} />
-        <SelectField id="civilStatus" name="civil_status" label="Civil status" options={CIVIL_STATUS_OPTIONS} />
+        <SelectField id="civil_status" name="civil_status" label="Civil status" options={CIVIL_STATUS_OPTIONS} />
       </div>
 
       {isStudent && (

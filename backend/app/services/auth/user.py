@@ -1,4 +1,5 @@
-import app.database.database_client as supabase_admin
+from app.database.database_client import supabase_admin
+from app.utils.email_utils import add_ucc_domain
 
 def create_auth_user(
     user_id: str,
