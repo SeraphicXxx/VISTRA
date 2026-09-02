@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Save, UserPlus, Info } from "lucide-react";
+import { ArrowLeft, Save, UserPlus, Info, Eye, EyeOff } from "lucide-react";
 import { FieldLabel } from "/@/utils/FieldLabel.jsx";
 import { TextField } from "/@/utils/TextField.jsx";
 import { SelectField, ClassificationToggle, COURSE_OPTIONS, YEAR_OPTIONS, SECTION_OPTIONS, SEX_OPTIONS, CIVIL_STATUS_OPTIONS, POSITION_OPTIONS, DEPARTMENT_OPTIONS } from "/@/utils/NewPatientUtils.jsx";
@@ -10,6 +10,7 @@ export default function NewPatientRecordForm({ onBack, onSave, errors }) {
   const [studentIdError, setStudentIdError] = useState("");
   const [facultyIdError, setFacultyIdError] = useState("");
   const [adminIdError, setAdminIdError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   console.log(errors);
   const handleBack = () => {
     if (onBack) onBack();
@@ -95,6 +96,35 @@ export default function NewPatientRecordForm({ onBack, onSave, errors }) {
 
         <TextField id="birthday" name="birthday" label="Birthday" type="date" required />
         <TextField id="mobileNumber" name="mobile_number" label="Mobile number" type="tel" placeholder="09XXXXXXXXX" required />
+        <div>
+          <div className="relative">
+            <TextField
+              id="password"
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              required
+              minLength={8}
+            />
+            <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted transition-colors hover:text-textPrimary"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+              ) : (
+                  <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+
+          <p className="mt-1 text-xs text-textMuted">
+            Must be at least 8 characters.
+          </p>
+        </div>
         <TextField id="age" name="age" label="Age" type="number" placeholder="e.g. 20" required />
         <SelectField id="sex" name="sex" label="Sex" options={SEX_OPTIONS} />
         <SelectField id="civil_status" name="civil_status" label="Civil status" options={CIVIL_STATUS_OPTIONS} />
