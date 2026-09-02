@@ -7,7 +7,7 @@ from app.routes import health, auth, staff, patient
 
 app = FastAPI(
     title="VISTRA API",
-    version="2.1.0"
+    version="2.2.0"
 )
 app.add_middleware(
     CORSMiddleware,

@@ -1,13 +1,15 @@
 from datetime import date, datetime
 from uuid import UUID
 from pydantic import BaseModel, Field, field_validator
+from app.utils.name_utils import separate_name
 
 class Patient(BaseModel):
     id: UUID
     patient_id: str
     created_by: str
+
+
 class PatientProfile(BaseModel):
-    id: int
     patient_id: str
     first_name: str
     middle_name: str | None = None
@@ -21,6 +23,8 @@ class PatientProfile(BaseModel):
     course: str | None = None
     contact_no: str | None = None
     school_year: str | None = None
+
+
 class PatientMedicalHistory(BaseModel):
     id: int
     patient_id: str
@@ -34,6 +38,8 @@ class PatientMedicalHistory(BaseModel):
     alcohol_intake: bool | None = None
     last_menstrual_period: str | None = "N/A"
     family_planning_method: str | None = None
+
+
 class PatientVitalSigns(BaseModel):
     id: int
     patient_id: str
@@ -43,11 +49,17 @@ class PatientVitalSigns(BaseModel):
     respiratory_rate: float | None = None
     eyes: float | None = None
     recorded_at: date | None = None
+
+
 class PatientFamilyMedicalHistory(BaseModel):
     id: int
     patient_id: str
     condition: str | None = "NONE"
     other_condition: str | None = "NONE"
+
+
+
+
 
 class CreatePatientRequest(BaseModel):
     patient_id: str = Field(..., min_length=1, max_length=50)
@@ -72,6 +84,25 @@ class CreatePatientRequest(BaseModel):
     department: str | None = None
     position: str | None = None
 
+    def to_patient_profile(self) -> PatientProfile:
+        name = separate_name(self.name)
+
+        return PatientProfile(
+            patient_id=self.patient_id,
+            first_name=name.first_name,
+            middle_name=name.middle_name,
+            last_name=name.last_name,
+            birthday=self.birthday,
+            age=self.age,
+            sex=self.sex,
+            complete_address=self.address,
+            barangay=self.barangay,
+            civil_status=self.civil_status,
+            course=self.course,
+            contact_no=self.mobile_number,
+            school_year=self.school_year,
+        )
+    
     @field_validator("name", "address", "barangay")
     @classmethod
     def validate_not_blank(cls, value: str):
