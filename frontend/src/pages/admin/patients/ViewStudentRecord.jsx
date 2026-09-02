@@ -1,10 +1,61 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  Stethoscope,
+  Syringe,
+  CalendarClock,
+} from "lucide-react";
 import { patientRecords, getMockPatientRecords } from "./patientsData";
 
-import { TABS, getInitials, sortRecordsByDateDesc, groupRecordsByMonth, findPatientById, sanitizeRecords, getPatientSubLine, isStudentPatient, formatDate } from "/@/utils/recordUtils";
+const TABS = [
+  {
+    key: "medical",
+    label: "Medical",
+    icon: Stethoscope,
+    text: "text-primary",
+    chip: "bg-primary/10",
+  },
+  {
+    key: "dental",
+    label: "Dental",
+    icon: Syringe,
+    text: "text-info",
+    chip: "bg-info/10",
+  },
+  {
+    key: "appointment",
+    label: "Appointments",
+    icon: CalendarClock,
+    text: "text-treatment",
+    chip: "bg-treatment/10",
+  },
+];
 
+function getInitials(name = "") {
+  const parts = name.trim().split(" ").filter(Boolean);
+  return (
+    parts
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase())
+      .join("") || "?"
+  );
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function monthKey(date) {
+  return new Date(date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+  });
+}
 
 function RecordRow({ record, tabMeta }) {
   return (
@@ -56,7 +107,6 @@ function EmptyState({ label, tabMeta }) {
   );
 }
 
-
 export default function ViewStudentRecord() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,7 +119,8 @@ export default function ViewStudentRecord() {
   });
   const [loadingRecords, setLoadingRecords] = useState(true);
 
-  const patient = useMemo(() => findPatientById(patientRecords, id), [id]);
+  // Look up the patient by the :id in the URL (matches patient.id, e.g. "PAT-1001")
+  const patient = useMemo(() => patientRecords.find((p) => p.id === id), [id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -77,7 +128,7 @@ export default function ViewStudentRecord() {
 
     Promise.resolve(getMockPatientRecords(id)).then((data) => {
       if (!cancelled) {
-        setRecords(sanitizeRecords(data));
+        setRecords(data);
         setLoadingRecords(false);
       }
     });
@@ -89,15 +140,25 @@ export default function ViewStudentRecord() {
 
   const handleBack = () => navigate(-1);
 
-  const subLine = getPatientSubLine(patient);
-  const isStudent = isStudentPatient(patient);
+  const isStudent = patient?.userType === "Student";
+  const subLine = isStudent
+    ? [patient?.course, patient?.yearSection].filter(Boolean).join(" • ")
+    : patient?.department;
 
   const activeTabMeta = TABS.find((t) => t.key === activeTab);
-  const activeRecords = sortRecordsByDateDesc(records[activeTab] || []);
-  const grouped = useMemo(
-    () => groupRecordsByMonth(activeRecords),
-    [activeRecords]
-  );
+  const activeRecords = (records[activeTab] || [])
+    .slice()
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const grouped = useMemo(() => {
+    const map = new Map();
+    for (const record of activeRecords) {
+      const key = monthKey(record.date);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(record);
+    }
+    return Array.from(map.entries());
+  }, [activeRecords]);
 
   if (!patient) {
     return (
@@ -122,6 +183,7 @@ export default function ViewStudentRecord() {
 
   return (
     <div className="flex min-h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card sm:flex-row">
+      {" "}
       {/* Sidebar */}
       <div className="flex shrink-0 flex-col border-b border-border bg-white sm:w-72 sm:border-b-0 sm:border-r">
         <div className="p-7 pb-0">
@@ -162,7 +224,9 @@ export default function ViewStudentRecord() {
             <dt className="font-medium uppercase tracking-wide text-textMuted">
               ID:
             </dt>
-            <dd className=" font-mono text-textPrimary">{patient?.userId}</dd>
+            <dd className=" font-mono text-textPrimary">
+              {patient?.userId}
+            </dd>
           </div>
 
           {subLine && (
@@ -213,7 +277,6 @@ export default function ViewStudentRecord() {
           })}
         </nav>
       </div>
-
       {/* Record panel */}
       <div
         key={activeTab}
@@ -275,7 +338,6 @@ export default function ViewStudentRecord() {
           />
         )}
       </div>
-
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(2px); }

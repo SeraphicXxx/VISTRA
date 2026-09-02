@@ -5,6 +5,10 @@ import {
   XCircle,
   Hourglass,
   RotateCcw,
+  CalendarDays,
+  Clock,
+  ClipboardList,
+  GraduationCap,
 } from "lucide-react";
 
 const exampleAppointment = {
@@ -50,11 +54,19 @@ const STATUS_META = {
   },
 };
 
-function InfoStat({ label, value }) {
+function InfoField({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-xl border border-border bg-background px-4 py-3">
-      <p className="text-[10px] font-medium uppercase tracking-wide text-textMuted">{label}</p>
-      <p className="mt-1 truncate text-sm font-medium text-textPrimary">{value || "—"}</p>
+    <div className="rounded-xl border border-border bg-surfaceMuted/30 px-4 py-3">
+      <div className="flex items-center gap-2">
+        <Icon className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-textMuted">
+          {label}
+        </p>
+      </div>
+
+      <p className="mt-1.5 text-sm font-medium text-textPrimary">
+        {value || "—"}
+      </p>
     </div>
   );
 }
@@ -68,7 +80,8 @@ export default function AppointmentDetailView({
   const [decliningReason, setDecliningReason] = useState(false);
   const [reason, setReason] = useState("");
 
-  const meta = STATUS_META[status];
+  const meta = STATUS_META[status] || STATUS_META.pending;
+  const StatusIcon = meta.icon;
 
   const handleBack = () => {
     if (onBack) {
@@ -90,130 +103,199 @@ export default function AppointmentDetailView({
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6">
-      <div className="mx-auto w-full max-w-2xl">
-        <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-          {/* Header */}
-          <div className="p-6 sm:p-8">
+    <div className="mx-auto w-full">
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
+
+        <div className="relative p-6 sm:p-8">
+          <div className="mb-6 flex items-start justify-between gap-4">
             <button
               type="button"
               onClick={handleBack}
-              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-textSecondary transition-colors duration-150 hover:bg-background hover:text-textPrimary"
+              className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
             >
-              <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
+              <ArrowLeft className="h-3.5 w-3.5" />
               Back to appointments
             </button>
+          </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-lg font-semibold text-primary ring-1 ring-inset ring-primary/15">
-                  {getInitials(appointment.student)}
-                </span>
-                <div>
-                  <h1 className="font-heading text-xl font-semibold tracking-tight text-primaryDark">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-5">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
+                {getInitials(appointment.student)}
+              </span>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="font-heading text-2xl font-semibold text-primaryDark">
                     {appointment.student}
                   </h1>
-                  <p className="mt-0.5 font-mono text-xs text-textMuted">{appointment.id}</p>
+
+                  <span className="rounded-md bg-surfaceMuted px-2 py-0.5 font-mono text-xs text-textMuted">
+                    {appointment.id}
+                  </span>
+                </div>
+
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textMuted">
+                  <span>{appointment.course}</span>
+                  <span>•</span>
+                  <span>Appointment</span>
                 </div>
               </div>
+            </div>
 
-              <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium ${meta.chip} ${meta.text}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-                {meta.label}
-              </span>
+            <span
+              className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium ${meta.chip} ${meta.text}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+              {meta.label}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <div className="flex flex-col gap-y-5 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          <div className="border-b border-border pb-4">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-4 w-4 text-primary" />
+
+              <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                Appointment Information
+              </h2>
             </div>
           </div>
 
-          <div className="border-t border-border px-6 py-6 sm:px-8 sm:py-8">
-            {/* Appointment info */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <InfoStat label="Time" value={appointment.time} />
-              <InfoStat label="Type" value={appointment.type} />
-              <InfoStat label="Course" value={appointment.course} />
+          <div className="grid grid-cols-1 gap-3">
+            <InfoField
+              icon={CalendarDays}
+              label="Appointment Date"
+              value={appointment.date}
+            />
+
+            <InfoField
+              icon={Clock}
+              label="Appointment Time"
+              value={appointment.time}
+            />
+
+            <InfoField
+              icon={ClipboardList}
+              label="Appointment Type"
+              value={appointment.type}
+            />
+
+            <InfoField
+              icon={GraduationCap}
+              label="Course"
+              value={appointment.course}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
+          <div className="border-b border-border pb-4">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-4 w-4 text-primary" />
+
+              <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                Appointment Notes
+              </h2>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-xl border border-dashed border-border bg-surfaceMuted/20 px-4 py-4 text-sm text-textMuted">
+            No additional notes were submitted with this appointment.
+          </div>
+
+          <div className="mt-8 border-t border-border pt-6">
+            <div className="mb-4">
+              <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                Update Status
+              </h2>
+
+              <p className="mt-1 text-xs text-textMuted">
+                Update the appointment status based on the clinic's decision.
+              </p>
             </div>
 
-            {/* Notes */}
-            <div className="mt-6">
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-textMuted">Notes</p>
-              <div className="rounded-xl border border-dashed border-border px-4 py-3 text-sm text-textMuted">
-                No additional notes were submitted with this request.
+            {decliningReason ? (
+              <div className="rounded-xl border border-danger/25 bg-danger/5 p-4">
+                <label className="block text-xs font-medium text-textSecondary">
+                  Reason for declining{" "}
+                  <span className="text-textMuted">(optional)</span>
+                </label>
+
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={3}
+                  placeholder="e.g. Schedule conflict — ask student to rebook"
+                  className="mt-2 w-full resize-none rounded-lg border border-border bg-surface p-3 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={confirmDecline}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                  >
+                    <XCircle className="h-3.5 w-3.5" />
+                    Confirm decline
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDecliningReason(false);
+                      setReason("");
+                    }}
+                    className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {status !== "confirmed" && (
+                  <button
+                    type="button"
+                    onClick={() => applyStatus("confirmed")}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Confirm appointment
+                  </button>
+                )}
 
-            {/* Status actions */}
-            <div className="mt-6 border-t border-border pt-6">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-textMuted">Update status</p>
+                {status !== "declined" && (
+                  <button
+                    type="button"
+                    onClick={() => setDecliningReason(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15"
+                  >
+                    <XCircle className="h-3.5 w-3.5" />
+                    Decline
+                  </button>
+                )}
 
-              {decliningReason ? (
-                <div className="space-y-3 rounded-xl border border-danger/25 bg-danger/5 p-4">
-                  <label className="block text-xs font-medium text-textSecondary">
-                    Reason for declining <span className="text-textMuted">(optional)</span>
-                  </label>
-                  <textarea
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    rows={3}
-                    placeholder="e.g. Schedule conflict — ask student to rebook"
-                    className="w-full rounded-lg border border-border bg-white p-3 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={confirmDecline}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                    >
-                      <XCircle className="h-3.5 w-3.5" strokeWidth={2} />
-                      Confirm decline
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDecliningReason(false)}
-                      className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary transition-colors duration-150 hover:bg-background"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {status !== "confirmed" && (
-                    <button
-                      type="button"
-                      onClick={() => applyStatus("confirmed")}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-success px-4 py-2 text-xs font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
-                      Confirm appointment
-                    </button>
-                  )}
-
-                  {status !== "declined" && (
-                    <button
-                      type="button"
-                      onClick={() => setDecliningReason(true)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger transition-colors duration-150 hover:bg-danger/15"
-                    >
-                      <XCircle className="h-3.5 w-3.5" strokeWidth={2} />
-                      Decline
-                    </button>
-                  )}
-
-                  {status !== "pending" && (
-                    <button
-                      type="button"
-                      onClick={() => applyStatus("pending")}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary transition-colors duration-150 hover:bg-background"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
-                      Reset to pending
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+                {status !== "pending" && (
+                  <button
+                    type="button"
+                    onClick={() => applyStatus("pending")}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Reset to pending
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+

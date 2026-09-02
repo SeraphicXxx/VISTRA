@@ -13,7 +13,7 @@ export const patientRecords = [
     name: "Ivan Mejorada",
     userId: "20230792-M",
     userType: "Student",
-    course: "BS Nursing",
+    course: "BS Psychology",
     yearSection: "3rd Year, Section B",
     lastVisit: "August 26, 2026",
   },
@@ -22,8 +22,8 @@ export const patientRecords = [
     name: "Cjay Gonzales",
     userId: "20240841-M",
     userType: "Student",
-    course: "BS Architecture",
-    yearSection: "5th Year, Section A",
+    course: "BS Industrial Engineering",
+    yearSection: "2nd Year, Section A",
     lastVisit: "August 25, 2026",
   },
   {
@@ -31,7 +31,7 @@ export const patientRecords = [
     name: "Joshua Lapitan",
     userId: "20220653-C",
     userType: "Student",
-    course: "BS Civil Engineering",
+    course: "BS Electronics Engineering",
     yearSection: "4th Year, Section C",
     lastVisit: "August 24, 2026",
   },
@@ -67,7 +67,7 @@ export const patientRecords = [
     name: "Sofia Cruz",
     userId: "20241862-C",
     userType: "Student",
-    course: "BS Education",
+    course: "Bachelor of Early Childhood Education",
     yearSection: "2nd Year, Section A",
     lastVisit: "August 20, 2026",
   },
@@ -335,11 +335,9 @@ export const patientRecordsMockData = {
     dental: [],
     appointment: [],
   },
-
-  
 };
 
-  export const patientColumns = [
+export const patientColumns = [
   "Name",
   "User ID",
   "User Type",
@@ -348,8 +346,6 @@ export const patientRecordsMockData = {
   "Last Visit",
 ];
 
-// Returns the records for a patient, falling back to empty arrays if the ID isn't in the mock data
-// (keeps the shape identical to what the real API is expected to return).
 export function getMockPatientRecords(patientId) {
   return (
     patientRecordsMockData[patientId] || {
@@ -359,4 +355,3 @@ export function getMockPatientRecords(patientId) {
     }
   );
 }
-

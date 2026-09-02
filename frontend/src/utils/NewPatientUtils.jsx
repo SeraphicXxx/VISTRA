@@ -7,10 +7,10 @@ export const COURSE_OPTIONS = [
   { code: "BSIS", label: "BS Information Systems" },
   { code: "BSIT", label: "BS Information Technology" },
   { code: "BSEMC", label: "BS Entertainment and Multimedia Computing" },
-  { code: "BPA", label: "Public Administration" },
+  { code: "BPA", label: "Bachelor of Public Administration" },
   {
     code: "BPA ECGE",
-    label: "Public Administration (Evening Class for Govt Employees)",
+    label: "Bachelor of Public Administration (Evening Class for Government Employees)",
   },
   { code: "BA COMM", label: "BA Communication" },
   { code: "BA POS", label: "BA Political Science" },
@@ -19,39 +19,39 @@ export const COURSE_OPTIONS = [
   { code: "BSA", label: "BS Accountancy" },
   { code: "BSTM", label: "BS Tourism Management" },
   { code: "BSHM", label: "BS Hospitality Management" },
-  { code: "BSBA FMGT", label: "BSBA major in Financial Management" },
-  { code: "BSBA MKTG", label: "BSBA major in Marketing Management" },
+  { code: "BSBA FMGT", label: "BSBA Major in Financial Management" },
+  { code: "BSBA MKTG", label: "BSBA Major in Marketing Management" },
   { code: "BS ENTREP", label: "BS Entrepreneurship" },
-  { code: "BSBA HRM", label: "BSBA major in Human Resource Management" },
+  { code: "BSBA HRM", label: "BSBA Major in Human Resource Management" },
   { code: "BECED", label: "Bachelor of Early Childhood Education" },
-  { code: "BSE SCI", label: "BSE major in Science" },
-  { code: "BSE ENG", label: "BSE major in English" },
+  { code: "BSE SCI", label: "BSE Major in Science" },
+  { code: "BSE ENG", label: "BSE Major in English" },
   {
     code: "BSE ENG-CHI",
-    label: "BSE major in English (with Chinese Language & Pedagogy)",
+    label: "BSE Major in English with Chinese Language and Pedagogy",
   },
-  { code: "BTLED HE", label: "BTLEd major in Home Economics" },
+  { code: "BTLED HE", label: "BTLEd Major in Home Economics" },
   { code: "BS CRIM", label: "BS Criminology" },
-  { code: "PHD", label: "PhD in Educational Management" },
-  { code: "MSC", label: "MS in Criminal Justice major in Criminology" },
-  { code: "MATS", label: "MA in Teaching Science" },
-  { code: "MBA", label: "Master in Business Administration" },
-  { code: "MPA", label: "Master in Public Administration" },
-  {
-    code: "MAED",
-    label: "MA in Education major in Educational Management",
-  },
-  { code: "MAT-EG", label: "MA in Teaching (Early Grades)" },
-  { code: "CPE", label: "Certificate in Professional Education" },
-  { code: "DPA", label: "Doctor in Public Administration" },
-  { code: "ABBS", label: "BA in Behavioural Sciences" },
   { code: "BS CPE", label: "BS Computer Engineering" },
   { code: "BS IE", label: "BS Industrial Engineering" },
   { code: "BS ECE", label: "BS Electronics Engineering" },
   { code: "BS EE", label: "BS Electrical Engineering" },
   { code: "BSSW", label: "BS Social Work" },
   { code: "BSISM", label: "BS Industrial Security Management" },
+  { code: "ABBS", label: "BA in Behavioural Sciences" },
   { code: "JD", label: "Juris Doctor" },
+  { code: "PHD", label: "PhD in Educational Management" },
+  { code: "MSC", label: "MS in Criminal Justice Major in Criminology" },
+  { code: "MATS", label: "MA in Teaching Science" },
+  { code: "MBA", label: "Master in Business Administration" },
+  { code: "MPA", label: "Master in Public Administration" },
+  {
+    code: "MAED",
+    label: "MA in Education Major in Educational Management",
+  },
+  { code: "MAT-EG", label: "MA in Teaching (Early Grades)" },
+  { code: "CPE", label: "Certificate in Professional Education" },
+  { code: "DPA", label: "Doctor in Public Administration" },
 ];
 
 export const YEAR_OPTIONS = [
@@ -105,9 +105,7 @@ export function SelectField({
 
   return (
     <div>
-      <FieldLabel htmlFor={id}>
-        {label}
-      </FieldLabel>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
 
       <select
         id={id}
@@ -120,10 +118,7 @@ export function SelectField({
         </option>
 
         {normalized.map((opt) => (
-          <option
-            key={opt.code}
-            value={opt.code}
-          >
+          <option key={opt.code} value={opt.code}>
             {opt.label}
           </option>
         ))}
@@ -137,18 +132,9 @@ export function ClassificationToggle({
   onChange,
 }) {
   const options = [
-    {
-      key: "student",
-      label: "Student",
-    },
-    {
-      key: "faculty",
-      label: "Faculty / Professor",
-    },
-    {
-      key: "admin",
-      label: "Admin",
-    },
+    { key: "student", label: "Student" },
+    { key: "faculty", label: "Faculty / Professor" },
+    { key: "admin", label: "Admin" },
   ];
 
   return (
