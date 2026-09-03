@@ -4,21 +4,31 @@ import React, {
     ReactNode,
     useMemo,
 } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getAllPatientProfiles } from "/@/api/patient.api";
+import {
+    useMutation,
+    useQuery,
+    useQueryClient, } from "@tanstack/react-query";
+import {createPatientAccount, getAllPatientProfiles} from "/@/api/patient.api";
 import { PatientProfile } from "/@/api/schema/PatientSchema";
 import {
     PatientModel,
     PatientDashboardRecord,
 } from "/@/repository/PatientModel";
+import {sessionManager} from "/@/utils/SessionManager";
 
 interface PatientContextType {
     patientProfiles: PatientProfile[];
     patientRecords: PatientDashboardRecord[];
+
     isLoading: boolean;
     isRefreshing: boolean;
+    isSaving: boolean;
+
     error: string | null;
+    saveError: any;
+
     refreshPatients: () => void;
+    savePatient: (record: any) => Promise<unknown>;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(
@@ -32,6 +42,7 @@ interface PatientProviderProps {
 export function PatientProvider({
                                     children,
                                 }: PatientProviderProps) {
+    const queryClient = useQueryClient();
 
     const {
         data: patientProfiles = [],
@@ -53,18 +64,43 @@ export function PatientProvider({
     const refreshPatients = async () => {
         await refetch();
     };
+    const savePatientMutation = useMutation({
+        mutationFn: async (record: any) => {
+            const user = sessionManager.getUser();
 
+            const patientData = {
+                ...record,
+                created_by: user?.staff_id,
+            };
+
+            return createPatientAccount(patientData);
+        },
+
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["patients"],
+            });
+        },
+    });
     return (
         <PatientContext.Provider
             value={{
                 patientProfiles,
                 patientRecords,
+
                 isLoading,
                 isRefreshing: isFetching,
+                isSaving: savePatientMutation.isPending,
+
                 error: error
                     ? "Failed to load patient profiles."
                     : null,
-                refreshPatients,
+
+                saveError: savePatientMutation.error,
+
+                refreshPatients: refetch,
+
+                savePatient: savePatientMutation.mutateAsync,
             }}
         >
             {children}
