@@ -16,6 +16,7 @@ interface PatientContextType {
     patientProfiles: PatientProfile[];
     patientRecords: PatientDashboardRecord[];
     isLoading: boolean;
+    isRefreshing: boolean;
     error: string | null;
     refreshPatients: () => void;
 }
@@ -35,6 +36,7 @@ export function PatientProvider({
     const {
         data: patientProfiles = [],
         isLoading,
+        isFetching,
         error,
         refetch,
     } = usePatients();
@@ -48,6 +50,9 @@ export function PatientProvider({
             }),
         [patientProfiles]
     );
+    const refreshPatients = async () => {
+        await refetch();
+    };
 
     return (
         <PatientContext.Provider
@@ -55,10 +60,11 @@ export function PatientProvider({
                 patientProfiles,
                 patientRecords,
                 isLoading,
+                isRefreshing: isFetching,
                 error: error
                     ? "Failed to load patient profiles."
                     : null,
-                refreshPatients: refetch,
+                refreshPatients,
             }}
         >
             {children}
