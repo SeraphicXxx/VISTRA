@@ -51,4 +51,6 @@ class PatientRepository:
             .select("*")
             .execute()
         )
+
         return response.data
+

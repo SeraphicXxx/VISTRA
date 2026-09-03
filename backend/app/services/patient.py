@@ -143,3 +143,18 @@ def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase):
             "message": str(e)
         }
 
+def get_all_patient_profiles(supabase):
+    try:
+        patient_repo = PatientRepository(supabase)
+        response = patient_repo.get_all_profile()
+
+        return {
+            "success": True,
+            "data": response
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
