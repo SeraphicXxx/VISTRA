@@ -80,10 +80,10 @@ export function PatientProvider({
             error,
             refreshPatients: loadPatients,
     }}
->
-    {children}
-    </PatientContext.Provider>
-);
+    >
+        {children}
+        </PatientContext.Provider>
+    );
 }
 
 export function usePatients(): PatientContextType {
