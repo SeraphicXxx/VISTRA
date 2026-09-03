@@ -16,13 +16,14 @@ import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/components/ProtectedRoute.jsx"
-import PatientsTab from "/@/pages/admin/patients/patientsTab.jsx"
+import PatientsTab from "/src/pages/admin/patients/patientsTab.jsx"
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"
 import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
 import { createPatientAccount } from "/@/api/patient.api.ts"
 import {sessionManager} from "/@/utils/SessionManager.ts";
 import {useState} from "react";
+import {PatientProvider} from "/@/context/PatientContext.tsx";
 
 
 function AppRoutes() {
@@ -81,9 +82,23 @@ function AppRoutes() {
 
             <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
             <Route path={ROUTES.admin.appointment.viewAppointment} element={<AppointmentDetailView/>}/>
-            <Route path={ROUTES.admin.dashboard.patients} element={<PatientsTab/>}/>
-            <Route path={ROUTES.admin.patient.createNewRecord} element={<NewPatientRecordForm onSave={handleSave} errors={errors}/>} />
-            <Route path={`${ROUTES.admin.patient.patientRecordTab}/:id`} element={<ViewStudentRecord />} />
+
+            <Route path={ROUTES.admin.dashboard.patients} element={
+              <PatientProvider>
+                <PatientsTab/>
+              </PatientProvider>
+            }/>
+            <Route path={ROUTES.admin.patient.createNewRecord} element={
+              <PatientProvider>
+                <NewPatientRecordForm onSave={handleSave} errors={errors}/>
+              </PatientProvider>
+            } />
+            <Route path={`${ROUTES.admin.patient.patientRecordTab}/:id`} element={
+              <PatientProvider>
+                <ViewStudentRecord />
+              </PatientProvider>
+            } />
+
           </Route>
         </Route>
       </Routes>

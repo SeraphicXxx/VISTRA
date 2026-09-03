@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     patient: {
         get_patients: "/patients/",
         create_patient: "/patients/",
-        getPatientById: (patientId) => `/patients/${patientId}`,
+        get_all_patient_profile: "/patients/profiles/",
+        get_patient_by_id: (patientId) => `/patients/${patientId}`,
     },
 };

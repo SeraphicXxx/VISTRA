@@ -6,7 +6,8 @@ import {
   Syringe,
   CalendarClock,
 } from "lucide-react";
-import { patientRecords, getMockPatientRecords } from "./patientsData";
+import { getMockPatientRecords } from "./patientsData";
+import {usePatients} from "/@/context/PatientContext.tsx";
 
 const TABS = [
   {
@@ -108,6 +109,7 @@ function EmptyState({ label, tabMeta }) {
 }
 
 export default function ViewStudentRecord() {
+  const { patientRecords, isLoading } = usePatients();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -125,7 +127,7 @@ export default function ViewStudentRecord() {
   useEffect(() => {
     let cancelled = false;
     setLoadingRecords(true);
-
+    //TODO use dataViewPatientRecords
     Promise.resolve(getMockPatientRecords(id)).then((data) => {
       if (!cancelled) {
         setRecords(data);
