@@ -81,7 +81,7 @@ export function PatientProvider({
             refreshPatients: loadPatients,
     }}
     >
-        {children}
+            {children}
         </PatientContext.Provider>
     );
 }
