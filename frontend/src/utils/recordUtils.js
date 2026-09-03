@@ -26,15 +26,20 @@ export const TABS = [
 ];
 
 
-export function getInitials(name = "") {
-  const parts = name.trim().split(" ").filter(Boolean);
-  return (
-    parts
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase())
-      .join("") || "?"
-  );
-}
+export const NameUtil = {
+  getFullName(data) {
+    return [data.first_name, data.middle_name, data.last_name]
+        .filter(Boolean)
+        .join(' ');
+  },
+
+  getInitials(data) {
+    return this.getFullName(data)
+        .split(' ')
+        .map(name => name.charAt(0).toUpperCase())
+        .join('');
+  }
+};
 
 export function formatDate(date) {
   return new Date(date).toLocaleDateString(undefined, {

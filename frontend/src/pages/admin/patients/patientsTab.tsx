@@ -7,17 +7,14 @@ import {
 
 import { ROUTES } from "/@/config/RoutePaths.js";
 
-import { getAllPatientProfiles } from "/@/api/patient.api";
-
 import { patientColumns } from "./patientsData";
 
-import { usePatients } from "/@/context/PatientContext";
+import { usePatientContext } from "/@/context/PatientContext";
 import LoadingPage from "/@/components/LoadingPage";
 
 
 export default function PatientsTab() {
-    const { patientRecords, isLoading } = usePatients();
-
+    const { patientRecords, isLoading } = usePatientContext();
     if (isLoading) {
         return <LoadingPage />;
     }

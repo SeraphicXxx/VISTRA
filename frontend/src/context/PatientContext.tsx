@@ -1,14 +1,12 @@
 import React, {
     createContext,
     useContext,
-    useEffect,
-    useState,
     ReactNode,
+    useMemo,
 } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { getAllPatientProfiles } from "/@/api/patient.api";
 import { PatientProfile } from "/@/api/schema/PatientSchema";
-
 import {
     PatientModel,
     PatientDashboardRecord,
@@ -19,12 +17,12 @@ interface PatientContextType {
     patientRecords: PatientDashboardRecord[];
     isLoading: boolean;
     error: string | null;
-    refreshPatients: () => Promise<void>;
+    refreshPatients: () => void;
 }
 
-const PatientContext = createContext<
-    PatientContextType | undefined
->(undefined);
+const PatientContext = createContext<PatientContextType | undefined>(
+    undefined
+);
 
 interface PatientProviderProps {
     children: ReactNode;
@@ -33,65 +31,57 @@ interface PatientProviderProps {
 export function PatientProvider({
                                     children,
                                 }: PatientProviderProps) {
-    const [patientProfiles, setPatientProfiles] =
-        useState<PatientProfile[]>([]);
 
-    const [isLoading, setIsLoading] = useState(true);
+    const {
+        data: patientProfiles = [],
+        isLoading,
+        error,
+        refetch,
+    } = usePatients();
 
-    const [error, setError] = useState<string | null>(null);
+    const patientRecords = useMemo<PatientDashboardRecord[]>(
+        () =>
+            patientProfiles.map((patientProfile) => {
+                const patientModel = new PatientModel(patientProfile);
 
-    const loadPatients = async (): Promise<void> => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            const data = await getAllPatientProfiles();
-
-            setPatientProfiles(data);
-        } catch (error: unknown) {
-            console.error(
-                "Failed to load patient profiles:",
-                error
-            );
-
-            setError("Failed to load patient profiles.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        void loadPatients();
-    }, []);
-
-    const patientRecords: PatientDashboardRecord[] =
-        patientProfiles.map((patientProfile) => {
-            const patientModel = new PatientModel(patientProfile);
-
-            return patientModel.dataViewPatientDashboardRecord();
-        });
+                return patientModel.dataViewPatientDashboardRecord();
+            }),
+        [patientProfiles]
+    );
 
     return (
         <PatientContext.Provider
             value={{
-        patientProfiles,
-            patientRecords,
-            isLoading,
-            error,
-            refreshPatients: loadPatients,
-    }}
-    >
+                patientProfiles,
+                patientRecords,
+                isLoading,
+                error: error
+                    ? "Failed to load patient profiles."
+                    : null,
+                refreshPatients: refetch,
+            }}
+        >
             {children}
         </PatientContext.Provider>
     );
 }
 
-export function usePatients(): PatientContextType {
+export function usePatients() {
+    return useQuery({
+        queryKey: ["patients"],
+        queryFn: getAllPatientProfiles,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientContext() {
     const context = useContext(PatientContext);
 
     if (!context) {
         throw new Error(
-            "usePatients must be used inside PatientProvider"
+            "usePatientContext must be used within a PatientProvider"
         );
     }
 

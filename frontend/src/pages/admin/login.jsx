@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(credentials);
+    login(credentials);
   };
   return (
     <div className="min-h-screen bg-background">

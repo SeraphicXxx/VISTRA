@@ -12,13 +12,14 @@ interface LoginStaffResponse {
     access_token: string;
     refresh_token: string;
     token_type: string;
+    detail?: string;
 }
 
 export const loginStaff = async ({
                                      staffId,
                                      password,
                                  }: LoginStaffParams) => {
-    return apiClient<LoginStaffResponse>(
+    const { response, data } = await apiClient<LoginStaffResponse>(
         API_ENDPOINTS.staff.login,
         {
             method: "POST",
@@ -28,4 +29,12 @@ export const loginStaff = async ({
             }),
         }
     );
+
+    if (!response.ok) {
+        throw new Error(
+            data?.detail ?? "Login failed"
+        );
+    }
+
+    return data;
 };
