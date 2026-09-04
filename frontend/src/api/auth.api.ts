@@ -1,21 +1,11 @@
 import { apiClient } from "/@/api/client";
 import { API_ENDPOINTS } from "/@/config/ApiConfig";
-
-interface LoginStaffParams {
-    staffId: string;
-    password: string;
-}
-interface LoginStaffResponse {
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
-    detail?: string;
-}
+import { PasswordAndId, LoginStaffResponse } from "/@/api/schema/ApiResponseSchema"
 
 export const loginStaff = async ({
                                      staffId,
                                      password,
-                                 }: LoginStaffParams) => {
+                                 }: PasswordAndId) => {
     let result;
 
     try {

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {Logo} from "/@/components/Logo.jsx";
-import {useLogin, useLoginForm} from "/@/hooks/UseLogin.js";
+import {useLogin, useLoginForm} from "/src/hooks/UseLogin.js";
 import {useNavigate} from "react-router-dom";
 import {FormInput} from "/@/utils/FormInput.tsx";
 
