@@ -1,7 +1,8 @@
-import { apiClient } from "/@/api/client";
-import { API_ENDPOINTS } from "/@/config/ApiConfig.js";
-import { ApiMessageResponse, ApiDataResponse } from "/@/api/schema/ApiResponseSchema"
+import {apiClient} from "/@/api/client";
+import {API_ENDPOINTS} from "/@/config/ApiConfig.js";
+import {ApiDataResponse, ApiMessageResponse} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile} from "/@/api/schema/PatientSchema";
+import {FastAPIErrorResponse} from "/@/api/schema/FastApiValidationResponse";
 
 export const createPatientAccount = async  (
     request: CreatePatientSchema,
@@ -24,12 +25,16 @@ export const createPatientAccount = async  (
     return apiResponse;
 }
 
-export const getAllPatientProfiles = async () => {
-    const { data: apiResponse } = await apiClient<ApiDataResponse<PatientProfile>>(
+export const getAllPatientProfiles = async () :Promise<ApiDataResponse<PatientProfile>> => {
+    const { data: apiResponse, response } = await apiClient<ApiDataResponse<PatientProfile>>(
         API_ENDPOINTS.patient.get_all_patient_profile,
         {
             method: "GET",
         }
     );
-    return apiResponse.data;
+    if (!response.ok) {
+        throw await response.json();
+    }
+
+    return apiResponse;
 };

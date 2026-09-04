@@ -23,6 +23,8 @@ import {
 } from "/@/repository/PatientModel";
 
 import { sessionManager } from "/@/utils/SessionManager";
+import {isFastAPIError} from "/@/utils/ApiHelper";
+import {ApiDataResponse} from "/@/api/schema/ApiResponseSchema";
 
 /* -------------------------------------------------------------------------- */
 /* Types                                                                      */
@@ -44,7 +46,7 @@ interface PatientContextType {
 
     // Mutation state
     isSaving: boolean;
-    saveError: Error | null;
+    saveError: Error | null | unknown;
 
     // Actions
     refreshPatients: () => Promise<unknown>;
@@ -82,6 +84,7 @@ export function PatientProvider({
      * - errors
      * - refetching
      */
+
     const {
         data: patientProfiles = [],
         isLoading,
@@ -134,6 +137,16 @@ export function PatientProvider({
                 queryKey: ["patients"],
             });
         },
+        onError: (error: unknown) => {
+            if (isFastAPIError(error)) {
+                return;
+            }
+
+            if(error instanceof Error) {
+                return;
+            }
+
+        }
     });
 
     /*
@@ -193,7 +206,10 @@ export function PatientProvider({
 export function usePatientQuery() {
     return useQuery({
         queryKey: ["patients"],
-        queryFn: getAllPatientProfiles,
+        queryFn: async () => {
+            const response: ApiDataResponse<PatientProfile> = await getAllPatientProfiles();
+            return response.data;
+        },
 
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,

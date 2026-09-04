@@ -12,7 +12,7 @@ import {ROUTES} from "/@/config/RoutePaths.js";
 import {Logo} from "/@/components/Logo.jsx";
 import {useLogin, useLoginForm} from "/src/hooks/UseLogin.js";
 import {useNavigate} from "react-router-dom";
-import {FormInput} from "/@/utils/FormInput.tsx";
+import {FormInput} from "/src/components/InputCollection.tsx";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();

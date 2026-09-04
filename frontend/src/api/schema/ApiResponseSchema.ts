@@ -9,18 +9,6 @@ export interface ApiMessageResponse {
     message: string;
 }
 
-export interface ValidationError {
-    type: string;
-    loc: (string | number)[];
-    msg: string;
-    input?: unknown;
-    ctx?: Record<string, unknown>;
-}
-
-export interface FastAPIErrorResponse {
-    detail: ValidationError[];
-}
-
 export interface PasswordAndId {
     staffId: string;
     password: string;
