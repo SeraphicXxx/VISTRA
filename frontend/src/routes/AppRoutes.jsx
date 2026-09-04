@@ -20,9 +20,6 @@ import PatientsTab from "/src/pages/admin/patients/patientsTab.jsx"
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"
 import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
-import { createPatientAccount } from "/@/api/patient.api.ts"
-import {sessionManager} from "/@/utils/SessionManager.ts";
-import {useState} from "react";
 import {PatientProvider} from "/@/context/PatientContext.tsx";
 
 

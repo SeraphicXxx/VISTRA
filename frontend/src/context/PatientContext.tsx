@@ -7,33 +7,61 @@ import React, {
 import {
     useMutation,
     useQuery,
-    useQueryClient, } from "@tanstack/react-query";
-import {createPatientAccount, getAllPatientProfiles} from "/@/api/patient.api";
-import { PatientProfile } from "/@/api/schema/PatientSchema";
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+    createPatientAccount,
+    getAllPatientProfiles,
+} from "/@/api/patient.api";
+
+import {CreatePatientSchema, PatientProfile} from "/@/api/schema/PatientSchema";
+
 import {
     PatientModel,
     PatientDashboardRecord,
 } from "/@/repository/PatientModel";
-import {sessionManager} from "/@/utils/SessionManager";
+
+import { sessionManager } from "/@/utils/SessionManager";
+
+/* -------------------------------------------------------------------------- */
+/* Types                                                                      */
+/* -------------------------------------------------------------------------- */
+
+type SavePatientInput = Omit<CreatePatientSchema, "created_by">;
 
 interface PatientContextType {
+    // Server data
     patientProfiles: PatientProfile[];
+
+    // Application/domain data
     patientRecords: PatientDashboardRecord[];
 
+    // Query state
     isLoading: boolean;
     isRefreshing: boolean;
-    isSaving: boolean;
-
     error: string | null;
-    saveError: any;
 
-    refreshPatients: () => void;
-    savePatient: (record: any) => Promise<unknown>;
+    // Mutation state
+    isSaving: boolean;
+    saveError: Error | null;
+
+    // Actions
+    refreshPatients: () => Promise<unknown>;
+    savePatient: (record: SavePatientInput) => Promise<unknown>;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Context                                                                    */
+/* -------------------------------------------------------------------------- */
 
 const PatientContext = createContext<PatientContextType | undefined>(
     undefined
 );
+
+/* -------------------------------------------------------------------------- */
+/* Provider                                                                   */
+/* -------------------------------------------------------------------------- */
 
 interface PatientProviderProps {
     children: ReactNode;
@@ -44,14 +72,30 @@ export function PatientProvider({
                                 }: PatientProviderProps) {
     const queryClient = useQueryClient();
 
+    /*
+     * React Query owns the server state.
+     *
+     * This gives us:
+     * - patientProfiles
+     * - loading state
+     * - fetching state
+     * - errors
+     * - refetching
+     */
     const {
         data: patientProfiles = [],
         isLoading,
         isFetching,
         error,
         refetch,
-    } = usePatients();
+    } = usePatientQuery();
 
+    /*
+     * Convert API models into records specifically
+     * designed for the patient dashboard.
+     *
+     * Components don't need to know how this transformation works.
+     */
     const patientRecords = useMemo<PatientDashboardRecord[]>(
         () =>
             patientProfiles.map((patientProfile) => {
@@ -61,16 +105,25 @@ export function PatientProvider({
             }),
         [patientProfiles]
     );
-    const refreshPatients = async () => {
-        await refetch();
-    };
-    const savePatientMutation = useMutation({
-        mutationFn: async (record: any) => {
-            const user = sessionManager.getUser();
 
+    /*
+     * Save patient mutation.
+     *
+     * The provider adds application-specific behavior:
+     * - Gets the currently logged-in staff member
+     * - Adds created_by
+     * - Calls the API
+     * - Invalidates the patient query after success
+     */
+    const savePatientMutation = useMutation({
+        mutationFn: async (record: SavePatientInput) => {
+            const user = sessionManager.getUser();
+            if (!user){
+                throw new Error("Not logged in");
+            }
             const patientData = {
                 ...record,
-                created_by: user?.staff_id,
+                created_by: user.staff_id,
             };
 
             return createPatientAccount(patientData);
@@ -82,43 +135,83 @@ export function PatientProvider({
             });
         },
     });
+
+    /*
+     * Context exposes only what the rest of the application needs.
+     */
+    const contextValue = useMemo<PatientContextType>(
+        () => ({
+            patientProfiles,
+            patientRecords,
+
+            isLoading,
+            isRefreshing: isFetching,
+            error: error
+                ? "Failed to load patient profiles."
+                : null,
+
+            isSaving: savePatientMutation.isPending,
+            saveError: savePatientMutation.error,
+
+            refreshPatients: refetch,
+            savePatient: savePatientMutation.mutateAsync,
+        }),
+        [
+            patientProfiles,
+            patientRecords,
+            isLoading,
+            isFetching,
+            error,
+            savePatientMutation.isPending,
+            savePatientMutation.error,
+            refetch,
+            savePatientMutation.mutateAsync,
+        ]
+    );
+
     return (
-        <PatientContext.Provider
-            value={{
-                patientProfiles,
-                patientRecords,
-
-                isLoading,
-                isRefreshing: isFetching,
-                isSaving: savePatientMutation.isPending,
-
-                error: error
-                    ? "Failed to load patient profiles."
-                    : null,
-
-                saveError: savePatientMutation.error,
-
-                refreshPatients: refetch,
-
-                savePatient: savePatientMutation.mutateAsync,
-            }}
-        >
+        <PatientContext.Provider value={contextValue}>
             {children}
         </PatientContext.Provider>
     );
 }
 
-export function usePatients() {
+/* -------------------------------------------------------------------------- */
+/* React Query                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Handles patient server state.
+ *
+ * React Query is responsible for:
+ * - fetching
+ * - caching
+ * - stale state
+ * - garbage collection
+ * - refetching
+ */
+export function usePatientQuery() {
     return useQuery({
         queryKey: ["patients"],
         queryFn: getAllPatientProfiles,
+
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
+
         refetchOnWindowFocus: false,
     });
 }
 
-export function usePatientContext() {
+/* -------------------------------------------------------------------------- */
+/* Context Hook                                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Provides access to patient-specific application functionality.
+ *
+ * Must be used inside PatientProvider.
+ */
+export function usePatientContext(): PatientContextType {
     const context = useContext(PatientContext);
 
     if (!context) {

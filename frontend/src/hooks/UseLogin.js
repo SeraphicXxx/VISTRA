@@ -1,64 +1,42 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 import { sessionManager } from "/@/utils/SessionManager.ts";
-import { ROUTES } from "/@/config/RoutePaths.js";
 import { loginStaff } from "/@/api/auth.api.ts";
 
 export function useLogin() {
-    const navigate = useNavigate();
-    const [error, setError] = useState("");
-
     const mutation = useMutation({
         mutationFn: loginStaff,
 
         onSuccess: (data) => {
+            console.log(data);
             sessionManager.setLogin(
                 data.access_token,
                 data.refresh_token,
                 data.user
             );
-
-            navigate(
-                ROUTES.admin.dashboard.overview
-            );
-        },
-
-        onError: (error) => {
-            if (error.message === "Invalid email or password") {
-                setError("Invalid staff ID or password.");
-            } else {
-                setError("Unable to connect to the server.");
-            }
         },
     });
 
-    const login = (credentials) => {
-        if (!credentials.staffId.trim() || !credentials.password) {
-            setError(
-                "Enter your staff ID and password to continue."
-            );
-            return;
-        }
-
-        setError("");
-        mutation.mutate(credentials);
-    };
-
     return {
-        login,
+        login: mutation.mutateAsync,
         isLoading: mutation.isPending,
-        error,
+        isError: mutation.isError,
+        error: mutation.error?.message ?? null,
     };
 }
+
+
 
 export function useLoginForm() {
     const [credentials, setCredentials] = useState({
         staffId: "",
         password: "",
     });
-
+    const [validationErrors, setValidationErrors] = useState({
+        staffId: "",
+        password: "",
+    });
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -66,10 +44,31 @@ export function useLoginForm() {
             ...prev,
             [name]: value,
         }));
+        // Clear the field's error when the user starts correcting it
+        setValidationErrors((previous) => ({
+            ...previous,
+            [name]: undefined,
+        }))
     };
+    const validate = () => {
+        const newErrors = {};
 
+        if (!credentials.staffId.trim()) {
+            newErrors.staffId = "Staff ID is required.";
+        }
+
+        if (!credentials.password) {
+            newErrors.password = "Password is required.";
+        }
+
+        setValidationErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
     return {
         credentials,
+        validationErrors,
         handleChange,
+        validate
     };
 }

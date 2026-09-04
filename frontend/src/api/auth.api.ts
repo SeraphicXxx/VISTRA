@@ -5,9 +5,6 @@ interface LoginStaffParams {
     staffId: string;
     password: string;
 }
-interface RefreshTokenParam {
-    refresh_token: string;
-}
 interface LoginStaffResponse {
     access_token: string;
     refresh_token: string;
@@ -19,21 +16,29 @@ export const loginStaff = async ({
                                      staffId,
                                      password,
                                  }: LoginStaffParams) => {
-    const { response, data } = await apiClient<LoginStaffResponse>(
-        API_ENDPOINTS.staff.login,
-        {
-            method: "POST",
-            body: JSON.stringify({
-                email: staffId,
-                password,
-            }),
-        }
-    );
+    let result;
+
+    try {
+        result = await apiClient<LoginStaffResponse>(
+            API_ENDPOINTS.staff.login,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email: staffId,
+                    password,
+                }),
+            }
+        );
+    } catch (e) {
+        throw new Error(
+            "Unable to connect to server. Please try again later."
+        );
+    }
+
+    const { response, data } = result;
 
     if (!response.ok) {
-        throw new Error(
-            data?.detail ?? "Login failed"
-        );
+        throw new Error(data?.detail ?? "Login failed");
     }
 
     return data;
