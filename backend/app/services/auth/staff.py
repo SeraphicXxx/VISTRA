@@ -1,7 +1,7 @@
-from app.database.database_client import  supabase
-from app.utils.email_utils import add_ucc_domain, staff_id_format
 from fastapi import HTTPException
-from supabase_auth.errors import AuthApiError
+from app.database.database_client import supabase
+from app.utils.email_utils import add_ucc_domain, staff_id_format
+
 
 def staff_login(request):
     try:
