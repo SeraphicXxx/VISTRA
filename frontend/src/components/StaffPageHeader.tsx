@@ -48,7 +48,6 @@ export default function StaffPageHeader({
         isLoading,
         error,
     } = useStaffInfo(staffId);
-    {console.log(error)}
     return (
         <header className="flex flex-col gap-3 border-b border-border bg-surface px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
 

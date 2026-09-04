@@ -7,17 +7,13 @@ export const getStaffById = async (
     staffId: string,
     signal?: AbortSignal
 ): Promise<StaffModel> => {
-    const { data: apiResponse, response:     reps } = await apiClient<ApiDataResponse<StaffModel>>(
+    const { data: apiResponse } = await apiClient<ApiDataResponse<StaffModel>>(
         API_ENDPOINTS.staff.getStaffById(staffId),
         {
             method: "GET",
             signal,
         }
     );
-    console.log(reps);
-    if (!apiResponse.success) {
-        throw new Error(apiResponse.message || `Staff not found for ${staffId}`);
-    }
 
     if (!apiResponse.data || apiResponse.data.length === 0 || !apiResponse) {
         throw new Error(`Staff not found for ${staffId}`);
