@@ -16,17 +16,24 @@ interface SelectOption {
 
 type SelectOptionInput = string | SelectOption;
 
-interface SelectFieldProps {
+interface SelectFieldProps
+    extends React.SelectHTMLAttributes<HTMLSelectElement> {
     id: string;
     label: string;
     options: SelectOptionInput[];
     placeholder?: string;
+    error?: string;
+    className?: string;
 }
+
 export function SelectField({
                                 id,
                                 label,
                                 options,
                                 placeholder = "Select",
+                                error,
+                                className,
+                                ...props
                             }: SelectFieldProps) {
     const normalized: SelectOption[] = options.map((opt) =>
         typeof opt === "string"
@@ -47,7 +54,12 @@ export function SelectField({
                 id={id}
                 name={id}
                 defaultValue=""
-                className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                {...props}
+                className={`w-full rounded-xl border bg-background px-3.5 py-2.5 text-sm text-textPrimary transition-colors duration-200 focus:outline-none focus:ring-2 ${
+                    error
+                        ? "border-danger/50 focus:border-danger/50 focus:ring-danger/20"
+                        : "border-border focus:border-primary/50 focus:ring-primary/20"
+                } ${className ?? ""}`}
             >
                 <option value="" disabled>
                     {placeholder}
@@ -62,9 +74,16 @@ export function SelectField({
                     </option>
                 ))}
             </select>
+
+            {error && (
+                <p className="mt-1 text-xs text-danger">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }
+
 export function FormInput({
                               label,
                               error,

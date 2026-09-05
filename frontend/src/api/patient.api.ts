@@ -35,6 +35,6 @@ export const getAllPatientProfiles = async () :Promise<ApiDataResponse<PatientPr
     if (!response.ok) {
         throw await response.json();
     }
-
+    console.log(response.status);
     return apiResponse;
 };

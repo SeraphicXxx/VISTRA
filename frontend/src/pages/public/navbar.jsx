@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "#visit", label: "How It Works" },
 ];
 
+//to be removed??
 function LiveDot({ className = "bg-primary" }) {
   const [beat, setBeat] = useState(false);
 

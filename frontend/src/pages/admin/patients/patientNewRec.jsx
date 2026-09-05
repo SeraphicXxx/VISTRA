@@ -23,6 +23,7 @@ import {
 } from "/@/utils/NewPatientValidation.jsx";
 
 import { usePatientContext } from "/@/context/PatientContext.tsx";
+import {getFieldErrors} from "/@/utils/Formatters.js";
 
 export default function NewPatientRecordForm() {
   const {
@@ -30,7 +31,7 @@ export default function NewPatientRecordForm() {
     isSaving,
     saveError,
   } = usePatientContext();
-  const saveErrorMessage = saveError;
+  const saveErrorMessage = getFieldErrors(saveError);
   const [classification, setClassification] = useState("student");
   const [studentIdError, setStudentIdError] = useState("");
   const [facultyIdError, setFacultyIdError] = useState("");
@@ -131,6 +132,7 @@ export default function NewPatientRecordForm() {
                 label="Name"
                 placeholder="Last name, First name, Middle name"
                 required
+                error={saveErrorMessage?.name}
             />
           </div>
 
@@ -200,6 +202,7 @@ export default function NewPatientRecordForm() {
               label="Birthday"
               type="date"
               required
+              error={saveErrorMessage?.birthday}
           />
 
           <FormInput
@@ -209,6 +212,7 @@ export default function NewPatientRecordForm() {
               type="tel"
               placeholder="09XXXXXXXXX"
               required
+              error={saveErrorMessage?.mobile_number}
           />
 
           {/* Password */}
@@ -254,6 +258,7 @@ export default function NewPatientRecordForm() {
               type="number"
               placeholder="e.g. 20"
               required
+              error={saveErrorMessage?.age}
           />
 
           <SelectField
@@ -261,6 +266,7 @@ export default function NewPatientRecordForm() {
               name="sex"
               label="Sex"
               options={SEX_OPTIONS}
+              error={saveErrorMessage?.sex}
           />
 
           <SelectField
@@ -268,6 +274,7 @@ export default function NewPatientRecordForm() {
               name="civil_status"
               label="Civil status"
               options={CIVIL_STATUS_OPTIONS}
+              error={saveErrorMessage?.civil_status}
           />
         </div>
 
@@ -284,6 +291,7 @@ export default function NewPatientRecordForm() {
                     name="course"
                     label="Course"
                     options={COURSE_OPTIONS}
+                    error={saveErrorMessage?.course}
                 />
 
                 <SelectField
@@ -291,6 +299,7 @@ export default function NewPatientRecordForm() {
                     name="year"
                     label="Year"
                     options={YEAR_OPTIONS}
+                    error={saveErrorMessage?.year}
                 />
 
                 <SelectField
@@ -298,6 +307,7 @@ export default function NewPatientRecordForm() {
                     name="section"
                     label="Section"
                     options={SECTION_OPTIONS}
+                    error={saveErrorMessage?.section}
                 />
               </div>
             </div>
@@ -316,6 +326,7 @@ export default function NewPatientRecordForm() {
                     name="department"
                     label="Department"
                     options={DEPARTMENT_OPTIONS}
+                    error={saveErrorMessage?.department}
                 />
 
                 <SelectField
@@ -323,6 +334,7 @@ export default function NewPatientRecordForm() {
                     name="position"
                     label="Position"
                     options={POSITION_OPTIONS}
+                    error={saveErrorMessage?.position}
                 />
               </div>
             </div>
@@ -342,6 +354,7 @@ export default function NewPatientRecordForm() {
                   label="Address"
                   placeholder="House no., Street"
                   required
+                  error={saveErrorMessage?.address}
               />
             </div>
 
@@ -351,6 +364,7 @@ export default function NewPatientRecordForm() {
                 label="Barangay"
                 placeholder="e.g. Brgy. 176"
                 required
+                error={saveErrorMessage?.barangay}
             />
           </div>
         </div>

@@ -121,8 +121,10 @@ export default function ViewStudentRecord() {
     appointment: [],
   });
   const [loadingRecords, setLoadingRecords] = useState(true);
-  // Look up the patient by the :id in the URL (matches patient.id, e.g. "PAT-1001")
+
+  // replace with reactQuery custom hook
   const patient = useMemo(() => patientProfiles.find((p) => p.patient_id === id), [id]);
+
 
   useEffect(() => {
     let cancelled = false;

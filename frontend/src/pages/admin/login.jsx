@@ -19,7 +19,6 @@ export default function AdminLoginPage() {
   const { credentials, handleChange, validationErrors, validate } = useLoginForm();
   const { login, isLoading, isError, error } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

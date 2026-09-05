@@ -11,4 +11,4 @@ class Appointments(BaseModel):
     reason: str
     location: str
     created_at: datetime
-    staff_id: str
+    staff_id: str | None = None
