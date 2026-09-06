@@ -26,6 +26,7 @@ interface RecordsTablePanelProps {
   showRecordCount?: boolean;
   showFilter?: boolean;
   maxRecords?: number;
+  showRecentLabel?: boolean;
 }
 
 export const RecordsTablePanel = ({
@@ -41,6 +42,7 @@ export const RecordsTablePanel = ({
   showRecordCount = true,
   showFilter = true,
   maxRecords,
+  showRecentLabel = false,
 }: RecordsTablePanelProps) => {
   const { searchQuery } = useOutletContext<OutletContext>();
 
@@ -62,6 +64,10 @@ export const RecordsTablePanel = ({
                     route={createRecordPath}
                     disabled={createDisabled}
                   />
+                ) : showRecentLabel && maxRecords ? (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                    {Math.min(maxRecords, filteredData.length)} recent
+                  </span>
                 ) : null
               }
             />

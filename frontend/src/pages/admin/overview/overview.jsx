@@ -121,17 +121,18 @@ export default function OverviewTab() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ConsultationPanel filteredRecords={filteredRecords} />
         <RecordsTablePanel
-          name="Appointment"
-          data={filteredAppointments}
-          columns={getTableColumns(filteredAppointments, ["id"])}
-          icon={CalendarClock}
-          createDisabled={true}
-          showCreate={false}
-          showRecordsSuffix={false}
-          showRecordCount={false}
-          showFilter={false}
-          maxRecords={6}
-        />
+  name="Appointment"
+  data={filteredAppointments}
+  columns={getTableColumns(filteredAppointments, ["id"])}
+  icon={CalendarClock}
+  createDisabled={true}
+  showCreate={false}
+  showRecordsSuffix={false}
+  showRecordCount={false}
+  showFilter={false}
+  maxRecords={6}
+  showRecentLabel={true}
+/>
       </div>
     </>
   );
