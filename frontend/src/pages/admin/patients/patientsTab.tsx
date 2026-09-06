@@ -3,7 +3,7 @@ import { UserRound } from "lucide-react";
 import {
     RecordsTablePanel,
     PatientRow,
-} from "/@/components/Table.jsx";
+} from "/@/components/Table.tsx";
 
 import { ROUTES } from "/@/config/RoutePaths.js";
 

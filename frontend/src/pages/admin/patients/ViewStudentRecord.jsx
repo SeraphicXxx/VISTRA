@@ -226,7 +226,7 @@ export default function ViewStudentRecord() {
             <dt className="font-medium uppercase tracking-wide text-textMuted">
               ID:
             </dt>
-            <dd className=" font-mono text-textPrimary">
+            <dd className=" font-medium text-textPrimary">
               {patient?.userId}
             </dd>
           </div>

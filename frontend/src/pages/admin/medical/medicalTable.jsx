@@ -1,5 +1,5 @@
 import React from "react";
-import { GenericTable, GenericRow } from "/@/components/Table.jsx";
+import { GenericTable, GenericRow } from "/@/components/Table.tsx";
 import { getTableColumns } from "/@/utils/TableUtils.js";
 import { ROUTES } from "/@/config/RoutePaths.js";
 

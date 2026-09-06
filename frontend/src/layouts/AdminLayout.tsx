@@ -23,7 +23,7 @@ export default function AdminLayout() {
     );
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-background font-sans text-textPrimary selection:bg-primary/20">
+        <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-background via-primary/[0.03] to-primary/10 font-sans text-textPrimary selection:bg-primary/20">
             <Sidebar />
 
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
