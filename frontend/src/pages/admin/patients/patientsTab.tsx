@@ -18,12 +18,11 @@ export default function PatientsTab() {
     if (isLoading) {
         return <LoadingPage />;
     }
-
+    //TODO make RecordsTablePanel data to any type
     return (
         <RecordsTablePanel
             name="Patient"
             icon={UserRound}
-            //TODO make RecordsTablePanel data to any type
             data={patientRecords}
             columns={patientColumns}
             createRecordPath={ROUTES.admin.patient.createNewRecord}
