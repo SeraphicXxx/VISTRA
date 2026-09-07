@@ -40,3 +40,20 @@ export function getClinicOperationState(date = new Date()) {
         ? "open"
         : "closed";
 }
+export function getFieldErrors(error) {
+    const details = error?.detail;
+
+    if (!Array.isArray(details)) {
+        return {};
+    }
+
+    return details.reduce((errors, item) => {
+        const field = item.loc?.[item.loc.length - 1];
+
+        if (field) {
+            errors[field] = item.msg;
+        }
+
+        return errors;
+    }, {});
+}

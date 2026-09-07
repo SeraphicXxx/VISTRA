@@ -91,41 +91,6 @@ export const DEPARTMENT_OPTIONS = [
   "College of Criminal Justice Education",
 ];
 
-export function SelectField({
-  id,
-  label,
-  options,
-  placeholder = "Select",
-}) {
-  const normalized = options.map((opt) =>
-    typeof opt === "string"
-      ? { code: opt, label: opt }
-      : opt
-  );
-
-  return (
-    <div>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-
-      <select
-        id={id}
-        name={id}
-        defaultValue=""
-        className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-      >
-        <option value="" disabled>
-          {placeholder}
-        </option>
-
-        {normalized.map((opt) => (
-          <option key={opt.code} value={opt.code}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
 
 export function ClassificationToggle({
   value,
