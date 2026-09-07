@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -7,7 +7,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { getMockPatientRecords } from "./patientsData";
-import {usePatients} from "/@/context/PatientContext.tsx";
+import {usePatientContext} from "/@/context/PatientContext.tsx";
 
 const TABS = [
   {
@@ -109,7 +109,8 @@ function EmptyState({ label, tabMeta }) {
 }
 
 export default function ViewStudentRecord() {
-  const { patientRecords, isLoading } = usePatients();
+  const { patientProfiles } = usePatientContext();
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -121,8 +122,9 @@ export default function ViewStudentRecord() {
   });
   const [loadingRecords, setLoadingRecords] = useState(true);
 
-  // Look up the patient by the :id in the URL (matches patient.id, e.g. "PAT-1001")
-  const patient = useMemo(() => patientRecords.find((p) => p.id === id), [id]);
+  // replace with reactQuery custom hook
+  const patient = useMemo(() => patientProfiles.find((p) => p.patient_id === id), [id]);
+
 
   useEffect(() => {
     let cancelled = false;

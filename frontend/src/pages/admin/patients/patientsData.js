@@ -106,7 +106,7 @@ export const patientRecords = [
 ];
 
 export const patientRecordsMockData = {
-  "PAT-1001": {
+  "20230847-S": {
     medical: [
       {
         id: "MED-1001-1",

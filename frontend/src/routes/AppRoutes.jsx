@@ -15,7 +15,7 @@ import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
-import ProtectedRoute from "/@/components/ProtectedRoute.jsx"
+import ProtectedRoute from "/@/routes/ProtectedRoute.jsx"
 import PatientsTab from "/src/pages/admin/patients/patientsTab.jsx"
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"

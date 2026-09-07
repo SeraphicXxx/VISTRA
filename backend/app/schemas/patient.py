@@ -1,6 +1,12 @@
 from datetime import date, datetime
 from uuid import UUID
+
+from fastapi import Depends
 from pydantic import BaseModel, Field, field_validator
+from supabase import Client
+
+from app.database.database_client import get_supabase_for_user
+from app.repositories import patient_repositories
 from app.utils.name_utils import separate_name
 
 class Patient(BaseModel):
@@ -102,7 +108,8 @@ class CreatePatientRequest(BaseModel):
             contact_no=self.mobile_number,
             school_year=self.school_year,
         )
-    
+
+
     @field_validator("name", "address", "barangay")
     @classmethod
     def validate_not_blank(cls, value: str):
