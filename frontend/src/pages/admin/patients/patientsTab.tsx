@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UserRound } from "lucide-react";
 import {
     RecordsTablePanel,
     PatientRow,
-} from "/@/components/Table.tsx";
+} from "/@/components/Table";
 
 import { ROUTES } from "/@/config/RoutePaths.js";
-
-import { getAllPatientProfiles } from "/@/api/patient.api";
 
 import { patientColumns } from "./patientsData";
 
@@ -26,6 +24,7 @@ export default function PatientsTab() {
         <RecordsTablePanel
             name="Patient"
             icon={UserRound}
+            //TODO make RecordsTablePanel data to any type
             data={patientRecords}
             columns={patientColumns}
             createRecordPath={ROUTES.admin.patient.createNewRecord}

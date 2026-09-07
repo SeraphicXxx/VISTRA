@@ -168,6 +168,8 @@ const TAB_SEARCH_PLACEHOLDERS = {
   settings: "Search settings",
 };
 
+
+//TODO: DERECATED should be removed?
 export default function AdminDashboardPage() {
   const [activeNavId, setActiveNavId] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
