@@ -1,116 +1,16 @@
 import React, { useState } from "react";
-import {
-  ArrowLeft,
-  User,
-  ClipboardList,
-  Printer,
-  Pencil,
-} from "lucide-react";
+import { ArrowLeft, User, ClipboardList, Printer, Pencil } from "lucide-react";
+
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal.jsx";
 import { StatusBadge } from "/@/components/statusbadge.jsx";
 
-const visitEditFields = [
-  {
-    name: "date",
-    label: "Visit Date",
-    type: "date",
-  },
-  {
-    name: "complaint",
-    label: "Chief Complaint",
-    type: "text",
-  },
-  {
-    name: "treatment",
-    label: "Treatment",
-    type: "textarea",
-  },
-];
+import { Patient, Visit, visitEditFields } from "/@/types/types";
+import { VisitTimeline } from "/@/components/VisitTimeline";
+import { VisitDetailModal } from "/@/components/VisitDetailModal";
 
-function VisitRow({ visit, isLast, onEdit }) {
-  const formatted = new Date(visit.date).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 
-  return (
-    <li className="relative flex gap-4 pb-7 pl-1 last:pb-0">
-      {!isLast && (
-        <span
-          className="absolute left-[7px] top-3 h-full w-px bg-border"
-          aria-hidden="true"
-        />
-      )}
-
-      <span className="relative mt-2 h-3 w-3 shrink-0 rounded-full border-2 border-primary bg-surface" />
-
-      <div className="min-w-0 flex-1">
-        <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primaryDark">
-          {formatted}
-        </span>
-
-        <div className="mt-2 rounded-xl border border-l-4 border-border border-l-primary/50 bg-surfaceMuted/40 p-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-textPrimary">
-                {visit.complaint}
-              </p>
-              <p className="mt-1 text-sm text-textSecondary">
-                {visit.treatment}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onEdit(visit)}
-              className="shrink-0 rounded-md p-1.5 text-textMuted hover:bg-surfaceMuted hover:text-textPrimary"
-              aria-label="Edit visit"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </li>
-  );
-}
-
-function VisitTimeline({ visits, onEdit }) {
-  const byYear = visits.reduce((acc, visit) => {
-    const year = new Date(visit.date).getFullYear();
-    (acc[year] ||= []).push(visit);
-    return acc;
-  }, {});
-
-  const years = Object.keys(byYear).sort((a, b) => b - a);
-
-  return (
-    <div className="space-y-8">
-      {years.map((year) => (
-        <div key={year}>
-          <p className="mb-4 text-sm font-semibold text-textPrimary">
-            {year}
-          </p>
-
-          <ol>
-            {byYear[year].map((visit, index) => (
-              <VisitRow
-                key={visit.id}
-                visit={visit}
-                isLast={index === byYear[year].length - 1}
-                onEdit={onEdit}
-              />
-            ))}
-          </ol>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-const examplePatient = {
+const examplePatient: Patient = {
   recordId: "MED-1042",
   studentId: "20230810-S",
   name: "Kenji Briones Chua",
@@ -126,31 +26,43 @@ const examplePatient = {
   status: "cleared",
 };
 
-const exampleVisits = [
+const exampleVisits: Visit[] = [
   {
     id: "v1",
     date: "2026-02-14",
+    doctor: "Dr. Maria Santos",
     complaint: "Mild fever, headache",
+    treatmentType: "Medicine",
     treatment: "Paracetamol 500mg, rest advised",
   },
   {
     id: "v2",
     date: "2026-05-03",
+    doctor: "Dr. Ramon Cruz",
     complaint: "Sprained ankle during PE",
+    treatmentType: "Procedure",
     treatment: "Ice compress, elastic bandage applied",
   },
 ];
+
+interface PatientRecordViewProps {
+  patient?: Patient;
+  visits?: Visit[];
+  onBack?: () => void;
+  onSave?: (patient: Patient) => void;
+}
 
 export default function PatientRecordView({
   patient = examplePatient,
   visits = exampleVisits,
   onBack,
   onSave,
-}) {
-  const [patientData, setPatientData] = useState(patient);
-  const [visitData, setVisitData] = useState(visits);
+}: PatientRecordViewProps) {
+  const [patientData, setPatientData] = useState<Patient>(patient);
+  const [visitData, setVisitData] = useState<Visit[]>(visits);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingVisit, setEditingVisit] = useState(null);
+  const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
+  const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
 
   const handleBack = () => {
     if (onBack) {
@@ -160,7 +72,7 @@ export default function PatientRecordView({
     }
   };
 
-  const handleSaveRecord = (updatedPatient) => {
+  const handleSaveRecord = (updatedPatient: Patient) => {
     setPatientData(updatedPatient);
     setIsEditOpen(false);
 
@@ -169,7 +81,7 @@ export default function PatientRecordView({
     }
   };
 
-  const handleSaveVisit = (updatedVisit) => {
+  const handleSaveVisit = (updatedVisit: Visit) => {
     setVisitData((currentVisits) =>
       currentVisits.map((visit) =>
         visit.id === updatedVisit.id ? updatedVisit : visit
@@ -198,6 +110,17 @@ export default function PatientRecordView({
           data={editingVisit}
           onClose={() => setEditingVisit(null)}
           onSave={handleSaveVisit}
+        />
+      )}
+
+      {viewingVisit && (
+        <VisitDetailModal
+          visit={viewingVisit}
+          onClose={() => setViewingVisit(null)}
+          onEdit={(visit) => {
+            setViewingVisit(null);
+            setEditingVisit(visit);
+          }}
         />
       )}
 
@@ -327,6 +250,7 @@ export default function PatientRecordView({
           {visitData.length > 0 ? (
             <VisitTimeline
               visits={visitData}
+              onView={setViewingVisit}
               onEdit={setEditingVisit}
             />
           ) : (

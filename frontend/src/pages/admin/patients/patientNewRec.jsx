@@ -4,6 +4,7 @@ import { FieldLabel } from "/@/utils/FieldLabel.jsx";
 import { TextField } from "/@/utils/TextField.jsx";
 import { SelectField, ClassificationToggle, COURSE_OPTIONS, YEAR_OPTIONS, SECTION_OPTIONS, SEX_OPTIONS, CIVIL_STATUS_OPTIONS, POSITION_OPTIONS, DEPARTMENT_OPTIONS } from "/@/utils/NewPatientUtils.jsx";
 import { STUDENT_ID_PATTERN, FACULTY_ID_PATTERN, ADMIN_ID_PATTERN, validateStudentId, validateFacultyId, validateAdminId } from "/@/utils/NewPatientValidation.jsx";
+import MedicalHistoryForm from "/@/components/MedicalHistoryForm";
 
 export default function NewPatientRecordForm({ onBack, onSave, errors }) {
   const [classification, setClassification] = useState("student");
@@ -23,7 +24,9 @@ export default function NewPatientRecordForm({ onBack, onSave, errors }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const record = Object.fromEntries(new FormData(e.target).entries());
+    const formData = new FormData(e.target);
+    const record = Object.fromEntries(formData.entries());
+    record.family_history = formData.getAll("family_history");
     if (onSave) onSave(record);
   };
 
@@ -160,6 +163,8 @@ export default function NewPatientRecordForm({ onBack, onSave, errors }) {
           <TextField id="barangay" name="barangay" label="Barangay" placeholder="e.g. Brgy. 176" required />
         </div>
       </div>
+
+      <MedicalHistoryForm />
 
       <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2} />
