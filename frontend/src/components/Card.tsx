@@ -1,9 +1,10 @@
-import React, { ReactNode } from "react";
+import React, {ComponentType, ReactNode} from "react";
+import {LucideProps} from "lucide-react";
 
 interface CardProps {
     title?: string;
     description?: string;
-    icon?: ReactNode;
+    icon?: ComponentType<LucideProps>;
     children?: ReactNode;
     footer?: ReactNode;
     className?: string;
@@ -12,7 +13,7 @@ interface CardProps {
 export default function Card({
                                  title,
                                  description,
-                                 icon,
+                                 icon: Icon,
                                  children,
                                  footer,
                                  className = "",
@@ -29,11 +30,11 @@ export default function Card({
             `}
         >
             {/* Header */}
-            {(title || description || icon) && (
+            {(title || description || Icon) && (
                 <div className="flex items-start gap-3 border-b border-gray-200 p-5">
-                    {icon && (
+                    {Icon && (
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                            {icon}
+                            <Icon className="h-4 w-4" strokeWidth={2} />
                         </div>
                     )}
 

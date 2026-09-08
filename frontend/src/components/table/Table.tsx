@@ -11,11 +11,7 @@ export interface Default {
     type: string;
     status: string;
 }
-export interface Column<T> {
-    key: keyof T;
-    label: string;
-    render?: (value: T[keyof T], record: T) => ReactNode;
-}
+
 export const defaultColumns: Column<Default>[] = [
     {
         key: "student",
@@ -78,6 +74,12 @@ export const defaultColumns: Column<Default>[] = [
 
 ];
 
+export interface Column<T> {
+    key: keyof T;
+    label: string;
+    render?: (value: T[keyof T], record: T) => ReactNode;
+}
+
 interface GenericTableProps {
     children: ReactNode;
     className?: string;
@@ -96,6 +98,7 @@ export class GenericTable extends React.Component<GenericTableProps> {
         );
     }
 }
+
 export const GenericTableHeader = <T,>({
                                     columns,
                                     hasAction = false,
