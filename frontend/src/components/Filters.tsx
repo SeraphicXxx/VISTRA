@@ -2,6 +2,30 @@ import React, {useEffect, useRef, useState} from "react";
 import {ChevronDown, SlidersHorizontal} from "lucide-react";
 import {Default} from "/@/components/table/Table";
 
+interface DateFilterProps {
+    label: string;
+    value: string | null;
+    onChange: (value: string | null) => void;
+}
+
+export function DateFilter({
+                               label,
+                               value,
+                               onChange,
+                           }: DateFilterProps) {
+    return (
+        <div className="relative">
+            <input
+                type="date"
+                value={value ?? ""}
+                onChange={(e) =>
+                    onChange(e.target.value || null)
+                }
+                className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-textSecondary outline-none transition-colors duration-150 focus:border-primary"
+            />
+        </div>
+    );
+}
 interface FilterDropdownProps {
     label: string;
     options: string[];
@@ -111,6 +135,7 @@ export function FilterDropdown({
 export interface FilterColumn<T> {
     key: keyof T;
     label: string;
+    type?: "select" | "date";
 }
 
 type Filters<T> = Partial<Record<keyof T, string | null>>;
@@ -119,25 +144,6 @@ interface TableFiltersProps<T> {
     filterableColumns: FilterColumn<T>[];
     filterOptions: Partial<Record<keyof T, string[]>>;
 }
-
-const FILTERABLE_COLUMNS: FilterColumn<Default>[] = [
-    {
-        key: "status",
-        label: "Status",
-    },
-    {
-        key: "type",
-        label: "Type",
-    },
-    {
-        key: "course",
-        label: "Course",
-    },
-];
-
-const MOCK_FILTER_OPTIONS: Record<string, string[]> = {
-
-};
 
 export function TableFilters<T>({
                                     filterableColumns,
@@ -165,18 +171,32 @@ export function TableFilters<T>({
 
                 Filter
             </span>
+            {filterableColumns.map((column) => {
+                if (column.type === "date") {
+                    return (
+                        <DateFilter
+                            key={String(column.key)}
+                            label={column.label}
+                            value={filters[column.key] ?? null}
+                            onChange={(value) =>
+                                handleChange(column.key, value)
+                            }
+                        />
+                    );
+                }
 
-            {filterableColumns.map((column) => (
-                <FilterDropdown
-                    key={String(column.key)}
-                    label={column.label}
-                    value={filters[column.key] ?? null}
-                    onChange={(value) =>
-                        handleChange(column.key, value)
-                    }
-                    options={filterOptions[column.key] ?? []}
-                />
-            ))}
+                return (
+                    <FilterDropdown
+                        key={String(column.key)}
+                        label={column.label}
+                        value={filters[column.key] ?? null}
+                        onChange={(value) =>
+                            handleChange(column.key, value)
+                        }
+                        options={filterOptions[column.key] ?? []}
+                    />
+                );
+            })}
         </div>
     );
 }

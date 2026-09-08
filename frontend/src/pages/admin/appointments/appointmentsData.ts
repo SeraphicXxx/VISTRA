@@ -26,9 +26,26 @@ export interface Appointments {
   status: string;
 }
 export const appointmentFilters: FilterColumn<Appointments>[] = [
-  { key: "status", label: "Status", },
-  { key: "type", label: "Type", },
-  { key: "course", label: "Course", },
+  {
+    key: "status",
+    label: "Status",
+    type: "select",
+  },
+  {
+    key: "type",
+    label: "Type",
+    type: "select",
+  },
+  {
+    key: "course",
+    label: "Course",
+    type: "select",
+  },
+  {
+    key: "time",
+    label: "Date",
+    type: "date",
+  },
 ]
 export const appointmentFiltersOptions: Record<string, string[]> = {
   status: [
