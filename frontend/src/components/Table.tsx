@@ -45,7 +45,7 @@ export const RecordsTablePanel = ({
   showRecentLabel = false,
 }: RecordsTablePanelProps) => {
   const { searchQuery } = useOutletContext<OutletContext>();
-console.log(data)
+
   const filteredData = filterByQuery(data, searchQuery, columns) ?? [];
   const displayData = maxRecords ? filteredData.slice(0, maxRecords) : filteredData;
 
