@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar } from "lucide-react";
-import { APPOINTMENTS } from "./appointmentsData";
+import {    APPOINTMENTS } from "./appointmentsData.ts";
 import { RecordsTablePanel } from "/@/components/Table.tsx";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getTableColumns } from "/@/utils/TableUtils.js";

@@ -1,4 +1,6 @@
-export const APPOINTMENTS = [
+import {FilterColumn} from "/@/components/Filters";
+
+export const APPOINTMENTS: Appointments[] = [
   { id: "APT-1042", student: "Kenji Chua", course: "BS Computer Science", time: "9:00 AM", type: "Medical Consultation", status: "pending" },
   { id: "APT-1043", student: "Ivan Mejorada", course: "BS Business Administration", time: "9:30 AM", type: "Follow-up", status: "confirmed" },
   { id: "APT-1044", student: "Cjay Gonzales", course: "BS Psychology", time: "10:00 AM", type: "Dental Consultation", status: "declined" },
@@ -15,3 +17,40 @@ export const APPOINTMENTS = [
   { id: "APT-1055", student: "Nathan Flores", course: "BS Psychology", time: "3:30 PM", type: "Dental Consultation", status: "confirmed" },
   { id: "APT-1056", student: "Bianca Ramos", course: "BS Education", time: "4:00 PM", type: "Medical Consultation", status: "declined" },
 ];
+export interface Appointments {
+  id: string;
+  student: string;
+  course: string;
+  time: string;
+  type: string;
+  status: string;
+}
+export const appointmentFilters: FilterColumn<Appointments>[] = [
+  { key: "status", label: "Status", },
+  { key: "type", label: "Type", },
+  { key: "course", label: "Course", },
+]
+export const appointmentFiltersOptions: Record<string, string[]> = {
+  status: [
+    "pending",
+    "confirmed",
+    "declined",
+  ],
+
+  type: [
+    "Medical Consultation",
+    "Dental Consultation",
+    "Follow-up",
+    "Fit to Work Certificate",
+  ],
+
+  course: [
+    "BS Computer Science",
+    "BS Business Administration",
+    "BS Psychology",
+    "BS Nursing",
+    "BS Information Technology",
+    "BS Education",
+    "BS Accountancy",
+  ],
+}

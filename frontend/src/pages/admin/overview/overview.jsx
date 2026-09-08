@@ -2,7 +2,7 @@ import React, {useMemo} from "react";
 import {useOutletContext} from "react-router-dom";
 import {FileText, Stethoscope, CalendarClock} from "lucide-react";
 import StatsGrid from "./Stats.tsx";
-import {APPOINTMENTS} from "../appointments/appointmentsData";
+import {APPOINTMENTS} from "/@/pages/admin/appointments/appointmentsData.ts";
 import {filterByQuery} from "/@/utils/FilterByQuery.js";
 import PanelHeader from "/@/components/OverviewHeader.jsx";
 import {

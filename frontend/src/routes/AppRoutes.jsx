@@ -24,7 +24,7 @@ import { createPatientAccount } from "/@/api/patient.api.ts"
 import {sessionManager} from "/@/utils/SessionManager.ts";
 import {useState} from "react";
 import {PatientProvider} from "/@/context/PatientContext.tsx";
-import Dashboard from "/@/pages/public/DemoPage";
+import {AppointmentTable} from "/@/pages/public/DemoPage";
 
 function AppRoutes() {
   // TODO refactor state along with handleSave
@@ -61,7 +61,7 @@ function AppRoutes() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="*" element={<PageNotFound />} />
-          <Route path="/DEMO/" element={<Dashboard />} />
+          <Route path="/DEMO/" element={<AppointmentTable />} />
         </Route>
 
         {/* Admin Showcase / Login */}
