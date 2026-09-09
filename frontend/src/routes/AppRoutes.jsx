@@ -10,7 +10,7 @@ import OverviewTab from "/src/pages/admin/overview/Overview";
 import MedicalTab from "/@/pages/admin/medical/medicalTab";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
 import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
-import DentalTab from "/@/pages/admin/dental/dentalTab";
+import DentalTab from "/src/pages/admin/dental/dentalTab";
 import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import AppointmentsTab from "/src/pages/admin/appointments/appointmentsTab";

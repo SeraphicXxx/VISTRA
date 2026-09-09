@@ -1,6 +1,21 @@
 import { Link, useNavigate } from "react-router-dom";
-import type { ComponentType } from "react";
+import React, { ComponentType } from "react";
 import { ROUTES } from "/@/config/RoutePaths.js";
+import {ChevronRight} from "lucide-react";
+
+
+export function HyperlinkText({ link, title, icon: Icon }: { link: string, title: string, icon?: ComponentType<{ className?: string; strokeWidth?: number }> }) {
+    return(
+        <Link
+            to={link}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
+        >
+            {title}
+            {Icon && <Icon className="h-3.5 w-3.5" strokeWidth={2} />}
+        </Link>
+    );
+}
+
 
 interface LinkButtonProps {
     title: string;

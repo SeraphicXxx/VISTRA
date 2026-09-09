@@ -1,5 +1,5 @@
 import { medRecords } from "../pages/admin/medical/medicalData";
-import { dentalRecords } from "../pages/admin/dental/dentalData";
+import { dentalRecords } from "../pages/admin/dental/DentalData.ts";
 
 export const recordLimit = 8;
 

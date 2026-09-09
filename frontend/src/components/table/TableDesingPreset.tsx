@@ -39,7 +39,7 @@ export function DefaultTablePreset<T extends { id: string }>({
 
                     <PanelHeader title={title} icon={Icon} action={action}/>
 
-                    <div className="border-t border-border"/>
+                    <div className=" border-t border-border"/>
 
                     <TableFilters<T>
                         filterableColumns={filterableColumns}

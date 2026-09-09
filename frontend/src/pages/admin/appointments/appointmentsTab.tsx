@@ -4,7 +4,7 @@ import {appointmentFilters, appointmentFiltersOptions, Appointments, APPOINTMENT
 import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
 import {defaultColumns} from "/@/components/table/Table";
 import {ROUTES} from "/@/config/RoutePaths.js";
-import {LinkButton} from "/@/components/Button";
+import {HyperlinkText} from "/@/components/Button";
 
 export default function AppointmentsTab() {
     return (
@@ -17,9 +17,9 @@ export default function AppointmentsTab() {
             columns={defaultColumns}
             renderAction={
                 (appointment) => (
-                    <LinkButton
+                    <HyperlinkText
                         title={`View`}
-                        route={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
+                        link={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
                         icon={ChevronRight}
                     />
                 )

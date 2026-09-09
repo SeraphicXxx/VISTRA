@@ -20,7 +20,7 @@ import {Status, statusLabels} from "/@/components/StatusBadge";
 import {CardList} from "/@/components/CardList";
 import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
 import {defaultColumns} from "/@/components/table/Table";
-import {LinkButton} from "/@/components/Button";
+import {HyperlinkText, LinkButton} from "/@/components/Button";
 import {ROUTES} from "/@/config/RoutePaths";
 interface ConsultationEntry {
     id: string
@@ -173,9 +173,9 @@ export default function OverviewTab() {
                     columns={defaultColumns}
                     renderAction={
                         (appointment) => (
-                            <LinkButton
+                            <HyperlinkText
                                 title={`View`}
-                                route={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
+                                link={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
                                 icon={ChevronRight}
                             />
                         )
