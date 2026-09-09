@@ -5,8 +5,8 @@ import {
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import Sidebar from "./sidebar";
-import AppointmentsTab from "./appointments/appointmentsTab";
-import OverviewTab from "./overview/overview";
+import AppointmentsTab from "./appointments/appointmentsTab.tsx";
+import OverviewTab from "./overview/Overview.tsx";
 import MedicalTab from "./medical/medicalTab";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 const RECORDS = [

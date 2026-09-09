@@ -1,7 +1,7 @@
-import React, { ReactNode } from "react";
+import React, {ReactNode} from "react";
 
 import {getTypeIcon, getInitials, avatarColor} from "/@/components/avatar";
-import {StatusBadge} from "/@/components/statusbadge";
+import {Status, StatusBadge} from "/@/components/StatusBadge";
 
 export interface Default {
     id: string;
@@ -9,7 +9,7 @@ export interface Default {
     course: string;
     time: string;
     type: string;
-    status: string;
+    status: Status;
 }
 
 export const defaultColumns: Column<Default>[] = [
@@ -68,7 +68,7 @@ export const defaultColumns: Column<Default>[] = [
         key: "status",
         label: "Status",
         render: (value) => (
-            <StatusBadge status={value as string} />
+            <StatusBadge status={value as Status}/>
         ),
     },
 
@@ -87,7 +87,7 @@ interface GenericTableProps {
 
 export class GenericTable extends React.Component<GenericTableProps> {
     render() {
-        const { children, className = "" } = this.props;
+        const {children, className = ""} = this.props;
 
         return (
             <table
@@ -99,10 +99,10 @@ export class GenericTable extends React.Component<GenericTableProps> {
     }
 }
 
-export const GenericTableHeader = <T,>({
-                                    columns,
-                                    hasAction = false,
-                                }: {
+export const GenericTableHeader = <T, >({
+                                            columns,
+                                            hasAction = false,
+                                        }: {
     columns: Column<T>[];
     hasAction?: boolean;
 }) => {
@@ -112,14 +112,29 @@ export const GenericTableHeader = <T,>({
             {columns.map((column) => (
                 <th
                     key={String(column.key)}
-                    className="border-b border-border pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-textMuted"
+                    className="
+                            border-b border-border
+                            px-4 py-3
+                            text-xs font-semibold
+                            uppercase tracking-wide
+                            text-textMuted
+                        "
                 >
                     {column.label}
                 </th>
             ))}
 
             {hasAction && (
-                <th className="border-b border-border pb-2 text-right text-xs font-semibold uppercase tracking-wide text-textMuted">
+                <th
+                    className="
+                            border-b border-border
+                            px-4 py-3
+                            text-right
+                            text-xs font-semibold
+                            uppercase tracking-wide
+                            text-textMuted
+                        "
+                >
                     Action
                 </th>
             )}
@@ -129,10 +144,10 @@ export const GenericTableHeader = <T,>({
 };
 
 export const GenericTableBody = <T extends { id: string }>({
-                                                        data,
-                                                        columns,
-                                                        renderAction,
-                                                    }: {
+                                                               data,
+                                                               columns,
+                                                               renderAction,
+                                                           }: {
     data: T[];
     columns: Column<T>[];
     renderAction?: (record: T) => ReactNode;
@@ -163,7 +178,7 @@ export const GenericTableBody = <T extends { id: string }>({
     );
 };
 
-function GenericRow({ children }: { children: ReactNode }) {
+function GenericRow({children}: { children: ReactNode }) {
     return (
         <tr className="group transition-colors duration-150 hover:bg-primary/[0.03]">
             {children}

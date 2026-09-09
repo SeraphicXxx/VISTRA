@@ -6,14 +6,14 @@ import AdminLayout from "/@/layouts/AdminLayout.tsx";
 import LandingPage from "/@/pages/public/landingpage";
 import StaffLandingPage from "/@/pages/admin/home";
 import StaffLoginPage from "/@/pages/admin/login";
-import OverviewTab from "/@/pages/admin/overview/overview";
+import OverviewTab from "/src/pages/admin/overview/Overview";
 import MedicalTab from "/@/pages/admin/medical/medicalTab";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
 import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
 import DentalTab from "/@/pages/admin/dental/dentalTab";
 import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
-import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
+import AppointmentsTab from "/src/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute.jsx"
 import PatientsTab from "/src/pages/admin/patients/patientsTab.jsx"
@@ -24,7 +24,7 @@ import { createPatientAccount } from "/@/api/patient.api.ts"
 import {sessionManager} from "/@/utils/SessionManager.ts";
 import {useState} from "react";
 import {PatientProvider} from "/@/context/PatientContext.tsx";
-import {AppointmentTable} from "/@/pages/public/DemoPage";
+
 
 function AppRoutes() {
   // TODO refactor state along with handleSave
@@ -61,7 +61,7 @@ function AppRoutes() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="*" element={<PageNotFound />} />
-          <Route path="/DEMO/" element={<AppointmentTable />} />
+          {/*<Route path="/DEMO/" element={<DemoPage />} />*/}
         </Route>
 
         {/* Admin Showcase / Login */}

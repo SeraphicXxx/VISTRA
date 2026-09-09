@@ -22,38 +22,48 @@ interface TablePresetProps<T> {
     renderAction?: (row: T) => React.ReactNode;
 }
 
-export function DefaultTablePreset <T extends { id: string }>({
-                                          title,
-                                          icon: Icon,
-                                          action,
-                                          filterableColumns,
-                                          filterOptions,
-                                          data,
-                                          columns,
-                                          renderAction,
-                                      }: TablePresetProps<T>) {
+export function DefaultTablePreset<T extends { id: string }>({
+                                                                 title,
+                                                                 icon: Icon,
+                                                                 action,
+                                                                 filterableColumns,
+                                                                 filterOptions,
+                                                                 data,
+                                                                 columns,
+                                                                 renderAction,
+                                                             }: TablePresetProps<T>) {
     return (
         <>
-            <PanelHeader title={title} icon={Icon} action={action}/>
+            <div className="rounded-2xl border border-border bg-surface shadow-card">
+                <div className="p-6 overflow-x-auto">
 
-            <TableFilters<T>
-                filterableColumns={filterableColumns}
-                filterOptions={filterOptions}
-            />
+                    <PanelHeader title={title} icon={Icon} action={action}/>
 
-            <GenericTable>
+                    <div className="border-t border-border"/>
 
-                <GenericTableHeader
-                    columns={columns}
-                    hasAction
-                />
+                    <TableFilters<T>
+                        filterableColumns={filterableColumns}
+                        filterOptions={filterOptions}
+                    />
 
-                <GenericTableBody
-                    data={data}
-                    columns={columns}
-                    renderAction={renderAction}
-                />
-            </GenericTable>
+                    <div className="border-t border-border" />
+
+                    <GenericTable>
+
+                        <GenericTableHeader
+                            columns={columns}
+                            hasAction
+                        />
+
+                        <GenericTableBody
+                            data={data}
+                            columns={columns}
+                            renderAction={renderAction}
+                        />
+                    </GenericTable>
+
+                </div>
+            </div>
         </>
     );
 }

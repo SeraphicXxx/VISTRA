@@ -10,7 +10,7 @@ import {sessionManager} from "/@/utils/SessionManager.ts";
 import { AdminRoutes } from "/@/config/Routes.js";
 import {ROUTES} from "/@/config/RoutePaths.js";
 
-import {LogoClickable} from "/@/components/Button.jsx";
+import {LogoClickable} from "/src/components/Button.jsx";
 
 const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
   const Icon = item.icon;

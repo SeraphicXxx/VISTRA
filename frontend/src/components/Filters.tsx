@@ -162,7 +162,7 @@ export function TableFilters<T>({
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 py-3">
             <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
                 <SlidersHorizontal
                     className="h-3.5 w-3.5"

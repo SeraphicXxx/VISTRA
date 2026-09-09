@@ -1,4 +1,5 @@
 import {FilterColumn} from "/@/components/Filters";
+import {Status} from "/@/components/StatusBadge";
 
 export const APPOINTMENTS: Appointments[] = [
   { id: "APT-1042", student: "Kenji Chua", course: "BS Computer Science", time: "9:00 AM", type: "Medical Consultation", status: "pending" },
@@ -23,7 +24,7 @@ export interface Appointments {
   course: string;
   time: string;
   type: string;
-  status: string;
+  status: Status;
 }
 export const appointmentFilters: FilterColumn<Appointments>[] = [
   {

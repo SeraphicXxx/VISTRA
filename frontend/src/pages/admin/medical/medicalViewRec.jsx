@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal.jsx";
-import { StatusBadge } from "/@/components/statusbadge.jsx";
+import { StatusBadge } from "/src/components/StatusBadge.jsx";
 
 const visitEditFields = [
   {

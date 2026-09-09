@@ -1,13 +1,19 @@
-import { ChevronRight, FileX2 } from "lucide-react";
+import { ChevronRight, FileX2, Plus } from "lucide-react";
 import React from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { StatusBadge } from "./statusbadge";
+import { StatusBadge } from "./StatusBadge";
 import { avatarColor, getInitials, getTypeIcon } from "./avatar";
 import { filterByQuery } from "../utils/FilterByQuery";
 import PanelHeader from "./PanelHeader";
-import { LinkButton } from "./Button";
+import { LinkButton } from "./Button.tsx";
 import { FilterBar, resolveColumn, useTableFilters } from "/@/components/filterTableBar";
 import type { Column, TableRecord } from "/@/types/table";
+
+//THIS MODULE IS DEPRECATED SOON TO BE REMOVED
+//THIS MODULE IS DEPRECATED SOON TO BE REMOVED
+//THIS MODULE IS DEPRECATED SOON TO BE REMOVED
+//THIS MODULE IS DEPRECATED SOON TO BE REMOVED
+//THIS MODULE IS DEPRECATED SOON TO BE REMOVED
 
 interface OutletContext {
   searchQuery: string;
@@ -62,6 +68,7 @@ export const RecordsTablePanel = ({
                   <LinkButton
                     title={`New ${name} Record`}
                     route={createRecordPath}
+                    icon={Plus}
                     disabled={createDisabled}
                   />
                 ) : showRecentLabel && maxRecords ? (
