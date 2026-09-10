@@ -45,9 +45,8 @@ export interface patientData {
     name: string;
     patient_id: string;
     user_type: string;
-    course: string;
+    course_department: string;
     year_section: string;
-    last_visit: string;
 }
 
 export const patientColumns: Column<patientData>[] = [
@@ -79,7 +78,7 @@ export const patientColumns: Column<patientData>[] = [
         label: "User Type"
     },
     {
-        key: "course",
+        key: "course_department",
         label: "Course / Department"
     },
     {
@@ -94,11 +93,6 @@ export const patientColumnsFilter: FilterColumn<patientData>[] = [
         label: "User Type",
         type: "select"
     },
-    {
-        key: "last_visit",
-        label: "Last Visit",
-        type: "date"
-    }
 ]
 
 export const patientColumnsFilterOption: Record<string, string[]> = {

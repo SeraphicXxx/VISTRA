@@ -6,7 +6,7 @@ export interface PatientDashboardRecord {
     name: string;
     patient_id: string;
     user_type: string;
-    course: string;
+    course_department: string;
     year_section: string;
     last_visit: string;
 }
@@ -48,7 +48,7 @@ export class PatientModel {
 
             user_type: this.PatientProfile.person_type,
 
-            course: this.PatientProfile.course ?? "N/A",
+            course_department: this.PatientProfile.course || this.PatientProfile.department ? `${this.PatientProfile.course || ""}  ${this.PatientProfile.department || ""}` : "N/A",
 
             year_section: this.PatientProfile.school_year ?? "N/A",
 

@@ -14,7 +14,7 @@ const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis
 const dentalStudentFields = [
   { id: "age", label: "Age" },
   { id: "sex", label: "Gender" },
-  { id: "year_section", label: "Year and section / course", span: "sm:col-span-3" },
+  { id: "year_section", label: "Year and section / course_department", span: "sm:col-span-3" },
 ];
 
 export default function DentalRecordForm({ onBack, onSave }) {

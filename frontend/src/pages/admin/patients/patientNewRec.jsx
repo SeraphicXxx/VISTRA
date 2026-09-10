@@ -291,7 +291,7 @@ export default function NewPatientRecordForm() {
                     name="course"
                     label="Course"
                     options={COURSE_OPTIONS}
-                    error={saveErrorMessage?.course}
+                    error={saveErrorMessage?.course_department}
                 />
 
                 <SelectField

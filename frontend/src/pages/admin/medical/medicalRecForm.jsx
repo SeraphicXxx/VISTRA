@@ -22,7 +22,7 @@ export default function PatientRecordForm({ onBack, onSave }) {
 
   const details = selectedStudent
     ? {
-        course: selectedStudent.course,
+        course: selectedStudent.course_department,
         address: selectedStudent.address,
         barangay: selectedStudent.barangay,
         age: selectedStudent.age,

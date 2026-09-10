@@ -69,7 +69,7 @@ class PatientRepository:
             table_filters = table_filters.eq("status", filters.status)
 
         if filters.course:
-            table_filters = table_filters.eq("course", filters.course)
+            table_filters = table_filters.eq("course_department", filters.course)
 
         if filters.year_section:
             table_filters = table_filters.eq(
