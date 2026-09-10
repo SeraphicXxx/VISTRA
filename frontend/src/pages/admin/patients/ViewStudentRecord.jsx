@@ -6,7 +6,7 @@ import {
   Syringe,
   CalendarClock,
 } from "lucide-react";
-import { getMockPatientRecords } from "./patientsData";
+import { getMockPatientRecords } from "./patientsData.ts";
 import {usePatientContext} from "/@/context/PatientContext.tsx";
 
 const TABS = [
@@ -229,7 +229,7 @@ export default function ViewStudentRecord() {
               ID:
             </dt>
             <dd className=" font-medium text-textPrimary">
-              {patient?.userId}
+              {patient?.patient_id}
             </dd>
           </div>
 

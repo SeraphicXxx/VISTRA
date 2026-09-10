@@ -1,16 +1,14 @@
 import React from "react";
-import { UserRound } from "lucide-react";
-import {
-    RecordsTablePanel,
-    PatientRow,
-} from "/@/components/Table";
+import {ChevronRight, Plus, UserRound} from "lucide-react";
 
 import { ROUTES } from "/@/config/RoutePaths.js";
 
-import { patientColumns } from "./patientsData";
+import { patientColumns, patientColumnsFilter, patientColumnsFilterOption, patientData } from "./patientsData";
 
 import { usePatientContext } from "/@/context/PatientContext";
 import LoadingPage from "/@/components/LoadingPage";
+import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
+import {HyperlinkText, LinkButton} from "/@/components/Button";
 
 
 export default function PatientsTab() {
@@ -18,22 +16,30 @@ export default function PatientsTab() {
     if (isLoading) {
         return <LoadingPage />;
     }
-    //TODO make RecordsTablePanel data to any type
     return (
-        <RecordsTablePanel
-            name="Patient"
+        <DefaultTablePreset<patientData>
+            title="Patients"
             icon={UserRound}
+            filterableColumns={patientColumnsFilter}
+            filterOptions={patientColumnsFilterOption}
             data={patientRecords}
             columns={patientColumns}
-            createRecordPath={ROUTES.staff.patient.createNewRecord}
-            renderRow={(record) => (
-                <PatientRow
-                    data={record}
-                    viewRecordPath={
-                        ROUTES.staff.patient.patientRecordTab
-                    }
+            panelAddon={
+                <LinkButton
+                    title={`New Patient Record`}
+                    route={`${ROUTES.staff.patient.createNewRecord}`}
+                    icon={Plus}
                 />
-            )}
+            }
+            renderAction={
+                (patient) => (
+                    <HyperlinkText
+                        title={`View`}
+                        link={`${ROUTES.staff.patient.patientRecordTab}/${patient.patient_id}`}
+                        icon={ChevronRight}
+                    />
+                )
+            }
         />
     );
 }

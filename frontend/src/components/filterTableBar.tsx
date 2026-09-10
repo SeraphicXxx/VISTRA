@@ -11,7 +11,7 @@ const LABEL_TO_FIELD: Record<string, string> = {
   time: "time",
   type: "type",
   status: "status",
-  userid: "userId",
+  userid: "patient_id",
   usertype: "userType",
   yearsection: "yearSection",
   lastvisit: "lastVisit",

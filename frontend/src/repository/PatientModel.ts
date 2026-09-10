@@ -4,14 +4,14 @@ import { formatDate } from "/@/utils/DateUtils";
 export interface PatientDashboardRecord {
     id: string;
     name: string;
-    userId: string;
-    userType: string;
+    patient_id: string;
+    user_type: string;
     course: string;
-    yearSection: string;
-    lastVisit: string;
+    year_section: string;
+    last_visit: string;
 }
 
-export interface PatientRecord {
+interface PatientRecord {
     id: string;
     title: string;
     date: string;
@@ -19,7 +19,7 @@ export interface PatientRecord {
     provider: string;
 }
 
-export interface PatientRecords {
+interface PatientRecords {
     medical: PatientRecord[];
     dental: PatientRecord[];
     appointment: PatientRecord[];
@@ -44,15 +44,15 @@ export class PatientModel {
                 .filter(Boolean)
                 .join(" "),
 
-            userId: this.PatientProfile.patient_id,
+            patient_id: this.PatientProfile.patient_id,
 
-            userType: "Student",
+            user_type: "Student",
 
             course: this.PatientProfile.course ?? "N/A",
 
-            yearSection: this.PatientProfile.school_year ?? "N/A",
+            year_section: this.PatientProfile.school_year ?? "N/A",
 
-            lastVisit: formatDate(this.PatientProfile.created_at),
+            last_visit: formatDate(this.PatientProfile.created_at),
         };
     }
 
