@@ -25,12 +25,12 @@ export default function PatientsTab() {
             icon={UserRound}
             data={patientRecords}
             columns={patientColumns}
-            createRecordPath={ROUTES.admin.patient.createNewRecord}
+            createRecordPath={ROUTES.staff.patient.createNewRecord}
             renderRow={(record) => (
                 <PatientRow
                     data={record}
                     viewRecordPath={
-                        ROUTES.admin.patient.patientRecordTab
+                        ROUTES.staff.patient.patientRecordTab
                     }
                 />
             )}

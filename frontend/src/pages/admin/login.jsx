@@ -26,7 +26,7 @@ export default function AdminLoginPage() {
         return;
       }
       await login(credentials);
-      navigate(ROUTES.admin.dashboard.overview);
+      navigate(ROUTES.staff.dashboard.overview);
     }
     catch {
       // Error is already handled by useLogin.
@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
             <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
               <div className="h-1 w-full bg-primary" aria-hidden="true"/>
               <div className="flex flex-col items-center px-8 pt-8 text-center">
-                <a href={ROUTES.admin.dashboard.overview}>
+                <a href={ROUTES.staff.dashboard.overview}>
                   <Logo className="h-11" />
                 </a>
 

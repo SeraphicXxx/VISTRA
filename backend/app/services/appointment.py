@@ -16,7 +16,8 @@ def create_appointment(request: CreateAppointmentRequest, supabase):
             "success": False,
             "message": str(e)
         }
-    
+
+
 def get_all_appointments(supabase):
     try:
         appointment_repo = AppointmentRepository(supabase)
@@ -31,6 +32,7 @@ def get_all_appointments(supabase):
             "success": False,
             "message": str(e)
         }
+
 
 def get_appointment_by_id(appointment_id: int, supabase):
     try:
@@ -53,10 +55,12 @@ def get_appointment_by_id(appointment_id: int, supabase):
             "message": str(e)
         }
 
+
 def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, supabase):
     try:
         appointment_repo = AppointmentRepository(supabase)
-        response = appointment_repo.update_appointment(appointment_id, request.model_dump(mode="json", exclude_unset=True))
+        response = appointment_repo.update_appointment(appointment_id,
+                                                       request.model_dump(mode="json", exclude_unset=True))
 
         if response:
             return {
@@ -73,6 +77,7 @@ def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, s
             "success": False,
             "message": str(e)
         }
+
 
 def delete_appointment(appointment_id: int, supabase):
     try:

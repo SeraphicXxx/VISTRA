@@ -76,7 +76,7 @@ export default function NewPatientRecordForm() {
 
   const isStudent = classification === "student";
   const isFaculty = classification === "faculty";
-  const isAdmin = classification === "admin";
+  const isAdmin = classification === "staff";
 
   return (
       <form

@@ -3,7 +3,7 @@ export const ROUTES = {
         home: "/",
     },
 
-    admin: {
+    staff: {
         home: "/staff",
         login: "/login",
 

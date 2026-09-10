@@ -7,7 +7,7 @@ import LandingPage from "/@/pages/public/landingpage";
 import StaffLandingPage from "/@/pages/admin/home";
 import StaffLoginPage from "/@/pages/admin/login";
 import OverviewTab from "/src/pages/admin/overview/Overview";
-import MedicalTab from "/@/pages/admin/medical/medicalTab";
+import MedicalTab from "/src/pages/admin/medical/medicalTab";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
 import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
 import DentalTab from "/src/pages/admin/dental/dentalTab";
@@ -65,36 +65,36 @@ function AppRoutes() {
         </Route>
 
         {/* Admin Showcase / Login */}
-        <Route path={ROUTES.admin.home} element={<StaffLandingPage />} />
-        <Route path={ROUTES.admin.login} element={<StaffLoginPage />} />
+        <Route path={ROUTES.staff.home} element={<StaffLandingPage />} />
+        <Route path={ROUTES.staff.login} element={<StaffLoginPage />} />
 
         {/* Admin */}
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
-            <Route path={ROUTES.admin.dashboard.overview} element={<OverviewTab />} />
-            <Route path={ROUTES.admin.dashboard.medical} element={<MedicalTab />} />
-            <Route path={ROUTES.admin.medical.createNewRecord} element={<PatientRecordForm />} />
-            <Route path={ROUTES.admin.medical.viewRecord} element={<PatientRecordView />} />
+            <Route path={ROUTES.staff.dashboard.overview} element={<OverviewTab />} />
+            <Route path={ROUTES.staff.dashboard.medical} element={<MedicalTab />} />
+            <Route path={ROUTES.staff.medical.createNewRecord} element={<PatientRecordForm />} />
+            <Route path={ROUTES.staff.medical.viewRecord} element={<PatientRecordView />} />
 
-            <Route path={ROUTES.admin.dashboard.dental} element={<DentalTab />} />
-            <Route path={ROUTES.admin.dental.createNewRecord} element={<DentalRecordForm />} />
-            <Route path={ROUTES.admin.dental.viewRecord} element={<DentalRecordView />} />
+            <Route path={ROUTES.staff.dashboard.dental} element={<DentalTab />} />
+            <Route path={ROUTES.staff.dental.createNewRecord} element={<DentalRecordForm />} />
+            <Route path={ROUTES.staff.dental.viewRecord} element={<DentalRecordView />} />
 
-            <Route path={ROUTES.admin.dashboard.appointments} element={<AppointmentsTab />} />
-            <Route path={ROUTES.admin.appointment.viewAppointment} element={<AppointmentDetailView/>}/>
+            <Route path={ROUTES.staff.dashboard.appointments} element={<AppointmentsTab />} />
+            <Route path={ROUTES.staff.appointment.viewAppointment} element={<AppointmentDetailView/>}/>
 
-            <Route path={ROUTES.admin.dashboard.patients} element={
+            <Route path={ROUTES.staff.dashboard.patients} element={
               <PatientProvider>
                 <PatientsTab/>
               </PatientProvider>
             }/>
-            <Route path={ROUTES.admin.patient.createNewRecord} element={
+            <Route path={ROUTES.staff.patient.createNewRecord} element={
               <PatientProvider>
                 <NewPatientRecordForm onSave={handleSave} errors={errors}/>
               </PatientProvider>
             } />
-            <Route path={`${ROUTES.admin.patient.patientRecordTab}/:id`} element={
+            <Route path={`${ROUTES.staff.patient.patientRecordTab}/:id`} element={
               <PatientProvider>
                 <ViewStudentRecord />
               </PatientProvider>

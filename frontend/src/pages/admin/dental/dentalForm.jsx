@@ -5,7 +5,7 @@ import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../comp
 import { TextField } from "../../../utils/TextField.jsx";
 import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
 import { StudentInfoSection } from "../../../components/StudentInfoSection.jsx";
-import { students } from "../medical/medicalData";
+import { students } from "../medical/medicalData.ts";
 
 const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilepsy", "Heart Disease", "Hypertension", "Others"];
 

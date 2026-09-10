@@ -1,4 +1,7 @@
-export const medRecords = [
+import {Status} from "/@/components/StatusBadge";
+import {FilterColumn} from "/@/components/Filters";
+
+export const medRecords: medData[] = [
   {
     id: "MED-1042",
     student: "Kenji Chua",
@@ -109,14 +112,6 @@ export const students = [
   },
 ];
 
-export const civilstatus = [
-  "Single",
-  "Married",
-  "Widowed",
-  "Separated",
-  "Divorced",
-];
-
 export const type = [
   "Medical Consultation",
   "Follow-up",
@@ -134,3 +129,61 @@ export const emptyDetails = {
   yearSection: "",
   type: "",
 };
+
+export interface medData {
+  id: string;
+  student: string;
+  course: string;
+  time: string;
+  type: string;
+  status: Status
+}
+
+export const medFilters :FilterColumn<medData>[] = [
+  {
+    key: "status",
+    label: "Status",
+    type: "select",
+  },
+  {
+    key: "type",
+    label: "Type",
+    type: "select",
+  },
+  {
+    key: "course",
+    label: "Course",
+    type: "select",
+  },
+  {
+    key: "time",
+    label: "Date",
+    type: "date",
+  },
+]
+
+export const medFilterOption: Record<string, string[]> = {
+  status: [
+    "ongoingTreatment",
+    "followUp",
+    "declined",
+    "completed",
+    "referred",
+  ],
+
+  type: [
+    "Medical Consultation",
+    "secondOpinion",
+  ],
+
+  course: [
+    "BS Computer Science",
+    "BS Business Administration",
+    "BS Psychology",
+    "BS Nursing",
+    "BS Information Technology",
+    "BS Education",
+    "BS Accountancy",
+  ],
+
+}

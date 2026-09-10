@@ -16,10 +16,10 @@ export default function DentalTab() {
           filterOptions={dentalFiltersOptions}
           data={dentalRecords}
           columns={defaultColumns}
-          action={
+          panelAddon={
               <LinkButton
                   title={`New Dental Record`}
-                  route={`${ROUTES.admin.dental.createNewRecord}`}
+                  route={`${ROUTES.staff.dental.createNewRecord}`}
                   icon={Plus}
               />
             }
@@ -27,8 +27,8 @@ export default function DentalTab() {
           (dental) => (
               <HyperlinkText
                   title={`View`}
-                  link={`${ROUTES.admin.dental.viewRecord}`}
-                  // link={`${ROUTES.admin.dental.viewRecord}/${dental.id}`}
+                  link={`${ROUTES.staff.dental.viewRecord}`}
+                  // link={`${ROUTES.staff.dental.viewRecord}/${dental.id}`}
                   icon={ChevronRight}
               />
           )

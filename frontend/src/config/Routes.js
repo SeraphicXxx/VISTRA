@@ -9,31 +9,31 @@ import {
 
 export const AdminRoutes = [
     {
-        path: ROUTES.admin.dashboard.overview,
+        path: ROUTES.staff.dashboard.overview,
         label: "Overview",
         icon: LayoutDashboard,
         component: "overview",
     },
     {
-        path: ROUTES.admin.dashboard.medical,
+        path: ROUTES.staff.dashboard.medical,
         label: "Medical Consultation",
         icon: HeartPulse,
         component: "medical",
     },
     {
-        path: ROUTES.admin.dashboard.dental,
+        path: ROUTES.staff.dashboard.dental,
         label: "Dental Consultation",
         icon: Stethoscope,
         component: "dental",
     },
     {
-        path: ROUTES.admin.dashboard.appointments,
+        path: ROUTES.staff.dashboard.appointments,
         label: "Appointments",
         icon: CalendarDays,
         component: "appointments",
     },
     {
-        path: ROUTES.admin.dashboard.patients,
+        path: ROUTES.staff.dashboard.patients,
         label: "Patient Management",
         icon: UsersRound,
         component: "patients"

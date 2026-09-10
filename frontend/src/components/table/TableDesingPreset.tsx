@@ -10,7 +10,7 @@ import React from "react";
 interface TablePresetProps<T> {
     title: string;
     icon: React.ComponentType<{ className?: string }>;
-    action?: React.ReactNode;
+    panelAddon?: React.ReactNode;
 
     filterableColumns: FilterColumn<T>[];
     filterOptions: Record<keyof T, string[]>;
@@ -25,7 +25,7 @@ interface TablePresetProps<T> {
 export function DefaultTablePreset<T extends { id: string }>({
                                                                  title,
                                                                  icon: Icon,
-                                                                 action,
+                                                                 panelAddon,
                                                                  filterableColumns,
                                                                  filterOptions,
                                                                  data,
@@ -37,7 +37,7 @@ export function DefaultTablePreset<T extends { id: string }>({
             <div className="rounded-2xl border border-border bg-surface shadow-card">
                 <div className="p-6 overflow-x-auto">
 
-                    <PanelHeader title={title} icon={Icon} action={action}/>
+                    <PanelHeader title={title} icon={Icon} action={panelAddon}/>
 
                     <div className=" border-t border-border"/>
 

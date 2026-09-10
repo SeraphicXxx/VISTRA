@@ -10,7 +10,7 @@ export default function PatientsTable({ PatientRecords }) {
         data={PatientRecords}
         columns={getTableColumns(PatientRecords, ["id"])}
         renderRow={(record) => (
-          <GenericRow data={record} viewRecordPath={ROUTES.admin.patient.patientRecordTab} />
+          <GenericRow data={record} viewRecordPath={ROUTES.staff.patient.patientRecordTab} />
         )}
       />
     </div>

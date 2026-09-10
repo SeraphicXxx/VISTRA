@@ -19,7 +19,7 @@ export default function AppointmentsTab() {
                 (appointment) => (
                     <HyperlinkText
                         title={`View`}
-                        link={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
+                        link={`${ROUTES.staff.patient.patientRecordTab}/${appointment.id}`}
                         icon={ChevronRight}
                     />
                 )

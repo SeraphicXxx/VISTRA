@@ -4,7 +4,7 @@ import { ROUTES } from "/@/config/RoutePaths.js";
 
 export default function ProtectedRoute() {
     if (!sessionManager.isAuthenticated()) {
-        return <Navigate to={ROUTES.admin.login} replace />;
+        return <Navigate to={ROUTES.staff.login} replace />;
     }
 
     return <Outlet />;

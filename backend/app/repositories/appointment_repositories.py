@@ -14,7 +14,7 @@ class AppointmentRepository:
             return response.data[0]
 
         return None
-    
+
     def get_appointments(self):
         response = (
             self.supabase
@@ -39,7 +39,6 @@ class AppointmentRepository:
             return response.data[0]
 
         return None
-
 
     def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
         response = (

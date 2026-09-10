@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Save, ArrowLeft, User, ClipboardList, Info } from "lucide-react";
-import { students, emptyDetails, type as visitTypeOptions } from "./medicalData";
+import { students, emptyDetails, type as visitTypeOptions } from "./medicalData.ts";
 import { ReadOnlyField } from "/@/utils/ReadOnlyField.jsx";
 import { StudentCombobox } from "/@/utils/StudentComboBox.jsx";
 import { FieldLabel } from "/@/utils/FieldLabel.jsx";

@@ -22,6 +22,7 @@ import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
 import {defaultColumns} from "/@/components/table/Table";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
 import {ROUTES} from "/@/config/RoutePaths";
+
 interface ConsultationEntry {
     id: string
     student: string
@@ -31,6 +32,7 @@ interface ConsultationEntry {
     status: Status
     department: string
 }
+
 interface ConsultationCardProps {
     entry: ConsultationEntry;
 }
@@ -86,11 +88,12 @@ function ConsultationsList({
             items={entries}
             keyExtractor={(entry) => entry.id}
             renderItem={(entry) => (
-                <ConsultationCard entry={entry} />
+                <ConsultationCard entry={entry}/>
             )}
             emptyState={
                 <div className="flex flex-col items-center gap-2 py-10 text-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <span
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <Stethoscope
                             className="h-5 w-5"
                             strokeWidth={2}
@@ -132,7 +135,7 @@ function ConsultationPanel({
             />
 
             <div className="mt-5 max-h-96 overflow-x-auto">
-                <ConsultationsList entries={filteredRecords} />
+                <ConsultationsList entries={filteredRecords}/>
             </div>
         </div>
     );
@@ -171,11 +174,16 @@ export default function OverviewTab() {
                     filterOptions={appointmentFiltersOptions}
                     data={APPOINTMENTS}
                     columns={defaultColumns}
+                    panelAddon={
+                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                            {APPOINTMENTS.length} recent
+                        </span>
+                    }
                     renderAction={
                         (appointment) => (
                             <HyperlinkText
                                 title={`View`}
-                                link={`${ROUTES.admin.patient.patientRecordTab}/${appointment.id}`}
+                                link={`${ROUTES.staff.patient.patientRecordTab}/${appointment.id}`}
                                 icon={ChevronRight}
                             />
                         )
