@@ -61,14 +61,14 @@ export default function AdminLoginPage() {
                 <div className="relative">
                   <FormInput
                       label="Staff ID"
-                      id="staffId"
-                      name="staffId"
+                      id="email"
+                      name="email"
                       type="text"
                       autoComplete="username"
-                      value={credentials.staffId}
+                      value={credentials.email}
                       onChange={handleChange}
                       placeholder="e.g. UCC-2481"
-                      error={validationErrors.staffId}
+                      error={validationErrors.email}
                       icon={ <User className="h-4 w-4" strokeWidth={2} /> }
                   />
                 </div>

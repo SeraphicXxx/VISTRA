@@ -1,35 +1,43 @@
-import { apiClient } from "/@/api/client";
+import axios from "axios";
+
+import { apiClient } from "/@/api/axios_client";
 import { API_ENDPOINTS } from "/@/config/ApiConfig";
-import { PasswordAndId, LoginStaffResponse } from "/@/api/schema/ApiResponseSchema"
+import {
+    PasswordAndId,
+    LoginStaffResponse
+} from "/@/api/schema/ApiResponseSchema";
 
 export const loginStaff = async ({
-                                     staffId,
+                                     email,
                                      password,
-                                 }: PasswordAndId) => {
-    let result;
+                                 }: PasswordAndId): Promise<LoginStaffResponse> => {
 
     try {
-        result = await apiClient<LoginStaffResponse>(
+        const result = await apiClient<LoginStaffResponse>(
             API_ENDPOINTS.staff.login,
             {
                 method: "POST",
-                body: JSON.stringify({
-                    email: staffId,
+                data: {
+                    email,
                     password,
-                }),
+                },
             }
         );
-    } catch (e) {
+
+        return result.data;
+
+    } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+            const detail = error.response?.data?.detail;
+
+            throw new Error(
+                detail ?? "Login failed"
+            );
+        }
+
         throw new Error(
             "Unable to connect to server. Please try again later."
         );
     }
-
-    const { response, data } = result;
-
-    if (!response.ok) {
-        throw new Error(data?.detail ?? "Login failed");
-    }
-
-    return data;
 };

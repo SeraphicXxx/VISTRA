@@ -9,7 +9,7 @@ import { PasswordAndId } from "/@/api/schema/ApiResponseSchema"
 /* -------------------------------------------------------------------------- */
 
 interface LoginValidationErrors {
-    staffId?: string;
+    email?: string;
     password?: string;
 }
 
@@ -47,7 +47,7 @@ export function useLogin() {
 export function useLoginForm() {
     const [credentials, setCredentials] =
         useState<PasswordAndId>({
-            staffId: "",
+            email: "",
             password: "",
         });
 
@@ -75,8 +75,8 @@ export function useLoginForm() {
     const validate = (): boolean => {
         const newErrors: LoginValidationErrors = {};
 
-        if (!credentials.staffId.trim()) {
-            newErrors.staffId = "Staff ID is required.";
+        if (!credentials.email.trim()) {
+            newErrors.email = "Staff ID is required.";
         }
 
         if (!credentials.password) {

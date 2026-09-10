@@ -1,3 +1,9 @@
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
 import { sessionManager } from "/@/utils/SessionManager";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {getApiUrl} from "../config/ApiConfig";
@@ -95,3 +101,9 @@ export const apiClient = async <T = unknown>(
         data,
     };
 };
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED

@@ -21,7 +21,7 @@ interface TablePresetProps<T> {
 
     renderAction?: (row: T) => React.ReactNode;
 }
-
+//used in  overview,dental,medical,appointment and patient tabs
 export function DefaultTablePreset<T extends { id: string }>({
                                                                  title,
                                                                  icon: Icon,

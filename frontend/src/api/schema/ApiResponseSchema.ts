@@ -10,7 +10,7 @@ export interface ApiMessageResponse {
 }
 
 export interface PasswordAndId {
-    staffId: string;
+    email: string;
     password: string;
 }
 

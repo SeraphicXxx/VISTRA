@@ -11,10 +11,10 @@ export const API_ENDPOINTS = {
         health_check: "/api/health",
     },
     auth:{
-        refresh_token: "/staff/auth/refresh",
+        refresh_token: "/staff/auth/refresh/",
     },
     staff: {
-        login: "/staff/auth/login",
+        login: "/staff/auth/login/",
         create_staff: "/staff/",
         getStaffById: (staffId) => `/staff/${staffId}/`,
     },
@@ -22,6 +22,6 @@ export const API_ENDPOINTS = {
         get_patients: "/patients/",
         create_patient: "/patients/",
         get_all_patient_profile: "/patients/profiles/",
-        get_patient_by_id: (patientId) => `/patients/${patientId}`,
+        get_patient_by_id: (patientId) => `/patients/${patientId}/`,
     },
 };

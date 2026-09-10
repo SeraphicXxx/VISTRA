@@ -6,7 +6,7 @@ import {
   Syringe,
   CalendarClock,
 } from "lucide-react";
-import { getMockPatientRecords } from "./patientsData.ts";
+import { getMockPatientRecords } from "./patientsData.tsx";
 import {usePatientContext} from "/@/context/PatientContext.tsx";
 
 const TABS = [
