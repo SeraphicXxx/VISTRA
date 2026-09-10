@@ -40,4 +40,6 @@ export interface PatientProfile {
     course?: string
     contact_no?: string
     school_year?: string
+    department?: string
+    person_type: string
 }

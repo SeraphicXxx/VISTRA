@@ -114,6 +114,7 @@ axiosClient.interceptors.response.use(
                 return axiosClient(originalRequest);
 
             } catch (refreshError) {
+                console.log(refreshError);
                 sessionManager.clear();
                 throw refreshError;
             }

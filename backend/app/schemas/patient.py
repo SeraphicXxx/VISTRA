@@ -29,6 +29,8 @@ class PatientProfile(BaseModel):
     course: str | None = None
     contact_no: str | None = None
     school_year: str | None = None
+    department: str | None = None
+    person_type: str | None = None
 
 
 class PatientMedicalHistory(BaseModel):
@@ -51,7 +53,7 @@ class PatientVitalSigns(BaseModel):
     patient_id: str
     temperature: float | None = None
     blood_pressure: float | None = None
-    hearth_rate: float | None = None
+    heart_rate: float | None = None
     respiratory_rate: float | None = None
     eyes: float | None = None
     recorded_at: date | None = None
@@ -107,6 +109,9 @@ class CreatePatientRequest(BaseModel):
             course=self.course,
             contact_no=self.mobile_number,
             school_year=self.school_year,
+            department=self.department,
+            person_type=self.classification,
+
         )
 
 

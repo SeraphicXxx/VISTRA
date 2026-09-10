@@ -46,7 +46,7 @@ export class PatientModel {
 
             patient_id: this.PatientProfile.patient_id,
 
-            user_type: "Student",
+            user_type: this.PatientProfile.person_type,
 
             course: this.PatientProfile.course ?? "N/A",
 
