@@ -22,8 +22,8 @@ def create(request: CreatePatientRequest, supabase: Client = Depends(get_supabas
     return create_patient(request, supabase)
 
 @protected_patients_router.get("/profiles/")
-def get_all_profiles(request : Filter | None = None, supabase: Client = Depends(get_supabase_for_user)):
-    return get_all_patient_profiles(supabase, request)
+def get_all_profiles(filters : Filter = Depends(), supabase: Client = Depends(get_supabase_for_user)):
+    return get_all_patient_profiles(supabase, filters)
 
 @protected_patients_router.get("/{patient_id}/")
 def get_patient(patient_id: str, supabase: Client = Depends(get_supabase_for_user)):

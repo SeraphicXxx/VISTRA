@@ -47,33 +47,36 @@ class PatientRepository:
             .execute()
         )
 
-    def get_all_profile(self, query: Filter | None = None):
+    def get_all_profile(self, filters):
 
-        table_query = self.supabase.table("PATIENT_PROFILE").select("*")
+        table_filters = (
+            self.supabase
+            .table("PATIENT_PROFILE")
+            .select("*")
+        )
 
-        if not query:
-            return table_query.execute().data
-
-        if query.search:
-            query = query.or_(
-                f"first_name.ilike.%{query.search}%,"
-                f"last_name.ilike.%{query.search}%,"
-                f"patient_id.ilike.%{query.search}%"
+        if filters.search:
+            table_filters = table_filters.or_(
+                f"first_name.ilike.%{filters.search}%,"
+                f"last_name.ilike.%{filters.search}%,"
+                f"patient_id.ilike.%{filters.search}%"
             )
 
-        if query.sex:
-            table_query = table_query.eq("sex", query.sex)
+        if filters.sex:
+            table_filters = table_filters.eq("sex", filters.sex)
 
-        if query.status:
-            table_query = table_query.eq("status", query.status)
+        if filters.status:
+            table_filters = table_filters.eq("status", filters.status)
 
-        if query.course:
-            table_query = table_query.eq("course", query.course)
+        if filters.course:
+            table_filters = table_filters.eq("course", filters.course)
 
-        if query.year_section:
-            table_query = table_query.eq("year_section", query.year_section)
+        if filters.year_section:
+            table_filters = table_filters.eq(
+                "year_section",
+                filters.year_section
+            )
 
-        response = table_query.execute()
+        response = table_filters.execute()
 
         return response.data
-
