@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {ChevronDown, SlidersHorizontal} from "lucide-react";
+import {ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 import {Default} from "/@/components/table/Table";
 
 interface DateFilterProps {
@@ -150,6 +150,7 @@ export function TableFilters<T>({
                                     filterOptions,
                                 }: TableFiltersProps<T>) {
     const [filters, setFilters] = useState<Filters<T>>({});
+    const [search, setSearch] = useState("");
 
     const handleChange = (
         key: keyof T,
@@ -161,8 +162,44 @@ export function TableFilters<T>({
         }));
     };
 
+    const handleRun = () => {
+        console.log({
+            search,
+            filters,
+        });
+
+        // Call your API / filtering logic here
+    };
+
     return (
         <div className="flex flex-wrap items-center gap-2 py-3">
+            {/* Search */}
+            <div className="relative">
+                <Search
+                    className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
+                    strokeWidth={2}
+                />
+
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="
+                        h-9 w-56
+                        rounded-lg
+                        border border-border
+                        bg-surface
+                        pl-9 pr-3
+                        text-sm
+                        text-primaryDark
+                        outline-none
+                        focus:border-primary
+                    "
+                />
+            </div>
+
+            {/* Filter label */}
             <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
                 <SlidersHorizontal
                     className="h-3.5 w-3.5"
@@ -171,6 +208,8 @@ export function TableFilters<T>({
 
                 Filter
             </span>
+
+            {/* Filters */}
             {filterableColumns.map((column) => {
                 if (column.type === "date") {
                     return (
@@ -197,6 +236,25 @@ export function TableFilters<T>({
                     />
                 );
             })}
+
+            {/* Run */}
+            <button
+                type="button"
+                onClick={handleRun}
+                className="
+                    h-9
+                    rounded-lg
+                    bg-primary
+                    px-4
+                    text-sm
+                    font-medium
+                    text-white
+                    transition
+                    hover:opacity-90
+                "
+            >
+                Run
+            </button>
         </div>
     );
 }
