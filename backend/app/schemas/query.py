@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
-class PatientQuery(BaseModel):
+class Filter(BaseModel):
     search: str | None = None,
-    gender: str | None = None,
+    sex: str | None = None,
     status: str | None = None,
     course: str | None = None,
     year_section: str | None = None,

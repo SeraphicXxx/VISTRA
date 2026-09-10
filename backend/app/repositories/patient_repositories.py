@@ -1,3 +1,6 @@
+from app.schemas.query import Filter
+
+
 class PatientRepository:
 
     def __init__(self, supabase):
@@ -44,13 +47,33 @@ class PatientRepository:
             .execute()
         )
 
-    def get_all_profile(self):
-        response = (
-            self.supabase
-            .table("PATIENT_PROFILE")
-            .select("*")
-            .execute()
-        )
+    def get_all_profile(self, query: Filter | None = None):
+
+        table_query = self.supabase.table("PATIENT_PROFILE").select("*")
+
+        if not query:
+            return table_query.execute().data
+
+        if query.search:
+            query = query.or_(
+                f"first_name.ilike.%{query.search}%,"
+                f"last_name.ilike.%{query.search}%,"
+                f"patient_id.ilike.%{query.search}%"
+            )
+
+        if query.sex:
+            table_query = table_query.eq("sex", query.sex)
+
+        if query.status:
+            table_query = table_query.eq("status", query.status)
+
+        if query.course:
+            table_query = table_query.eq("course", query.course)
+
+        if query.year_section:
+            table_query = table_query.eq("year_section", query.year_section)
+
+        response = table_query.execute()
 
         return response.data
 

@@ -86,10 +86,6 @@ export const patientColumns: Column<patientData>[] = [
         key: "year_section",
         label: "Year & Section"
     },
-    {
-        key: "last_visit",
-        label: "Last Visit"
-    }
 ]
 
 export const patientColumnsFilter: FilterColumn<patientData>[] = [

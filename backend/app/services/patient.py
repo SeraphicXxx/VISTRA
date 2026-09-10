@@ -2,6 +2,7 @@ from fastapi import status, HTTPException
 
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
+from app.schemas.query import Filter
 from app.services.auth.user import create_auth_user, delete_auth_user
 from app.utils.email_utils import remove_ucc_domain
 
@@ -178,10 +179,10 @@ def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase):
         }
 
 
-def get_all_patient_profiles(supabase):
+def get_all_patient_profiles(supabase, request: Filter | None = None):
     try:
         patient_repo = PatientRepository(supabase)
-        response = patient_repo.get_all_profile()
+        response = patient_repo.get_all_profile(request)
 
         return {
             "success": True,
