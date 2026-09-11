@@ -13,7 +13,7 @@ import {removeNullFilters} from "/@/components/Filters";
 
 
 export default function PatientsTab() {
-    const { patientTableRecords, isLoading, setFilters } = usePatientContext();
+    const { patientTableRecords, isLoading, setFilters, isRefreshing } = usePatientContext();
     return (
         <DefaultTablePreset<patientData>
             title="Patients"
@@ -22,6 +22,7 @@ export default function PatientsTab() {
             filterOptions={patientColumnsFilterOption}
             data={patientTableRecords}
             isLoading={isLoading}
+            isRefreshing={isRefreshing}
             columns={patientColumns}
             panelAddon={
                 <LinkButton

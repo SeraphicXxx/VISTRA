@@ -43,9 +43,7 @@ export function DefaultTablePreset<T extends { id: string }>({
 
                                                                  onRun,
                                                              }: TablePresetProps<T>) {
-    if (isLoading) {
-        return <LoadingPage />;
-    }
+
     return (
         <TableProvider<T> onRun={onRun}>
             <div className="rounded-2xl border border-border bg-surface shadow-card">
@@ -75,11 +73,7 @@ export function DefaultTablePreset<T extends { id: string }>({
                             columns={columns}
                             renderAction={renderAction}
                         />
-                        {isRefreshing && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-surface/70">
-                                Loading...
-                            </div>
-                        )}
+
                     </GenericTable>
 
                 </div>

@@ -7,3 +7,4 @@ class Filter(BaseModel):
     status: str | None = None
     course: str | None = None
     year_section: str | None = None
+    user_type: str | None = None

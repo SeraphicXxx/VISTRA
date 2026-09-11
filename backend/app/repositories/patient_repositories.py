@@ -77,6 +77,9 @@ class PatientRepository:
                 filters.year_section
             )
 
+        if filters.user_type:
+            table_filters = table_filters.eq("person_type", filters.user_type)
+
         response = table_filters.execute()
 
         return response.data
