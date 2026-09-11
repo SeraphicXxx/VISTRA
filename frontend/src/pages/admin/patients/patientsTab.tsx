@@ -6,7 +6,6 @@ import { ROUTES } from "/@/config/RoutePaths.js";
 import { patientColumns, patientColumnsFilter, patientColumnsFilterOption, patientData } from "./patientsData";
 
 import { usePatientContext } from "/@/context/PatientContext";
-import LoadingPage from "/@/components/LoadingPage";
 import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
 import {removeNullFilters} from "/@/components/Filters";
@@ -42,14 +41,9 @@ export default function PatientsTab() {
             }
 
             onRun={(search, filters) => {
-                console.log("PatientsTab onRun:", search, filters);
                 setFilters({
                     search,
-                    ...Object.fromEntries(
-                        Object.entries(filters).filter(
-                            ([_, value]) => value !== null
-                        )
-                    ),
+                    ...removeNullFilters(filters),
                 });
             }}
 

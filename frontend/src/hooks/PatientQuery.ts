@@ -16,8 +16,11 @@ export function usePatientQuery(filters?: PatientFilters) {
     return useQuery({
         queryKey: ["patients", filters],
 
-        queryFn: async () => {
-            const {data} = await getAllPatientProfiles(filters);
+        queryFn: async ({signal}) => {
+            const {data} = await getAllPatientProfiles(
+                filters,
+                signal
+            );
 
             return data.data;
         },

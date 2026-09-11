@@ -42,7 +42,9 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  renderAction,
                                                                  onRun,
                                                              }: TablePresetProps<T>) {
-
+    if (isLoading && isRefreshing){
+        return <LoadingPage />;
+    }
 
     return (
         <TableProvider<T> onRun={onRun}>

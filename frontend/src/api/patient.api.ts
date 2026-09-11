@@ -21,13 +21,15 @@ export const createPatientAccount = async (
 };
 
 export async function getAllPatientProfiles(
-    filters?: PatientFilters
+    filters?: PatientFilters,
+    signal?: AbortSignal
 ) {
     return apiClient<ApiDataResponse<PatientProfile>>(
         API_ENDPOINTS.patient.get_all_patient_profile,
         {
             method: "GET",
             params: filters,
+            signal,
         }
     );
 }

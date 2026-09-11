@@ -292,10 +292,16 @@ export function TableFilters<T>({
     );
 }
 
-export function removeNullFilters<T extends object>(filters: T): Partial<T> {
+export function removeNullFilters<T extends object>(
+    filters: T
+): {
+    [K in keyof T]: Exclude<T[K], null>
+} {
     return Object.fromEntries(
         Object.entries(filters).filter(
             ([_, value]) => value !== null
         )
-    ) as Partial<T>;
+    ) as {
+        [K in keyof T]: Exclude<T[K], null>
+    };
 }
