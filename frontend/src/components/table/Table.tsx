@@ -147,33 +147,62 @@ export const GenericTableBody = <T extends { id: string }>({
                                                                data,
                                                                columns,
                                                                renderAction,
+                                                               isRefreshing,
                                                            }: {
     data: T[];
     columns: Column<T>[];
     renderAction?: (record: T) => ReactNode;
+    isRefreshing?: boolean;
 }) => {
-    return (
-        <tbody>
-        {data.map((record) => (
-            <GenericRow key={record.id}>
-                {columns.map((column) => (
-                    <td
-                        key={String(column.key)}
-                        className="border-b border-border py-3 pr-4"
-                    >
-                        {column.render
-                            ? column.render(record[column.key], record)
-                            : String(record[column.key])}
-                    </td>
-                ))}
+    const colSpan = columns.length + (renderAction ? 1 : 0);
 
-                {renderAction && (
-                    <td className="border-b border-border py-3 text-right">
-                        {renderAction(record)}
-                    </td>
-                )}
-            </GenericRow>
-        ))}
+    return (
+        <tbody className={isRefreshing ? "opacity-50" : ""}>
+        {data.length === 0 && !isRefreshing ? (
+            <tr>
+                <td
+                    colSpan={colSpan}
+                    className="py-10 text-center text-sm text-textMuted"
+                >
+                    No records found.
+                </td>
+            </tr>
+        ) : (
+            data.map((record) => (
+                <GenericRow key={record.id}>
+                    {columns.map((column) => (
+                        <td
+                            key={String(column.key)}
+                            className="border-b border-border py-3 pr-4"
+                        >
+                            {column.render
+                                ? column.render(
+                                    record[column.key],
+                                    record
+                                )
+                                : String(record[column.key])}
+                        </td>
+                    ))}
+
+                    {renderAction && (
+                        <td className="border-b border-border py-3 text-right">
+                            {renderAction(record)}
+                        </td>
+                    )}
+                </GenericRow>
+            ))
+        )}
+
+        {isRefreshing && (
+            <tr>
+                <td
+                    colSpan={colSpan}
+                    className="py-3 text-center text-xs text-textMuted"
+                >
+                    Loading...
+                </td>
+            </tr>
+        )}
         </tbody>
     );
 };

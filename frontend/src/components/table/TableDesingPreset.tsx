@@ -40,9 +40,9 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  isRefreshing,
                                                                  columns,
                                                                  renderAction,
-
                                                                  onRun,
                                                              }: TablePresetProps<T>) {
+
 
     return (
         <TableProvider<T> onRun={onRun}>
@@ -53,11 +53,12 @@ export function DefaultTablePreset<T extends { id: string }>({
 
                     <div className=" border-t border-border"/>
 
-                    <TableFilters<T>
-                        filterableColumns={filterableColumns}
-                        filterOptions={filterOptions}
-
-                    />
+                    <div className="relative overflow-visible">
+                        <TableFilters
+                            filterableColumns={filterableColumns}
+                            filterOptions={filterOptions}
+                        />
+                    </div>
 
                     <div className="border-t border-border"/>
 
@@ -72,6 +73,7 @@ export function DefaultTablePreset<T extends { id: string }>({
                             data={data}
                             columns={columns}
                             renderAction={renderAction}
+                            isRefreshing={isRefreshing}
                         />
 
                     </GenericTable>

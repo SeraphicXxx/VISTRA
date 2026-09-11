@@ -92,7 +92,23 @@ export function FilterDropdown({
 
             {open && (
                 <div
-                    className="absolute left-0 z-20 mt-1.5 min-w-[180px] overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-lg">
+                    className="
+                        absolute
+                        left-0
+                        top-full
+                        z-50
+                        mt-1.5
+                        min-w-[180px]
+                        max-h-60
+                        overflow-y-auto
+                        rounded-xl
+                        border
+                        border-border
+                        bg-surface
+                        py-1
+                        shadow-lg
+                    "
+                >
                     <button
                         type="button"
                         onClick={() => {
@@ -275,6 +291,7 @@ export function TableFilters<T>({
         </div>
     );
 }
+
 export function removeNullFilters<T extends object>(filters: T): Partial<T> {
     return Object.fromEntries(
         Object.entries(filters).filter(
