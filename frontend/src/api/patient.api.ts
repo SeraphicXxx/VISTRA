@@ -2,6 +2,7 @@ import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig.js";
 import {ApiDataResponse, ApiMessageResponse} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile} from "/@/api/schema/PatientSchema";
+import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
 
 export const createPatientAccount = async (
     request: CreatePatientSchema,
@@ -19,13 +20,14 @@ export const createPatientAccount = async (
     return data;
 };
 
-export const getAllPatientProfiles = async (): Promise<ApiDataResponse<PatientProfile>> => {
-    const {data} = await apiClient<ApiDataResponse<PatientProfile>>(
+export async function getAllPatientProfiles(
+    filters?: PatientFilters
+) {
+    return apiClient<ApiDataResponse<PatientProfile>>(
         API_ENDPOINTS.patient.get_all_patient_profile,
         {
             method: "GET",
+            params: filters,
         }
     );
-
-    return data;
-};
+}

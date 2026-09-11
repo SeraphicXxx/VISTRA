@@ -9,20 +9,19 @@ import { usePatientContext } from "/@/context/PatientContext";
 import LoadingPage from "/@/components/LoadingPage";
 import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
+import {removeNullFilters} from "/@/components/Filters";
 
 
 export default function PatientsTab() {
-    const { patientRecords, isLoading } = usePatientContext();
-    if (isLoading) {
-        return <LoadingPage />;
-    }
+    const { patientTableRecords, isLoading, setFilters } = usePatientContext();
     return (
         <DefaultTablePreset<patientData>
             title="Patients"
             icon={UserRound}
             filterableColumns={patientColumnsFilter}
             filterOptions={patientColumnsFilterOption}
-            data={patientRecords}
+            data={patientTableRecords}
+            isLoading={isLoading}
             columns={patientColumns}
             panelAddon={
                 <LinkButton
@@ -40,6 +39,19 @@ export default function PatientsTab() {
                     />
                 )
             }
+
+            onRun={(search, filters) => {
+                console.log("PatientsTab onRun:", search, filters);
+                setFilters({
+                    search,
+                    ...Object.fromEntries(
+                        Object.entries(filters).filter(
+                            ([_, value]) => value !== null
+                        )
+                    ),
+                });
+            }}
+
         />
     );
 }

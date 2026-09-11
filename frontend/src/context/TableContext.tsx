@@ -23,11 +23,18 @@ const TableContext =
 
 interface TableProviderProps<T> {
     children: React.ReactNode;
+
+    onRun?: (
+        search: string,
+        filters: Filters<T>
+    ) => void;
 }
 
 export function TableProvider<T>({
-    children,
-}: TableProviderProps<T>) {
+                                     children,
+                                     onRun,
+
+                                 }: TableProviderProps<T>) {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState<Filters<T>>({});
 
@@ -47,10 +54,8 @@ export function TableProvider<T>({
     };
 
     const run = () => {
-        console.log("Search:", search);
-        console.log("Filters:", filters);
+        onRun?.(search, filters);
     };
-
     const contextValue = useMemo<TableContextValue<T>>(
         () => ({
             search,

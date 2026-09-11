@@ -2,7 +2,8 @@ import PanelHeader from "/@/components/PanelHeader";
 import {FilterColumn, TableFilters} from "/@/components/Filters";
 import {Column, GenericTable, GenericTableBody, GenericTableHeader} from "/@/components/table/Table";
 import React from "react";
-import {TableProvider, useTableContext} from "/@/context/TableContext";
+import {TableProvider} from "/@/context/TableContext";
+import LoadingPage from "/@/components/LoadingPage";
 
 
 interface TablePresetProps<T> {
@@ -14,11 +15,19 @@ interface TablePresetProps<T> {
     filterOptions: Record<keyof T, string[]>;
 
     data: T[];
+    isLoading: boolean;
+    isRefreshing: boolean;
 
     columns: Column<T>[];
 
     renderAction?: (row: T) => React.ReactNode;
+
+    onRun?: (
+        search: string,
+        filters: Partial<Record<keyof T, string | null>>
+    ) => void;
 }
+
 //used in  overview,dental,medical,appointment and patient tabs
 export function DefaultTablePreset<T extends { id: string }>({
                                                                  title,
@@ -27,11 +36,18 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  filterableColumns,
                                                                  filterOptions,
                                                                  data,
+                                                                 isLoading,
+                                                                 isRefreshing,
                                                                  columns,
                                                                  renderAction,
+
+                                                                 onRun,
                                                              }: TablePresetProps<T>) {
+    if (isLoading) {
+        return <LoadingPage />;
+    }
     return (
-        <TableProvider<T>>
+        <TableProvider<T> onRun={onRun}>
             <div className="rounded-2xl border border-border bg-surface shadow-card">
                 <div className="p-6 overflow-x-auto">
 
@@ -42,9 +58,10 @@ export function DefaultTablePreset<T extends { id: string }>({
                     <TableFilters<T>
                         filterableColumns={filterableColumns}
                         filterOptions={filterOptions}
+
                     />
 
-                    <div className="border-t border-border" />
+                    <div className="border-t border-border"/>
 
                     <GenericTable>
 
@@ -58,6 +75,11 @@ export function DefaultTablePreset<T extends { id: string }>({
                             columns={columns}
                             renderAction={renderAction}
                         />
+                        {isRefreshing && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-surface/70">
+                                Loading...
+                            </div>
+                        )}
                     </GenericTable>
 
                 </div>
