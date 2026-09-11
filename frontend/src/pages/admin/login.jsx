@@ -13,7 +13,7 @@ import {ROUTES} from "/@/config/RoutePaths.js";
 import {Logo} from "/@/components/Logo.jsx";
 import {useLogin, useLoginForm} from "/@/hooks/UseLogin.js";
 
-export default function AdminLoginPage() {
+export default function UserLoginPage() {
   const { credentials, handleChange } = useLoginForm()
   const {
     login,

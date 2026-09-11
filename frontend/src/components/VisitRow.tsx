@@ -6,7 +6,7 @@ interface VisitRowProps {
   visit: Visit;
   isLast: boolean;
   onView: (visit: Visit) => void;
-  onEdit: (visit: Visit) => void;
+  onEdit?: (visit: Visit) => void;
 }
 
 export function VisitRow({ visit, isLast, onView, onEdit }: VisitRowProps) {
@@ -63,32 +63,33 @@ export function VisitRow({ visit, isLast, onView, onEdit }: VisitRowProps) {
                 </p>
               </div>
 
-              <p className="text-xs font-medium text-primary">
-                View details
-              </p>
+              <p className="text-xs font-medium text-primary">View details</p>
             </div>
 
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(visit);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+            {onEdit && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
                   e.stopPropagation();
                   onEdit(visit);
-                }
-              }}
-              className="shrink-0 rounded-md p-1.5 text-textMuted hover:bg-surface hover:text-textPrimary"
-              aria-label="Edit visit"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </span>
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    onEdit(visit);
+                  }
+                }}
+                className="shrink-0 rounded-md p-1.5 text-textMuted hover:bg-surface hover:text-textPrimary"
+                aria-label="Edit visit"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </span>
+            )}
           </div>
         </button>
       </div>
     </li>
   );
 }
+

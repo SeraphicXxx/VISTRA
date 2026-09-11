@@ -1,9 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Reveal, fadeUp, fadeRight, stagger } from "../../components/landinganim.jsx";
 import { LiveDot } from "./Shared.jsx";
 import { vitals, vitalStyles } from "./data.jsx";
+import { ROUTES } from "/@/config/RoutePaths";
 
 export default function Start() {
   return (
@@ -42,12 +44,13 @@ export default function Start() {
               >
                 Download the App
               </a>
-              <a href="#hours"
+              <Link
+                to={ROUTES.patient.login}
                 className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-medium text-textPrimary transition-colors hover:border-primary/40"
               >
-                Proced to Check-In
+                Proceed to Check-In
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </Reveal>
         </div>

@@ -6,9 +6,10 @@ interface VisitTimelineProps {
   visits: Visit[];
   onView: (visit: Visit) => void;
   onEdit: (visit: Visit) => void;
+  showEdit?: boolean;
 }
 
-export function VisitTimeline({ visits, onView, onEdit }: VisitTimelineProps) {
+export function VisitTimeline({ visits, onView, onEdit, showEdit = true }: VisitTimelineProps) {
   const byYear = visits.reduce<Record<string, Visit[]>>((acc, visit) => {
     const year = String(new Date(visit.date).getFullYear());
     (acc[year] ||= []).push(visit);
@@ -21,10 +22,7 @@ export function VisitTimeline({ visits, onView, onEdit }: VisitTimelineProps) {
     <div className="space-y-8">
       {years.map((year) => (
         <div key={year}>
-          <p className="mb-4 text-sm font-semibold text-textPrimary">
-            {year}
-          </p>
-
+          <p className="mb-4 text-sm font-semibold text-textPrimary">{year}</p>
           <ol>
             {byYear[year].map((visit, index) => (
               <VisitRow
@@ -32,7 +30,7 @@ export function VisitTimeline({ visits, onView, onEdit }: VisitTimelineProps) {
                 visit={visit}
                 isLast={index === byYear[year].length - 1}
                 onView={onView}
-                onEdit={onEdit}
+                onEdit={showEdit ? onEdit : undefined}
               />
             ))}
           </ol>

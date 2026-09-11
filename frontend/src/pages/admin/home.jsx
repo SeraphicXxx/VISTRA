@@ -11,7 +11,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { LiveDot, AdminAnimStyles } from "/@/components/adminanim.jsx";
-import Footer from "/@/pages/public/Footer.jsx";
 import { useNavigate } from "react-router-dom";
 
 
@@ -178,8 +177,6 @@ export default function AdminLandingPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }
