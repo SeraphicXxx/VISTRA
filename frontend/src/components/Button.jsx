@@ -40,3 +40,21 @@ export function LogoClickable({className = "h-10", navigateTo = ROUTES.public.ho
         />
     );
 }
+
+export function UserLogoClickable({ className = "h-10", onClick }) {
+  function handleClick(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onClick?.();
+  }
+
+  return (
+    <a href="/" onClick={handleClick}>
+      <img
+        src="/Vistralogo.png"
+        alt="Vistra Logo"
+        className={`${className} w-auto object-contain cursor-pointer`}
+      />
+    </a>
+  );
+}
