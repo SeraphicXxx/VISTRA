@@ -4,6 +4,8 @@ import {Column, GenericTable, GenericTableBody, GenericTableHeader} from "/@/com
 import React from "react";
 import {TableProvider} from "/@/context/TableContext";
 import LoadingPage from "/@/components/LoadingPage";
+import {Pagination} from "@mui/material";
+
 
 
 interface TablePresetProps<T> {
@@ -80,6 +82,9 @@ export function DefaultTablePreset<T extends { id: string }>({
 
                     </GenericTable>
 
+                    <div className="flex justify-center">
+                        <Pagination count={10} />
+                    </div>
                 </div>
             </div>
         </TableProvider>

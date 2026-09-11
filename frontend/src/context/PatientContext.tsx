@@ -113,7 +113,7 @@ export function PatientProvider({
             patientTableRecords: patientRecords,
 
             isLoading,
-            isRefreshing: isFetching && !isLoading,
+            isRefreshing: isFetching,
             error: error
                 ? "Failed to load patient profiles."
                 : null,

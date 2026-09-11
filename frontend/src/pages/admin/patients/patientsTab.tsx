@@ -13,6 +13,7 @@ import {removeNullFilters} from "/@/components/Filters";
 
 export default function PatientsTab() {
     const { patientTableRecords, isLoading, setFilters, isRefreshing } = usePatientContext();
+    console.log(isRefreshing)
     return (
         <DefaultTablePreset<patientData>
             title="Patients"

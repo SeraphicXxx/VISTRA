@@ -197,7 +197,7 @@ export const GenericTableBody = <T extends { id: string }>({
             <tr>
                 <td
                     colSpan={colSpan}
-                    className="py-3 text-center text-xs text-textMuted"
+                    className="py-3 text-center text-xs text-black"
                 >
                     Loading...
                 </td>
