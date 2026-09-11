@@ -1,4 +1,3 @@
-
 import  { useState } from "react";
 import { ArrowLeft, Save, UserPlus, Info, Eye, EyeOff } from "lucide-react";
 import { FormInput, SelectField } from "/@/components/InputCollection.jsx";
@@ -23,7 +22,7 @@ import {
 } from "/@/utils/NewPatientValidation.jsx";
 
 import { usePatientContext } from "/@/context/PatientContext.tsx";
-import {getFieldErrors} from "/@/utils/Formatters.js";
+import {getFieldErrors} from "/src/utils/Formatters.js";
 
 export default function NewPatientRecordForm() {
   const {
@@ -31,6 +30,7 @@ export default function NewPatientRecordForm() {
     isSaving,
     saveError,
   } = usePatientContext();
+
   const saveErrorMessage = getFieldErrors(saveError);
   const [classification, setClassification] = useState("student");
   const [studentIdError, setStudentIdError] = useState("");
@@ -65,8 +65,6 @@ export default function NewPatientRecordForm() {
 
     try {
       await savePatient(record);
-
-      console.log("Patient created successfully");
 
       window.history.back();
     } catch (error) {
@@ -112,13 +110,9 @@ export default function NewPatientRecordForm() {
         </div>
 
         {/* Save errors */}
-        {saveErrorMessage?.length > 0 && (
+        {saveErrorMessage && (
             <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              <ul className="list-disc space-y-1 pl-5">
-                {saveErrorMessage.map((message, index) => (
-                    <li key={index}>{message}</li>
-                ))}
-              </ul>
+              <p>{saveErrorMessage}</p>
             </div>
         )}
 

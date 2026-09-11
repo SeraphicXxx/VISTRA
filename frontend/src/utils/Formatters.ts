@@ -1,4 +1,4 @@
-export function getHonorific(position) {
+export function getHonorific(position: any) {
     return position?.toLowerCase().includes("doctor") ? "Dr." : "";
 }
 
@@ -17,7 +17,7 @@ export function formatDisplayDate(date = new Date()) {
         day: "numeric",
     }).format(date);
 }
-export function extractStaffCode(email) {
+export function extractStaffCode(email: any) {
     if (!email || typeof email !== "string") {
         return "";
     }
@@ -40,20 +40,32 @@ export function getClinicOperationState(date = new Date()) {
         ? "open"
         : "closed";
 }
-export function getFieldErrors(error) {
-    const details = error?.detail;
-
-    if (!Array.isArray(details)) {
-        return {};
+export function getFieldErrors(error: unknown): string {
+    if (!error) {
+        return "";
     }
 
-    return details.reduce((errors, item) => {
-        const field = item.loc?.[item.loc.length - 1];
+    if (Array.isArray((error as any).detail)) {
+        return (error as any).detail
+            .map((item: any) => {
+                const field = item.loc?.[item.loc.length - 1];
 
-        if (field) {
-            errors[field] = item.msg;
-        }
+                if (field) {
+                    return `${field}: ${item.msg}`;
+                }
 
-        return errors;
-    }, {});
+                return item.msg;
+            })
+            .join(", ");
+    }
+
+    if (typeof (error as any).detail === "string") {
+        return (error as any).detail;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return "";
 }

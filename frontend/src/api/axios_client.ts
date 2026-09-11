@@ -1,11 +1,9 @@
-import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-} from "axios";
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig,} from "axios";
 
-import { sessionManager } from "/@/utils/SessionManager";
-import { API_ENDPOINTS, getApiUrl } from "/@/config/ApiConfig";
+import {sessionManager} from "/@/utils/SessionManager";
+import {API_ENDPOINTS, getApiUrl} from "/@/config/ApiConfig";
+import {FastAPIErrorResponse} from "/@/api/schema/FastApiValidationResponse";
+import {FastAPIConflictError, FastAPIValidationError} from "/@/api/errors";
 
 const API_URL = getApiUrl();
 
@@ -31,7 +29,7 @@ const refreshAccessToken = async (): Promise<string> => {
                 }
             );
 
-            const { access_token, refresh_token } = response.data;
+            const {access_token, refresh_token} = response.data;
 
             sessionManager.setTokens(
                 access_token,
@@ -53,10 +51,6 @@ const refreshAccessToken = async (): Promise<string> => {
     }
 };
 
-
-/*
- * Axios instance
- */
 const axiosClient: AxiosInstance = axios.create({
     baseURL: API_URL,
     headers: {
@@ -64,10 +58,6 @@ const axiosClient: AxiosInstance = axios.create({
     },
 });
 
-
-/*
- * Request interceptor
- */
 axiosClient.interceptors.request.use(
     (config) => {
         const accessToken = sessionManager.getAccessToken();
@@ -85,18 +75,13 @@ axiosClient.interceptors.request.use(
  * Response interceptor
  */
 axiosClient.interceptors.response.use(
-    (response) => {
-        return response;
-    },
+    (response) => response,
 
     async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestConfig & {
             _retry?: boolean;
         };
 
-        /*
-         * Only refresh once.
-         */
         if (
             error.response?.status === 401 &&
             !originalRequest._retry
@@ -114,16 +99,28 @@ axiosClient.interceptors.response.use(
                 return axiosClient(originalRequest);
 
             } catch (refreshError) {
-                console.log(refreshError);
                 sessionManager.clear();
                 throw refreshError;
             }
         }
 
+        if (error.response?.status === 422) {
+            const data = error.response.data as FastAPIErrorResponse;
+            throw new FastAPIValidationError(data);
+        }
+
+
+        if (error.response?.status === 409) {
+            const data = error.response.data as { detail: string };
+
+            throw new FastAPIConflictError(
+                data.detail || "Conflict"
+            );
+        }
+
         throw error;
     }
 );
-
 
 export const apiClient = async <T = unknown>(
     endpoint: string,

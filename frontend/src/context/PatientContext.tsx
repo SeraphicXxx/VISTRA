@@ -137,16 +137,6 @@ export function PatientProvider({
                 queryKey: ["patients"],
             });
         },
-        onError: (error: unknown) => {
-            if (isFastAPIError(error)) {
-                return;
-            }
-
-            if(error instanceof Error) {
-                return;
-            }
-
-        }
     });
 
     /*

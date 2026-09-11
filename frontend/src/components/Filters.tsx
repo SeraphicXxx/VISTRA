@@ -159,7 +159,7 @@ export function TableFilters<T>({
         run,
     } = useTableContext<T>();
 
-    const hasFilters =
+    const checkFiltersValue =
         search.trim() !== "" ||
         Object.values(filters).some((value) => value !== null && value !== "");
 
@@ -245,11 +245,10 @@ export function TableFilters<T>({
                 Run
             </button>
 
-            {hasFilters && (
+            {checkFiltersValue && (
                 <button
                     type="button"
                     onClick={() => {
-                        setSearch("");
                         clearFilters();
                     }}
                     className="

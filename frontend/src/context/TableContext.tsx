@@ -43,6 +43,7 @@ export function TableProvider<T>({
 
     const clearFilters = () => {
         setFilters({});
+        setSearch("");
     };
 
     const run = () => {

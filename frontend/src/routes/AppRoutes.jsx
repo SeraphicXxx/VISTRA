@@ -20,40 +20,10 @@ import PatientsTab from "/src/pages/admin/patients/patientsTab.jsx"
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx"
 import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
-import { createPatientAccount } from "/@/api/patient.api.ts"
-import {sessionManager} from "/@/utils/SessionManager.ts";
-import {useState} from "react";
 import {PatientProvider} from "/@/context/PatientContext.tsx";
 
 
 function AppRoutes() {
-  // TODO refactor state along with handleSave
-  //-ken
-  const [errors, setErrors] = useState(null);
-  const handleSave = async (record) => {
-    const user = sessionManager.getUser();
-    const patientData = {
-      ...record,
-      created_by: user.staff_id,
-    };
-    console.log(record)
-    try {
-      setErrors(null);
-      const result = await createPatientAccount(patientData);
-
-      console.log("Patient created:", result);
-
-    } catch (error) {
-      setErrors(
-          error?.detail || [
-            {
-              msg: error?.message || "Failed to create patient",
-            },
-          ]
-      );
-    }
-  };
-
   return (
     <BrowserRouter>
       <Routes>
@@ -91,7 +61,7 @@ function AppRoutes() {
             }/>
             <Route path={ROUTES.staff.patient.createNewRecord} element={
               <PatientProvider>
-                <NewPatientRecordForm onSave={handleSave} errors={errors}/>
+                <NewPatientRecordForm/>
               </PatientProvider>
             } />
             <Route path={`${ROUTES.staff.patient.patientRecordTab}/:id`} element={
