@@ -1,10 +1,8 @@
-import {useNavigate} from "react-router-dom";
-import {ChevronRight} from "lucide-react";
-
 import PanelHeader from "/@/components/PanelHeader";
 import {FilterColumn, TableFilters} from "/@/components/Filters";
 import {Column, GenericTable, GenericTableBody, GenericTableHeader} from "/@/components/table/Table";
 import React from "react";
+import {TableProvider, useTableContext} from "/@/context/TableContext";
 
 
 interface TablePresetProps<T> {
@@ -33,7 +31,7 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  renderAction,
                                                              }: TablePresetProps<T>) {
     return (
-        <>
+        <TableProvider<T>>
             <div className="rounded-2xl border border-border bg-surface shadow-card">
                 <div className="p-6 overflow-x-auto">
 
@@ -64,6 +62,6 @@ export function DefaultTablePreset<T extends { id: string }>({
 
                 </div>
             </div>
-        </>
+        </TableProvider>
     );
 }

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
-import {ChevronDown, Search, SlidersHorizontal } from "lucide-react";
-import {Default} from "/@/components/table/Table";
+import {ChevronDown, Search, SlidersHorizontal} from "lucide-react";
+import {useTableContext} from "/@/context/TableContext";
 
 interface DateFilterProps {
     label: string;
@@ -26,6 +26,7 @@ export function DateFilter({
         </div>
     );
 }
+
 interface FilterDropdownProps {
     label: string;
     options: string[];
@@ -138,42 +139,42 @@ export interface FilterColumn<T> {
     type?: "select" | "date";
 }
 
-type Filters<T> = Partial<Record<keyof T, string | null>>;
-
 interface TableFiltersProps<T> {
     filterableColumns: FilterColumn<T>[];
     filterOptions: Partial<Record<keyof T, string[]>>;
+
 }
+
 
 export function TableFilters<T>({
                                     filterableColumns,
                                     filterOptions,
                                 }: TableFiltersProps<T>) {
-    const [filters, setFilters] = useState<Filters<T>>({});
-    const [search, setSearch] = useState("");
+    const {
+        search,
+        setSearch,
+        filters,
+        setFilter,
+        clearFilters,
+        run,
+    } = useTableContext<T>();
 
-    const handleChange = (
-        key: keyof T,
-        value: string | null,
-    ) => {
-        setFilters((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
-    };
-
-    const handleRun = () => {
-        console.log({
-            search,
-            filters,
-        });
-
-        // Call your API / filtering logic here
-    };
+    const hasFilters =
+        search.trim() !== "" ||
+        Object.values(filters).some((value) => value !== null && value !== "");
 
     return (
         <div className="flex flex-wrap items-center gap-2 py-3">
-            {/* Search */}
+
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
+                <SlidersHorizontal
+                    className="h-3.5 w-3.5"
+                    strokeWidth={2}
+                />
+
+                Filter
+            </span>
+
             <div className="relative">
                 <Search
                     className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
@@ -199,17 +200,6 @@ export function TableFilters<T>({
                 />
             </div>
 
-            {/* Filter label */}
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
-                <SlidersHorizontal
-                    className="h-3.5 w-3.5"
-                    strokeWidth={2}
-                />
-
-                Filter
-            </span>
-
-            {/* Filters */}
             {filterableColumns.map((column) => {
                 if (column.type === "date") {
                     return (
@@ -218,7 +208,7 @@ export function TableFilters<T>({
                             label={column.label}
                             value={filters[column.key] ?? null}
                             onChange={(value) =>
-                                handleChange(column.key, value)
+                                setFilter(column.key, value)
                             }
                         />
                     );
@@ -230,17 +220,16 @@ export function TableFilters<T>({
                         label={column.label}
                         value={filters[column.key] ?? null}
                         onChange={(value) =>
-                            handleChange(column.key, value)
+                            setFilter(column.key, value)
                         }
                         options={filterOptions[column.key] ?? []}
                     />
                 );
             })}
 
-            {/* Run */}
             <button
                 type="button"
-                onClick={handleRun}
+                onClick={run}
                 className="
                     h-9
                     rounded-lg
@@ -255,6 +244,31 @@ export function TableFilters<T>({
             >
                 Run
             </button>
+
+            {hasFilters && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        setSearch("");
+                        clearFilters();
+                    }}
+                    className="
+                        h-9
+                        rounded-lg
+                        border border-border
+                        bg-surface
+                        px-4
+                        text-sm
+                        font-medium
+                        text-textSecondary
+                        transition
+                        hover:border-primary/30
+                        hover:text-primary
+                    "
+                >
+                    Clear
+                </button>
+            )}
         </div>
     );
 }
