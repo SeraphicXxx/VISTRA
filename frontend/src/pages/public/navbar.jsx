@@ -107,14 +107,14 @@ export default function Navbar() {
   const highlighted = hovered ?? (hasInteracted ? activeSection : null);
 
   return (
-    <header className="sticky top-0 z-30">
+    <header className={`sticky z-30 ${scrolled ? "top-3" : "top-0"}`}>
       <motion.div
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={`mx-auto flex items-center justify-between transition-all duration-500 ${
           scrolled
-            ? "mt-3 max-w-3xl rounded-2xl border border-border/60 bg-surface/85 px-4 py-2.5 shadow-lg shadow-black/[0.06] backdrop-blur-xl sm:mx-6 lg:mx-auto"
+            ? "max-w-3xl rounded-2xl border border-border/60 bg-surface/85 px-4 py-2.5 shadow-lg shadow-black/[0.06] backdrop-blur-xl sm:mx-6 lg:mx-auto"
             : "mt-0 max-w-6xl border border-transparent bg-transparent px-6 py-5"
         }`}
       >
