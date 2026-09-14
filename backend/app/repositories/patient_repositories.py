@@ -1,5 +1,4 @@
-from app.schemas.query import Filter
-
+from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 class PatientRepository:
 
@@ -47,51 +46,35 @@ class PatientRepository:
             .execute()
         )
 
-    def get_all_profile(self, filters):
+    def get_profiles(self, filters):
 
-        start = (filters.page - 1) * filters.page_size
-        end = start + filters.page_size - 1
-
-        table_filters = (
-            self.supabase
-            .table("PATIENT_PROFILE")
-            .select("*", count="exact")
+        query = (
+            SupabaseQueryBuilder(
+                self.supabase,
+                "PATIENT_PROFILE",
+                count="exact",
+            )
+            .eq("sex", filters.sex)
+            .eq("status", filters.status)
+            .eq("course_department", filters.course)
+            .eq("year_section", filters.year_section)
+            .eq("person_type", filters.user_type)
         )
 
         if filters.search:
-            table_filters = table_filters.or_(
+            query.or_(
                 f"first_name.ilike.%{filters.search}%,"
                 f"last_name.ilike.%{filters.search}%,"
                 f"patient_id.ilike.%{filters.search}%"
             )
 
-        if filters.sex:
-            table_filters = table_filters.eq("sex", filters.sex)
-
-        if filters.status:
-            table_filters = table_filters.eq("status", filters.status)
-
-        if filters.course:
-            table_filters = table_filters.eq(
-                "course_department",
-                filters.course
-            )
-
-        if filters.year_section:
-            table_filters = table_filters.eq(
-                "year_section",
-                filters.year_section
-            )
-
-        if filters.user_type:
-            table_filters = table_filters.eq(
-                "person_type",
-                filters.user_type
-            )
-
         response = (
-            table_filters
-            .range(start, end)
+            query
+            .paginate(
+                filters.page,
+                filters.page_size,
+            )
+            .build()
             .execute()
         )
 

@@ -182,7 +182,7 @@ def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase):
 def get_all_patient_profiles(supabase, filters):
     try:
         patient_repo = PatientRepository(supabase)
-        response = patient_repo.get_all_profile(filters)
+        response = patient_repo.get_profiles(filters)
 
         return {
             "success": True,

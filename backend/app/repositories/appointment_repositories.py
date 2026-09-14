@@ -56,6 +56,9 @@ class AppointmentRepository:
 
     def delete_appointment(self, appointment_id: int):
         response = (
-            self.supabase.table("APPOINTMENT").delete().eq("id", appointment_id).execute()
+            self.supabase.table("APPOINTMENT")
+            .delete()
+            .eq("id", appointment_id)
+            .execute()
         )
         return bool(response.data)
