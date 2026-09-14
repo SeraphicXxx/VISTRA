@@ -1,57 +1,39 @@
-import React, {createContext, ReactNode, useContext, useMemo, useState,} from "react";
-import {useMutation, useQueryClient,} from "@tanstack/react-query";
+import React, {
+    createContext,
+    ReactNode,
+    useContext,
+    useMemo,
+    useState,
+} from "react";
 
-import {createPatientAccount,} from "/@/api/patient.api";
-
-import {CreatePatientSchema, PatientProfile} from "/@/api/schema/PatientSchema";
-
-import {PatientDashboardRecord, PatientModel,} from "/@/repository/PatientModel";
-
-import {sessionManager} from "/@/utils/SessionManager";
-import {usePatientQuery} from "/@/hooks/PatientQuery";
+import {PatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
-/* -------------------------------------------------------------------------- */
-/* Types                                                                      */
-/* -------------------------------------------------------------------------- */
 
-type SavePatientInput = Omit<CreatePatientSchema, "created_by">;
+import {
+    PatientDashboardRecord,
+    PatientModel,
+} from "/@/repository/PatientModel";
+
+import {usePatientQuery} from "/@/hooks/PatientQuery";
 
 interface PatientContextType {
-    // Filters
     filters: PatientFilters;
     setFilters: React.Dispatch<React.SetStateAction<PatientFilters>>;
 
-    // Server data
     patientProfiles: PatientProfile[];
 
-    // Application/domain data
     patientTableRecords: PatientDashboardRecord[];
 
-    // Query state
     isLoading: boolean;
     isRefreshing: boolean;
     error: string | null;
 
-    // Mutation state
-    isSaving: boolean;
-    saveError: Error | null | unknown;
-
-    // Actions
     refreshPatients: () => Promise<unknown>;
-    savePatient: (record: SavePatientInput) => Promise<unknown>;
 }
-
-/* -------------------------------------------------------------------------- */
-/* Context                                                                    */
-/* -------------------------------------------------------------------------- */
 
 const PatientContext = createContext<PatientContextType | undefined>(
     undefined
 );
-
-/* -------------------------------------------------------------------------- */
-/* Provider                                                                   */
-/* -------------------------------------------------------------------------- */
 
 interface PatientProviderProps {
     children: ReactNode;
@@ -60,8 +42,6 @@ interface PatientProviderProps {
 export function PatientProvider({
                                     children,
                                 }: PatientProviderProps) {
-    const queryClient = useQueryClient();
-
     const [filters, setFilters] = useState<PatientFilters>({});
 
     const {
@@ -72,7 +52,6 @@ export function PatientProvider({
         refetch,
     } = usePatientQuery(filters);
 
-
     const patientRecords = useMemo<PatientDashboardRecord[]>(
         () =>
             patientProfiles.map((patientProfile) => {
@@ -82,27 +61,6 @@ export function PatientProvider({
             }),
         [patientProfiles]
     );
-
-    const savePatientMutation = useMutation({
-        mutationFn: async (record: SavePatientInput) => {
-            const user = sessionManager.getUser();
-            if (!user){
-                throw new Error("Not logged in");
-            }
-            const patientData = {
-                ...record,
-                created_by: user.staff_id,
-            };
-
-            return createPatientAccount(patientData);
-        },
-
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ["patients"],
-            });
-        },
-    });
 
     const contextValue = useMemo<PatientContextType>(
         () => ({
@@ -118,11 +76,7 @@ export function PatientProvider({
                 ? "Failed to load patient profiles."
                 : null,
 
-            isSaving: savePatientMutation.isPending,
-            saveError: savePatientMutation.error,
-
             refreshPatients: refetch,
-            savePatient: savePatientMutation.mutateAsync,
         }),
         [
             filters,
@@ -131,10 +85,7 @@ export function PatientProvider({
             isLoading,
             isFetching,
             error,
-            savePatientMutation.isPending,
-            savePatientMutation.error,
             refetch,
-            savePatientMutation.mutateAsync,
         ]
     );
 
@@ -145,15 +96,6 @@ export function PatientProvider({
     );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Context Hook                                                               */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Provides access to patient-specific application functionality.
- *
- * Must be used inside PatientProvider.
- */
 export function usePatientContext(): PatientContextType {
     const context = useContext(PatientContext);
 

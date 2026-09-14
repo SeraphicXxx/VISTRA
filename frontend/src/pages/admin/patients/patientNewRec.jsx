@@ -21,15 +21,15 @@ import {
   validateAdminId,
 } from "/@/utils/NewPatientValidation.jsx";
 
-import { usePatientContext } from "/@/context/PatientContext.tsx";
+import { useSavePatient } from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/src/utils/Formatters.js";
 
 export default function NewPatientRecordForm() {
   const {
-    savePatient,
-    isSaving,
-    saveError,
-  } = usePatientContext();
+    mutateAsync: savePatient,
+    isPending: isSaving,
+    error: saveError,
+  } = useSavePatient();
 
   const saveErrorMessage = getFieldErrors(saveError);
   const [classification, setClassification] = useState("student");
@@ -65,7 +65,6 @@ export default function NewPatientRecordForm() {
 
     try {
       await savePatient(record);
-
       window.history.back();
     } catch (error) {
       console.error("Failed to create patient:", error);
