@@ -74,10 +74,23 @@ export const defaultColumns: Column<Default>[] = [
 
 ];
 
+export type ColumnType =
+    | "text"
+    | "select"
+    | "date"
+    | "dateTime";
+
 export interface Column<T> {
     key: keyof T;
     label: string;
-    render?: (value: T[keyof T], record: T) => ReactNode;
+
+    render?: (
+        value: T[keyof T],
+        record: T
+    ) => ReactNode;
+
+    filterType?: ColumnType;
+    options?: string[];
 }
 
 interface GenericTableProps {

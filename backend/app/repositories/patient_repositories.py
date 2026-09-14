@@ -81,7 +81,7 @@ class PatientRepository:
         total = response.count or 0
 
         return {
-            "data": response.data,
+            "items": response.data,
             "total": total,
             "page": filters.page,
             "page_size": filters.page_size,

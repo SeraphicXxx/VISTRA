@@ -1,29 +1,41 @@
-import React, {useEffect, useRef, useState} from "react";
-import {ChevronDown, Search, SlidersHorizontal} from "lucide-react";
-import {useTableContext} from "/@/context/TableContext";
+import React, { useEffect, useRef, useState } from "react";
+import {
+    ChevronDown,
+    Search,
+    SlidersHorizontal,
+} from "lucide-react";
+
+import { useTableContext } from "/@/context/TableContext";
+import type { Column } from "/@/components/table/Table";
 
 interface DateFilterProps {
-    label: string;
     value: string | null;
     onChange: (value: string | null) => void;
 }
 
 export function DateFilter({
-                               label,
                                value,
                                onChange,
                            }: DateFilterProps) {
     return (
-        <div className="relative">
-            <input
-                type="date"
-                value={value ?? ""}
-                onChange={(e) =>
-                    onChange(e.target.value || null)
-                }
-                className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-textSecondary outline-none transition-colors duration-150 focus:border-primary"
-            />
-        </div>
+        <input
+            type="date"
+            value={value ?? ""}
+            onChange={(e) => onChange(e.target.value || null)}
+            className="
+                rounded-lg
+                border border-border
+                bg-surface
+                px-3 py-1.5
+                text-xs
+                font-medium
+                text-textSecondary
+                outline-none
+                transition-colors
+                duration-150
+                focus:border-primary
+            "
+        />
     );
 }
 
@@ -44,48 +56,83 @@ export function FilterDropdown({
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
+        function handleClickOutside(event: MouseEvent) {
             if (
                 ref.current &&
-                !ref.current.contains(e.target as Node)
+                !ref.current.contains(event.target as Node)
             ) {
                 setOpen(false);
             }
         }
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
 
-        return () =>
+        return () => {
             document.removeEventListener(
                 "mousedown",
                 handleClickOutside
             );
+        };
     }, []);
 
     return (
-        <div className="relative" ref={ref}>
+        <div
+            ref={ref}
+            className="relative"
+        >
             <button
                 type="button"
-                onClick={() => setOpen((o) => !o)}
-                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors duration-150 ${
+                onClick={() => setOpen((current) => !current)}
+                className={`
+                    flex
+                    items-center
+                    gap-1.5
+                    rounded-lg
+                    border
+                    px-3 py-1.5
+                    text-xs
+                    font-medium
+                    text-textSecondary
+                    transition-colors
+                    duration-150
+                    ${
                     value
                         ? "border-primary/30 bg-primary/5 text-primary"
                         : "border-border bg-surface hover:border-primary/30 hover:text-textPrimary"
-                }`}
+                }
+                `}
             >
                 <span>{label}</span>
 
                 {value && (
                     <span
-                        className="max-w-[110px] truncate rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
+                        className="
+                            max-w-[110px]
+                            truncate
+                            rounded-md
+                            bg-primary/10
+                            px-1.5 py-0.5
+                            text-[11px]
+                            font-semibold
+                            text-primary
+                        "
+                    >
                         {value}
                     </span>
                 )}
 
                 <ChevronDown
-                    className={`h-3.5 w-3.5 shrink-0 transition-transform duration-150 ${
-                        open ? "rotate-180" : ""
-                    }`}
+                    className={`
+                        h-3.5
+                        w-3.5
+                        shrink-0
+                        transition-transform
+                        duration-150
+                        ${open ? "rotate-180" : ""}
+                    `}
                     strokeWidth={2}
                 />
             </button>
@@ -115,32 +162,53 @@ export function FilterDropdown({
                             onChange(null);
                             setOpen(false);
                         }}
-                        className={`block w-full px-3 py-1.5 text-left text-xs transition-colors duration-150 ${
+                        className={`
+                            block
+                            w-full
+                            px-3 py-1.5
+                            text-left
+                            text-xs
+                            transition-colors
+                            duration-150
+                            ${
                             !value
                                 ? "font-semibold text-primary"
                                 : "text-textSecondary"
-                        } hover:bg-primary/5`}
+                        }
+                            hover:bg-primary/5
+                        `}
                     >
                         All {label}
                     </button>
 
-                    <div className="my-1 h-px bg-border"/>
+                    <div className="my-1 h-px bg-border" />
 
-                    {options.map((opt) => (
+                    {options.map((option) => (
                         <button
-                            key={opt}
+                            key={option}
                             type="button"
                             onClick={() => {
-                                onChange(opt);
+                                onChange(option);
                                 setOpen(false);
                             }}
-                            className={`block w-full truncate px-3 py-1.5 text-left text-xs transition-colors duration-150 ${
-                                value === opt
+                            className={`
+                                block
+                                w-full
+                                truncate
+                                px-3 py-1.5
+                                text-left
+                                text-xs
+                                transition-colors
+                                duration-150
+                                ${
+                                value === option
                                     ? "font-semibold text-primary"
                                     : "text-textSecondary"
-                            } hover:bg-primary/5`}
+                            }
+                                hover:bg-primary/5
+                            `}
                         >
-                            {opt}
+                            {option}
                         </button>
                     ))}
                 </div>
@@ -149,26 +217,12 @@ export function FilterDropdown({
     );
 }
 
-export interface FilterColumn<T> {
-    key: keyof T;
-    label: string;
-    type?: "select" | "date";
-}
-
 interface TableFiltersProps<T> {
-    filterableColumns: FilterColumn<T>[];
-    filterOptions: Partial<Record<keyof T, string[]>>;
-
-    onFilterChange?: (
-        key: keyof T,
-        value: string | null
-    ) => void;
+    columns: Column<T>[];
 }
-
 
 export function TableFilters<T>({
-                                    filterableColumns,
-                                    filterOptions,
+                                    columns,
                                 }: TableFiltersProps<T>) {
     const {
         search,
@@ -179,13 +233,18 @@ export function TableFilters<T>({
         run,
     } = useTableContext<T>();
 
-    const checkFiltersValue =
+    const filterableColumns = columns.filter(
+        (column) => column.filterType
+    );
+
+    const hasFilters =
         search.trim() !== "" ||
-        Object.values(filters).some((value) => value !== null && value !== "");
+        Object.values(filters).some(
+            (value) => value !== null && value !== ""
+        );
 
     return (
         <div className="flex flex-wrap items-center gap-2 py-3">
-
             <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
                 <SlidersHorizontal
                     className="h-3.5 w-3.5"
@@ -197,7 +256,14 @@ export function TableFilters<T>({
 
             <div className="relative">
                 <Search
-                    className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
+                    className="
+                        absolute
+                        left-3
+                        top-1/2
+                        h-4 w-4
+                        -translate-y-1/2
+                        text-textMuted
+                    "
                     strokeWidth={2}
                 />
 
@@ -207,7 +273,8 @@ export function TableFilters<T>({
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="
-                        h-9 w-56
+                        h-9
+                        w-56
                         rounded-lg
                         border border-border
                         bg-surface
@@ -221,30 +288,42 @@ export function TableFilters<T>({
             </div>
 
             {filterableColumns.map((column) => {
-                if (column.type === "date") {
+                const value =
+                    filters[column.key] ?? null;
+
+                if (column.filterType === "date") {
                     return (
                         <DateFilter
                             key={String(column.key)}
-                            label={column.label}
-                            value={filters[column.key] ?? null}
-                            onChange={(value) =>
-                                setFilter(column.key, value)
+                            value={value}
+                            onChange={(nextValue) =>
+                                setFilter(
+                                    column.key,
+                                    nextValue
+                                )
                             }
                         />
                     );
                 }
 
-                return (
-                    <FilterDropdown
-                        key={String(column.key)}
-                        label={column.label}
-                        value={filters[column.key] ?? null}
-                        onChange={(value) =>
-                            setFilter(column.key, value)
-                        }
-                        options={filterOptions[column.key] ?? []}
-                    />
-                );
+                if (column.filterType === "select") {
+                    return (
+                        <FilterDropdown
+                            key={String(column.key)}
+                            label={column.label}
+                            options={column.options ?? []}
+                            value={value}
+                            onChange={(nextValue) =>
+                                setFilter(
+                                    column.key,
+                                    nextValue
+                                )
+                            }
+                        />
+                    );
+                }
+
+                return null;
             })}
 
             <button
@@ -265,12 +344,10 @@ export function TableFilters<T>({
                 Run
             </button>
 
-            {checkFiltersValue && (
+            {hasFilters && (
                 <button
                     type="button"
-                    onClick={() => {
-                        clearFilters();
-                    }}
+                    onClick={clearFilters}
                     className="
                         h-9
                         rounded-lg
@@ -295,13 +372,13 @@ export function TableFilters<T>({
 export function removeNullFilters<T extends object>(
     filters: T
 ): {
-    [K in keyof T]: Exclude<T[K], null>
+    [K in keyof T]: Exclude<T[K], null>;
 } {
     return Object.fromEntries(
         Object.entries(filters).filter(
-            ([_, value]) => value !== null
+            ([, value]) => value !== null
         )
     ) as {
-        [K in keyof T]: Exclude<T[K], null>
+        [K in keyof T]: Exclude<T[K], null>;
     };
 }

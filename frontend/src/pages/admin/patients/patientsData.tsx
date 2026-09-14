@@ -1,5 +1,4 @@
 import {Column} from "/@/components/table/Table";
-import {FilterColumn} from "/@/components/Filters";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import React from "react";
 // sample for view rec
@@ -75,7 +74,13 @@ export const patientColumns: Column<patientData>[] = [
     },
     {
         key: "user_type",
-        label: "User Type"
+        label: "User Type",
+        filterType: "select",
+        options: [
+            "Student",
+            "Professor",
+            "Staff"
+        ]
     },
     {
         key: "course_department",
@@ -86,22 +91,6 @@ export const patientColumns: Column<patientData>[] = [
         label: "Year & Section"
     },
 ]
-
-export const patientColumnsFilter: FilterColumn<patientData>[] = [
-    {
-        key: "user_type",
-        label: "User Type",
-        type: "select"
-    },
-]
-
-export const patientColumnsFilterOption: Record<string, string[]> = {
-    user_type: [
-        "Student",
-        "Professor",
-        "Staff"
-    ]
-}
 
 //DEPRECATED
 export function getMockPatientRecords(patientId: number) {

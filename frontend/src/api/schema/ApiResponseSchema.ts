@@ -1,9 +1,15 @@
-export interface ApiDataResponse<T> {
+export interface ApiResponse<T> {
     success: boolean;
     message?: string;
-    data: Array<T>;
+    data: T;
 }
-
+export interface PaginatedData<T> {
+    items: T[];
+    page: number;
+    page_sizes: number;
+    total: number;
+    total_pages: number
+}
 export interface ApiMessageResponse {
     success: boolean;
     message: string;

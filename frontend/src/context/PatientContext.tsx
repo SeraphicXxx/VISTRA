@@ -45,16 +45,17 @@ export function PatientProvider({
     const [filters, setFilters] = useState<PatientFilters>({});
 
     const {
-        data: patientProfiles = [],
+        data: patientData,
         isLoading,
         isFetching,
         error,
         refetch,
     } = usePatientQuery(filters);
+    const patientProfiles = patientData?.items ?? [];
 
     const patientRecords = useMemo<PatientDashboardRecord[]>(
         () =>
-            patientProfiles.map((patientProfile) => {
+            patientProfiles.map((patientProfile: PatientProfile) => {
                 const patientModel = new PatientModel(patientProfile);
 
                 return patientModel.dataViewPatientDashboardRecord();

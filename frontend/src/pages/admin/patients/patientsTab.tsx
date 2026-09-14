@@ -3,7 +3,7 @@ import {ChevronRight, Plus, UserRound} from "lucide-react";
 
 import { ROUTES } from "/@/config/RoutePaths.js";
 
-import { patientColumns, patientColumnsFilter, patientColumnsFilterOption, patientData } from "./patientsData";
+import { patientColumns, patientData } from "./patientsData";
 
 import { usePatientContext } from "/@/context/PatientContext";
 import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
@@ -18,8 +18,6 @@ export default function PatientsTab() {
         <DefaultTablePreset<patientData>
             title="Patients"
             icon={UserRound}
-            filterableColumns={patientColumnsFilter}
-            filterOptions={patientColumnsFilterOption}
             data={patientTableRecords}
             isLoading={isLoading}
             isRefreshing={isRefreshing}

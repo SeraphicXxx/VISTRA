@@ -1,6 +1,6 @@
 import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig.js";
-import {ApiDataResponse, ApiMessageResponse} from "/@/api/schema/ApiResponseSchema"
+import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
 
@@ -24,7 +24,7 @@ export async function getAllPatientProfiles(
     filters?: PatientFilters,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiDataResponse<PatientProfile>>(
+    return apiClient<ApiResponse<PaginatedData<PatientProfile>>>(
         API_ENDPOINTS.patient.get_all_patient_profile,
         {
             method: "GET",

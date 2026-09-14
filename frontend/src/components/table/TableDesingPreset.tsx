@@ -1,20 +1,21 @@
-import PanelHeader from "/@/components/PanelHeader";
-import {FilterColumn, TableFilters} from "/@/components/Filters";
-import {Column, GenericTable, GenericTableBody, GenericTableHeader} from "/@/components/table/Table";
 import React from "react";
-import {TableProvider} from "/@/context/TableContext";
+import { Pagination } from "@mui/material";
+
+import PanelHeader from "/@/components/PanelHeader";
 import LoadingPage from "/@/components/LoadingPage";
-import {Pagination} from "@mui/material";
-
-
+import { TableFilters } from "/@/components/Filters";
+import {
+    Column,
+    GenericTable,
+    GenericTableBody,
+    GenericTableHeader,
+} from "/@/components/table/Table";
+import { TableProvider } from "/@/context/TableContext";
 
 interface TablePresetProps<T> {
     title: string;
     icon: React.ComponentType<{ className?: string }>;
     panelAddon?: React.ReactNode;
-
-    filterableColumns: FilterColumn<T>[];
-    filterOptions: Record<keyof T, string[]>;
 
     data: T[];
     isLoading: boolean;
@@ -30,13 +31,10 @@ interface TablePresetProps<T> {
     ) => void;
 }
 
-//used in  overview,dental,medical,appointment and patient tabs
 export function DefaultTablePreset<T extends { id: string }>({
                                                                  title,
                                                                  icon: Icon,
                                                                  panelAddon,
-                                                                 filterableColumns,
-                                                                 filterOptions,
                                                                  data,
                                                                  isLoading,
                                                                  isRefreshing,
@@ -44,30 +42,31 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  renderAction,
                                                                  onRun,
                                                              }: TablePresetProps<T>) {
-    if (isLoading && isRefreshing){
+    if (isLoading && isRefreshing) {
         return <LoadingPage />;
     }
 
     return (
         <TableProvider<T> onRun={onRun}>
             <div className="rounded-2xl border border-border bg-surface shadow-card">
-                <div className="p-6 overflow-x-auto">
+                <div className="overflow-x-auto p-6">
+                    <PanelHeader
+                        title={title}
+                        icon={Icon}
+                        action={panelAddon}
+                    />
 
-                    <PanelHeader title={title} icon={Icon} action={panelAddon}/>
-
-                    <div className=" border-t border-border"/>
+                    <div className="border-t border-border" />
 
                     <div className="relative overflow-visible">
                         <TableFilters
-                            filterableColumns={filterableColumns}
-                            filterOptions={filterOptions}
+                            columns={columns}
                         />
                     </div>
 
-                    <div className="border-t border-border"/>
+                    <div className="border-t border-border" />
 
                     <GenericTable>
-
                         <GenericTableHeader
                             columns={columns}
                             hasAction
@@ -79,7 +78,6 @@ export function DefaultTablePreset<T extends { id: string }>({
                             renderAction={renderAction}
                             isRefreshing={isRefreshing}
                         />
-
                     </GenericTable>
 
                     <div className="flex justify-center">
