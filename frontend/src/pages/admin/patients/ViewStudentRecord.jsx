@@ -7,7 +7,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { getMockPatientRecords } from "./patientsData.tsx";
-import {usePatientContext} from "/@/context/PatientContext.tsx";
+import {usePatientContext} from "/@/routes/AppRoutes";
 
 const TABS = [
   {
@@ -109,7 +109,7 @@ function EmptyState({ label, tabMeta }) {
 }
 
 export default function ViewStudentRecord() {
-  const { patientProfiles } = usePatientContext();
+  const { items: patientProfiles, } = usePatientContext();
 
   const { id } = useParams();
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React from "react";
 import {ChevronRight, Plus, Syringe} from "lucide-react";
-import {dentalFilters, dentalRecords, DentalData, dentalFiltersOptions} from "./DentalData";
+import {dentalRecords, DentalData} from "./DentalData";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
+import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {defaultColumns} from "/@/components/table/Table";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
 
@@ -12,8 +12,6 @@ export default function DentalTab() {
       <DefaultTablePreset<DentalData>
           title="Dental"
           icon={Syringe}
-          filterableColumns={dentalFilters}
-          filterOptions={dentalFiltersOptions}
           data={dentalRecords}
           columns={defaultColumns}
           panelAddon={

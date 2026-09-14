@@ -1,7 +1,7 @@
 import React from "react";
 import {Calendar, ChevronRight} from "lucide-react";
 import {appointmentFilters, appointmentFiltersOptions, Appointments, APPOINTMENTS} from "./appointmentsData";
-import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
+import {DefaultTablePreset} from "/src/components/table/TableDesignPreset";
 import {defaultColumns} from "/@/components/table/Table";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {HyperlinkText} from "/@/components/Button";

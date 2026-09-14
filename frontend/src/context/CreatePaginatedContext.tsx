@@ -5,12 +5,11 @@ import {
     type ReactNode,
 } from "react";
 
+import type { UseQueryResult } from "@tanstack/react-query";
 import type { PaginatedData } from "/@/api/schema/ApiResponseSchema";
 
-interface PaginatedContextValue<T, F> {
+interface PaginatedContextValue<T> {
     items: T[];
-
-    filters?: F;
 
     total: number;
     page: number;
@@ -24,41 +23,37 @@ interface PaginatedContextValue<T, F> {
     refetch: () => void;
 }
 
-interface PaginatedProviderProps<T, F> {
+interface PaginatedProviderProps<T> {
     children: ReactNode;
-    data?: PaginatedData<T>;
-    filters?: F;
-    isLoading: boolean;
-    isFetching: boolean;
-    error: Error | null;
-    refetch: () => void;
+    query: UseQueryResult<PaginatedData<T>, Error>;
 }
 
-export function createPaginatedContext<T, F>() {
+export function createPaginatedContext<T>() {
 
     const Context = createContext<
-        PaginatedContextValue<T, F> | undefined
+        PaginatedContextValue<T> | undefined
     >(undefined);
 
     function Provider({
                           children,
-                          data,
-                          filters,
-                          isLoading,
-                          isFetching,
-                          error,
-                          refetch,
-                      }: PaginatedProviderProps<T, F>) {
+                          query,
+                      }: PaginatedProviderProps<T>) {
+
+        const {
+            data,
+            isLoading,
+            isFetching,
+            error,
+            refetch,
+        } = query;
 
         const value = useMemo(
             () => ({
                 items: data?.items ?? [],
 
-                filters,
-
                 total: data?.total ?? 0,
                 page: data?.page ?? 1,
-                pageSize: data?.page_sizes ?? 10,
+                pageSize: data?.page_size ?? 10,
                 totalPages: data?.total_pages ?? 0,
 
                 isLoading,
@@ -71,7 +66,6 @@ export function createPaginatedContext<T, F>() {
             }),
             [
                 data,
-                filters,
                 isLoading,
                 isFetching,
                 error,

@@ -1,51 +1,73 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {ChevronRight, Plus, UserRound} from "lucide-react";
 
-import { ROUTES } from "/@/config/RoutePaths.js";
+import {ROUTES} from "/@/config/RoutePaths.js";
 
-import { patientColumns, patientData } from "./patientsData";
+import {patientColumns, patientData} from "./patientsData";
 
-import { usePatientContext } from "/@/context/PatientContext";
-import {DefaultTablePreset} from "/@/components/table/TableDesingPreset";
+import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
 import {removeNullFilters} from "/@/components/Filters";
+import {PatientModel} from "/@/repository/PatientModel";
+import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
+import {usePatientContext} from "/@/routes/AppRoutes";
 
 
-export default function PatientsTab() {
-    const { patientTableRecords, isLoading, setFilters, isRefreshing } = usePatientContext();
-    console.log(isRefreshing)
+interface PatientsTabProps {
+    setFilters: (filters: PatientFilters) => void;
+}
+
+export default function PatientsTab({setFilters}: PatientsTabProps) {
+    const {
+        items: patientProfiles,
+        totalPages,
+        page,
+        isLoading,
+        isFetching,
+    } = usePatientContext();
+
+    const patientTableRecords = useMemo(
+        () =>
+            patientProfiles.map((patientProfile) => {
+                const patientModel = new PatientModel(patientProfile);
+
+                return patientModel.dataViewPatientDashboardRecord();
+            }),
+        [patientProfiles]
+    );
+
     return (
         <DefaultTablePreset<patientData>
             title="Patients"
             icon={UserRound}
             data={patientTableRecords}
             isLoading={isLoading}
-            isRefreshing={isRefreshing}
+            isRefreshing={isFetching}
             columns={patientColumns}
+            totalPages={totalPages}
+            page={page}
             panelAddon={
                 <LinkButton
-                    title={`New Patient Record`}
-                    route={`${ROUTES.staff.patient.createNewRecord}`}
+                    title="New Patient Record"
+                    route={ROUTES.staff.patient.createNewRecord}
                     icon={Plus}
                 />
             }
-            renderAction={
-                (patient) => (
-                    <HyperlinkText
-                        title={`View`}
-                        link={`${ROUTES.staff.patient.patientRecordTab}/${patient.patient_id}`}
-                        icon={ChevronRight}
-                    />
-                )
-            }
-
-            onRun={(search, filters) => {
+            renderAction={(patient) => (
+                <HyperlinkText
+                    title="View"
+                    link={`${ROUTES.staff.patient.patientRecordTab}/${patient.patient_id}`}
+                    icon={ChevronRight}
+                />
+            )}
+            onRun={(search, filters, page, pageSize) => {
                 setFilters({
                     search,
                     ...removeNullFilters(filters),
+                    page,
+                    page_size: pageSize,
                 });
             }}
-
         />
     );
 }

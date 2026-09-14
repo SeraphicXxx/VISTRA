@@ -1,15 +1,6 @@
 import { PatientProfile } from "/@/api/schema/PatientSchema";
-import { formatDate } from "/@/utils/DateUtils";
+import {patientData} from "/@/pages/admin/patients/patientsData";
 
-export interface PatientDashboardRecord {
-    id: string;
-    name: string;
-    patient_id: string;
-    user_type: string;
-    course_department: string;
-    year_section: string;
-    last_visit: string;
-}
 
 interface PatientRecord {
     id: string;
@@ -18,6 +9,7 @@ interface PatientRecord {
     details: string;
     provider: string;
 }
+
 
 interface PatientRecords {
     medical: PatientRecord[];
@@ -32,7 +24,7 @@ export class PatientModel {
         this.PatientProfile = patientProfile;
     }
 
-    dataViewPatientDashboardRecord(): PatientDashboardRecord {
+    dataViewPatientDashboardRecord(): patientData {
         return {
             id: this.PatientProfile.patient_id,
 
@@ -52,7 +44,6 @@ export class PatientModel {
 
             year_section: this.PatientProfile.school_year ?? "N/A",
 
-            last_visit: formatDate(this.PatientProfile.created_at),
         };
     }
 
