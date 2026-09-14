@@ -8,3 +8,6 @@ class Filter(BaseModel):
     course: str | None = None
     year_section: str | None = None
     user_type: str | None = None
+
+    page: int = 1
+    page_size: int = 10

@@ -49,10 +49,13 @@ class PatientRepository:
 
     def get_all_profile(self, filters):
 
+        start = (filters.page - 1) * filters.page_size
+        end = start + filters.page_size - 1
+
         table_filters = (
             self.supabase
             .table("PATIENT_PROFILE")
-            .select("*")
+            .select("*", count="exact")
         )
 
         if filters.search:
@@ -69,7 +72,10 @@ class PatientRepository:
             table_filters = table_filters.eq("status", filters.status)
 
         if filters.course:
-            table_filters = table_filters.eq("course_department", filters.course)
+            table_filters = table_filters.eq(
+                "course_department",
+                filters.course
+            )
 
         if filters.year_section:
             table_filters = table_filters.eq(
@@ -78,8 +84,26 @@ class PatientRepository:
             )
 
         if filters.user_type:
-            table_filters = table_filters.eq("person_type", filters.user_type)
+            table_filters = table_filters.eq(
+                "person_type",
+                filters.user_type
+            )
 
-        response = table_filters.execute()
+        response = (
+            table_filters
+            .range(start, end)
+            .execute()
+        )
 
-        return response.data
+        total = response.count or 0
+
+        return {
+            "data": response.data,
+            "total": total,
+            "page": filters.page,
+            "page_size": filters.page_size,
+            "total_pages": (
+                    (total + filters.page_size - 1)
+                    // filters.page_size
+            ),
+        }
