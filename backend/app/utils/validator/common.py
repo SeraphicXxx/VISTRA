@@ -1,10 +1,42 @@
+from datetime import date
 from enum import Enum
 from typing import TypeVar
 
 E = TypeVar("E", bound=Enum)
 
 
-def validate_enum(value: str, enum_class: type[E]) -> str:
+def confirm_birthday(value: date) -> date:
+    today = date.today()
+
+    hundred_years_ago = today.replace(year=today.year - 100)
+
+    if value <= hundred_years_ago:
+        raise ValueError("Birthday must be for someone younger than 100 years old")
+
+    return value
+
+
+def confirm_age(age: int, birthday: date) -> int:
+    today = date.today()
+
+    calculated_age = today.year - birthday.year
+
+    if (today.month, today.day) < (
+        birthday.month,
+         birthday.day,
+    ):
+        calculated_age -= 1
+
+    if age != calculated_age:
+        raise ValueError(
+            f"Age does not match birthday. "
+            f"Expected {calculated_age}, got {age}"
+        )
+
+    return age
+
+
+def confirm_enum(value: str, enum_class: type[E]) -> str:
     if value not in [item.value for item in enum_class]:
         raise ValueError(
             f"Value must be one of: {', '.join(item.value for item in enum_class)}"
@@ -30,32 +62,5 @@ def confirm_mobile_number(value: str) -> str:
 
     if len(value) not in (10, 11):
         raise ValueError("Invalid mobile number")
-
-    return value
-
-
-def confirm_sex(value: str) -> str:
-    allowed = {"Male", "Female"}
-
-    if value not in Sex:
-        raise ValueError(
-            f"Sex must be one of : {', '.join(allowed)}"
-        )
-
-    return value
-
-
-def confirm_civil_status(value: str) -> str:
-    allowed = {
-        "Single",
-        "Married",
-        "Widowed",
-        "Separated"
-    }
-
-    if value not in allowed:
-        raise ValueError(
-            f"Civil status must be one of: {', '.join(allowed)}"
-        )
 
     return value
