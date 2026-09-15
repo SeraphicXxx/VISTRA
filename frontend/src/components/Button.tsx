@@ -1,17 +1,20 @@
-import { Link, useNavigate } from "react-router-dom";
-import React, { ComponentType } from "react";
-import { ROUTES } from "/@/config/RoutePaths.js";
-import {ChevronRight} from "lucide-react";
+import {Link, useNavigate} from "react-router-dom";
+import React, {ComponentType} from "react";
+import {ROUTES} from "/@/config/RoutePaths.js";
+import type {MouseEvent} from "react";
 
-
-export function HyperlinkText({ link, title, icon: Icon }: { link: string, title: string, icon?: ComponentType<{ className?: string; strokeWidth?: number }> }) {
-    return(
+export function HyperlinkText({link, title, icon: Icon}: {
+    link: string,
+    title: string,
+    icon?: ComponentType<{ className?: string; strokeWidth?: number }>
+}) {
+    return (
         <Link
             to={link}
             className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 hover:text-primaryDark"
         >
             {title}
-            {Icon && <Icon className="h-3.5 w-3.5" strokeWidth={2} />}
+            {Icon && <Icon className="h-3.5 w-3.5" strokeWidth={2}/>}
         </Link>
     );
 }
@@ -73,5 +76,28 @@ export function LogoClickable({
             className={`${className} w-auto cursor-pointer object-contain`}
             onClick={() => navigate(navigateTo)}
         />
+    );
+}
+
+interface UserLogoClickableProps {
+    className?: string;
+    onClick?: () => void;
+}
+
+export function UserLogoClickable({className = "h-10", onClick,}: UserLogoClickableProps) {
+    function handleClick(e: MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        window.scrollTo({top: 0, behavior: "smooth",});
+        onClick?.();
+    }
+
+    return (
+        <button type="button" onClick={handleClick} className="cursor-pointer">
+            <img
+                src="/Vistralogo.png"
+                alt="Vistra Logo"
+                className={`${className} w-auto object-contain`}
+            />
+        </button>
     );
 }

@@ -3,8 +3,6 @@ import {useOutletContext} from "react-router-dom";
 import {FileText, Stethoscope, Calendar, ChevronRight} from "lucide-react";
 import StatsGrid from "./Stats";
 import {
-    appointmentFilters,
-    appointmentFiltersOptions,
     Appointments,
     APPOINTMENTS
 } from "/@/pages/admin/appointments/appointmentsData";

@@ -15,12 +15,19 @@ import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
-import ProtectedRoute from "/@/routes/ProtectedRoute.jsx"
-import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx"
-import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx"
+import ProtectedRoute from "/@/routes/ProtectedRoute.jsx";
+import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx";
+import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx";
 import {createPaginatedContext} from "/@/context/CreatePaginatedContext";
-import {PatientProfile} from "/@/api/schema/PatientSchema"
+import {PatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
+import ProtectedPatientRoute from "/@/components/ProtectedPatientRoute";
+import PatientLayout from "/@/layouts/PatientLayout";
+import PatientOverviewTab from "/@/pages/patient/overview/overview";
+import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTab";
+import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
+import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
+import PatientProfilePage from "/@/pages/patient/profile/profile";
 
 export const {
     Provider: PatientProvider,
@@ -71,6 +78,15 @@ function AppRoutes() {
                             element={<ViewPatientRecord/>}
                         />
 
+                    </Route>
+                </Route>
+                <Route element={<ProtectedPatientRoute />}>
+                    <Route element={<PatientLayout />}>
+                        <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab />} />
+                        <Route path={ROUTES.patient.dashboard.appointments} element={<PatientAppointmentsTab />} />
+                        <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab />} />
+                        <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab />} />
+                        <Route path={ROUTES.patient.profile} element={<PatientProfilePage />} />
                     </Route>
                 </Route>
             </Routes>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Save, ArrowLeft, User, ClipboardList, Info } from "lucide-react";
 import { students, emptyDetails, type as visitTypeOptions } from "./medicalData.ts";
 import { ReadOnlyField } from "/@/utils/ReadOnlyField.jsx";
