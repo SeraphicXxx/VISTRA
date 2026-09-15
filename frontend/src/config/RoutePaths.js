@@ -6,7 +6,6 @@ export const ROUTES = {
     staff: {
         home: "/staff",
         login: "/login",
-
         dashboard: {
             overview: "/staff/dashboard/overview",
             medical: "/staff/dashboard/medical",
@@ -14,23 +13,35 @@ export const ROUTES = {
             appointments: "/staff/dashboard/appointments",
             patients: "/staff/dashboard/patients",
         },
-       medical: {
-            viewRecord: "/staff/medical/records/view",
+        medical: {
             createNewRecord: "/staff/medical/new",
-        },
-        appointment: {
-            createNewRecord: "/staff/appointment/new",
-            viewAppointment: "/staff/appointment/view"
+            viewRecord: "/staff/medical/view",
         },
         dental: {
             createNewRecord: "/staff/dental/new",
-            viewRecord: "/staff/dental/records/view",
-
+            viewRecord: "/staff/dental/view",
         },
+        appointment: {viewAppointment: "/staff/appointments/view"},
         patient: {
-            createNewRecord: "/staff/patient/new",
-            patientRecordTab: "/staff/patient/record/view",
-
+            createNewRecord: "/staff/patients/new",
+            patientRecordTab: "/staff/patients/record",
         },
+    },
+
+    /* Patient */
+
+    patient: {
+        login: "/patient/login",
+        dashboard: {
+            overview: "/patient/dashboard/overview",
+            appointments: "/patient/dashboard/appointments",
+            medical: "/patient/dashboard/medical",
+            dental: "/patient/dashboard/dental",
+        },
+        appointment: {
+            bookAppointment: "/patient/appointments/book",
+            viewAppointment: "/patient/appointments/view",
+        },
+        profile: "/patient/profile",
     },
 };

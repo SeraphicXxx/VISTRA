@@ -16,13 +16,13 @@ export const AdminRoutes = [
     },
     {
         path: ROUTES.staff.dashboard.medical,
-        label: "Medical Consultation",
+        label: "Medical Records",
         icon: HeartPulse,
         component: "medical",
     },
     {
         path: ROUTES.staff.dashboard.dental,
-        label: "Dental Consultation",
+        label: "Dental Records",
         icon: Stethoscope,
         component: "dental",
     },

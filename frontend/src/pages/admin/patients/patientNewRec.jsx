@@ -11,7 +11,7 @@ import {
   POSITION_OPTIONS,
   DEPARTMENT_OPTIONS,
 } from "/@/utils/NewPatientUtils.jsx";
-
+import MedicalHistoryForm from "/@/components/MedicalHistoryForm";
 import {
   STUDENT_ID_PATTERN,
   FACULTY_ID_PATTERN,
@@ -333,48 +333,36 @@ export default function NewPatientRecordForm() {
             </div>
         )}
 
-        {/* Address */}
-        <div className="mt-8 border-t border-border pt-6">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-            RESIDENTIAL ADDRESS
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="sm:col-span-2">
-              <FormInput
-                  id="address"
-                  name="address"
-                  label="Address"
-                  placeholder="House no., Street"
-                  required
-                  error={saveErrorMessage?.address}
-              />
-            </div>
-
+      <div className="mt-8 border-t border-border pt-6">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">RESIDENTIAL ADDRESS</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="sm:col-span-2">
             <FormInput
-                id="barangay"
-                name="barangay"
-                label="Barangay"
-                placeholder="e.g. Brgy. 176"
+                id="address"
+                name="address"
+                label="Address"
+                placeholder="House no., Street"
                 required
-                error={saveErrorMessage?.barangay}
+                error={saveErrorMessage?.address}
             />
           </div>
-        </div>
-
-        {/* Notice */}
-        <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
-          <Info
-              className="mt-0.5 h-3.5 w-3.5 shrink-0"
-              strokeWidth={2}
+          <FormInput
+              id="barangay"
+              name="barangay"
+              label="Barangay"
+              placeholder="e.g. Brgy. 176"
+              required
+              error={saveErrorMessage?.barangay}
           />
-
-          <span>
-            Please ensure all information is accurate before saving.
-            This record will be stored in the system for future
-            reference.
-        </span>
         </div>
+      </div>
+
+      <MedicalHistoryForm />
+
+      <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+        <span>Please ensure all information is accurate before saving. This record will be stored in the system for future reference.</span>
+      </div>
 
         {/* Actions */}
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
@@ -408,4 +396,3 @@ export default function NewPatientRecordForm() {
 
   );
 }
-
