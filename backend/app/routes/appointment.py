@@ -4,6 +4,7 @@ from supabase import Client
 from app.config.security import get_current_user
 from app.database.database_client import get_supabase_for_user
 from app.schemas.appointments import (CreateAppointmentRequest,UpdateAppointmentRequest)
+from app.schemas.query import FilterAppointment
 from app.services.appointment import (
     create_appointment,get_all_appointments,
     get_appointment_by_id,update_appointment,
@@ -20,11 +21,11 @@ def create(request: CreateAppointmentRequest,supabase: Client = Depends(get_supa
     return create_appointment(request, supabase)
 
 @protected_appointments_router.get("/")
-def get_appointments(supabase: Client = Depends(get_supabase_for_user)):
-    return get_all_appointments(supabase)
+def get_appointments(filters: FilterAppointment = Depends(), supabase: Client = Depends(get_supabase_for_user)):
+    return get_all_appointments(filters, supabase)
 
 @protected_appointments_router.get("/{appointment_id}/")
-def get_appointment(appointment_id: int,supabase: Client = Depends(get_supabase_for_user)):
+def get_appointment(appointment_id: int, supabase: Client = Depends(get_supabase_for_user)):
     return get_appointment_by_id(appointment_id, supabase)
 
 @protected_appointments_router.patch("/{appointment_id}/")

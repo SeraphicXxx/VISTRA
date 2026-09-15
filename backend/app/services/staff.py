@@ -1,7 +1,3 @@
-"""
-TODO: Implement staff management functions using Supabase Admin API.
-staff_update()
-"""
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData, CreateStaffRequest
 from app.services.auth.user import create_auth_user, delete_auth_user

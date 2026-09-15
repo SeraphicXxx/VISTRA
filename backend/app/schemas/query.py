@@ -15,6 +15,7 @@ class FilterPatient(BaseModel):
 # separated for flexibility
 
 class FilterAppointment(BaseModel):
+    search: str | None = None
     status: str | None = None
     type: str | None = None
     course: str | None = None
@@ -25,6 +26,7 @@ class FilterAppointment(BaseModel):
 
 
 class FilterDental(BaseModel):
+    search: str | None = None
     status: str | None = None
     type: str | None = None
     course: str | None = None
@@ -35,6 +37,7 @@ class FilterDental(BaseModel):
 
 
 class FilterMedical(BaseModel):
+    search: str | None = None
     status: str | None = None
     type: str | None = None
     course: str | None = None

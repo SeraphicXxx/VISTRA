@@ -1,3 +1,7 @@
+from app.schemas.reponses import PaginatedResponse
+from app.utils.supabase_query_builder import SupabaseQueryBuilder
+
+
 class AppointmentRepository:
     def __init__(self, supabase):
         self.supabase = supabase
@@ -15,15 +19,36 @@ class AppointmentRepository:
 
         return None
 
-    def get_appointments(self):
+    def get_appointments(self, filters):
+        query = (
+            SupabaseQueryBuilder(
+                self.supabase,
+                "APPOINTMENT",
+                count="exact",
+            )
+            .eq("status", filters.status)
+            .eq("type", filters.type)
+            .eq("course", filters.course)
+            .eq("date", filters.date)
+        )
         response = (
-            self.supabase
-            .table("APPOINTMENT")
-            .select("*")
+            query
+            .paginate(
+                filters.page,
+                filters.page_size,
+            )
+            .build()
             .execute()
         )
 
-        return response.data
+        total = response.count or 0
+
+        return PaginatedResponse(
+            items=response.data,
+            total=total,
+            page=filters.page,
+            page_size=filters.page_size,
+        )
 
     def get_appointment_by_id(self, appointment_id: int):
         response = (

@@ -1,4 +1,6 @@
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
+from app.schemas.reponses import PaginatedResponse
+
 
 class PatientRepository:
 
@@ -80,13 +82,9 @@ class PatientRepository:
 
         total = response.count or 0
 
-        return {
-            "items": response.data,
-            "total": total,
-            "page": filters.page,
-            "page_size": filters.page_size,
-            "total_pages": (
-                    (total + filters.page_size - 1)
-                    // filters.page_size
-            ),
-        }
+        return PaginatedResponse(
+            items=response.data,
+            total=total,
+            page=filters.page,
+            page_size=filters.page_size,
+        )

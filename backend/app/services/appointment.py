@@ -18,10 +18,10 @@ def create_appointment(request: CreateAppointmentRequest, supabase):
         }
 
 
-def get_all_appointments(supabase):
+def get_all_appointments(filters, supabase):
     try:
         appointment_repo = AppointmentRepository(supabase)
-        response = appointment_repo.get_appointments()
+        response = appointment_repo.get_appointments(filters)
 
         return {
             "success": True,
