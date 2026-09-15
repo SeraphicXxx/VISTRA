@@ -2,7 +2,6 @@ from fastapi import status, HTTPException
 
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
-from app.schemas.query import Filter
 from app.services.auth.user import create_auth_user, delete_auth_user
 from app.utils.email_utils import remove_ucc_domain
 

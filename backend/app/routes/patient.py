@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends
 
 from app.config.security import get_current_user
 from app.schemas.patient import CreatePatientRequest
-from app.schemas.query import Filter
+from app.schemas.query import FilterPatient
 from app.services.patient import get_all_patients, create_patient, get_patient_by_id, get_all_patient_profiles
 from app.database.database_client import get_supabase_for_user
 from supabase import Client
@@ -22,7 +22,7 @@ def create(request: CreatePatientRequest, supabase: Client = Depends(get_supabas
     return create_patient(request, supabase)
 
 @protected_patients_router.get("/profiles/")
-def get_all_profiles(filters : Filter = Depends(), supabase: Client = Depends(get_supabase_for_user)):
+def get_all_profiles(filters : FilterPatient = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_patient_profiles(supabase, filters)
 
 @protected_patients_router.get("/{patient_id}/")
