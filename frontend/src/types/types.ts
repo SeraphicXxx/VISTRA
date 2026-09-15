@@ -1,3 +1,5 @@
+import {Status} from "/@/components/StatusBadge";
+
 export type TreatmentType =
   | "Medicine"
   | "Procedure"
@@ -27,7 +29,7 @@ export interface Patient {
   civilStatus: string;
   yearSection: string;
   course: string;
-  status: string;
+  status: Status;
 }
 
 export type EditFieldType = "date" | "text" | "textarea" | "select";

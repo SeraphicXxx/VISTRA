@@ -28,8 +28,6 @@ export const ROUTES = {
         },
     },
 
-    /* Patient */
-
     patient: {
         login: "/patient/login",
         dashboard: {

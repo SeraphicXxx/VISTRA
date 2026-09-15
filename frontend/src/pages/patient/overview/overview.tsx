@@ -11,10 +11,10 @@ import PatientStatsGrid from "./stats";
 import { getMyAppointments, Appointment } from "./appointmentsData";
 import { myMedicalRecords, myVisits } from "../medical/medicalData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
-import { statusLabels } from "/@/components/statusbadge.jsx";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { statusLabels } from "/@/components/StatusBadge";
+import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import { formatDate } from "/@/utils/FormatDate.ts";
+import { formatDate } from "/@/utils/FormatDate";
 import { Visit } from "/@/types/types";
 
 const DEFAULT_STUDENT_ID = "20230518-S";
@@ -256,12 +256,12 @@ function UpcomingList({ appointments }: { appointments: Appointment[] }) {
 export default function PatientOverviewTab() {
   const { searchQuery } = useOutletContext<OutletContextShape>();
   const user = sessionManager.getUser();
-  const sessionId: string = user?.patient_id ?? user?.student_id ?? "";
+  const sessionId: string = user?.user_id ?? "";
   const studentId = myMedicalRecords[sessionId] ? sessionId : DEFAULT_STUDENT_ID;
 
   const patientName = myMedicalRecords[studentId]?.name ?? "there";
 
-  const visits: Visit[] = useMemo(() => myVisits[studentId] ?? [], [studentId]);
+  const visits = useMemo(() => myVisits[studentId] ?? [], [studentId]);
   const appointments: Appointment[] = useMemo(() => getMyAppointments(studentId), [studentId]);
   const medicalStatus = myMedicalRecords[studentId]?.status;
 

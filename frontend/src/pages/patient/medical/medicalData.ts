@@ -1,4 +1,35 @@
-export const myMedicalRecords = {
+import {Status} from "/@/components/StatusBadge";
+
+export interface MedicalRecord {
+  recordId: string;
+  studentId: string;
+  name: string;
+  address: string;
+  barangay: string;
+  age: string;
+  mobileNumber: string;
+  sex: string;
+  birthday: string;
+  civilStatus: string;
+  yearSection: string;
+  course: string;
+  status: Status;
+}
+
+export interface Visit {
+  id: string;
+  date: string;
+  doctor: string;
+  complaint: string;
+  treatmentType: string;
+  treatment: string;
+}
+
+export type MedicalRecords = Record<string, MedicalRecord>;
+
+export type MyVisits = Record<string, Visit[]>;
+
+export const myMedicalRecords: MedicalRecords = {
   "20230518-S": {
     recordId: "MED-1042",
   studentId: "20230810-S",
@@ -16,7 +47,7 @@ export const myMedicalRecords = {
   },
 };
 
-export const myVisits = {
+export const myVisits: MyVisits = {
   "20230518-S": [
     {
       id: "v1",
@@ -37,7 +68,7 @@ export const myVisits = {
   ],
 };
 
-export const emptyMedicalRecord = {
+export const emptyMedicalRecord: MedicalRecord = {
   recordId: "",
   studentId: "",
   name: "",
@@ -50,5 +81,5 @@ export const emptyMedicalRecord = {
   civilStatus: "",
   yearSection: "",
   course: "",
-  status: "",
+  status: "pending",
 };

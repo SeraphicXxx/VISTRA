@@ -1,6 +1,6 @@
 import  { useState } from "react";
 import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
-import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
+import { InfoField, getInitials } from "/src/utils/RecordInfo.jsx";
 import {
   ToothArch,
   ToothNoteModal,

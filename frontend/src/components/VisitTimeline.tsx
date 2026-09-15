@@ -5,7 +5,7 @@ import { VisitRow } from "./VisitRow";
 interface VisitTimelineProps {
   visits: Visit[];
   onView: (visit: Visit) => void;
-  onEdit: (visit: Visit) => void;
+  onEdit?: (visit: Visit) => void;
   showEdit?: boolean;
 }
 

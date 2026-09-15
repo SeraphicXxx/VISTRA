@@ -18,7 +18,7 @@ export function useSavePatient() {
 
             return createPatientAccount({
                 ...record,
-                created_by: user.staff_id,
+                created_by: user.user_id,
             });
         },
 

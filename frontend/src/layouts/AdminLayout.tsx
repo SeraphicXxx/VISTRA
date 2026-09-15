@@ -29,7 +29,7 @@ export default function AdminLayout() {
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
                 {!hideHeader && (
                     <StaffPageHeader
-                        staffId={sessionManager.getUser()?.staff_id || ""}
+                        staffId={sessionManager.getUser()?.user_id || ""}
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />
