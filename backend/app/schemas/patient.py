@@ -1,13 +1,12 @@
-from datetime import date, datetime
+from datetime import date
 from uuid import UUID
 
-from fastapi import Depends
 from pydantic import BaseModel, Field, field_validator
-from supabase import Client
 
-from app.database.database_client import get_supabase_for_user
-from app.repositories import patient_repositories
+from app.enums.civil_status import CivilStatus
 from app.utils.name_utils import separate_name
+from app.utils.validator.common import confirm_mobile_number, confirm_civil_status, confirm_not_blank, validate_enum
+from app.enums.sex import Sex
 
 class Patient(BaseModel):
     id: UUID
@@ -66,9 +65,6 @@ class PatientFamilyMedicalHistory(BaseModel):
     other_condition: str | None = "NONE"
 
 
-
-
-
 class CreatePatientRequest(BaseModel):
     patient_id: str = Field(..., min_length=1, max_length=50)
     password: str = Field(..., min_length=8, max_length=128)
@@ -114,55 +110,23 @@ class CreatePatientRequest(BaseModel):
 
         )
 
-
     @field_validator("name", "address", "barangay")
     @classmethod
     def validate_not_blank(cls, value: str):
-        value = value.strip()
-
-        if not value:
-            raise ValueError("Field cannot be blank")
-
-        return value
+        return confirm_not_blank(value)
 
     @field_validator("mobile_number")
     @classmethod
-    def validate_mobile_number(cls, value: str):
-        value = value.strip()
-
-        if not value.isdigit():
-            raise ValueError("Mobile number must contain only digits")
-
-        if len(value) not in (10, 11):
-            raise ValueError("Invalid mobile number")
-
-        return value
+    def validate_mobile(cls, value: str) -> str:
+        return confirm_mobile_number(value)
 
     @field_validator("sex")
     @classmethod
     def validate_sex(cls, value: str):
-        allowed = {"Male", "Female"}
-
-        if value not in allowed:
-            raise ValueError(
-                f"Sex must be one of: {', '.join(allowed)}"
-            )
-
-        return value
+        return validate_enum(value, Sex)
 
     @field_validator("civil_status")
     @classmethod
     def validate_civil_status(cls, value: str):
-        allowed = {
-            "Single",
-            "Married",
-            "Widowed",
-            "Separated"
-        }
+        return validate_enum(value, CivilStatus)
 
-        if value not in allowed:
-            raise ValueError(
-                f"Civil status must be one of: {', '.join(allowed)}"
-            )
-
-        return value
