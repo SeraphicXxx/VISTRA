@@ -15,7 +15,7 @@ const visitLogColumns = [
 
 const emptyVisitRow = () => ({ date: "", complaint: "", treatment: "" });
 
-export default function PatientRecordForm({ onBack, onSave }) {
+export default function PatientRecordForm() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [visitType, setVisitType] = useState("");
   const { rows: visitRows, addRow, removeRow, updateRow, resetRows } = useEditableRows(emptyVisitRow, 1);
@@ -35,8 +35,7 @@ export default function PatientRecordForm({ onBack, onSave }) {
     : emptyDetails;
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else if (typeof window !== "undefined") window.history.back();
+      if (typeof window !== "undefined") window.history.back();
   };
 
   const handleClear = () => {
@@ -55,7 +54,7 @@ export default function PatientRecordForm({ onBack, onSave }) {
       type: visitType,
       visits: visitRows
         .filter((row) => row.date || row.complaint || row.treatment)
-        .map(({ id, ...rest }) => rest),
+        .map(({  ...rest }) => rest),
     };
 
     if (onSave) onSave(record);

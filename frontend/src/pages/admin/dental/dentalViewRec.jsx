@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 import {
@@ -52,22 +52,19 @@ const exampleDental = {
 
 export default function DentalRecordView({
   record = exampleDental,
-  onBack,
-  onSave,
 }) {
   const [recordData, setRecordData] = useState(record);
   const [selectedTooth, setSelectedTooth] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else window.history.back();
+    if (typeof window !== "undefined") window.history.back();
   };
 
   const handleSaveRecord = (updatedRecord) => {
     setRecordData(updatedRecord);
     setIsEditOpen(false);
-    if (onSave) onSave(updatedRecord);
+    
   };
 
   const handleSaveTooth = (updatedTooth) => {
@@ -81,8 +78,6 @@ export default function DentalRecordView({
 
     setRecordData(updatedRecord);
     setSelectedTooth(null);
-
-    if (onSave) onSave(updatedRecord);
   };
 
   const handleClearTooth = () => {
@@ -97,7 +92,6 @@ export default function DentalRecordView({
     setRecordData(updatedRecord);
     setSelectedTooth(null);
 
-    if (onSave) onSave(updatedRecord);
   };
 
   return (

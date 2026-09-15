@@ -17,14 +17,13 @@ const dentalStudentFields = [
   { id: "year_section", label: "Year and section / course_department", span: "sm:col-span-3" },
 ];
 
-export default function DentalRecordForm({ onBack, onSave }) {
+export default function DentalRecordForm() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedTooth, setSelectedTooth] = useState(null);
   const [toothRecords, setToothRecords] = useState({});
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else if (typeof window !== "undefined") window.history.back();
+    if (typeof window !== "undefined") window.history.back();
   };
 
   const openTooth = (number) => setSelectedTooth(number);

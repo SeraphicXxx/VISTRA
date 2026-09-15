@@ -1,5 +1,5 @@
 import React, {useRef, useState, Fragment} from "react";
-import {HeartPulse, ClipboardList, ArrowLeft, ArrowRight, Check} from "lucide-react";
+import {ArrowLeft, ArrowRight, Check} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
 import {SelectField} from "/@/components/InputCollection";
 import {FormInput} from "/@/components/InputCollection";

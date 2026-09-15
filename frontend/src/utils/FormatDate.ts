@@ -27,3 +27,29 @@ export function formatShortDate(dateStr: string): string {
     day: "numeric",
   }).format(date);
 }
+
+export function parseTimeToday(timeStr: string | null | undefined): number {
+  if (!timeStr) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(timeStr.trim());
+
+  if (!match) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const meridiem = match[3].toUpperCase();
+
+  if (meridiem === "PM" && hours !== 12) {
+    hours += 12;
+  }
+
+  if (meridiem === "AM" && hours === 12) {
+    hours = 0;
+  }
+
+  return hours * 60 + minutes;
+}

@@ -1,19 +1,17 @@
 import React, {useMemo} from "react";
-import {useOutletContext} from "react-router-dom";
 import {FileText, Stethoscope, Calendar, ChevronRight} from "lucide-react";
 import StatsGrid from "./Stats";
 import {
     Appointments,
     APPOINTMENTS
 } from "/@/pages/admin/appointments/appointmentsData";
-import {filterByQuery} from "/@/utils/FilterByQuery.js";
 import PanelHeader from "/@/components/OverviewHeader.jsx";
 import {
     buildClinicalRecords,
-    parseTimeToday,
     DepartmentBadge,
     recordLimit,
 } from "/@/components/overviewcmp.jsx";
+import {parseTimeToday} from "/@/utils/FormatDate";
 import {Status, statusLabels} from "/@/components/StatusBadge";
 import {CardList} from "/@/components/CardList";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
@@ -140,7 +138,6 @@ function ConsultationPanel({
 }
 
 export default function OverviewTab() {
-    const {searchQuery} = useOutletContext();
 
     const clinicalRecords = useMemo(() => buildClinicalRecords(), []);
 
@@ -150,21 +147,11 @@ export default function OverviewTab() {
             .slice(0, recordLimit);
     }, [clinicalRecords]);
 
-    const filteredRecords = useMemo(
-        () =>
-            filterByQuery(recentRecords, searchQuery, [
-                "student",
-                "course",
-                "type",
-                "id",
-            ]),
-        [searchQuery, recentRecords],
-    );
     return (
         <>
             <StatsGrid stats={[]}/>
             <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <ConsultationPanel filteredRecords={filteredRecords}/>
+                <ConsultationPanel filteredRecords={recentRecords}/>
                 <DefaultTablePreset<Appointments>
                     title="Appointments"
                     icon={Calendar}
