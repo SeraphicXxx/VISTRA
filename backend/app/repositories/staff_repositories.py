@@ -25,7 +25,7 @@ class StaffRepository:
             .execute()
         )
 
-    def get_all(self):
+    def get_staff(self):
         response = (
             self.supabase
             .table("STAFF")
