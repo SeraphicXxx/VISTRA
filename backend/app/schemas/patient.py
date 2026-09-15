@@ -1,12 +1,13 @@
 from datetime import date
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.enums.civil_status import CivilStatus
 from app.utils.name_utils import separate_name
-from app.utils.validator.common import confirm_mobile_number, confirm_civil_status, confirm_not_blank, validate_enum
+from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_enum
 from app.enums.sex import Sex
+
 
 class Patient(BaseModel):
     id: UUID
@@ -115,6 +116,15 @@ class CreatePatientRequest(BaseModel):
     def validate_not_blank(cls, value: str):
         return confirm_not_blank(value)
 
+    @field_validator("birthday")
+    @classmethod
+    def validate_birthday(cls, value: date):
+        return confirm_birthday(value)
+
+    @model_validator(mode="after")
+    def validate_age(self):
+        return confirm_age(self.age, self.birthday)
+
     @field_validator("mobile_number")
     @classmethod
     def validate_mobile(cls, value: str) -> str:
@@ -123,10 +133,9 @@ class CreatePatientRequest(BaseModel):
     @field_validator("sex")
     @classmethod
     def validate_sex(cls, value: str):
-        return validate_enum(value, Sex)
+        return confirm_enum(value, Sex)
 
     @field_validator("civil_status")
     @classmethod
     def validate_civil_status(cls, value: str):
-        return validate_enum(value, CivilStatus)
-
+        return confirm_enum(value, CivilStatus)
