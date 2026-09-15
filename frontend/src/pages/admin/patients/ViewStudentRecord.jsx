@@ -7,7 +7,8 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { getMockPatientRecords } from "./patientsData.tsx";
-import {usePatientContext} from "/@/routes/AppRoutes";
+import {usePatientContext} from "/@/context/PaginatedContext.ts";
+
 
 const TABS = [
   {

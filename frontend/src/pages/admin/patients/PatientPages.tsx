@@ -1,5 +1,5 @@
 import PatientsTab from "/@/pages/admin/patients/patientsTab";
-import {PatientProvider} from "/@/routes/AppRoutes";
+import {PatientProvider} from "/@/context/PaginatedContext";
 import {usePatientQuery} from "/@/hooks/PatientQuery";
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";

@@ -18,8 +18,6 @@ import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute.jsx";
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx";
 import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx";
-import {createPaginatedContext} from "/@/context/CreatePaginatedContext";
-import {PatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
 import ProtectedPatientRoute from "/@/components/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
@@ -29,10 +27,7 @@ import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
 
-export const {
-    Provider: PatientProvider,
-    usePaginatedContext: usePatientContext,
-} = createPaginatedContext<PatientProfile>();
+
 
 function AppRoutes() {
     return (

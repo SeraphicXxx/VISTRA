@@ -10,7 +10,7 @@ import {HyperlinkText, LinkButton} from "/@/components/Button";
 import {removeNullFilters} from "/@/components/Filters";
 import {PatientModel} from "/@/repository/PatientModel";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
-import {usePatientContext} from "/@/routes/AppRoutes";
+import {usePatientContext} from "/@/context/PaginatedContext";
 
 
 interface PatientsTabProps {
