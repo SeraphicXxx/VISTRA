@@ -53,3 +53,26 @@ export function parseTimeToday(timeStr: string | null | undefined): number {
 
   return hours * 60 + minutes;
 }
+
+
+export const formatTime = (dateTime?: string | null): string => {
+  if (!dateTime) {
+    return "";
+  }
+
+  const timePart = dateTime.split("T")[1];
+
+  if (!timePart) {
+    return "";
+  }
+
+  const [hours, minutes] = timePart.split(":");
+
+  const date = new Date();
+  date.setHours(Number(hours), Number(minutes));
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};

@@ -9,6 +9,8 @@ export interface AppointmentSchema {
 
     status: Status;
     reason: string;
+    notes: string | null;
+    decline_reason: string | null;
     location: string;
 
     created_at: string;

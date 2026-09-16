@@ -1,6 +1,6 @@
 import React, {useMemo} from "react";
 import {Calendar, ChevronRight} from "lucide-react";
-import {AppointmentsColumns, Appointment} from "./appointmentsData";
+import {AppointmentsColumns, AppointmentTableFormat} from "./appointmentsData";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {HyperlinkText} from "/@/components/Button";
@@ -19,7 +19,6 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
         totalPages,
         page,
         isLoading,
-        isFetching,
     } = useAppointmentContext();
 
     const appointments = useMemo(
@@ -27,18 +26,17 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
             Appointment.map((appointment) => {
                 const appointmentModel = new AppointmentModel(appointment);
 
-                return appointmentModel.UiFormat();
+                return appointmentModel.UiTableFormat();
             }),
         [Appointment]
     );
 
     return (
-        <DefaultTablePreset<Appointment>
+        <DefaultTablePreset<AppointmentTableFormat>
             title="Appointment"
             icon={Calendar}
             data={appointments}
             isLoading={isLoading}
-            isRefreshing={isFetching}
             columns={AppointmentsColumns}
             totalPages={totalPages}
             page={page}

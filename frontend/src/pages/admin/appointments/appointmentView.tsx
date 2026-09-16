@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 import { AppointmentFilters } from "/@/api/schema/FilterSchemaCollection";
 import { useAppointmentContext } from "/@/context/PaginatedContext";
 import { AppointmentModel } from "/@/repository/AppointmentModel";
+import {AppointmentPageFormat} from "/@/pages/admin/appointments/appointmentsData";
 
 type AppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -24,6 +25,7 @@ interface AppointmentUiModel {
     student: string;
     course: string;
     date?: string;
+    notes?: string
     time: string;
     type: string;
     status: AppointmentStatus;
@@ -127,7 +129,7 @@ export default function AppointmentDetailView() {
                 const appointmentModel =
                     new AppointmentModel(appointment);
 
-                return appointmentModel.UiFormat() as AppointmentUiModel;
+                return appointmentModel.UiPageFormat() as AppointmentUiModel;
             }),
         [appointmentDetails]
     );
@@ -347,7 +349,7 @@ export default function AppointmentDetailView() {
 
 
                     <div className="mt-5 rounded-xl border border-dashed border-border bg-surfaceMuted/20 px-4 py-4 text-sm text-textMuted">
-                        No additional notes were submitted with this appointment.
+                        {appointment.notes || "No additional notes were submitted with this appointment."}
                     </div>
 
                     <div className="mt-8 border-t border-border pt-6">

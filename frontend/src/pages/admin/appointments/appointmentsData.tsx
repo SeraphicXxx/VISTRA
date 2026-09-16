@@ -3,7 +3,7 @@ import {Column} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
 import React from "react";
 
-export const APPOINTMENTS: Appointment[] = [
+export const APPOINTMENTS: AppointmentTableFormat[] = [
     {
         id: "APT-1042",
         student: "Kenji Chua",
@@ -126,7 +126,7 @@ export const APPOINTMENTS: Appointment[] = [
     },
 ];
 
-export interface Appointment {
+export interface AppointmentTableFormat {
     id: string;
     student: string;
     course: string;
@@ -135,7 +135,19 @@ export interface Appointment {
     status: Status;
 }
 
-export const AppointmentsColumns: Column<Appointment>[] = [
+export interface AppointmentPageFormat {
+    id: string;
+    student: string;
+    course: string;
+    time: string;
+    date: string;
+    type: string;
+    notes: string | null;
+    decline_reason: string | null;
+    status: Status;
+}
+
+export const AppointmentsColumns: Column<AppointmentTableFormat>[] = [
     {
         key: "student",
         label: "Student",
