@@ -2,6 +2,7 @@ import React, {ReactNode} from "react";
 
 import {getTypeIcon, getInitials, avatarColor} from "/@/components/avatar";
 import {Status, StatusBadge} from "/@/components/StatusBadge";
+import LoadingPage from "/@/components/LoadingPage";
 
 export interface Default {
     id: string;
@@ -159,19 +160,34 @@ export const GenericTableHeader = <T, >({
 export const GenericTableBody = <T extends { id: string }>({
                                                                data,
                                                                columns,
+                                                               isLoading,
                                                                renderAction,
-                                                               isRefreshing,
                                                            }: {
     data: T[];
     columns: Column<T>[];
+    isLoading: boolean;
     renderAction?: (record: T) => ReactNode;
-    isRefreshing?: boolean;
 }) => {
     const colSpan = columns.length + (renderAction ? 1 : 0);
+    console.log(isLoading,data.length)
+    if (isLoading && data.length === 0) {
+        return (
+            <tbody>
+            <tr>
+                <td
+                    colSpan={colSpan}
+                    className="py-10 text-center text-sm text-textMuted"
+                >
+                    <LoadingPage />
+                </td>
+            </tr>
+            </tbody>
+        );
+    }
 
     return (
-        <tbody className={isRefreshing ? "opacity-50" : ""}>
-        {data.length === 0 && !isRefreshing ? (
+        <tbody>
+        {data.length === 0 ? (
             <tr>
                 <td
                     colSpan={colSpan}
@@ -206,11 +222,11 @@ export const GenericTableBody = <T extends { id: string }>({
             ))
         )}
 
-        {isRefreshing && (
+        {isLoading && data.length > 0 && (
             <tr>
                 <td
                     colSpan={colSpan}
-                    className="py-3 text-center text-xs text-black"
+                    className="py-3 text-center text-xs text-textMuted"
                 >
                     Loading...
                 </td>

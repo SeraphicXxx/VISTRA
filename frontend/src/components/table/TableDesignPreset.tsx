@@ -17,8 +17,7 @@ interface TablePresetProps<T> {
     icon: React.ComponentType<{ className?: string }>,
     panelAddon?: React.ReactNode,
     data: T[],
-    isLoading?: boolean,
-    isRefreshing?: boolean,
+    isLoading: boolean,
     columns: Column<T>[],
     renderAction?: (row: T) => React.ReactNode,
     onRun?: (
@@ -37,16 +36,12 @@ export function DefaultTablePreset<T extends { id: string }>({
                                                                  panelAddon,
                                                                  data,
                                                                  isLoading,
-                                                                 isRefreshing,
                                                                  columns,
                                                                  renderAction,
                                                                  onRun,
                                                                  totalPages,
                                                                  page
                                                              }: TablePresetProps<T>) {
-    if (isLoading && isRefreshing) {
-        return <LoadingPage/>;
-    }
 
     return (
         <TableProvider<T> onRun={onRun}>
@@ -55,9 +50,9 @@ export function DefaultTablePreset<T extends { id: string }>({
                 page={page}
                 title={title}
                 icon={Icon}
+                isLoading={isLoading}
                 panelAddon={panelAddon}
                 data={data}
-                isRefreshing={isRefreshing}
                 columns={columns}
                 renderAction={renderAction}
             />
@@ -70,7 +65,7 @@ function DefaultTableContent<T extends { id: string }>({
                                                            icon: Icon,
                                                            panelAddon,
                                                            data,
-                                                           isRefreshing,
+                                                           isLoading,
                                                            columns,
                                                            renderAction,
                                                            page,
@@ -110,7 +105,7 @@ function DefaultTableContent<T extends { id: string }>({
                         data={data}
                         columns={columns}
                         renderAction={renderAction}
-                        isRefreshing={isRefreshing}
+                        isLoading={isLoading}
                     />
                 </GenericTable>
 

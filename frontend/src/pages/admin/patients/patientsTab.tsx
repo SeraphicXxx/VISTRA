@@ -23,7 +23,6 @@ export default function PatientsTab({setFilters}: PatientsTabProps) {
         totalPages,
         page,
         isLoading,
-        isFetching,
     } = usePatientContext();
 
     const patientTableRecords = useMemo(
@@ -42,7 +41,6 @@ export default function PatientsTab({setFilters}: PatientsTabProps) {
             icon={UserRound}
             data={patientTableRecords}
             isLoading={isLoading}
-            isRefreshing={isFetching}
             columns={patientColumns}
             totalPages={totalPages}
             page={page}
