@@ -1,17 +1,47 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {Calendar, ChevronRight} from "lucide-react";
-import {AppointmentsColumns, Appointments, APPOINTMENTS} from "./appointmentsData";
+import {AppointmentsColumns, Appointment, APPOINTMENTS} from "./appointmentsData";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {HyperlinkText} from "/@/components/Button";
+import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
+import {removeNullFilters} from "/@/components/Filters";
+import {useAppointmentContext} from "/@/context/PaginatedContext";
+import {AppointmentModel} from "/@/repository/AppointmentModel";
 
-export default function AppointmentsTab() {
+interface  AppointmentTadProps {
+    setFilters: (filters: AppointmentFilters) => void;
+}
+
+export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
+    const {
+        items: Appointment,
+        totalPages,
+        page,
+        isLoading,
+        isFetching,
+    } = useAppointmentContext();
+
+    const appointments = useMemo(
+        () =>
+            Appointment.map((appointment) => {
+                const appointmentModel = new AppointmentModel(appointment);
+
+                return appointmentModel.tableFormat();
+            }),
+        [Appointment]
+    );
+
     return (
-        <DefaultTablePreset<Appointments>
-            title="Appointments"
+        <DefaultTablePreset<Appointment>
+            title="Appointment"
             icon={Calendar}
-            data={APPOINTMENTS}
+            data={appointments}
+            isLoading={isLoading}
+            isRefreshing={isFetching}
             columns={AppointmentsColumns}
+            totalPages={totalPages}
+            page={page}
             renderAction={
                 (appointment) => (
                     <HyperlinkText
@@ -19,7 +49,14 @@ export default function AppointmentsTab() {
                         link={`${ROUTES.staff.patient.patientRecordTab}/${appointment.id}`}
                         icon={ChevronRight}
                     />
-                )
+                )}
+            onRun={(search, filters, page, pageSize) =>
+                setFilters({
+                    search,
+                    ...removeNullFilters(filters),
+                    page,
+                    page_size: pageSize,
+                })
             }
         />
     );

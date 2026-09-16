@@ -2,7 +2,7 @@ import {Status, StatusBadge} from "/@/components/StatusBadge";
 import {Column} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
 import React from "react";
-import {Appointments} from "/@/pages/admin/appointments/appointmentsData";
+import {Appointment} from "/@/pages/admin/appointments/appointmentsData";
 
 
 export const dentalRecords: DentalData[] = [

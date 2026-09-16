@@ -10,3 +10,16 @@ export interface PatientFilters {
     total?: number;
     total_pages?: number
 }
+
+export interface AppointmentFilters {
+    search?: string;
+    status?: string;
+    type?: string;
+    course?: string;
+
+    page?: number;
+    page_size?: number;
+    total?: number;
+    total_pages?: number
+
+}

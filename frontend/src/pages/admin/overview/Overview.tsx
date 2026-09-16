@@ -2,7 +2,7 @@ import React, {useMemo} from "react";
 import {FileText, Stethoscope, Calendar, ChevronRight} from "lucide-react";
 import StatsGrid from "./Stats";
 import {
-    Appointments,
+    Appointment,
     APPOINTMENTS,
     AppointmentsColumns
 } from "/@/pages/admin/appointments/appointmentsData";
@@ -153,8 +153,8 @@ export default function OverviewTab() {
             <StatsGrid stats={[]}/>
             <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <ConsultationPanel filteredRecords={recentRecords}/>
-                <DefaultTablePreset<Appointments>
-                    title="Appointments"
+                <DefaultTablePreset<Appointment>
+                    title="Appointment"
                     icon={Calendar}
                     data={APPOINTMENTS}
                     columns={AppointmentsColumns}

@@ -3,7 +3,7 @@ import {Column} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
 import React from "react";
 
-export const APPOINTMENTS: Appointments[] = [
+export const APPOINTMENTS: Appointment[] = [
     {
         id: "APT-1042",
         student: "Kenji Chua",
@@ -126,7 +126,7 @@ export const APPOINTMENTS: Appointments[] = [
     },
 ];
 
-export interface Appointments {
+export interface Appointment {
     id: string;
     student: string;
     course: string;
@@ -135,7 +135,7 @@ export interface Appointments {
     status: Status;
 }
 
-export const AppointmentsColumns: Column<Appointments>[] = [
+export const AppointmentsColumns: Column<Appointment>[] = [
     {
         key: "student",
         label: "Student",
