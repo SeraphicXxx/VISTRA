@@ -1,4 +1,4 @@
-from app.schemas.reponses import PaginatedResponse
+from app.schemas.response_dto.reponses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 

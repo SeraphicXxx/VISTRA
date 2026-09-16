@@ -17,7 +17,7 @@ def staff_login(request):
             "success": True,
             "user": {
                 "id": user.id,
-                "staff_id": staff_id_format(user.email),
+                "user_id": staff_id_format(user.email),
                 "email": user.email
             },
             "access_token": session.access_token,

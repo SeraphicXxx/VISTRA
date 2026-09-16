@@ -1,3 +1,5 @@
+import {SessionUser} from "/@/utils/SessionManager";
+
 export interface ApiResponse<T> {
     success: boolean;
     message?: string;
@@ -25,11 +27,5 @@ export interface LoginStaffResponse {
     refresh_token: string;
     token_type: string;
     detail: string
-    user: userSessionField;
-}
-
-interface userSessionField {
-    email: string
-    id: string
-    staff_id: string
+    user: SessionUser;
 }
