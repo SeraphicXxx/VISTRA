@@ -16,7 +16,6 @@ import {parseTimeToday} from "/@/utils/FormatDate";
 import {Status, statusLabels} from "/@/components/StatusBadge";
 import {CardList} from "/@/components/CardList";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
-import {defaultColumns} from "/@/components/table/Table";
 import {HyperlinkText} from "/@/components/Button";
 import {ROUTES} from "/@/config/RoutePaths";
 

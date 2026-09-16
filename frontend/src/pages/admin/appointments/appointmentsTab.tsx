@@ -1,6 +1,6 @@
 import React, {useMemo} from "react";
 import {Calendar, ChevronRight} from "lucide-react";
-import {AppointmentsColumns, Appointment, APPOINTMENTS} from "./appointmentsData";
+import {AppointmentsColumns, Appointment} from "./appointmentsData";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {HyperlinkText} from "/@/components/Button";
@@ -27,7 +27,7 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
             Appointment.map((appointment) => {
                 const appointmentModel = new AppointmentModel(appointment);
 
-                return appointmentModel.tableFormat();
+                return appointmentModel.UiFormat();
             }),
         [Appointment]
     );
@@ -46,7 +46,7 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
                 (appointment) => (
                     <HyperlinkText
                         title={`View`}
-                        link={`${ROUTES.staff.patient.patientRecordTab}/${appointment.id}`}
+                        link={`${ROUTES.staff.appointment.viewAppointment(appointment.id)}`}
                         icon={ChevronRight}
                     />
                 )}

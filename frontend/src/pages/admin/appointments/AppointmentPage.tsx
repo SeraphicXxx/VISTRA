@@ -3,6 +3,7 @@ import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useAppointmentQuery} from "/@/hooks/AppointmentQuery";
 import {AppointmentProvider} from "/@/context/PaginatedContext";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
+import AppointmentDetailView from "/src/pages/admin/appointments/appointmentView";
 
 export function AppointmentPage() {
     const [filters, setFilters] = useState<AppointmentFilters>({
@@ -16,5 +17,16 @@ export function AppointmentPage() {
             <AppointmentsTab setFilters={setFilters}/>
         </AppointmentProvider>
     );
+
+}
+
+export function AppointmentDetailPage() {
+    const appointmentQuery = useAppointmentQuery()
+
+    return (
+        <AppointmentProvider query={appointmentQuery}>
+            <AppointmentDetailView/>
+        </AppointmentProvider>
+    )
 
 }
