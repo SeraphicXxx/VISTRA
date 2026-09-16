@@ -3,7 +3,7 @@ import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useAppointmentQuery} from "/@/hooks/AppointmentQuery";
 import {AppointmentProvider} from "/@/context/PaginatedContext";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
-import AppointmentDetailView from "/src/pages/admin/appointments/appointmentView";
+import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView";
 
 export function AppointmentPage() {
     const [filters, setFilters] = useState<AppointmentFilters>({

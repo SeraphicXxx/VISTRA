@@ -153,7 +153,7 @@ export default function OverviewTab() {
             <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <ConsultationPanel filteredRecords={recentRecords}/>
                 <DefaultTablePreset<AppointmentTableFormat>
-                    title="AppointmentTableFormat"
+                    title="Appointment"
                     icon={Calendar}
                     isLoading={false}
                     data={APPOINTMENTS}

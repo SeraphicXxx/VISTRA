@@ -17,6 +17,7 @@ import { AppointmentFilters } from "/@/api/schema/FilterSchemaCollection";
 import { useAppointmentContext } from "/@/context/PaginatedContext";
 import { AppointmentModel } from "/@/repository/AppointmentModel";
 import {AppointmentPageFormat} from "/@/pages/admin/appointments/appointmentsData";
+import LoadingPage from "/@/components/LoadingPage";
 
 type AppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -121,6 +122,7 @@ export default function AppointmentDetailView() {
 
     const {
         items: appointmentDetails,
+        isLoading
     } = useAppointmentContext();
 
     const appointments = useMemo<AppointmentUiModel[]>(
