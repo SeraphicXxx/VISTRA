@@ -1,7 +1,7 @@
 import React from "react";
 import {Calendar, ChevronRight} from "lucide-react";
-import {appointmentFilters, appointmentFiltersOptions, Appointments, APPOINTMENTS} from "./appointmentsData";
-import {DefaultTablePreset} from "/src/components/table/TableDesignPreset";
+import {AppointmentsColumns, Appointments, APPOINTMENTS} from "./appointmentsData";
+import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {defaultColumns} from "/@/components/table/Table";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {HyperlinkText} from "/@/components/Button";
@@ -11,10 +11,8 @@ export default function AppointmentsTab() {
         <DefaultTablePreset<Appointments>
             title="Appointments"
             icon={Calendar}
-            filterableColumns={appointmentFilters}
-            filterOptions={appointmentFiltersOptions}
             data={APPOINTMENTS}
-            columns={defaultColumns}
+            columns={AppointmentsColumns}
             renderAction={
                 (appointment) => (
                     <HyperlinkText

@@ -3,7 +3,8 @@ import {FileText, Stethoscope, Calendar, ChevronRight} from "lucide-react";
 import StatsGrid from "./Stats";
 import {
     Appointments,
-    APPOINTMENTS
+    APPOINTMENTS,
+    AppointmentsColumns
 } from "/@/pages/admin/appointments/appointmentsData";
 import PanelHeader from "/@/components/OverviewHeader.jsx";
 import {
@@ -156,7 +157,7 @@ export default function OverviewTab() {
                     title="Appointments"
                     icon={Calendar}
                     data={APPOINTMENTS}
-                    columns={defaultColumns}
+                    columns={AppointmentsColumns}
                     panelAddon={
                         <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                             {APPOINTMENTS.length} recent
