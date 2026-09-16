@@ -1,3 +1,5 @@
+from fastapi import HTTPException, status
+
 from app.repositories.appointment_repositories import AppointmentRepository
 from app.schemas.appointments import Appointments, CreateAppointmentRequest, UpdateAppointmentRequest
 
@@ -44,16 +46,20 @@ def get_appointment_by_id(appointment_id: int, supabase):
                 "success": True,
                 "data": response
             }
-        else:
-            return {
-                "success": False,
-                "message": "Appointment not found"
-            }
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Appointment not found"
+        )
+
+    except HTTPException:
+        raise
+
     except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 
 def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, supabase):
@@ -67,16 +73,20 @@ def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, s
                 "success": True,
                 "data": response
             }
-        else:
-            return {
-                "success": False,
-                "message": "Appointment not found"
-            }
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Appointment not found"
+        )
+
+    except HTTPException:
+        raise
+
     except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 
 def delete_appointment(appointment_id: int, supabase):
@@ -89,13 +99,17 @@ def delete_appointment(appointment_id: int, supabase):
                 "success": True,
                 "message": "Appointment deleted successfully"
             }
-        else:
-            return {
-                "success": False,
-                "message": "Appointment not found"
-            }
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Appointment not found"
+        )
+
+    except HTTPException:
+        raise
+
     except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )

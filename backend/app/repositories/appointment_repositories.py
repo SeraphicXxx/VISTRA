@@ -24,8 +24,20 @@ class AppointmentRepository:
             SupabaseQueryBuilder(
                 self.supabase,
                 "APPOINTMENT",
-                count="exact",
+                columns="""
+                    *,
+                    PATIENT(
+                        PATIENT_PROFILE(
+                            first_name,
+                            middle_name,
+                            last_name,
+                            course
+                        )
+                    )
+                """,
+                count="exact"
             )
+            .order("scheduled_start")
             .eq("status", filters.status)
             .eq("type", filters.type)
             .eq("course", filters.course)
@@ -43,8 +55,13 @@ class AppointmentRepository:
 
         total = response.count or 0
 
+        items = [
+            self._map_appointment(appointment)
+            for appointment in response.data
+        ]
+
         return PaginatedResponse(
-            items=response.data,
+            items=items,
             total=total,
             page=filters.page,
             page_size=filters.page_size,
@@ -54,16 +71,26 @@ class AppointmentRepository:
         response = (
             self.supabase
             .table("APPOINTMENT")
-            .select("*")
+            .select("""
+                *,
+                PATIENT(
+                    PATIENT_PROFILE(
+                        first_name,
+                        middle_name,
+                        last_name,
+                        course
+                    )
+                )
+            """)
             .eq("id", appointment_id)
             .limit(1)
             .execute()
         )
 
-        if response.data:
-            return response.data[0]
+        if not response.data:
+            return None
 
-        return None
+        return self._map_appointment(response.data[0])
 
     def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
         response = (
@@ -87,3 +114,16 @@ class AppointmentRepository:
             .execute()
         )
         return bool(response.data)
+
+    @staticmethod
+    def _map_appointment(appointment):
+        patient = appointment.pop("PATIENT", {})
+        profile = patient.get("PATIENT_PROFILE", {})
+
+        return {
+            **appointment,
+            "first_name": profile.get("first_name"),
+            "middle_name": profile.get("middle_name"),
+            "last_name": profile.get("last_name"),
+            "course": profile.get("course"),
+        }
