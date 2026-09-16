@@ -1,4 +1,3 @@
-import {FilterColumn} from "/@/components/Filters";
 import {Status, StatusBadge} from "/@/components/StatusBadge";
 import {Column} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
@@ -176,6 +175,7 @@ export const AppointmentsColumns: Column<Appointments>[] = [
     {
         key: "time",
         label: "Time",
+        filterType: "date"
     },
 
     {

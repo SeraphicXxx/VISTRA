@@ -1,7 +1,6 @@
 import React from "react";
 import {ChevronRight, Plus, Stethoscope} from "lucide-react";
-import {medRecords, medData} from "./medicalData";
-import {defaultColumns} from "/@/components/table/Table";
+import {medRecords, medData, MedicalColumns} from "./medicalData";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
@@ -12,7 +11,7 @@ export default function MedicalTab() {
             title="Medical"
             icon={Stethoscope}
             data={medRecords}
-            columns={defaultColumns}
+            columns={MedicalColumns}
             panelAddon={
                 <LinkButton
                     title={`New Medical Record`}

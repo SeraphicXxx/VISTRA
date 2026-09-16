@@ -1,5 +1,8 @@
-import {Status} from "/@/components/StatusBadge";
-import {FilterColumn} from "/@/components/Filters";
+import {Status, StatusBadge} from "/@/components/StatusBadge";
+import {Column} from "/@/components/table/Table";
+import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
+import React from "react";
+import {Appointments} from "/@/pages/admin/appointments/appointmentsData";
 
 export const medRecords: medData[] = [
   {
@@ -139,51 +142,87 @@ export interface medData {
   status: Status
 }
 
-export const medFilters :FilterColumn<medData>[] = [
+export const MedicalColumns: Column<medData>[] = [
   {
-    key: "status",
-    label: "Status",
-    type: "select",
-  },
-  {
-    key: "type",
-    label: "Type",
-    type: "select",
+    key: "student",
+    label: "Student",
+    render: (value) => {
+      const student = value as string;
+
+      return (
+          <div className="flex items-center gap-2.5">
+          <span
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(student)}`}
+          >
+      {getInitials(student)}
+      </span>
+
+            <span className="text-sm font-medium text-textPrimary">
+          {student}
+          </span>
+          </div>
+      );
+    },
   },
   {
     key: "course",
     label: "Course",
-    type: "select",
+    filterType: "select",
+    options: [
+      "BS Computer Science",
+      "BS Business Administration",
+      "BS Psychology",
+      "BS Nursing",
+      "BS Information Technology",
+      "BS Education",
+      "BS Accountancy",
+
+    ],
   },
   {
     key: "time",
-    label: "Date",
-    type: "date",
+    label: "Time",
+    filterType: "date"
+  },
+
+  {
+    key: "type",
+    label: "Type",
+    filterType: "select",
+    options: [
+      "Medical Consultation",
+      "secondOpinion",
+    ],
+    render: (value) => {
+      const type = value as string;
+      const TypeIcon = getTypeIcon(type);
+
+      return (
+          <div className="flex items-center gap-1.5 text-sm text-textSecondary">
+            <TypeIcon
+                className="h-3.5 w-3.5 shrink-0 text-textMuted"
+                strokeWidth={2}
+            />
+            {type}
+          </div>
+      );
+    },
+  },
+
+  {
+    key: "status",
+    label: "Status",
+    filterType: "select",
+    options: [
+      "ongoingTreatment",
+      "followUp",
+      "declined",
+      "completed",
+      "referred",
+    ],
+    render: (value) => (
+        <StatusBadge status={value as Status}/>
+    ),
+
   },
 ]
-
-export const medFilterOption: Record<string, string[]> = {
-  status: [
-    "ongoingTreatment",
-    "followUp",
-    "declined",
-    "completed",
-    "referred",
-  ],
-
-  type: [
-    "Medical Consultation",
-    "secondOpinion",
-  ],
-
-  course: [
-    "BS Computer Science",
-    "BS Business Administration",
-    "BS Psychology",
-    "BS Nursing",
-    "BS Information Technology",
-    "BS Education",
-    "BS Accountancy",
-  ],
-
-}
