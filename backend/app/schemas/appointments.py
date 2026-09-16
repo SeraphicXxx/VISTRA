@@ -12,6 +12,8 @@ class Appointments(BaseModel):
     location: str | None = None
     created_at: datetime
     staff_id: str | None = None
+    notes: str | None = None
+    decline_reason: str | None = None
 
 class CreateAppointmentRequest(BaseModel):
     patient_id: str
