@@ -112,7 +112,7 @@ export class GenericTable extends React.Component<GenericTableProps> {
     }
 }
 
-export const GenericTableHeader = <T,>({
+export const GenericTableHeader = <T, >({
                                             columns,
                                             hasAction = false,
                                         }: {

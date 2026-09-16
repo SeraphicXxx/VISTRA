@@ -13,11 +13,9 @@ import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
 import DentalTab from "/@/pages/admin/dental/dentalTab";
 import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
-import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute.jsx";
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx";
-import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView.jsx";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
 import ProtectedPatientRoute from "/@/components/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
@@ -26,7 +24,7 @@ import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTa
 import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
-import {AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
+import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 
 
 
@@ -60,8 +58,12 @@ function AppRoutes() {
 
                         <Route
                             path={ROUTES.staff.dashboard.appointments}
-                            element={<AppointmentPage/>}/>
-                        <Route path={ROUTES.staff.appointment.viewAppointment} element={<AppointmentDetailView/>}/>
+                            element={<AppointmentPage/>}
+                        />
+                        <Route
+                            path={ROUTES.staff.appointment.viewAppointmentRoute}
+                            element={<AppointmentDetailPage/>}
+                        />
 
                         <Route
                             path={ROUTES.staff.dashboard.patients}
@@ -75,9 +77,9 @@ function AppRoutes() {
                             path={`${ROUTES.staff.patient.patientRecordTab}/:id`}
                             element={<ViewPatientRecord/>}
                         />
-
                     </Route>
                 </Route>
+
                 <Route element={<ProtectedPatientRoute />}>
                     <Route element={<PatientLayout />}>
                         <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab />} />

@@ -2,6 +2,7 @@ import {AppointmentSchema} from "/@/api/schema/AppointmentSchema";
 import {Appointment} from "/@/pages/admin/appointments/appointmentsData";
 import {formatDate} from "/@/utils/FormatDate";
 
+
 export class AppointmentModel {
     private AppointmentSchema: AppointmentSchema
 
@@ -9,7 +10,7 @@ export class AppointmentModel {
         this.AppointmentSchema = appointmentSchema;
     }
 
-    tableFormat(): Appointment {
+    UiFormat(): Appointment {
         return {
             id: this.AppointmentSchema.patient_id,
 

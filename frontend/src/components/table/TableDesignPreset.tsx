@@ -82,7 +82,7 @@ function DefaultTableContent<T extends { id: string }>({
     } = useTableContext<T>();
     return (
         <div className="rounded-2xl border border-border bg-surface shadow-card">
-            <div className="overflow-x-auto p-6">
+            <div className="p-6">
 
                 <PanelHeader
                     title={title}
