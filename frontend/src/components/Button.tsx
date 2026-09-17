@@ -1,8 +1,31 @@
 import {Link, useNavigate} from "react-router-dom";
 import React, {ComponentType} from "react";
-import {ROUTES} from "/src/config/RoutePaths.js";
+import {ROUTES} from "/@/config/RoutePaths.js";
 import type {MouseEvent} from "react";
+import {ArrowRight, LoaderCircle} from "lucide-react";
+interface LoginButtonProps {
+    isLoading: boolean;
+}
 
+export function LoginButton({
+                                isLoading,
+                            }: LoginButtonProps) {
+    return (
+        <button
+            type="submit"
+            disabled={isLoading}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
+        >
+            {isLoading ? "Signing in..." : "Sign in"}
+
+            {isLoading ? (
+                <LoaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+                <ArrowRight className="h-4 w-4" />
+            )}
+        </button>
+    );
+}
 export function HyperlinkText({link, title, icon: Icon}: {
     link: string,
     title: string,

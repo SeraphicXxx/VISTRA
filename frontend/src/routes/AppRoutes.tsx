@@ -5,7 +5,7 @@ import PublicLayout from "/@/layouts/PublicLayout";
 import AdminLayout from "/@/layouts/AdminLayout";
 import LandingPage from "/@/pages/public/landingpage";
 import StaffLandingPage from "/@/pages/admin/home";
-import StaffLoginPage from "/@/pages/admin/login";
+import StaffLoginPage from "/src/pages/admin/login";
 import OverviewTab from "/@/pages/admin/overview/Overview";
 import MedicalTab from "/@/pages/admin/medical/medicalTab";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";

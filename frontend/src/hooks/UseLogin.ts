@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { sessionManager } from "/@/utils/SessionManager";
 import { loginStaff } from "/@/api/auth.api";
 import { PasswordAndId } from "/@/api/schema/ApiResponseSchema"
+import axios from "axios";
 /* -------------------------------------------------------------------------- */
 /* Types                                                                      */
 /* -------------------------------------------------------------------------- */
@@ -22,21 +23,24 @@ export function useLogin() {
         mutationFn: loginStaff,
 
         onSuccess: (data) => {
-            console.log(data);
-
             sessionManager.setLogin(
                 data.access_token,
                 data.refresh_token,
                 data.user
-            )
+            );
         },
     });
+
+    const errorMessage =
+        axios.isAxiosError(mutation.error)
+            ? mutation.error.response?.data?.detail ?? mutation.error.message
+            : mutation.error?.message ?? null;
 
     return {
         login: mutation.mutateAsync,
         isLoading: mutation.isPending,
         isError: mutation.isError,
-        error: mutation.error?.message ?? null,
+        error: errorMessage,
     };
 }
 

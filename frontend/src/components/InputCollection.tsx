@@ -1,5 +1,69 @@
-import React from "react";
-import { FieldLabel } from "/@/utils/FieldLabel.jsx";
+import React, {useState} from "react";
+import {FieldLabel} from "/@/utils/FieldLabel.jsx";
+import {
+    Eye,
+    EyeOff,
+    Lock,
+} from "lucide-react";
+
+interface PasswordInputProps {
+    value: string;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+    error?: string;
+}
+
+export function PasswordInput({
+                                  value,
+                                  onChange,
+                                  error,
+                              }: PasswordInputProps) {
+    const [showPassword, setShowPassword] = useState(false);
+
+    return (
+        <div className="relative">
+            <FormInput
+                label="Password"
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                value={value}
+                onChange={onChange}
+                placeholder="••••••••"
+                error={error}
+                icon={
+                    <Lock
+                        className="h-4 w-4"
+                        strokeWidth={2}
+                    />
+                }
+            />
+
+            <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted transition-colors duration-200 hover:text-textSecondary"
+                aria-label={
+                    showPassword
+                        ? "Hide password"
+                        : "Show password"
+                }
+            >
+                {showPassword ? (
+                    <EyeOff
+                        className="h-4 w-4"
+                        strokeWidth={2}
+                    />
+                ) : (
+                    <Eye
+                        className="h-4 w-4"
+                        strokeWidth={2}
+                    />
+                )}
+            </button>
+        </div>
+    );
+}
 
 interface FormInputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -9,6 +73,7 @@ interface FormInputProps
     icon?: React.ReactNode;
     className?: string;
 }
+
 interface SelectOption {
     code: string;
     label: string;

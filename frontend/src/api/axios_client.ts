@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig,} from "axios";
 
 import {sessionManager} from "/@/utils/SessionManager";
-import {API_ENDPOINTS, getApiUrl} from "/src/config/ApiConfig";
+import {API_ENDPOINTS, getApiUrl} from "/@/config/ApiConfig";
 import {FastAPIErrorResponse} from "/@/api/schema/FastApiValidationResponse";
 import {FastAPIConflictError, FastAPIValidationError} from "/@/api/errors";
 
@@ -84,7 +84,8 @@ axiosClient.interceptors.response.use(
 
         if (
             error.response?.status === 401 &&
-            !originalRequest._retry
+            !originalRequest._retry &&
+            originalRequest.url !== API_ENDPOINTS.staff.login
         ) {
             originalRequest._retry = true;
 
