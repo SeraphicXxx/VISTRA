@@ -44,7 +44,7 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
                 (appointment) => (
                     <HyperlinkText
                         title={`View`}
-                        link={`${ROUTES.staff.appointment.viewAppointment(appointment.id)}`}
+                        link={`${ROUTES.staff.appointments.view.build(appointment.studentId, appointment.id)}`}
                         icon={ChevronRight}
                     />
                 )}

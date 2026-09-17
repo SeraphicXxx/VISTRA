@@ -1,6 +1,6 @@
 import {Link, useNavigate} from "react-router-dom";
 import React, {ComponentType} from "react";
-import {ROUTES} from "/@/config/RoutePaths.js";
+import {ROUTES} from "/src/config/RoutePaths.js";
 import type {MouseEvent} from "react";
 
 export function HyperlinkText({link, title, icon: Icon}: {

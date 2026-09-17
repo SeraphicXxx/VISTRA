@@ -24,9 +24,9 @@ def create(request: CreateAppointmentRequest,supabase: Client = Depends(get_supa
 def get_appointments(filters: FilterAppointment = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_appointments(filters, supabase)
 
-@protected_appointments_router.get("/{appointment_id}/")
-def get_appointment(appointment_id: int, supabase: Client = Depends(get_supabase_for_user)):
-    return get_appointment_by_id(appointment_id, supabase)
+@protected_appointments_router.get("/{patient_id}/{appointment_id}")
+def get_appointment(appointment_id: int, patient_id: str, supabase: Client = Depends(get_supabase_for_user)):
+    return get_appointment_by_id(appointment_id , patient_id, supabase)
 
 @protected_appointments_router.patch("/{appointment_id}/")
 def update(appointment_id: int, request: UpdateAppointmentRequest,supabase: Client = Depends(get_supabase_for_user)):

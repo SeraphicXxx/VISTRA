@@ -16,7 +16,7 @@ export default function PatientMedicalRecordView() {
   const navigate = useNavigate();
 
   const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
+  const sessionId = user?.user_id ?? "";
   const studentId = myMedicalRecords[sessionId] ? sessionId : "20230518-S";
 
   const patientData = myMedicalRecords[studentId] ?? emptyMedicalRecord;

@@ -134,7 +134,7 @@ export default function ViewStudentRecord() {
     Promise.resolve(getMockPatientRecords(id)).then((data) => {
       if (!cancelled) {
         setRecords(data);
-        setLoadingRecords(false);
+        setLoadingRecords(true);
       }
     });
 

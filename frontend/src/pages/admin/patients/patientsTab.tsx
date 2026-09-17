@@ -1,7 +1,7 @@
 import React, {useMemo} from "react";
 import {ChevronRight, Plus, UserRound} from "lucide-react";
 
-import {ROUTES} from "/@/config/RoutePaths.js";
+import {ROUTES} from "/@/config/RoutePaths";
 
 import {patientColumns, patientData} from "./patientsData";
 

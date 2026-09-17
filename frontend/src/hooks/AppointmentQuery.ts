@@ -1,6 +1,6 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllAppointments} from "/@/api/appointments.api";
+import {getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
 
 export function useAppointmentQuery(filters?: AppointmentFilters) {
     return useQuery({
@@ -8,6 +8,25 @@ export function useAppointmentQuery(filters?: AppointmentFilters) {
         queryFn: async ({signal}) => {
             const {data} = await getAllAppointments(
                 filters,
+                signal
+            );
+
+            return data.data;
+        },
+        refetchOnWindowFocus: false,
+    })
+}
+
+export function useAppointmentByIdQuery(
+    appointmentId: string,
+    patientId: string
+) {
+    return useQuery({
+        queryKey: ["appointment", appointmentId, patientId],
+        queryFn: async ({signal}) => {
+            const {data} = await getAppointmentById(
+                appointmentId,
+                patientId,
                 signal
             );
 

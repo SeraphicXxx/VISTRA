@@ -16,15 +16,16 @@ export const API_ENDPOINTS = {
     staff: {
         login: "/staff/auth/login/",
         create_staff: "/staff/",
-        getStaffById: (staffId) => `/staff/${staffId}/`,
+        getStaffById: (staffId: string) => `/staff/${staffId}/`,
     },
     patient: {
         get_patients: "/patients/",
         create_patient: "/patients/",
         get_all_patient_profile: "/patients/profiles/",
-        get_patient_by_id: (patientId) => `/patients/${patientId}/`,
+        get_patient_by_id: (patientId: string) => `/patients/${patientId}/`,
     },
     appointment: {
         get_appointment: "/appointments/",
+        get_appointment_by_id: (patient_id: string, appointment_id: string) => `/appointment/${patient_id}/${appointment_id}`,
     }
 };

@@ -1,4 +1,4 @@
-import { ROUTES } from "./RoutePaths";
+import { ROUTES } from "./RoutePaths.ts";
 import {
     LayoutDashboard,
     CalendarDays,

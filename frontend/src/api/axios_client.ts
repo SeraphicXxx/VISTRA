@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig,} from "axios";
 
 import {sessionManager} from "/@/utils/SessionManager";
-import {API_ENDPOINTS, getApiUrl} from "/@/config/ApiConfig";
+import {API_ENDPOINTS, getApiUrl} from "/src/config/ApiConfig";
 import {FastAPIErrorResponse} from "/@/api/schema/FastApiValidationResponse";
 import {FastAPIConflictError, FastAPIValidationError} from "/@/api/errors";
 

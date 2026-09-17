@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     ArrowLeft,
     CheckCircle2,
@@ -10,14 +10,15 @@ import {
     ClipboardList,
     GraduationCap,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useParams } from "react-router-dom";
+import type {LucideIcon} from "lucide-react";
+import {useParams} from "react-router-dom";
 
-import { AppointmentFilters } from "/@/api/schema/FilterSchemaCollection";
-import { useAppointmentContext } from "/@/context/PaginatedContext";
-import { AppointmentModel } from "/@/repository/AppointmentModel";
+import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
+import {useAppointmentContext} from "/@/context/PaginatedContext";
+import {AppointmentModel} from "/@/repository/AppointmentModel";
 import {AppointmentPageFormat} from "/@/pages/admin/appointments/appointmentsData";
 import LoadingPage from "/@/components/LoadingPage";
+import {useAppointmentByIdQuery} from "/@/hooks/AppointmentQuery";
 
 type AppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -83,10 +84,10 @@ function getInitials(name: string = ""): string {
 }
 
 function InfoField({
-    icon: Icon,
-    label,
-    value,
-}: InfoFieldProps) {
+                       icon: Icon,
+                       label,
+                       value,
+                   }: InfoFieldProps) {
     return (
         <div className="rounded-xl border border-border bg-surfaceMuted/30 px-4 py-3">
             <div className="flex items-center gap-2">
@@ -107,24 +108,78 @@ function InfoField({
     );
 }
 
+interface AppointmentNotFoundProps {
+    patientId?: string | null;
+    appointmentId?: string | null;
+}
+
+export function AppointmentNotFound({
+                                        patientId,
+                                        appointmentId,
+                                    }: AppointmentNotFoundProps) {
+    return (
+        <div className="mx-auto w-full">
+            <div className="rounded-2xl border border-border bg-surface p-8 text-center shadow-sm">
+                <h2 className="font-heading text-lg font-semibold text-primaryDark">
+                    {appointmentId
+                        ? `Appointment No. ${appointmentId} not found`
+                        : "Appointment not found"}
+                </h2>
+
+                <p className="mt-2 text-sm text-textMuted">
+                    There is no appointment at No. {appointmentId} for patient{" "}
+                    <span className="font-medium text-textPrimary">
+                        {patientId ?? "unknown"}
+                    </span>
+                    .
+                </p>
+
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                >
+                    <ArrowLeft className="h-3.5 w-3.5"/>
+                    Back to appointments
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function AppointmentDetailView() {
-    const { patient_id } = useParams<{ patient_id: string }>();
+    const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
 
-    const [filters, setFilters] = useState<AppointmentFilters>({
-        search: patient_id ?? "",
-    });
-
-    useEffect(() => {
-        setFilters({
-            search: patient_id ?? "",
-        });
-    }, [patient_id]);
+    if (!appointmentId || !patientId) {
+        return (
+            <AppointmentNotFound
+                patientId={patientId}
+                appointmentId={appointmentId}
+            />
+        );
+    }
 
     const {
-        items: appointmentDetails,
-        isLoading
-    } = useAppointmentContext();
+        data: appointmentDetails,
+        isLoading,
+        isError,
+    } = useAppointmentByIdQuery(
+        patientId,
+        appointmentId
+    );
 
+    if (isLoading) {
+        return <LoadingPage/>
+    }
+
+    if (!appointmentDetails) {
+        return (
+            <AppointmentNotFound
+                patientId={patientId}
+                appointmentId={appointmentId}
+            />
+        );
+    }
     const appointments = useMemo<AppointmentUiModel[]>(
         () =>
             appointmentDetails.map((appointment) => {
@@ -153,35 +208,6 @@ export default function AppointmentDetailView() {
         }
     }, [appointment]);
 
-    if (!appointment) {
-        return (
-            <div className="mx-auto w-full">
-                <div className="rounded-2xl border border-border bg-surface p-8 text-center shadow-sm">
-                    <h2 className="font-heading text-lg font-semibold text-primaryDark">
-                        Appointment not found
-                    </h2>
-
-                    <p className="mt-2 text-sm text-textMuted">
-                        No appointment was found for patient{" "}
-                        <span className="font-medium text-textPrimary">
-                            {patient_id ?? "unknown"}
-                        </span>
-                        .
-                    </p>
-
-                    <button
-                        type="button"
-                        onClick={() => window.history.back()}
-                        className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
-                    >
-                        <ArrowLeft className="h-3.5 w-3.5" />
-                        Back to appointments
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     const meta = STATUS_META[status];
 
     const handleBack = (): void => {
@@ -207,7 +233,8 @@ export default function AppointmentDetailView() {
 
             <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
 
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
+                <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"/>
 
                 <div className="relative p-6 sm:p-8">
 
@@ -218,7 +245,7 @@ export default function AppointmentDetailView() {
                             onClick={handleBack}
                             className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
                         >
-                            <ArrowLeft className="h-3.5 w-3.5" />
+                            <ArrowLeft className="h-3.5 w-3.5"/>
                             Back to appointments
                         </button>
 
@@ -229,7 +256,8 @@ export default function AppointmentDetailView() {
 
                         <div className="flex items-center gap-5">
 
-                            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
+                            <span
+                                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
                                 {getInitials(appointment.student)}
                             </span>
 
@@ -241,7 +269,8 @@ export default function AppointmentDetailView() {
                                         {appointment.student}
                                     </h1>
 
-                                    <span className="rounded-md bg-surfaceMuted px-2 py-0.5 font-mono text-xs text-textMuted">
+                                    <span
+                                        className="rounded-md bg-surfaceMuted px-2 py-0.5 font-mono text-xs text-textMuted">
                                         {appointment.id}
                                     </span>
 
@@ -292,7 +321,7 @@ export default function AppointmentDetailView() {
 
                         <div className="flex items-center gap-2">
 
-                            <ClipboardList className="h-4 w-4 text-primary" />
+                            <ClipboardList className="h-4 w-4 text-primary"/>
 
                             <h2 className="font-heading text-sm font-semibold text-primaryDark">
                                 Appointment Information
@@ -339,7 +368,7 @@ export default function AppointmentDetailView() {
 
                         <div className="flex items-center gap-2">
 
-                            <ClipboardList className="h-4 w-4 text-primary" />
+                            <ClipboardList className="h-4 w-4 text-primary"/>
 
                             <h2 className="font-heading text-sm font-semibold text-primaryDark">
                                 Appointment Notes
@@ -350,7 +379,8 @@ export default function AppointmentDetailView() {
                     </div>
 
 
-                    <div className="mt-5 rounded-xl border border-dashed border-border bg-surfaceMuted/20 px-4 py-4 text-sm text-textMuted">
+                    <div
+                        className="mt-5 rounded-xl border border-dashed border-border bg-surfaceMuted/20 px-4 py-4 text-sm text-textMuted">
                         {appointment.notes || "No additional notes were submitted with this appointment."}
                     </div>
 
@@ -404,7 +434,7 @@ export default function AppointmentDetailView() {
                                         onClick={confirmDecline}
                                         className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90"
                                     >
-                                        <XCircle className="h-3.5 w-3.5" />
+                                        <XCircle className="h-3.5 w-3.5"/>
                                         Confirm decline
                                     </button>
 
@@ -439,7 +469,7 @@ export default function AppointmentDetailView() {
                                         }
                                         className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
                                     >
-                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                        <CheckCircle2 className="h-3.5 w-3.5"/>
                                         Confirm appointment
                                     </button>
 
@@ -457,7 +487,7 @@ export default function AppointmentDetailView() {
                                         }
                                         className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15"
                                     >
-                                        <XCircle className="h-3.5 w-3.5" />
+                                        <XCircle className="h-3.5 w-3.5"/>
                                         Decline
                                     </button>
 
@@ -475,7 +505,7 @@ export default function AppointmentDetailView() {
                                         }
                                         className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
                                     >
-                                        <RotateCcw className="h-3.5 w-3.5" />
+                                        <RotateCcw className="h-3.5 w-3.5"/>
                                         Reset to pending
                                     </button>
 

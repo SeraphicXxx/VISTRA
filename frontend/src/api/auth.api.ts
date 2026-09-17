@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import {apiClient} from "/@/api/axios_client";
-import {API_ENDPOINTS} from "/@/config/ApiConfig";
+import {API_ENDPOINTS} from "/src/config/ApiConfig";
 import {
     PasswordAndId,
     LoginStaffResponse

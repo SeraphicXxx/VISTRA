@@ -6,6 +6,7 @@ import React from "react";
 export const APPOINTMENTS: AppointmentTableFormat[] = [
     {
         id: "APT-1042",
+        studentId: "1",
         student: "Kenji Chua",
         course: "BS Computer Science",
         time: "9:00 AM",
@@ -14,6 +15,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1043",
+        studentId: "2",
         student: "Ivan Mejorada",
         course: "BS Business Administration",
         time: "9:30 AM",
@@ -22,6 +24,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1044",
+        studentId: "1",
         student: "Cjay Gonzales",
         course: "BS Psychology",
         time: "10:00 AM",
@@ -30,6 +33,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1045",
+        studentId: "1",
         student: "Joshua Lapitan",
         course: "BS Nursing",
         time: "10:15 AM",
@@ -38,6 +42,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1046",
+        studentId: "1",
         student: "Gillian Marc Lorenzo",
         course: "BS Information Technology",
         time: "10:30 AM",
@@ -46,6 +51,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1047",
+        studentId: "1",
         student: "Angel Emie Jane Bien",
         course: "BS Computer Science",
         time: "11:00 AM",
@@ -54,6 +60,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1048",
+        studentId: "1",
         student: "Maria Santos",
         course: "BS Education",
         time: "11:30 AM",
@@ -62,6 +69,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1049",
+        studentId: "1",
         student: "Daniel Reyes",
         course: "BS Accountancy",
         time: "12:00 PM",
@@ -70,6 +78,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1050",
+        studentId: "1",
         student: "Sofia Cruz",
         course: "BS Psychology",
         time: "1:00 PM",
@@ -78,6 +87,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1051",
+        studentId: "1",
         student: "Mark Villanueva",
         course: "BS Information Technology",
         time: "1:30 PM",
@@ -86,6 +96,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1052",
+        studentId: "1",
         student: "Andrea Garcia",
         course: "BS Nursing",
         time: "2:00 PM",
@@ -94,6 +105,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1053",
+        studentId: "1",
         student: "Carlo Mendoza",
         course: "BS Business Administration",
         time: "2:30 PM",
@@ -102,6 +114,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1054",
+        studentId: "1",
         student: "Leah Fernandez",
         course: "BS Computer Science",
         time: "3:00 PM",
@@ -110,6 +123,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1055",
+        studentId: "1",
         student: "Nathan Flores",
         course: "BS Psychology",
         time: "3:30 PM",
@@ -118,6 +132,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
     },
     {
         id: "APT-1056",
+        studentId: "1",
         student: "Bianca Ramos",
         course: "BS Education",
         time: "4:00 PM",
@@ -128,6 +143,7 @@ export const APPOINTMENTS: AppointmentTableFormat[] = [
 
 export interface AppointmentTableFormat {
     id: string;
+    studentId: string;
     student: string;
     course: string;
     time: string;
@@ -137,13 +153,14 @@ export interface AppointmentTableFormat {
 
 export interface AppointmentPageFormat {
     id: string;
+    studentId: string;
     student: string;
     course: string;
     time: string;
     date: string;
     type: string;
     notes: string | null;
-    decline_reason: string | null;
+    declineReason: string | null;
     status: Status;
 }
 

@@ -36,10 +36,10 @@ def get_all_appointments(filters, supabase):
         }
 
 
-def get_appointment_by_id(appointment_id: int, supabase):
+def get_appointment_by_id(appointment_id: int, patient_id: str, supabase):
     try:
         appointment_repo = AppointmentRepository(supabase)
-        response = appointment_repo.get_appointment_by_id(appointment_id)
+        response = appointment_repo.get_appointment_by_id(appointment_id, patient_id)
 
         if response:
             return {

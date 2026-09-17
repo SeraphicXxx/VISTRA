@@ -12,8 +12,8 @@ export class AppointmentModel {
 
     UiTableFormat(): AppointmentTableFormat {
         return {
-            id: this.AppointmentSchema.patient_id,
-
+            id: this.AppointmentSchema.id,
+            studentId: this.AppointmentSchema.patient_id,
             student: [
                 this.AppointmentSchema.first_name,
                 this.AppointmentSchema.middle_name,
@@ -30,7 +30,8 @@ export class AppointmentModel {
 
     UiPageFormat(): AppointmentPageFormat {
         return {
-            id: this.AppointmentSchema.patient_id,
+            id: this.AppointmentSchema.id,
+            studentId: this.AppointmentSchema.patient_id,
 
             student: [
                 this.AppointmentSchema.first_name,
@@ -44,7 +45,7 @@ export class AppointmentModel {
             date: formatDate(this.AppointmentSchema.scheduled_start),
             type: this.AppointmentSchema.reason,
             notes: this.AppointmentSchema.notes,
-            decline_reason: this.AppointmentSchema.decline_reason,
+            declineReason: this.AppointmentSchema.decline_reason,
             status: this.AppointmentSchema.status
         }
     }

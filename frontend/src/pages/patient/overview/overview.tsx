@@ -13,7 +13,7 @@ import { myMedicalRecords, myVisits } from "../medical/medicalData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
-import { ROUTES } from "/@/config/RoutePaths.js";
+import { ROUTES } from "/@/config/RoutePaths";
 import { formatDate } from "/@/utils/FormatDate";
 import { Visit } from "/@/types/types";
 

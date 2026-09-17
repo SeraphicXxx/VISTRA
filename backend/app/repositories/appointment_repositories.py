@@ -67,7 +67,7 @@ class AppointmentRepository:
             page_size=filters.page_size,
         )
 
-    def get_appointment_by_id(self, appointment_id: int):
+    def get_appointment_by_id(self, appointment_id: int, patient_id: str):
         response = (
             self.supabase
             .table("APPOINTMENT")
@@ -83,6 +83,7 @@ class AppointmentRepository:
                 )
             """)
             .eq("id", appointment_id)
+            .eq("patient_id", patient_id)
             .limit(1)
             .execute()
         )

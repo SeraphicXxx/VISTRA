@@ -1,7 +1,7 @@
 import {Status} from "/@/components/StatusBadge";
 
 export interface AppointmentSchema {
-    id: number;
+    id: string;
     patient_id: string;
 
     scheduled_start: string;

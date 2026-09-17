@@ -61,7 +61,7 @@ function AppRoutes() {
                             element={<AppointmentPage/>}
                         />
                         <Route
-                            path={ROUTES.staff.appointment.viewAppointmentRoute}
+                            path={ROUTES.staff.appointments.view.route}
                             element={<AppointmentDetailPage/>}
                         />
 
