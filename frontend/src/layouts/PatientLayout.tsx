@@ -25,7 +25,7 @@ export default function PatientLayout() {
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
                 {!hideHeader && (
                     <PatientPageHeader
-                        patientId={sessionManager.getUser()?.patient_id || ""}
+                        patientId={sessionManager.getUser()?.user_id || ""}
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />

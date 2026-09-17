@@ -9,6 +9,7 @@ export default function MedicalTab() {
     return (
         <DefaultTablePreset<medData>
             title="Medical"
+            isLoading={false}
             icon={Stethoscope}
             data={medRecords}
             columns={MedicalColumns}

@@ -180,18 +180,10 @@ export default function AppointmentDetailView() {
             />
         );
     }
-    const appointments = useMemo<AppointmentUiModel[]>(
-        () =>
-            appointmentDetails.map((appointment) => {
-                const appointmentModel =
-                    new AppointmentModel(appointment);
+    const appointmentModel = new AppointmentModel(appointmentDetails);
 
-                return appointmentModel.UiPageFormat() as AppointmentUiModel;
-            }),
-        [appointmentDetails]
-    );
+    const appointment = appointmentModel.UiPageFormat() as AppointmentUiModel;
 
-    const appointment = appointments[0];
 
     const [status, setStatus] =
         useState<AppointmentStatus>("pending");
