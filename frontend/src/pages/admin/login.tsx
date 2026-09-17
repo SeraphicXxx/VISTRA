@@ -1,10 +1,5 @@
-import React, {useState} from "react";
+import React from "react";
 import {
-    ArrowRight,
-    Eye,
-    EyeOff,
-    Lock,
-    LoaderCircle,
     ShieldCheck,
     User,
 } from "lucide-react";
@@ -33,6 +28,7 @@ interface LoginFormProps {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
 }
+
 export function LoginForm({
                             credentials,
                             validationErrors,

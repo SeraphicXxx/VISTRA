@@ -11,7 +11,7 @@ import MedicalTab from "/@/pages/admin/medical/medicalTab";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
 import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
 import DentalTab from "/@/pages/admin/dental/dentalTab";
-import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
+import DentalRecordForm from "/src/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute.jsx";
