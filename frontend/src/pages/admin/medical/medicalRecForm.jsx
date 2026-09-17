@@ -2,7 +2,7 @@ import  { useState } from "react";
 import { Save, ArrowLeft, User, ClipboardList, Info } from "lucide-react";
 import { students, emptyDetails, type as visitTypeOptions } from "./medicalData.tsx";
 import { ReadOnlyField } from "/@/utils/ReadOnlyField.jsx";
-import { StudentCombobox } from "/@/utils/StudentComboBox.jsx";
+import { StudentCombobox } from "/src/utils/StudentComboBox.jsx";
 import { FieldLabel } from "/@/utils/FieldLabel.jsx";
 import { EditableRowsTable } from "/@/utils/EditableRowsTable.jsx";
 import { useEditableRows } from "/@/utils/useEditableRows.js";
@@ -83,7 +83,7 @@ export default function PatientRecordForm() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <StudentCombobox studentList={students} selectedStudent={selectedStudent} onSelect={setSelectedStudent} />
+        <StudentCombobox selectedStudent={selectedStudent} onSelect={setSelectedStudent} />
         <ReadOnlyField id="course" label="Course" value={details.course} placeholder="Select a student first" />
         <ReadOnlyField id="address" label="Address" value={details.address} placeholder="Select a student first" />
         <ReadOnlyField id="barangay" label="Barangay" value={details.barangay} placeholder="Select a student first" />

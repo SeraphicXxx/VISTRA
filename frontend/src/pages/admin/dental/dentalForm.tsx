@@ -11,7 +11,7 @@ const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilep
 
 const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis / Periodontal Disease", "Debris", "Calculus", "Cleft Lip / Palate", "Others (Supernumerary/Mesiodens)", "No. of Permanent Teeth Present", "No. of Permanent Sound Present", "No. of Decayed Teeth (D)", "No. of Missing Teeth (M)", "No. of Filled Teeth (F)", "No. of Teeth for Extraction (X)", "No. of DMFX Teeth", "No. of Temporary Teeth Present"];
 
-const dentalStudentFields = [
+const  dentalStudentFields = [
     {id: "age", label: "Age"},
     {id: "sex", label: "Gender"},
     {id: "year_section", label: "Year and section / course_department", span: "sm:col-span-3"},
@@ -419,7 +419,6 @@ export default function DentalRecordForm() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
                 <StudentInfoSection
-                    students={students}
                     selectedStudent={selectedStudent}
                     onSelect={setSelectedStudent}
                     fields={dentalStudentFields}

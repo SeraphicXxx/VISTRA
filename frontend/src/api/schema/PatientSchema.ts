@@ -41,6 +41,7 @@ export interface PatientProfile {
     contact_no?: string
     school_year?: string
     department?: string
+    section?: string
     person_type: string
     last_visit: string
 }
