@@ -1,11 +1,13 @@
 import {useState} from "react";
 import {ArrowLeft, Save, Stethoscope, Info} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
-import {ToothArch, ToothNoteModal, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
+import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
 import {FormInput} from "/@/components/InputCollection.jsx";
 import {CheckboxRow} from "/@/utils/CheckboxRow.jsx";
 import {StudentInfoSection} from "/@/components/StudentInfoSection.jsx";
 import {students} from "../medical/medicalData";
+import {ToothNoteModal} from "/@/components/dental/ToothForm";
+import {useDentalRecordForm} from "/@/hooks/DentalForms";
 
 const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilepsy", "Heart Disease", "Hypertension", "Others"];
 
@@ -380,42 +382,45 @@ function DentalHabitsSection() {
 }
 
 export default function DentalRecordForm() {
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [selectedTooth, setSelectedTooth] = useState(null);
-    const [toothRecords, setToothRecords] = useState({});
+    const {
+        selectedStudent,
+        setSelectedStudent,
+
+        selectedTooth,
+        toothRecords,
+
+        openTooth,
+        closeTooth,
+        saveTooth,
+        clearTooth,
+    } = useDentalRecordForm();
 
     const handleBack = () => {
-        if (typeof window !== "undefined") window.history.back();
+        window.history.back();
     };
 
-    const openTooth = (number) => setSelectedTooth(number);
-    const closeModal = () => setSelectedTooth(null);
-
-    const saveTooth = (data) => {
-        setToothRecords((prev) => ({...prev, [selectedTooth]: data}));
-        setSelectedTooth(null);
-    };
-
-    const clearTooth = () => {
-        setToothRecords((prev) => {
-            const next = {...prev};
-            delete next[selectedTooth];
-            return next;
-        });
-        setSelectedTooth(null);
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = Object.fromEntries(new FormData(e.target).entries());
-        const record = {...formData, student: selectedStudent, tooth_records: toothRecords};
-        if (onSave) onSave(record);
+
+        const formData = Object.fromEntries(
+            new FormData(e.currentTarget).entries()
+        );
+
+        const record = {
+            ...formData,
+            student: selectedStudent,
+            tooth_records: toothRecords,
+        };
+
+        console.log(record);
     };
 
     return (
-        <form onSubmit={handleSubmit}
-              className="mx-auto w-full max-w-5xl rounded-2xl border border-border bg-surface p-8 shadow-lg">
-            <DentalRecordHeader/>
+        <form
+            onSubmit={handleSubmit}
+            className="mx-auto w-full max-w-5xl rounded-2xl border border-border bg-surface p-8 shadow-lg"
+        >
+            <DentalRecordHeader />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
                 <StudentInfoSection
@@ -423,31 +428,37 @@ export default function DentalRecordForm() {
                     onSelect={setSelectedStudent}
                     fields={dentalStudentFields}
                 />
-                <FormInput id="date" name="date" label="Date" type="date"/>
+
+                <FormInput
+                    id="date"
+                    name="date"
+                    label="Date"
+                    type="date"
+                />
             </div>
 
-            <DentalHabitsSection/>
+            <DentalHabitsSection />
 
             <OdontogramSection
                 records={toothRecords}
                 onToothClick={openTooth}
             />
 
-            <DentalConditionSection/>
+            <DentalConditionSection />
 
-            <MedicalHistorySection/>
+            <MedicalHistorySection />
 
-            <OralHealthStatusSection/>
+            <OralHealthStatusSection />
 
-            <RecordFormFooter onBack={handleBack}/>
+            <RecordFormFooter onBack={handleBack} />
 
             {selectedTooth !== null && (
                 <ToothNoteModal
                     toothNumber={selectedTooth}
                     initialRecord={toothRecords[selectedTooth]}
-                    onSave={saveTooth}
+                    onSubmit={saveTooth}
                     onClear={clearTooth}
-                    onClose={closeModal}
+                    onClose={closeTooth}
                 />
             )}
         </form>
