@@ -2,14 +2,13 @@
 TODO: Implement staff management functions using Supabase Admin API.
 staff_update()
 """
-from app.database.database_client import supabase
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData, CreateStaffRequest
 from app.services.auth.user import create_auth_user, delete_auth_user
 from app.utils.email_utils import remove_ucc_domain
 
 
-def create_staff(request: CreateStaffRequest):
+def create_staff(request: CreateStaffRequest, supabase):
     staff_id = remove_ucc_domain(request.staff_id)
 
     auth_response = create_auth_user(
@@ -31,7 +30,7 @@ def create_staff(request: CreateStaffRequest):
         )
     )
 
-    db_response = insert_staff_into_db(staff_data)
+    db_response = insert_staff_into_db(staff_data, supabase)
 
     if db_response["success"]:
         return {
@@ -55,7 +54,7 @@ def create_staff(request: CreateStaffRequest):
         )
     }
 
-def insert_staff_into_db(staff_data : StaffData):
+def insert_staff_into_db(staff_data : StaffData, supabase):
     try:
         staff_repo = StaffRepository(supabase)
         response = staff_repo.create(staff_data)
@@ -70,7 +69,7 @@ def insert_staff_into_db(staff_data : StaffData):
             "message": str(e)
         }
 
-def get_staff_by_id(staff_id: str):
+def get_staff_by_id(staff_id: str, supabase):
     try:
         staff_repo = StaffRepository(supabase)
         response = staff_repo.get_by_id(staff_id)

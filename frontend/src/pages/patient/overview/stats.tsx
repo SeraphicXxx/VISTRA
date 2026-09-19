@@ -1,7 +1,7 @@
 import React from "react";
 import { CalendarClock, Stethoscope, ShieldCheck, ClipboardList } from "lucide-react";
 import { LucideIcon } from "lucide-react";
-import { formatDate } from "/@/utils/FormatDate.ts";
+import { formatDate } from "/@/utils/FormatDate";
 import { Appointment } from "../appointments/appointmentsData";
 
 interface Stat {

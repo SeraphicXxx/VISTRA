@@ -5,9 +5,9 @@ import {
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import Sidebar from "./sidebar";
-import AppointmentsTab from "./appointments/appointmentsTab";
-import OverviewTab from "./overview/overview";
-import MedicalTab from "./medical/medicalTab";
+import AppointmentsTab from "./appointments/appointmentsTab.tsx";
+import OverviewTab from "./overview/Overview.tsx";
+import MedicalTab from "./medical/medicalTab.tsx";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 const RECORDS = [
   { id: "REC-3391", student: "Miguel Santos", lastUpdated: "Aug 3, 2026", updatedBy: "Dr. Villanueva" },
@@ -168,6 +168,8 @@ const TAB_SEARCH_PLACEHOLDERS = {
   settings: "Search settings",
 };
 
+
+//TODO: DERECATED should be removed?
 export default function AdminDashboardPage() {
   const [activeNavId, setActiveNavId] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");

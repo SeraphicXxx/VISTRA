@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { ArrowLeft, Save, Stethoscope, Info } from "lucide-react";
-import { FieldLabel } from "../../../utils/FieldLabel.jsx";
-import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "../../../components/teethDesign.jsx";
-import { TextField } from "../../../utils/TextField.jsx";
-import { CheckboxRow } from "../../../utils/CheckboxRow.jsx";
-import { StudentInfoSection } from "../../../components/StudentInfoSection.jsx";
-import { students } from "../medical/medicalData";
+import { FieldLabel } from "/@/utils/FieldLabel.jsx";
+import { ToothArch, ToothNoteModal, upperTeeth, lowerTeeth } from "/@/components/teethDesign.jsx";
+import { FormInput } from "/@/components/InputCollection.jsx";
+import { CheckboxRow } from "/@/utils/CheckboxRow.jsx";
+import { StudentInfoSection } from "/@/components/StudentInfoSection.jsx";
+import { students } from "../medical/medicalData.ts";
 
 const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilepsy", "Heart Disease", "Hypertension", "Others"];
 
@@ -14,17 +14,16 @@ const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis
 const dentalStudentFields = [
   { id: "age", label: "Age" },
   { id: "sex", label: "Gender" },
-  { id: "year_section", label: "Year and section / course", span: "sm:col-span-3" },
+  { id: "year_section", label: "Year and section / course_department", span: "sm:col-span-3" },
 ];
 
-export default function DentalRecordForm({ onBack, onSave }) {
+export default function DentalRecordForm() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedTooth, setSelectedTooth] = useState(null);
   const [toothRecords, setToothRecords] = useState({});
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else if (typeof window !== "undefined") window.history.back();
+    if (typeof window !== "undefined") window.history.back();
   };
 
   const openTooth = (number) => setSelectedTooth(number);
@@ -65,7 +64,7 @@ export default function DentalRecordForm({ onBack, onSave }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <StudentInfoSection students={students} selectedStudent={selectedStudent} onSelect={setSelectedStudent} fields={dentalStudentFields} />
-        <TextField id="date" name="date" label="Date" type="date" />
+        <FormInput id="date" name="date" label="Date" type="date" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-3">
@@ -171,7 +170,7 @@ export default function DentalRecordForm({ onBack, onSave }) {
           </div>
         </div>
 
-        <TextField id="medication" name="medication" label="Medication" placeholder="List current medications" />
+        <FormInput id="medication" name="medication" label="Medication" placeholder="List current medications" />
       </div>
 
       <div className="mt-6">

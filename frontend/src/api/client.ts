@@ -1,7 +1,13 @@
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
 import { sessionManager } from "/@/utils/SessionManager";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
-
-const API_URL: string = import.meta.env.VITE_LOCAL_API_URL;
+import {getApiUrl} from "../config/ApiConfig";
+const API_URL: string = getApiUrl();
 let refreshPromise: Promise<string> | null = null;
 
 const refreshAccessToken = async (): Promise<string> => {
@@ -95,3 +101,9 @@ export const apiClient = async <T = unknown>(
         data,
     };
 };
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED
+//DEPRECATED

@@ -1,6 +1,6 @@
 export interface SessionUser {
     id: string;
-    staff_id: string;
+    user_id: string;
     email: string;
 }
 

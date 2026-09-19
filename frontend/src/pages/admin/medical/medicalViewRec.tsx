@@ -3,7 +3,7 @@ import { ArrowLeft, User, ClipboardList, Printer, Pencil } from "lucide-react";
 
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal.jsx";
-import { StatusBadge } from "/@/components/statusbadge.jsx";
+import { StatusBadge } from "/@/components/StatusBadge.jsx";
 
 import { Patient, Visit, visitEditFields } from "/@/types/types";
 import { VisitTimeline } from "/@/components/VisitTimeline";

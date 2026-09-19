@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { User, ClipboardList, Printer } from "lucide-react";
 
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
-import { StatusBadge } from "/@/components/statusbadge.jsx";
+import { StatusBadge } from "/@/components/StatusBadge";
 import { VisitTimeline } from "/@/components/VisitTimeline";
 import { VisitDetailModal } from "/@/components/VisitDetailModal";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { sessionManager } from "/@/utils/SessionManager";
 
 import { Patient, Visit } from "/@/types/types";
 import { myMedicalRecords, myVisits, emptyMedicalRecord } from "./medicalData";
@@ -16,11 +16,11 @@ const DEFAULT_STUDENT_ID = "20230518-S";
 
 export default function PatientMedicalTab() {
   const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
+  const sessionId = user?.user_id ?? "";
   const studentId = myMedicalRecords[sessionId] ? sessionId : DEFAULT_STUDENT_ID;
 
-  const patientData: Patient = myMedicalRecords[studentId] ?? emptyMedicalRecord;
-  const visitData: Visit[] = myVisits[studentId] ?? [];
+  const patientData = myMedicalRecords[studentId] ?? emptyMedicalRecord;
+  const visitData = myVisits[studentId] ?? [];
 
   const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
 

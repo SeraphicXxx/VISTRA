@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Save, ArrowLeft, User, ClipboardList, Info } from "lucide-react";
-import { students, emptyDetails, type as visitTypeOptions } from "./medicalData";
+import { students, emptyDetails, type as visitTypeOptions } from "./medicalData.ts";
 import { ReadOnlyField } from "/@/utils/ReadOnlyField.jsx";
 import { StudentCombobox } from "/@/utils/StudentComboBox.jsx";
 import { FieldLabel } from "/@/utils/FieldLabel.jsx";
@@ -15,14 +15,14 @@ const visitLogColumns = [
 
 const emptyVisitRow = () => ({ date: "", complaint: "", treatment: "" });
 
-export default function PatientRecordForm({ onBack, onSave }) {
+export default function PatientRecordForm() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [visitType, setVisitType] = useState("");
   const { rows: visitRows, addRow, removeRow, updateRow, resetRows } = useEditableRows(emptyVisitRow, 1);
 
   const details = selectedStudent
     ? {
-        course: selectedStudent.course,
+        course: selectedStudent.course_department,
         address: selectedStudent.address,
         barangay: selectedStudent.barangay,
         age: selectedStudent.age,
@@ -35,8 +35,7 @@ export default function PatientRecordForm({ onBack, onSave }) {
     : emptyDetails;
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else if (typeof window !== "undefined") window.history.back();
+      if (typeof window !== "undefined") window.history.back();
   };
 
   const handleClear = () => {
@@ -55,7 +54,7 @@ export default function PatientRecordForm({ onBack, onSave }) {
       type: visitType,
       visits: visitRows
         .filter((row) => row.date || row.complaint || row.treatment)
-        .map(({ id, ...rest }) => rest),
+        .map(({  ...rest }) => rest),
     };
 
     if (onSave) onSave(record);

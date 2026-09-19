@@ -1,20 +1,35 @@
-export interface ApiDataResponse<T> {
+export interface ApiResponse<T> {
     success: boolean;
     message?: string;
-    data: Array<T>;
+    data: T;
+}
+export interface PaginatedData<T> {
+    items: T[];
+    page: number;
+    page_size: number;
+    total: number;
+    total_pages: number
 }
 export interface ApiMessageResponse {
     success: boolean;
     message: string;
 }
-export interface ValidationError {
-    type: string;
-    loc: (string | number)[];
-    msg: string;
-    input?: unknown;
-    ctx?: Record<string, unknown>;
+
+export interface PasswordAndId {
+    email: string;
+    password: string;
 }
 
-export interface FastAPIErrorResponse {
-    detail: ValidationError[];
+export interface LoginStaffResponse {
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    detail: string
+    user: userSessionField;
+}
+
+interface userSessionField {
+    email: string
+    id: string
+    staff_id: string
 }

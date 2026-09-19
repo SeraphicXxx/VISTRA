@@ -23,7 +23,7 @@ export function StudentCombobox({ studentList, selectedStudent, onSelect }) {
     const q = query.trim().toLowerCase();
     if (!q) return studentList;
     return studentList.filter(
-      (s) => s.name.toLowerCase().includes(q) || s.course.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)
+      (s) => s.name.toLowerCase().includes(q) || s.course_department.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)
     );
   }, [query, studentList]);
 
@@ -110,7 +110,7 @@ export function StudentCombobox({ studentList, selectedStudent, onSelect }) {
                 >
                   <span className="flex flex-col">
                     <span className="font-medium text-textPrimary">{student.name}</span>
-                    <span className="text-xs text-textMuted">{student.course} &middot; {student.id}</span>
+                    <span className="text-xs text-textMuted">{student.course_department} &middot; {student.id}</span>
                   </span>
                   {isSelected && <Check className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} />}
                 </li>

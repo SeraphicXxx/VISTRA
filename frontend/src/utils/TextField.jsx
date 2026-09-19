@@ -1,5 +1,8 @@
 import { FieldLabel } from "./FieldLabel";
-
+/**
+ * @deprecated Use `FormInput` instead.
+ * /@/components/InputCollection
+ */
 export function TextField({ id, name, label, type = "text", placeholder }) {
   return (
     <div>

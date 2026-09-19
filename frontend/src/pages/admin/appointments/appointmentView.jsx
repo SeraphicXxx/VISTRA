@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -73,32 +73,25 @@ function InfoField({ icon: Icon, label, value }) {
 
 export default function AppointmentDetailView({
   appointment = exampleAppointment,
-  onBack,
-  onStatusChange,
 }) {
   const [status, setStatus] = useState(appointment.status);
   const [decliningReason, setDecliningReason] = useState(false);
   const [reason, setReason] = useState("");
 
   const meta = STATUS_META[status] || STATUS_META.pending;
-  const StatusIcon = meta.icon;
-
   const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else if (typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
       window.history.back();
     }
   };
 
-  const applyStatus = (next, extra) => {
+  const applyStatus = (next) => {
     setStatus(next);
     setDecliningReason(false);
-    onStatusChange?.(appointment.id, next, extra);
   };
 
   const confirmDecline = () => {
-    applyStatus("declined", reason.trim() || undefined);
+    applyStatus("declined");
     setReason("");
   };
 
