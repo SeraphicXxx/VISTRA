@@ -1,10 +1,12 @@
+import {Dentition, ToothCondition} from "/@/types/Dental"
+
 export interface ToothSchema {
     id: string
     appointment_id: string,
     patient_id: string,
     tooth_number: number,
-    dentition: string,
-    condition: string,
+    dentition: Dentition,
+    condition: ToothCondition,
     notes: string
 }
 

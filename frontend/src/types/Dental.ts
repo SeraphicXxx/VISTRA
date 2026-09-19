@@ -23,3 +23,9 @@ export const toothConditionOptions = [
     {value: "unerupted", label: "Unerupted"},
     {value: "supernumerary", label: "Supernumerary"},
 ] satisfies { value: ToothCondition; label: string }[];
+type ToothRecord = {
+    toothNumber: number;
+    dentition: Dentition;
+    condition: ToothCondition;
+    notes: string;
+};

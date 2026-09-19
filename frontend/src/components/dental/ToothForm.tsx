@@ -2,14 +2,21 @@ import {CreateToothRequest, ToothSchema} from "/@/api/schema/DentalSchema";
 import {ToothModal} from "/@/components/dental/ToothModal";
 import {FormInput} from "/@/components/InputCollection";
 import {Dentition, ToothCondition, toothConditionOptions} from "/@/types/Dental";
+import {useState} from "react";
+import {useForm} from "/@/hooks/Form";
 
 interface ToothNoteModalProps {
     toothNumber: number;
-    initialRecord?: ToothSchema;
+    initialRecord?: CreateToothRequest;
     onSubmit: (record: CreateToothRequest) => void;
     onClear: () => void;
     onClose: () => void;
 }
+type ToothForm = {
+    dentition: Dentition;
+    condition: ToothCondition;
+    notes: string;
+};
 
 export function ToothNoteModal({
     toothNumber,
@@ -18,20 +25,28 @@ export function ToothNoteModal({
     onClear,
     onClose,
 }: ToothNoteModalProps) {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const { form, setField, reset } = useForm<ToothForm>({
+        dentition: initialRecord?.dentition ?? "permanent",
+        condition: initialRecord?.condition ?? "sound",
+        notes: initialRecord?.notes ?? "",
+    });
 
-        const formData = new FormData(event.currentTarget);
-
-        const record: CreateToothRequest = {
-            tooth_number: toothNumber,
-            dentition: formData.get("dentition") as Dentition,
-            condition: formData.get("condition") as ToothCondition,
-            notes: formData.get("notes")?.toString() ?? "",
-        };
-
-        onSubmit(record);
+    const handleSubmit = (
+        dentition: Dentition,
+        condition: ToothCondition,
+        notes: string,
+    ) => {
+    const record: CreateToothRequest = {
+        tooth_number: toothNumber,
+        dentition,
+        condition,
+        notes,
     };
+
+    onSubmit(record);
+};
+
+
 
     return (
         <ToothModal
@@ -59,50 +74,49 @@ export function ToothNoteModal({
                         type="submit"
                         form="tooth-note-form"
                         className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
+                        onClick={() => handleSubmit(form.dentition, form.condition, form.notes)}
+
                     >
                         Save
                     </button>
                 </>
             }
         >
-            <form
-                id="tooth-note-form"
-                onSubmit={handleSubmit}
-                className="space-y-5"
-            >
+
                 {/* Dentition */}
-                <fieldset>
-                    <legend className="mb-2 text-xs font-medium text-textMuted">
-                        Dentition
-                    </legend>
+            <fieldset>
+                <legend className="mb-2 text-xs font-medium text-textMuted">
+                    Dentition
+                </legend>
 
-                    <div className="flex gap-5">
-                        <label className="flex items-center gap-2 text-sm text-textPrimary">
-                            <input
-                                type="radio"
-                                name="dentition"
-                                value="permanent"
-                                defaultChecked={
-                                    initialRecord?.dentition === "permanent" ||
-                                    !initialRecord?.dentition
-                                }
-                            />
-                            Permanent
-                        </label>
+                <div className="flex gap-5">
+                    <label className="flex items-center gap-2 text-sm text-textPrimary">
+                        <input
+                            type="radio"
+                            name="dentition"
+                            value="permanent"
+                            checked={form.dentition === "permanent"}
+                            onChange={(event) =>
+                                setField("dentition", event.target.value as Dentition)
+                            }
+                        />
+                        Permanent
+                    </label>
 
-                        <label className="flex items-center gap-2 text-sm text-textPrimary">
-                            <input
-                                type="radio"
-                                name="dentition"
-                                value="temporary"
-                                defaultChecked={
-                                    initialRecord?.dentition === "temporary"
-                                }
-                            />
-                            Temporary
-                        </label>
-                    </div>
-                </fieldset>
+                    <label className="flex items-center gap-2 text-sm text-textPrimary">
+                        <input
+                            type="radio"
+                            name="dentition"
+                            value="temporary"
+                            checked={form.dentition === "temporary"}
+                            onChange={(event) =>
+                                setField("dentition", event.target.value as Dentition)
+                            }
+                        />
+                        Temporary
+                    </label>
+                </div>
+            </fieldset>
 
                 {/* Condition */}
                 <div>
@@ -120,6 +134,7 @@ export function ToothNoteModal({
                             initialRecord?.condition ?? "sound"
                         }
                         className="w-full rounded-xl border border-border bg-background px-3.5 py-3 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        onChange={(event) => setField("condition", event.target.value as ToothCondition)}
                     >
                         {toothConditionOptions.map((option) => (
                             <option
@@ -139,8 +154,9 @@ export function ToothNoteModal({
                     label="Notes"
                     defaultValue={initialRecord?.notes ?? ""}
                     placeholder="Add notes for this tooth..."
+                    onChange={(event) => setField("notes", event.target.value)}
                 />
-            </form>
+
         </ToothModal>
     );
 }
