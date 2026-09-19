@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -7,6 +7,19 @@ from app.enums.civil_status import CivilStatus
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_enum
 from app.enums.sex import Sex
+from app.enums.summary_type import SummaryType
+
+
+class PatientSummary(BaseModel):
+    type: SummaryType
+    id: str
+    patient_id: str
+    patient_name: str
+    date: datetime
+    title: str | None
+    notes: str | None
+    staff_id: str | None
+    provider: str | None
 
 
 class Patient(BaseModel):
@@ -111,7 +124,12 @@ class CreatePatientRequest(BaseModel):
 
         )
 
-    @field_validator("name", "address", "barangay")
+    @field_validator("mobile_number")
+    @classmethod
+    def validate_contact_no(cls, value: str):
+        return confirm_mobile_number(value)
+
+    @field_validator("patient_id", "name", "address", "barangay")
     @classmethod
     def validate_not_blank(cls, value: str):
         return confirm_not_blank(value)

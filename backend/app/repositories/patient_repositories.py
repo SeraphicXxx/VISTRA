@@ -1,3 +1,5 @@
+from urllib import response
+
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.schemas.response_dto.reponses import PaginatedResponse
 
@@ -87,4 +89,14 @@ class PatientRepository:
             total=total,
             page=filters.page,
             page_size=filters.page_size,
+        )
+
+    def get_summary_records(self, patient_id):
+        return (
+            self.supabase
+            .table("patient_summary")
+            .select("*")
+            .eq("patient_id", patient_id)
+            .order("date", desc=True)
+            .execute()
         )

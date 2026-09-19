@@ -26,3 +26,10 @@ class UpdateAppointmentRequest(BaseModel):
     status: str | None = None
     reason: str | None = None
     location: str | None = None
+
+class AppointmentSummary(BaseModel):
+    id: int
+    title: str
+    date: datetime
+    details: str
+    provider: str

@@ -1,8 +1,13 @@
 from datetime import date
 from enum import Enum
 from typing import TypeVar
+import re
 
 E = TypeVar("E", bound=Enum)
+
+def confirm_phone_number(phone: str) -> bool:
+    pattern = r"^((\+[0-9]{2})|0)[.\- ]?9[0-9]{2}[.\- ]?[0-9]{3}[.\- ]?[0-9]{4}$"
+    return bool(re.fullmatch(pattern, phone))
 
 
 def confirm_birthday(value: date) -> date:
