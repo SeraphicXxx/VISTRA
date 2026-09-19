@@ -1,3 +1,6 @@
+from app.schemas.dentalcreaterequest import DentalRecordCreateRequest
+
+
 class StaffRepository:
 
     def __init__(self, supabase):
@@ -17,7 +20,7 @@ class StaffRepository:
 
         return None
 
-    def create(self, staff_data):
+    def create(self, staff_data: DentalRecordCreateRequest):
         return (
             self.supabase
             .table("STAFF")
