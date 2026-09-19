@@ -29,6 +29,8 @@ import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord.jsx";
 import UserLoginPage from "/@/pages/patient/login.tsx";
 import PatientOverviewTab from "/@/pages/patient/overview/overview.tsx";
 import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTab.tsx";
+import PatientBookAppointment from "/@/pages/patient/appointments/appointmentBook.tsx";
+import PatientAppointmentView from "/@/pages/patient/appointments/appointmentView.tsx";
 import PatientMedicalTab from "/@/pages/patient/medical/medicalTab.tsx";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTab.tsx";
 import PatientProfilePage from "/@/pages/patient/profile/profile.tsx";
@@ -130,6 +132,9 @@ function AppRoutes() {
           <Route element={<PatientLayout />}>
             <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab />} />
             <Route path={ROUTES.patient.dashboard.appointments} element={<PatientAppointmentsTab />} />
+            <Route path={ROUTES.patient.appointment.bookAppointment} element={<PatientBookAppointment />} />
+            <Route path={ROUTES.patient.appointment.viewAppointment} element={<PatientAppointmentView />} />
+            <Route path={`${ROUTES.patient.appointment.viewAppointment}/:id`} element={<PatientAppointmentView />} />
             <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab />} />
             <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab />} />
             <Route path={ROUTES.patient.profile} element={<PatientProfilePage />} />

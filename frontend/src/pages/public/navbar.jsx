@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { UserLogoClickable } from "/@/components/Button.jsx";
+import { ROUTES } from "/@/config/RoutePaths";
+import {Link } from "react-router-dom";
+
+const MotionLink = motion(Link);
+
 
 const NAV_LINKS = [
   { href: "#app", label: "Mobile App" },
@@ -62,8 +67,7 @@ export default function Navbar() {
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries.filter((e) => e.isIntersecting);
-        // Ignore intersections while we're still near the top of the page —
-        // the scroll handler above owns that state.
+       
         if (visible.length > 0 && window.scrollY > 80) {
           setActiveSection(`#${visible[0].target.id}`);
           setHasInteracted(true);
@@ -154,8 +158,8 @@ export default function Navbar() {
           })}
         </nav>
 
-        <motion.a
-          href="#app"
+        <MotionLink
+          to={ROUTES.patient.login}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -165,7 +169,7 @@ export default function Navbar() {
         >
           <LiveDot />
           Book an Appointment
-        </motion.a>
+        </MotionLink>
 
         <button
           type="button"
@@ -222,14 +226,14 @@ export default function Navbar() {
                 </a>
               ))}
 
-              <a
-                href="#app"
+              <Link
+                to={ROUTES.patient.login}
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primaryDark"
               >
                 <LiveDot />
                 Book an Appointment
-              </a>
+              </Link>
 
               <a
                 href="#contact"
