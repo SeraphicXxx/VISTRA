@@ -1,4 +1,4 @@
-from app.schemas.dentalcreaterequest import DentalRecordCreateRequest
+from app.schemas.dental import DentalRecordCreateRequest
 
 
 class StaffRepository:

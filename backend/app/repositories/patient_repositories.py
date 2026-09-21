@@ -1,7 +1,5 @@
-from urllib import response
-
-from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.schemas.response_dto.reponses import PaginatedResponse
+from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
 class PatientRepository:
@@ -100,3 +98,6 @@ class PatientRepository:
             .order("date", desc=True)
             .execute()
         )
+# note to me
+# make a router for get_summary_records
+# use it on patient view profiles tab in ui
