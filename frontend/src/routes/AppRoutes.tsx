@@ -25,6 +25,8 @@ import ProtectedPatientRoute from "/@/components/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
 import PatientOverviewTab from "/@/pages/patient/overview/overview";
 import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTab";
+import PatientBookAppointment from "/@/pages/patient/appointments/appointmentBook";
+import PatientAppointmentView from "/@/pages/patient/appointments/appointmentView";
 import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
@@ -84,6 +86,8 @@ function AppRoutes() {
                     <Route element={<PatientLayout />}>
                         <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab />} />
                         <Route path={ROUTES.patient.dashboard.appointments} element={<PatientAppointmentsTab />} />
+                        <Route path={ROUTES.patient.appointment.bookAppointment} element={<PatientBookAppointment />} />
+                        <Route path={ROUTES.patient.appointment.viewAppointment} element={<PatientAppointmentView />} />
                         <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab />} />
                         <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab />} />
                         <Route path={ROUTES.patient.profile} element={<PatientProfilePage />} />

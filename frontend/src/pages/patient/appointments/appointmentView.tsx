@@ -1,33 +1,115 @@
 import React from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Check, X } from "lucide-react";
 
 import {
   getMyAppointments,
   getAppointmentById,
-  getEffectiveDate,
-  getEffectiveTime,
-  getRelativeDay,
-  formatTime,
-  STATUS_META,
   Appointment,
+  AppointmentStatus,
+  STATUS_META,
+  getDateParts,
+  getEffectiveSlot,
+  resolveStudentId,
 } from "./appointmentsData";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import { formatDate } from "/@/utils/FormatDate.ts";
 
-const DEFAULT_STUDENT_ID = "20230518-S";
+type StepState = "done" | "current" | "upcoming" | "failed";
 
-const APPOINTMENTS_PATH = ROUTES.patient.dashboard.appointments;
-const BOOK_PATH = `${APPOINTMENTS_PATH}/book`;
+interface Step {
+  title: string;
+  description: string;
+  state: StepState;
+}
 
-function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+const LABELS: Record<AppointmentStatus, { date: string; time: string }> = {
+  pending: { date: "Requested date", time: "Requested time" },
+  approved: { date: "Date", time: "Time" },
+  rejected: { date: "Requested date", time: "Requested time" },
+  rescheduled: { date: "New date", time: "New time" },
+};
+
+function buildSteps(status: AppointmentStatus): Step[] {
+  const outcome: Record<AppointmentStatus, Step> = {
+    pending: {
+      title: "Decision",
+      description: "You'll see the clinic's decision here.",
+      state: "upcoming",
+    },
+    approved: {
+      title: "Approved",
+      description: "Your slot is confirmed.",
+      state: "done",
+    },
+    rejected: {
+      title: "Rejected",
+      description: "See the clinic's note for what to do next.",
+      state: "failed",
+    },
+    rescheduled: {
+      title: "New time proposed",
+      description: "The clinic suggested a different slot.",
+      state: "done",
+    },
+  };
+
+  return [
+    {
+      title: "Request sent",
+      description: "Your request was submitted to the clinic.",
+      state: "done",
+    },
+    {
+      title: "Clinic review",
+      description:
+        status === "pending"
+          ? "The clinic is reviewing your request."
+          : "The clinic reviewed your request.",
+      state: status === "pending" ? "current" : "done",
+    },
+    outcome[status],
+  ];
+}
+
+function StepMarker({ state }: { state: StepState }) {
+  if (state === "done") {
+    return (
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+        <Check className="h-4 w-4" strokeWidth={2.5} />
+      </span>
+    );
+  }
+  if (state === "failed") {
+    return (
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
+        <X className="h-4 w-4" strokeWidth={2.5} />
+      </span>
+    );
+  }
+  if (state === "current") {
+    return (
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-amber-500 bg-amber-500/10">
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+      </span>
+    );
+  }
   return (
-    <div className="flex items-baseline justify-between gap-4 py-3.5">
-      <dt className="text-xs text-textMuted">{label}</dt>
-      <dd className={`text-right text-sm font-medium text-textPrimary ${mono ? "font-mono" : ""}`}>
-        {value}
-      </dd>
+    <span className="h-8 w-8 shrink-0 rounded-full border-2 border-border bg-surface" />
+  );
+}
+
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-6 py-3.5 text-sm">
+      <dt className="shrink-0 text-textMuted">{label}</dt>
+      <dd className="text-right font-medium text-textPrimary">{children}</dd>
     </div>
   );
 }
@@ -37,12 +119,7 @@ export default function PatientAppointmentView() {
   const params = useParams();
   const [searchParams] = useSearchParams();
 
-  const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
-  const studentId = getMyAppointments(sessionId).length > 0 ? sessionId : DEFAULT_STUDENT_ID;
-
-  // Handles either a route param (/view/:id) or a query string (?id=...),
-  // since it isn't confirmed yet which one links to this page.
+  const studentId = resolveStudentId(sessionManager.getUser());
   const requestedId = params.id ?? searchParams.get("id") ?? undefined;
 
   const appointments = getMyAppointments(studentId);
@@ -50,20 +127,21 @@ export default function PatientAppointmentView() {
     ? getAppointmentById(studentId, requestedId)
     : appointments[0];
 
-  const handleBack = () => navigate(APPOINTMENTS_PATH);
+  const handleBack = () => navigate(ROUTES.patient.dashboard.appointments);
+  const handleBook = () => navigate(ROUTES.patient.appointment.bookAppointment);
 
   if (!appointment) {
     return (
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-        <p className="text-sm font-medium text-textPrimary">That appointment isn't in your list</p>
-        <p className="mt-1 text-xs leading-relaxed text-textMuted">
-          It may have been removed, or the link points to a different patient.
+      <div className="w-full rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
+        <p className="text-sm text-textMuted">
+          We couldn't find that appointment.
         </p>
         <button
           type="button"
           onClick={handleBack}
-          className="mt-5 text-sm font-semibold text-primary hover:text-primaryDark"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primaryDark"
         >
+          <ArrowLeft className="h-3.5 w-3.5" />
           Back to appointments
         </button>
       </div>
@@ -71,93 +149,163 @@ export default function PatientAppointmentView() {
   }
 
   const meta = STATUS_META[appointment.status];
-  const date = getEffectiveDate(appointment);
-  const relative = getRelativeDay(date);
+  const StatusIcon = meta.icon;
+  const steps = buildSteps(appointment.status);
+  const labels = LABELS[appointment.status];
+  const slot = getEffectiveSlot(appointment);
+  const slotDate = getDateParts(slot.date);
+  const isRescheduled =
+    appointment.status === "rescheduled" && !!appointment.rescheduledTo;
+  const originalDate = isRescheduled ? getDateParts(appointment.date) : null;
+  const canRebook =
+    appointment.status === "rejected" || appointment.status === "rescheduled";
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div className="w-full">
       <button
         type="button"
         onClick={handleBack}
-        className="mb-5 inline-flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-xs font-medium text-textMuted transition-colors hover:text-textPrimary"
+        className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
       >
-        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
+        <ArrowLeft className="h-3.5 w-3.5" />
         Back to appointments
       </button>
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        {/* Left — the record */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-          <div className={`h-1 w-full ${meta.rail}`} aria-hidden="true" />
-
-          <div className="p-6 sm:p-8">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-textSecondary">
-              <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+      <section className="mt-3 overflow-hidden rounded-3xl bg-gradient-to-b from-primary/15 to-white text-primaryDark shadow-sm">
+        <div className="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-xs font-medium text-primary border border-primary/20">
+              <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
               {meta.label}
             </span>
-
-            <h1 className="mt-3 font-heading text-2xl font-semibold leading-tight text-textPrimary">
+            <h1 className="mt-4 font-heading text-3xl font-semibold tracking-tight">
               {appointment.type}
             </h1>
-            <p className="mt-2 max-w-prose text-sm leading-relaxed text-textSecondary">{meta.hint}</p>
-
-            <p className="mt-6 font-heading text-lg font-medium text-textPrimary">
-              {formatDate(date)} at {formatTime(getEffectiveTime(appointment))}
+            <p className="mt-1 font-mono text-xs text-primary">
+              {appointment.id}
             </p>
-            {relative && <p className="mt-1 text-xs text-textMuted">{relative}</p>}
+          </div>
 
-            {appointment.status === "rescheduled" && appointment.rescheduledTo && (
-              <p className="mt-6 border-l-2 border-primary/40 pl-4 text-sm leading-relaxed text-textSecondary">
-                The clinic moved this appointment. It was originally set for{" "}
-                {formatDate(appointment.date)} at {formatTime(appointment.time)}.
+          <div className="flex flex-wrap gap-3">
+            <div className="rounded-2xl border border-primary bg-white/50 px-5 py-4">
+              <p className="text-xs text-primary">{labels.date}</p>
+              <p className="mt-1 mb-1 text-lg font-semibold text-primary">
+                {slotDate?.full ?? slot.date}
               </p>
-            )}
-
-            <div className="mt-8 border-t border-border pt-6">
-              <p className="text-xs text-textMuted">Notes</p>
-              <p className="mt-2 max-w-prose text-sm leading-relaxed text-textSecondary">
-                {appointment.notes || "No additional notes for this appointment."}
-              </p>
+              {slotDate && (
+                <p className="text-xs text-primary">{slotDate.weekday}</p>
+              )}
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-border pt-6">
-              <button
-                type="button"
-                onClick={() => navigate(BOOK_PATH)}
-                className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-card transition-colors hover:bg-primaryDark"
-              >
-                {appointment.status === "rejected" ? "Submit a new request" : "Book another visit"}
-              </button>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-textPrimary transition-colors hover:border-primary/40 hover:text-primary"
-              >
-                Print
-              </button>
+            <div className="rounded-2xl border border-primary bg-white/50 px-5 py-4">
+              <p className="text-xs text-primary">{labels.time}</p>
+              <p className="mt-1 text-lg font-semibold text-primary">
+                {slot.time}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Right — the facts, pinned alongside */}
-        <aside className="lg:sticky lg:top-6">
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-            <h2 className="font-heading text-sm font-semibold text-textPrimary">Details</h2>
-
-            <dl className="mt-2 divide-y divide-border">
-              <Row label="Date" value={formatDate(date)} />
-              <Row label="Time" value={formatTime(getEffectiveTime(appointment))} />
-              <Row label="Type" value={appointment.type} />
-              <Row label="Reference" value={appointment.id} mono />
-              <Row label="Patient" value={studentId} mono />
-            </dl>
+        {isRescheduled && originalDate && (
+          <div className="border-t border-white/10 bg-white/5 px-6 py-4 text-sm text-white/70 sm:px-8">
+            Originally scheduled for {originalDate.full} at {appointment.time}.
           </div>
+        )}
+      </section>
 
-          <p className="mt-4 px-1 text-xs leading-relaxed text-textMuted">
-            Bring your student ID. To cancel or move a confirmed slot, contact the clinic at least 24
-            hours ahead.
+      <section className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <h2 className="font-heading text-sm font-semibold text-textPrimary">
+          Progress
+        </h2>
+
+        <ol className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {steps.map((step, index) => {
+            const isLast = index === steps.length - 1;
+            return (
+              <li key={step.title} className="min-w-0">
+                <div className="flex items-center gap-3">
+                  <StepMarker state={step.state} />
+                  {!isLast && (
+                    <span
+                      aria-hidden
+                      className={`hidden h-0.5 flex-1 md:block ${
+                        step.state === "done" ? "bg-primary/40" : "bg-border"
+                      }`}
+                    />
+                  )}
+                </div>
+                <p
+                  className={`mt-3 text-sm font-semibold ${
+                    step.state === "upcoming"
+                      ? "text-textMuted"
+                      : "text-textPrimary"
+                  }`}
+                >
+                  {step.title}
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-textMuted">
+                  {step.description}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="mt-6 flex items-start gap-3 rounded-xl bg-surfaceMuted/60 px-4 py-3">
+          <StatusIcon
+            className={`mt-0.5 h-4 w-4 shrink-0 ${meta.iconText}`}
+            strokeWidth={2}
+          />
+          <p className="text-sm leading-relaxed text-textSecondary">
+            {meta.message}
           </p>
-        </aside>
+        </div>
+      </section>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
+        <section className="rounded-2xl border border-border bg-surface shadow-sm">
+          <h2 className="border-b border-border px-6 py-4 font-heading text-sm font-semibold text-textPrimary">
+            Appointment details
+          </h2>
+          <dl className="divide-y divide-border px-6">
+            <DetailRow label="Type">{appointment.type}</DetailRow>
+            <DetailRow label="Reference">
+              <span className="font-mono">{appointment.id}</span>
+            </DetailRow>
+            {isRescheduled && originalDate ? (
+              <>
+                <DetailRow label="Original slot">
+                  {originalDate.full}, {appointment.time}
+                </DetailRow>
+                <DetailRow label="New slot">
+                  {slotDate?.full ?? slot.date}, {slot.time}
+                </DetailRow>
+              </>
+            ) : (
+              <>
+                <DetailRow label={labels.date}>
+                  {slotDate?.full ?? slot.date}
+                </DetailRow>
+                <DetailRow label={labels.time}>{slot.time}</DetailRow>
+              </>
+            )}
+            <DetailRow label="Status">
+              <span className="inline-flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
+                {meta.label}
+              </span>
+            </DetailRow>
+          </dl>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-surface shadow-sm">
+          <h2 className="border-b border-border px-6 py-4 font-heading text-sm font-semibold text-textPrimary">
+            Notes
+          </h2>
+          <p className="p-6 text-sm leading-relaxed text-textSecondary">
+            {appointment.notes || "No additional notes for this appointment."}
+          </p>
+        </section>
       </div>
     </div>
   );

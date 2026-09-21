@@ -1,291 +1,348 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CalendarDays, CalendarPlus, CalendarX, ChevronRight, Clock, RotateCcw } from "lucide-react";
 
 import {
   getMyAppointments,
-  sortAppointments,
-  isUpcoming,
-  getEffectiveDate,
-  getEffectiveTime,
-  getRelativeDay,
-  formatTime,
-  STATUS_META,
   Appointment,
   AppointmentStatus,
+  STATUS_META,
+  daysUntilLabel,
+  getDateParts,
+  getEffectiveSlot,
+  getViewPath,
+  isUpcoming,
+  resolveStudentId,
 } from "./appointmentsData";
-import { sessionManager } from "/@/utils/SessionManager";
+import { sessionManager } from "/@/utils/SessionManager.ts";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import { formatDate } from "/@/utils/FormatDate";
 
-const DEFAULT_STUDENT_ID = "20230518-S";
+const STATUS_KEYS: AppointmentStatus[] = ["pending", "approved", "rescheduled", "rejected"];
 
+type UpcomingFilter = "all" | Exclude<AppointmentStatus, "rejected">;
 
-const APPOINTMENTS_PATH = ROUTES.patient.dashboard.appointments;
-const BOOK_PATH = `${APPOINTMENTS_PATH}/book`;
-const viewPath = (id: string) => `${APPOINTMENTS_PATH}/view/${id}`;
-
-type Filter = "upcoming" | "all" | AppointmentStatus;
-
-const FILTERS: { key: Filter; label: string }[] = [
-  { key: "upcoming", label: "Upcoming" },
+const UPCOMING_FILTERS: { key: UpcomingFilter; label: string }[] = [
+  { key: "all", label: "All" },
   { key: "pending", label: "Pending" },
   { key: "approved", label: "Approved" },
-  { key: "all", label: "All" },
+  { key: "rescheduled", label: "Rescheduled" },
 ];
 
-function matchesFilter(appointment: Appointment, filter: Filter) {
-  if (filter === "all") return true;
-  if (filter === "upcoming") return isUpcoming(appointment);
-  return appointment.status === filter;
+interface FilterOption<T extends string> {
+  key: T;
+  label: string;
+  count: number;
+  dot?: string;
 }
 
-/** "18 Sep" split into its parts, for the date block on each row. */
-function splitDate(date: string) {
-  const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return { day: "--", month: "" };
-  return {
-    day: String(parsed.getDate()).padStart(2, "0"),
-    month: parsed.toLocaleDateString(undefined, { month: "short" }),
-  };
-}
-
-function StatusLabel({ status, className = "" }: { status: AppointmentStatus; className?: string }) {
-  const meta = STATUS_META[status];
-  return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium text-textSecondary ${className}`}>
-      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-      {meta.label}
-    </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-
-function AppointmentRow({
-  appointment,
-  isSelected,
-  onActivate,
+function FilterBar<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
 }: {
-  appointment: Appointment;
-  isSelected: boolean;
-  onActivate: () => void;
+  options: FilterOption<T>[];
+  value: T;
+  onChange: (key: T) => void;
+  label: string;
 }) {
-  const date = getEffectiveDate(appointment);
-  const { day, month } = splitDate(date);
-  const relative = getRelativeDay(date);
-
   return (
-    <button
-      type="button"
-      onClick={onActivate}
-      aria-current={isSelected ? "true" : undefined}
-      className={`group flex w-full items-center gap-4 rounded-xl border px-4 py-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-        isSelected
-          ? "border-primary/40 bg-primary/[0.04]"
-          : "border-border bg-surface hover:bg-surfaceMuted/40"
-      }`}
-    >
-      <span className="flex w-11 shrink-0 flex-col items-center border-r border-border pr-4">
-        <span className="font-heading text-lg font-semibold leading-none text-textPrimary">{day}</span>
-        <span className="mt-1 text-[11px] text-textMuted">{month}</span>
-      </span>
-
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-textPrimary">{appointment.type}</span>
-        <span className="mt-1 block text-xs text-textMuted">
-          {formatTime(getEffectiveTime(appointment))}
-          {relative ? ` · ${relative}` : ""}
-        </span>
-      </span>
-
-      <StatusLabel status={appointment.status} className="shrink-0" />
-    </button>
-  );
-}
-
-function DetailPreview({ appointment, onOpen }: { appointment: Appointment; onOpen: () => void }) {
-  const meta = STATUS_META[appointment.status];
-
-  return (
-    <div className="p-6">
-      <StatusLabel status={appointment.status} />
-
-      <h2 className="mt-3 font-heading text-lg font-semibold leading-snug text-textPrimary">
-        {appointment.type}
-      </h2>
-      <p className="mt-1.5 text-sm leading-relaxed text-textSecondary">{meta.hint}</p>
-
-      <dl className="mt-6 divide-y divide-border border-y border-border">
-        <div className="flex items-baseline justify-between gap-4 py-3">
-          <dt className="text-xs text-textMuted">Date</dt>
-          <dd className="text-right text-sm font-medium text-textPrimary">
-            {formatDate(getEffectiveDate(appointment))}
-          </dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 py-3">
-          <dt className="text-xs text-textMuted">Time</dt>
-          <dd className="text-right text-sm font-medium text-textPrimary">
-            {formatTime(getEffectiveTime(appointment))}
-          </dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 py-3">
-          <dt className="text-xs text-textMuted">Reference</dt>
-          <dd className="text-right font-mono text-sm text-textPrimary">{appointment.id}</dd>
-        </div>
-      </dl>
-
-      {appointment.status === "rescheduled" && appointment.rescheduledTo && (
-        <p className="mt-4 border-l-2 border-primary/40 pl-3 text-xs leading-relaxed text-textSecondary">
-          Moved from {formatDate(appointment.date)} at {formatTime(appointment.time)}.
-        </p>
-      )}
-
-      {appointment.notes && (
-        <div className="mt-5">
-          <p className="text-xs text-textMuted">Notes from the clinic</p>
-          <p className="mt-1.5 text-sm leading-relaxed text-textSecondary">{appointment.notes}</p>
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={onOpen}
-        className="mt-6 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-textPrimary transition-colors hover:border-primary/40 hover:text-primary"
-      >
-        Open full details
-      </button>
+    <div role="group" aria-label={label} className="flex gap-2 overflow-x-auto pb-1">
+      {options.map((option) => {
+        const active = option.key === value;
+        return (
+          <button
+            key={option.key}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(option.key)}
+            className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+              active
+                ? "border-primary bg-primary text-white"
+                : "border-border bg-surface text-textSecondary hover:bg-surfaceMuted/60 hover:text-textPrimary"
+            }`}
+          >
+            {option.dot && <span className={`h-2 w-2 rounded-full ${option.dot}`} />}
+            {option.label}
+            <span
+              className={`rounded-md px-1.5 py-0.5 text-[10px] leading-none ${
+                active ? "bg-white/20 text-white" : "bg-surfaceMuted text-textMuted"
+              }`}
+            >
+              {option.count}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-
-export default function PatientAppointments() {
-  const navigate = useNavigate();
-
-  const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
-  const studentId = getMyAppointments(sessionId).length > 0 ? sessionId : DEFAULT_STUDENT_ID;
-
-  const all = useMemo(() => sortAppointments(getMyAppointments(studentId)), [studentId]);
-
-  const [filter, setFilter] = useState<Filter>("upcoming");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const visible = useMemo(() => all.filter((a) => matchesFilter(a, filter)), [all, filter]);
-  const selected = visible.find((a) => a.id === selectedId) ?? visible[0];
-
-  const counts = useMemo(
-    () => ({
-      upcoming: all.filter((a) => isUpcoming(a)).length,
-      pending: all.filter((a) => a.status === "pending").length,
-      approved: all.filter((a) => a.status === "approved").length,
-      rejected: all.filter((a) => a.status === "rejected").length,
-      rescheduled: all.filter((a) => a.status === "rescheduled").length,
-      all: all.length,
-    }),
-    [all],
-  );
-
-  // Below `lg` there's no preview panel, so a tap goes straight to the detail
-  // page instead of selecting a row nothing will display.
-  const handleActivate = (id: string) => {
-    const hasPreview =
-      typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
-    if (hasPreview) setSelectedId(id);
-    else navigate(viewPath(id));
-  };
+function AppointmentCard({ appointment, onOpen }: { appointment: Appointment; onOpen: () => void }) {
+  const meta = STATUS_META[appointment.status];
+  const slot = getEffectiveSlot(appointment);
+  const date = getDateParts(slot.date);
+  const original = appointment.status === "rescheduled" ? getDateParts(appointment.date) : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
-      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-heading text-xl font-semibold text-textPrimary">My appointments</h1>
-          <p className="mt-1 text-sm text-textMuted">
-            {counts.upcoming > 0
-              ? `${counts.upcoming} upcoming · ${counts.pending} waiting on the clinic`
-              : "Nothing scheduled right now."}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => navigate(BOOK_PATH)}
-          className="w-fit rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-card transition-colors hover:bg-primaryDark"
-        >
-          Book appointment
-        </button>
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition-all hover:border-textMuted/40 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+    >
+      <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-surfaceMuted">
+        <span className="text-[11px] font-medium uppercase leading-none tracking-wide text-textMuted">
+          {date?.monthShort}
+        </span>
+        <span className="mt-1 font-heading text-xl font-semibold leading-none text-textPrimary">
+          {date?.day}
+        </span>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        {/* Left — the list */}
-        <div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {FILTERS.map((option) => {
-              const active = filter === option.key;
-              return (
-                <button
-                  key={option.key}
-                  type="button"
-                  onClick={() => {
-                    setFilter(option.key);
-                    setSelectedId(null);
-                  }}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    active
-                      ? "bg-primary text-white"
-                      : "text-textMuted hover:bg-surfaceMuted hover:text-textPrimary"
-                  }`}
-                >
-                  {option.label}{" "}
-                  <span className={active ? "text-white/70" : "text-textMuted"}>
-                    {counts[option.key as keyof typeof counts] ?? 0}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-textPrimary">{appointment.type}</p>
+        <p className="mt-0.5 text-xs text-textMuted">
+          {date?.weekdayShort}, {slot.time}
+        </p>
+        {original && (
+          <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-textMuted">
+            <RotateCcw className="h-3 w-3 shrink-0" strokeWidth={2} />
+            Originally {original.short}, {appointment.time}
+          </p>
+        )}
+      </div>
 
-          <div className="mt-4 flex flex-col gap-2.5">
-            {visible.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-surface px-6 py-14 text-center">
-                <p className="text-sm font-medium text-textPrimary">Nothing in this view</p>
-                <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-textMuted">
-                  Book a slot and it will appear here as soon as you submit it.
-                </p>
+      <div className="flex shrink-0 items-center gap-3">
+        <span className="inline-flex items-center gap-2 whitespace-nowrap text-xs font-medium text-textPrimary">
+          <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
+          <span className="hidden sm:inline">{meta.label}</span>
+        </span>
+        <ChevronRight
+          className="h-4 w-4 text-textMuted transition-transform group-hover:translate-x-0.5"
+          strokeWidth={2}
+        />
+      </div>
+    </button>
+  );
+}
+
+function Column({
+  title,
+  items,
+  emptyText,
+  onOpen,
+  toolbar,
+}: {
+  title: string;
+  items: Appointment[];
+  emptyText: string;
+  onOpen: (id: string) => void;
+  toolbar: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center gap-2 px-1">
+        <h3 className="font-heading text-base font-semibold text-textPrimary">{title}</h3>
+        <span className="rounded-md bg-surfaceMuted px-1.5 py-0.5 text-[11px] font-semibold text-textSecondary">
+          {items.length}
+        </span>
+      </div>
+
+      <div className="mb-3 flex min-h-[34px] items-center">{toolbar}</div>
+
+      {items.length > 0 ? (
+        <ul className="flex flex-col gap-3">
+          {items.map((appointment) => (
+            <li key={appointment.id}>
+              <AppointmentCard appointment={appointment} onOpen={() => onOpen(appointment.id)} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-border bg-surface/60 px-6 py-12 text-center">
+          <CalendarX className="h-5 w-5 text-textMuted" strokeWidth={2} />
+          <p className="mt-3 text-sm text-textMuted">{emptyText}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default function PatientAppointmentsTab() {
+  const navigate = useNavigate();
+  const studentId = resolveStudentId(sessionManager.getUser());
+  const [upcomingFilter, setUpcomingFilter] = useState<UpcomingFilter>("all");
+
+  const { upcoming, history, counts } = useMemo(() => {
+    const all = getMyAppointments(studentId);
+    const upcomingList = all
+      .filter(isUpcoming)
+      .sort((a, b) => getEffectiveSlot(a).date.localeCompare(getEffectiveSlot(b).date));
+    const historyList = all
+      .filter((appointment) => !isUpcoming(appointment))
+      .sort((a, b) => getEffectiveSlot(b).date.localeCompare(getEffectiveSlot(a).date));
+    const statusCounts: Record<AppointmentStatus, number> = {
+      pending: 0,
+      approved: 0,
+      rescheduled: 0,
+      rejected: 0,
+    };
+    all.forEach((appointment) => {
+      statusCounts[appointment.status] += 1;
+    });
+    return { upcoming: upcomingList, history: historyList, counts: statusCounts };
+  }, [studentId]);
+
+  const filterOptions = useMemo<FilterOption<UpcomingFilter>[]>(
+    () =>
+      UPCOMING_FILTERS.map((filter) => ({
+        key: filter.key,
+        label: filter.label,
+        count:
+          filter.key === "all"
+            ? upcoming.length
+            : upcoming.filter((appointment) => appointment.status === filter.key).length,
+        dot: filter.key === "all" ? undefined : STATUS_META[filter.key].dot,
+      })),
+    [upcoming]
+  );
+
+  const filteredUpcoming =
+    upcomingFilter === "all"
+      ? upcoming
+      : upcoming.filter((appointment) => appointment.status === upcomingFilter);
+
+  const activeFilterLabel = UPCOMING_FILTERS.find((filter) => filter.key === upcomingFilter)?.label.toLowerCase();
+
+  const next = upcoming[0];
+  const nextSlot = next ? getEffectiveSlot(next) : null;
+  const nextDate = nextSlot ? getDateParts(nextSlot.date) : null;
+  const nextMeta = next ? STATUS_META[next.status] : null;
+  const countdown = nextSlot ? daysUntilLabel(nextSlot.date) : "";
+
+  const goToBook = () => navigate(ROUTES.patient.appointment.bookAppointment);
+  const goToView = (id: string) => navigate(getViewPath(id));
+
+  return (
+    <div className="w-full">
+      <section className="overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-primary/15 to-white shadow-sm">
+        <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          {next && nextSlot && nextMeta ? (
+            <>
+              <div className="flex min-w-0 items-center gap-5">
+                <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-2xl border border-primary/50 bg-background text-primary">
+                  <span className="text-xs font-semibold uppercase leading-none tracking-wide text-primary">
+                    {nextDate?.monthShort}
+                  </span>
+                  <span className="mt-1.5 font-heading text-3xl font-semibold leading-none text-textPrimary">
+                    {nextDate?.day}
+                  </span>
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-medium uppercase tracking-wide text-textMuted">
+                      Next appointment
+                    </span>
+                    {countdown && (
+                      <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primaryDark">
+                        {countdown}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="mt-1.5 truncate font-heading text-2xl font-semibold tracking-tight text-primaryDark">
+                    {next.type}
+                  </p>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-textSecondary">
+                    <span className="inline-flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-textMuted" strokeWidth={2} />
+                      {nextDate?.weekday}, {nextDate?.short}
+                    </span>
+                    <span className="inline-flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-textMuted" strokeWidth={2} />
+                      {nextSlot.time}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => navigate(BOOK_PATH)}
-                  className="mt-4 text-sm font-semibold text-primary hover:text-primaryDark"
+                  onClick={() => goToView(next.id)}
+                  className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primaryDark"
                 >
-                  Book an appointment
+                  View details
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goToBook}
+                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-textPrimary transition-colors hover:bg-background"
+                >
+                  <CalendarPlus className="h-4 w-4 text-primary" strokeWidth={2} />
+                  Book appointment
                 </button>
               </div>
-            ) : (
-              visible.map((appointment) => (
-                <AppointmentRow
-                  key={appointment.id}
-                  appointment={appointment}
-                  isSelected={selected?.id === appointment.id}
-                  onActivate={() => handleActivate(appointment.id)}
-                />
-              ))
-            )}
-          </div>
-        </div>
+            </>
+          ) : (
+            <>
+              <div className="flex min-w-0 items-center gap-5">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-border bg-background text-primary">
+                  <CalendarPlus className="h-7 w-7" strokeWidth={2} />
+                </div>
 
-        {/* Right — detail preview, pinned on desktop */}
-        <aside className="hidden lg:sticky lg:top-6 lg:block">
-          <div className="rounded-2xl border border-border bg-surface shadow-sm">
-            {selected ? (
-              <DetailPreview appointment={selected} onOpen={() => navigate(viewPath(selected.id))} />
-            ) : (
-              <p className="px-6 py-14 text-center text-sm text-textMuted">
-                Select an appointment to see its details.
-              </p>
-            )}
-          </div>
-        </aside>
+                <div className="min-w-0">
+                  <p className="font-heading text-2xl font-semibold tracking-tight text-textPrimary">
+                    Nothing scheduled
+                  </p>
+                  <p className="mt-1 text-sm text-textSecondary">
+                    Book an appointment and the clinic will confirm your slot.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={goToBook}
+                className="inline-flex w-fit shrink-0 items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primaryDark"
+              >
+                <CalendarPlus className="h-4 w-4" strokeWidth={2} />
+                Book appointment
+              </button>
+            </>
+          )}
+        </div>
+      </section>
+
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+        <Column
+          title="Upcoming"
+          items={filteredUpcoming}
+          emptyText={
+            upcomingFilter === "all"
+              ? "No upcoming appointments."
+              : `No ${activeFilterLabel} appointments.`
+          }
+          onOpen={goToView}
+          toolbar={
+            <FilterBar
+              label="Filter upcoming appointments by status"
+              options={filterOptions}
+              value={upcomingFilter}
+              onChange={setUpcomingFilter}
+            />
+          }
+        />
+        <Column
+          title="History"
+          toolbar={<p className="text-xs text-textMuted">Past and closed requests</p>}
+          items={history}
+          emptyText="Nothing in your history yet."
+          onOpen={goToView}
+        />
       </div>
     </div>
   );
