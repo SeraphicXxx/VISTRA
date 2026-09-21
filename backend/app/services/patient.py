@@ -2,6 +2,7 @@ from fastapi import status, HTTPException
 
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
+from app.schemas.response_dto.reponses import Response, SummaryRecord
 from app.services.auth.user import create_auth_user, delete_auth_user
 from app.utils.email_utils import remove_ucc_domain
 
@@ -193,3 +194,24 @@ def get_all_patient_profiles(supabase, filters):
             "success": False,
             "message": str(e)
         }
+
+
+def get_patient_summary_record(supabase, patient_id):
+    try:
+        patient_repo = PatientRepository(supabase)
+
+        response = patient_repo.get_summary_records(patient_id)
+
+        return Response(
+            success=True,
+            data=response.data
+        )
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
