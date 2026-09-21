@@ -1,25 +1,12 @@
-from datetime import date, datetime
+from datetime import date
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.enums.civil_status import CivilStatus
+from app.enums.sex import Sex
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_enum
-from app.enums.sex import Sex
-from app.enums.summary_type import SummaryType
-
-
-class PatientSummary(BaseModel):
-    type: SummaryType
-    id: str
-    patient_id: str
-    patient_name: str
-    date: datetime
-    title: str | None
-    notes: str | None
-    staff_id: str | None
-    provider: str | None
 
 
 class Patient(BaseModel):
@@ -157,3 +144,11 @@ class CreatePatientRequest(BaseModel):
     @classmethod
     def validate_civil_status(cls, value: str):
         return confirm_enum(value, CivilStatus)
+
+class PatientRecord(BaseModel):
+    id: int
+    date: str
+    title: str
+    notes: str | None
+    staff_id: str
+    provider: str

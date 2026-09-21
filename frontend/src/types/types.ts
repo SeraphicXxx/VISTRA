@@ -1,4 +1,10 @@
 import {Status} from "/@/components/StatusBadge";
+import {PatientInfo} from "/@/api/schema/PatientSchema";
+
+export type PatientRecordTab = keyof Pick<
+    PatientInfo,
+    "appointment" | "medical" | "dental"
+>;
 
 export type TreatmentType =
   | "Medicine"

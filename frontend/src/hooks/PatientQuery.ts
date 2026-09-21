@@ -1,6 +1,6 @@
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord} from "/@/api/patient.api";
 import {useDebounce} from "/@/hooks/Debouncer";
 
 /**
@@ -44,6 +44,24 @@ export function usePatientDebouncedQuery(filters?: PatientFilters) {
             return data.data;
         },
 
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientRecordSummaryQuery(patientId: string) {
+    return useQuery({
+        queryKey: ["summaryRecord", patientId],
+
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientSummaryRecord(
+                patientId,
+                signal
+            );
+
+            return data;
+        },
+
+        enabled: Boolean(patientId),
         refetchOnWindowFocus: false,
     });
 }

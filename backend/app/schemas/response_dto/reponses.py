@@ -1,8 +1,8 @@
 from typing import Generic, TypeVar
-from datetime import datetime
+
 from pydantic import BaseModel, computed_field
 
-from app.enums.summary_type import SummaryType
+from app.schemas.patient import PatientRecord
 
 T = TypeVar("T")
 
@@ -25,11 +25,11 @@ class Response(BaseModel, Generic[T]):
     message: str | None = None
 
 class SummaryRecord(BaseModel):
-    type: SummaryType
-    id: int
     patient_id: str
     patient_name: str
-    date: datetime
-    title: str
-    staff_id: str
-    provider: str
+    course: str | None
+    department: str | None
+    school_year: str | None
+    appointment: list[PatientRecord]
+    medical: list[PatientRecord]
+    dental: list[PatientRecord]

@@ -156,7 +156,11 @@ type interviewForm = {
 
 export default function AppointmentDetailView() {
     const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
-
+    const { form, setField } = useForm<interviewForm>({
+        status: "pending",
+        declined: false,
+        reason: "",
+    });
     if (!appointmentId || !patientId) {
         return (
             <AppointmentNotFound
@@ -191,11 +195,7 @@ export default function AppointmentDetailView() {
 
     const appointment = appointmentModel.UiPageFormat() as AppointmentUiModel;
 
-    const { form, setField } = useForm<interviewForm>({
-        status: "pending",
-        declined: false,
-        reason: "",
-    });
+
 
     const meta = STATUS_META[form.status];
 

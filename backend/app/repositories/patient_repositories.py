@@ -95,7 +95,7 @@ class PatientRepository:
             .table("patient_summary")
             .select("*")
             .eq("patient_id", patient_id)
-            .order("date", desc=True)
+            .single()
             .execute()
         )
 # note to me

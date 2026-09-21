@@ -1,12 +1,12 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter, Depends
+from supabase import Client
 
 from app.config.security import get_current_user
+from app.database.database_client import get_supabase_for_user
 from app.schemas.patient import CreatePatientRequest
 from app.schemas.query import FilterPatient
-from app.schemas.response_dto.reponses import Response, SummaryRecord
-from app.services.patient import get_all_patients, create_patient, get_patient_by_id, get_all_patient_profiles, get_patient_summary_record
-from app.database.database_client import get_supabase_for_user
-from supabase import Client
+from app.services.patient import get_all_patients, create_patient, get_patient_by_id, get_all_patient_profiles, \
+    get_patient_summary_record
 
 protected_patients_router = APIRouter(
     prefix="/patients",
@@ -31,6 +31,6 @@ def get_patient(patient_id: str, supabase: Client = Depends(get_supabase_for_use
     return get_patient_by_id(patient_id, supabase)
 
 @protected_patients_router.get("/profiles/{patient_id}/")
-def profile_summary(patient_id: str ,supabase: Client = Depends(get_supabase_for_user)) -> Response[SummaryRecord]:
+def profile_summary(patient_id: str ,supabase: Client = Depends(get_supabase_for_user)):
     return get_patient_summary_record(supabase, patient_id)
 
