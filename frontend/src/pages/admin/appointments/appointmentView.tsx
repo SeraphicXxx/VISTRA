@@ -19,6 +19,7 @@ import {AppointmentModel} from "/@/repository/AppointmentModel";
 import {AppointmentPageFormat} from "/@/pages/admin/appointments/appointmentsData";
 import LoadingPage from "/@/components/LoadingPage";
 import {useAppointmentByIdQuery} from "/@/hooks/AppointmentQuery";
+import {useForm} from "/@/hooks/Form";
 
 type AppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -147,6 +148,12 @@ export function AppointmentNotFound({
     );
 }
 
+type interviewForm = {
+    status: AppointmentStatus
+    declined: boolean
+    reason: string
+}
+
 export default function AppointmentDetailView() {
     const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
 
@@ -184,40 +191,29 @@ export default function AppointmentDetailView() {
 
     const appointment = appointmentModel.UiPageFormat() as AppointmentUiModel;
 
+    const { form, setField } = useForm<interviewForm>({
+        status: "pending",
+        declined: false,
+        reason: "",
+    });
 
-    const [status, setStatus] =
-        useState<AppointmentStatus>("pending");
-
-    const [decliningReason, setDecliningReason] =
-        useState<boolean>(false);
-
-    const [reason, setReason] =
-        useState<string>("");
-
-    useEffect(() => {
-        if (appointment) {
-            setStatus(appointment.status);
-        }
-    }, [appointment]);
-
-    const meta = STATUS_META[status];
+    const meta = STATUS_META[form.status];
 
     const handleBack = (): void => {
         window.history.back();
     };
 
-
     const applyStatus = (
         next: AppointmentStatus
     ): void => {
-        setStatus(next);
-        setDecliningReason(false);
+        setField("status", next);
+        setField("declined", next === "declined");
     };
 
 
     const confirmDecline = (): void => {
         applyStatus("declined");
-        setReason("");
+        console.log(form.declined, form.reason)
     };
 
     return (
@@ -393,7 +389,7 @@ export default function AppointmentDetailView() {
 
                         {/* Decline reason */}
 
-                        {decliningReason ? (
+                        {form.declined ? (
 
                             <div className="rounded-xl border border-danger/25 bg-danger/5 p-4">
 
@@ -409,9 +405,9 @@ export default function AppointmentDetailView() {
 
 
                                 <textarea
-                                    value={reason}
+                                    value={form.reason}
                                     onChange={(event) =>
-                                        setReason(event.target.value)
+                                        setField("reason", event.target.value)
                                     }
                                     rows={3}
                                     placeholder="e.g. Schedule conflict — ask student to rebook"
@@ -434,8 +430,8 @@ export default function AppointmentDetailView() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setDecliningReason(false);
-                                            setReason("");
+                                            setField("declined", false);
+                                            setField("reason", "");
                                         }}
                                         className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
                                     >
@@ -452,7 +448,7 @@ export default function AppointmentDetailView() {
 
                                 {/* Confirm */}
 
-                                {status !== "confirmed" && (
+                                {form.status !== "confirmed" && (
 
                                     <button
                                         type="button"
@@ -470,12 +466,12 @@ export default function AppointmentDetailView() {
 
                                 {/* Decline */}
 
-                                {status !== "declined" && (
+                                {form.status !== "declined" && (
 
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            setDecliningReason(true)
+                                            setField("declined", true)
                                         }
                                         className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15"
                                     >
@@ -488,7 +484,7 @@ export default function AppointmentDetailView() {
 
                                 {/* Reset */}
 
-                                {status !== "pending" && (
+                                {form.status !== "pending" && (
 
                                     <button
                                         type="button"

@@ -12,9 +12,9 @@ import {
   STATUS_META,
   Appointment,
 } from "./appointmentsData";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import { formatDate } from "/@/utils/FormatDate.ts";
+import { formatDate } from "/@/utils/FormatDate";
 
 const DEFAULT_STUDENT_ID = "20230518-S";
 
@@ -38,7 +38,7 @@ export default function PatientAppointmentView() {
   const [searchParams] = useSearchParams();
 
   const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
+  const sessionId = user?.user_id ?? "";
   const studentId = getMyAppointments(sessionId).length > 0 ? sessionId : DEFAULT_STUDENT_ID;
 
   // Handles either a route param (/view/:id) or a query string (?id=...),

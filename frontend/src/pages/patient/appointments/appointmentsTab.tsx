@@ -164,7 +164,7 @@ export default function PatientAppointments() {
   const navigate = useNavigate();
 
   const user = sessionManager.getUser();
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
+  const sessionId = user?.user_id ?? "";
   const studentId = getMyAppointments(sessionId).length > 0 ? sessionId : DEFAULT_STUDENT_ID;
 
   const all = useMemo(() => sortAppointments(getMyAppointments(studentId)), [studentId]);
