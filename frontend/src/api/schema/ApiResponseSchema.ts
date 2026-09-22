@@ -3,7 +3,7 @@ import {SessionUser} from "/@/utils/SessionManager";
 export interface ApiResponse<T> {
     success: boolean;
     message?: string;
-    data: T;
+    data?: T;
 }
 export interface PaginatedData<T> {
     items: T[];

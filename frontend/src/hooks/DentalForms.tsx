@@ -1,8 +1,9 @@
 import { useState } from "react";
 import {CreateToothRequest} from "/@/api/schema/DentalSchema";
+import {PatientProfile} from "/@/api/schema/PatientSchema";
 
 export function useDentalRecordForm() {
-    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [selectedStudent, setSelectedStudent] = useState<PatientProfile | null>(null);
     const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
     const [toothRecords, setToothRecords] = useState<
         Record<number, CreateToothRequest>

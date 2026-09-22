@@ -24,6 +24,7 @@ export interface CreatePatientSchema {
     department?: string
     position?: string
 }
+
 export interface PatientProfile {
     id: string
     patient_id: string

@@ -2,7 +2,6 @@ import React from "react";
 import {Pagination} from "@mui/material";
 
 import PanelHeader from "/@/components/PanelHeader";
-import LoadingPage from "/@/components/LoadingPage";
 import {TableFilters} from "/@/components/Filters";
 import {
     Column,

@@ -4,9 +4,9 @@ from pydantic import BaseModel
 class DentalRecord(BaseModel):
     id: int
     patient_id: str
-    appointment_id: int
+    staff_id: str
     last_dental_visit: str
-    flossing_frequency: str
+    floss: bool
     brushing_frequency: str
     calculus_severity: str
     current_medication: str
@@ -24,34 +24,21 @@ class Odontogram(BaseModel):
 
 
 class OdontogramCreateRequest(BaseModel):
-    patient_id: str
     tooth_number: int
-    is_permanent: bool
     condition: str
+    dentition: str
     notes: str
-    dental_record_id: int
 
 
-class DentalRecordCreateRequest(BaseModel):
+class DentalVisitCreateRequest(BaseModel):
     patient_id: str
-    appointment_id: int
     last_dental_visit: str
-    flossing_frequency: str
     brushing_frequency: str
+    floss: bool
     calculus_severity: str
-    current_medication: str
+    current_medications: str
     notes: str
 
-
-class DentalCreateRequest(BaseModel):
-    patient_id: str
-    appointment_id: int
-    last_dental_visit: str
-    flossing_frequency: str
-    brushing_frequency: str
-    calculus_severity: str
-    current_medication: str
-    notes: str
-    tooth: list[OdontogramCreateRequest]
+    tooth_records: list[OdontogramCreateRequest]
 
 

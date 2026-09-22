@@ -169,7 +169,6 @@ export const GenericTableBody = <T extends { id: string }>({
     renderAction?: (record: T) => ReactNode;
 }) => {
     const colSpan = columns.length + (renderAction ? 1 : 0);
-    console.log(isLoading,data.length)
     if (isLoading && data.length === 0) {
         return (
             <tbody>

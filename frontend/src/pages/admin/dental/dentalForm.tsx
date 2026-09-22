@@ -8,6 +8,10 @@ import {StudentInfoSection} from "/@/components/StudentInfoSection.jsx";
 import {students} from "../medical/medicalData";
 import {ToothNoteModal} from "/@/components/dental/ToothForm";
 import {useDentalRecordForm} from "/@/hooks/DentalForms";
+import {getFieldErrors, removeEmptyValues} from "/@/utils/Formatters";
+import {useCreateDentalVisit} from "/@/hooks/DentalQuery";
+import {CreateDentalVisit} from "/@/api/schema/DentalSchema";
+import {sessionManager} from "/@/utils/SessionManager";
 
 const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilepsy", "Heart Disease", "Hypertension", "Others"];
 
@@ -25,11 +29,11 @@ function DentalConditionSection() {
         <>
             <div className="mt-8 grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-2">
                 <div>
-                    <FieldLabel htmlFor="calculus">Calculus</FieldLabel>
+                    <FieldLabel htmlFor="calculus_severity">Calculus</FieldLabel>
                     <div className="flex flex-wrap items-center gap-4 pt-1">
                         {["Light", "Moderate", "Heavy"].map((option) => (
                             <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
-                                <input type="radio" name="calculus" value={option}
+                                <input type="radio" name="calculus_severity" value={option}
                                        className="h-4 w-4 border-border text-primary focus:ring-primary/30"/>
                                 {option}
                             </label>
@@ -38,8 +42,8 @@ function DentalConditionSection() {
                 </div>
 
                 <FormInput
-                    id="medication"
-                    name="medication"
+                    id="current_medication"
+                    name="current_medication"
                     label="Medication"
                     placeholder="List current medications"
                 />
@@ -313,13 +317,13 @@ function DentalHabitsSection() {
     return (
         <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6">
             <div>
-                <FieldLabel htmlFor="last_visit">
+                <FieldLabel htmlFor="last_dental_visit">
                     When was the last time you visited a dentist?
                 </FieldLabel>
 
                 <input
-                    id="last_visit"
-                    name="last_visit"
+                    id="last_dental_visit"
+                    name="last_dental_visit"
                     type="text"
                     placeholder="e.g. 6 months ago"
                     className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -336,7 +340,7 @@ function DentalHabitsSection() {
                         <input
                             type="radio"
                             name="floss"
-                            value="yes"
+                            value="true"
                             className="h-4 w-4 border-border text-primary focus:ring-primary/30"
                         />
                         Yes
@@ -346,7 +350,7 @@ function DentalHabitsSection() {
                         <input
                             type="radio"
                             name="floss"
-                            value="no"
+                            value="false"
                             className="h-4 w-4 border-border text-primary focus:ring-primary/30"
                         />
                         No
@@ -355,7 +359,7 @@ function DentalHabitsSection() {
             </div>
 
             <div>
-                <FieldLabel htmlFor="brush_frequency">
+                <FieldLabel htmlFor="brushing_frequency">
                     How often do you brush your teeth?
                 </FieldLabel>
 
@@ -367,7 +371,7 @@ function DentalHabitsSection() {
                         >
                             <input
                                 type="radio"
-                                name="brush_frequency"
+                                name="brushing_frequency"
                                 value={option}
                                 className="h-4 w-4 border-border text-primary focus:ring-primary/30"
                             />
@@ -399,20 +403,39 @@ export default function DentalRecordForm() {
         window.history.back();
     };
 
+    const createDentalVisitMutation = useCreateDentalVisit();
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (selectedStudent === null) {
+            alert("Please select a student.");
+            return;
+        }
 
         const formData = Object.fromEntries(
             new FormData(e.currentTarget).entries()
         );
 
-        const record = {
-            ...formData,
-            student: selectedStudent,
-            tooth_records: toothRecords,
+        const record: CreateDentalVisit = {
+            last_dental_visit: String(formData.last_dental_visit ?? ""),
+            brushing_frequency: String(formData.brushing_frequency ?? ""),
+            floss: formData.floss === "true",
+            calculus_severity: String(formData.calculus_severity ?? ""),
+            current_medication: String(formData.current_medication ?? ""),
+            notes: String(formData.notes ?? ""),
+            patient_id: selectedStudent.patient_id,
+            tooth_records: Object.values(toothRecords),
         };
-
         console.log(record);
+        createDentalVisitMutation.mutate(record, {
+            onSuccess: (data) => {
+                console.log("Dental visit created:", data);
+            },
+            onError: (error) => {
+                console.error("Failed to create dental visit:", getFieldErrors(error));
+            },
+        });
     };
 
     return (

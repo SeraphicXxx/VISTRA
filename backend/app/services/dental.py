@@ -1,24 +1,23 @@
-from app.schemas.dental import DentalCreateRequest
+from app.schemas.dental import DentalVisitCreateRequest
 
 from app.repositories.dental_repositories import DentalRepositories
+from app.utils.email_utils import staff_id_format
 
 
-def create_dental_record(request: DentalCreateRequest, supabase):
+def create_dental_record(request: DentalVisitCreateRequest, supabase, current_user):
     try:
+        staff_id = staff_id_format(current_user.email)
         dental_repository = DentalRepositories(supabase)
 
-        dental_data = request.model_dump(
-            mode="json",
-            exclude={"tooth"}
-        )
+        dental_record_id = dental_repository.create(request, staff_id)
 
-        dental_record_id = dental_repository.create(dental_data)
-
+        print("dental_record_id", request)
         if not dental_record_id:
             raise Exception("Failed to create dental record")
 
         dental_repository.create_odontogram(
-            request.tooth,
+            request.tooth_records,
+            request.patient_id,
             dental_record_id
         )
 

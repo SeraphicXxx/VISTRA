@@ -72,3 +72,13 @@ export function getFieldErrors(error: unknown): string {
 
     return "";
 }
+
+export function removeEmptyValues<T extends Record<string, unknown>>(
+    obj: T
+): T {
+    return Object.fromEntries(
+        Object.entries(obj).filter(
+            ([, value]) => value !== "" && value !== null && value !== undefined
+        )
+    ) as T;
+}
