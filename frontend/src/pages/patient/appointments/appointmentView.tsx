@@ -8,12 +8,12 @@ import {
   Appointment,
   AppointmentStatus,
   STATUS_META,
-  getDateParts,
   getEffectiveSlot,
   resolveStudentId,
 } from "./appointmentsData";
 import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
+import { getDateParts } from "/@/utils/DateUtils";
 
 type StepState = "done" | "current" | "upcoming" | "failed";
 

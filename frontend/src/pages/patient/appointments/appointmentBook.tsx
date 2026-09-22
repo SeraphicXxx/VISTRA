@@ -18,12 +18,10 @@ import {
   addAppointment,
   APPOINTMENT_TYPES,
   DEFAULT_STUDENT_ID,
-  getDateParts,
-  to12Hour,
-  todayISO,
 } from "./appointmentsData";
 import { sessionManager } from "/@/utils/SessionManager.ts";
 import { ROUTES } from "/@/config/RoutePaths.js";
+import { getDateParts, todayISO, to12Hour } from "/@/utils/DateUtils";
 
 const INPUT_CLASS =
   "h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";

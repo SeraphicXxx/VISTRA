@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 import PatientStatsGrid from "./stats";
-import { getMyAppointments, Appointment } from "./appointmentsData";
+import { getMyAppointments, Appointment } from "../appointments/appointmentsData";
 import { myMedicalRecords, myVisits } from "../medical/medicalData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
@@ -41,7 +41,7 @@ function todayLabel(): string {
 
 function WelcomeHero({ name, studentId }: { name: string; studentId: string }) {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
+    <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-primary/5x to-white shadow-card">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_70%_100%_at_0%_0%,black,transparent)]" />
       <div className="pointer-events-none absolute -top-24 -left-10 h-64 w-64 rounded-full bg-primary/10 blur-[90px]" />
 
@@ -61,11 +61,11 @@ function WelcomeHero({ name, studentId }: { name: string; studentId: string }) {
             </span>
           </div>
 
-          <h1 className="mt-3 font-heading text-2xl font-semibold leading-tight text-textPrimary sm:text-3xl">
+          <h1 className="mt-3 font-heading text-2xl font-semibold leading-tight text-primaryDark sm:text-3xl">
             Welcome back, {name.split(" ")[0]}.
           </h1>
 
-          <p className="mt-1.5 max-w-md text-sm text-textSecondary">
+          <p className="mt-1.5 max-w-l text-sm text-textSecondary">
             Here's what's happening with your health records and upcoming visits.
           </p>
         </div>
@@ -223,36 +223,6 @@ function RecentVisitsPanel({ visits }: { visits: Visit[] }) {
   );
 }
 
-function UpcomingList({ appointments }: { appointments: Appointment[] }) {
-  if (appointments.length === 0) return null;
-
-  return (
-    <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
-      <h2 className="font-heading text-sm font-semibold text-primaryDark">Also Upcoming</h2>
-
-      <div className="mt-4 flex flex-col gap-1">
-        {appointments.map((apt) => (
-          <div
-            key={apt.id}
-            className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-background"
-          >
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-textPrimary">{apt.type}</p>
-              <p className="mt-0.5 text-xs text-textMuted">
-                {formatDate(apt.date)} · {apt.time}
-              </p>
-            </div>
-
-            <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium capitalize text-primary">
-              {statusLabels[apt.status] ?? apt.status}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function PatientOverviewTab() {
   const { searchQuery } = useOutletContext<OutletContextShape>();
   const user = sessionManager.getUser();
@@ -270,7 +240,6 @@ export default function PatientOverviewTab() {
     [appointments],
   );
   const nextAppointment: Appointment | null = sortedAppointments[0] ?? null;
-  const upcomingAfterNext = sortedAppointments.slice(1);
 
   const recentVisits = useMemo(() => {
     return [...visits].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
