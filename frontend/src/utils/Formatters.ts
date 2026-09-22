@@ -17,6 +17,7 @@ export function formatDisplayDate(date = new Date()) {
         day: "numeric",
     }).format(date);
 }
+
 export function extractStaffCode(email: any) {
     if (!email || typeof email !== "string") {
         return "";
@@ -24,6 +25,7 @@ export function extractStaffCode(email: any) {
 
     return email.split("@")[0].toUpperCase();
 }
+
 export function getClinicOperationState(date = new Date()) {
     const day = date.getDay();
 
@@ -40,6 +42,7 @@ export function getClinicOperationState(date = new Date()) {
         ? "open"
         : "closed";
 }
+
 export function getFieldErrors(error: unknown): string {
     if (!error) {
         return "";

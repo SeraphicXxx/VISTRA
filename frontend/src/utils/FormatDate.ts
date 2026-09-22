@@ -76,3 +76,11 @@ export const formatTime = (dateTime?: string | null): string => {
     minute: "2-digit",
   });
 };
+
+
+export function monthKey(date: string) {
+  return new Date(date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+  });
+}

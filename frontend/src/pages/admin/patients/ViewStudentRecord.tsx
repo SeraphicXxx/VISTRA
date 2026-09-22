@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -6,21 +6,21 @@ import {
   Syringe,
   CalendarClock,
 } from "lucide-react";
-import { getMockPatientRecords } from "./patientsData";
-import {usePatientContext} from "/@/context/PaginatedContext";
 import {usePatientRecordSummaryQuery} from "/@/hooks/PatientQuery";
 import {PatientRecordTab} from "/@/types/types";
 import {PatientRecord} from "/@/api/schema/PatientSchema";
 import LoadingPage from "/@/components/LoadingPage";
+import {formatDate, monthKey} from "/@/utils/FormatDate";
 
+interface Tabs{
+    key: PatientRecordTab;
+    label: string;
+    text: string;
+    chip: string
+    icon: React.ElementType;
+}
 
-const TABS: {
-  key: PatientRecordTab;
-  label: string;
-  text: string;
-  chip: string
-  icon: React.ElementType;
-}[] = [
+const TABS: Tabs[] = [
   {
     key: "medical",
     label: "Medical",
@@ -54,22 +54,10 @@ function getInitials(name = "") {
   );
 }
 
-function formatDate(date) {
-  return new Date(date).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
-function monthKey(date) {
-  return new Date(date).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-  });
-}
 
-function RecordRow({ record, tabMeta }) {
+
+function RecordRow({ record, tabMeta }: {record: PatientRecord, tabMeta: Tabs}) {
   return (
     <div className="group flex gap-3 rounded-xl border border-border bg-background px-5 py-4 shadow-card transition-all duration-150 hover:border-primary/20">
       <span
@@ -101,7 +89,7 @@ function RecordRow({ record, tabMeta }) {
   );
 }
 
-function EmptyState({ label, tabMeta }) {
+function EmptyState({ label, tabMeta }: { label: string, tabMeta: Tabs }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
       <span
