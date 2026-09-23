@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
                   />
                 </div>
                 <div className="mt-5">
-                  <div className="mb-1.5 flex items-center justify-between">
+                  <div className="mb-1.5 flex items-center justify-end">
                     <a href="#forgot-password"
                        className="text-xs font-medium text-primary transition-colors duration-200 hover:text-primaryDark"
                     >
@@ -99,7 +99,7 @@ export default function AdminLoginPage() {
                     <button
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted transition-colors duration-200 hover:text-textSecondary"
+                        className="absolute bottom-3.5 right-3.5 text-textMuted transition-colors duration-200 hover:text-textSecondary"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
