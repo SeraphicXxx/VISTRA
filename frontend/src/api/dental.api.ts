@@ -1,5 +1,5 @@
 import {CreateDentalVisit} from "/@/api/schema/DentalSchema";
-import {ApiMessageResponse, ApiResponse} from "/@/api/schema/ApiResponseSchema";
+import {ApiMessageResponse} from "/@/api/schema/ApiResponseSchema";
 import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 
