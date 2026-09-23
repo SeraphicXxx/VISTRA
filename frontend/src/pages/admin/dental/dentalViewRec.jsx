@@ -26,7 +26,7 @@ const exampleDental = {
   date: "2026-06-02",
   lastVisit: "6 months ago",
   floss: "Yes",
-  brushFrequency: "2x",
+  brushFrequency: "Once a day",
   calculus: "Light",
   medication: "None",
   notes: "Patient reports occasional sensitivity on the upper right molars.",

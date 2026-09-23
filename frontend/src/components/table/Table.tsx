@@ -1,6 +1,6 @@
 import React, {ReactNode} from "react";
 
-import {getTypeIcon, getInitials, avatarColor} from "/@/components/avatar";
+import { getInitials, avatarColor} from "/@/components/avatar";
 import {Status, StatusBadge} from "/@/components/StatusBadge";
 import LoadingPage from "/@/components/LoadingPage";
 
@@ -49,20 +49,6 @@ export const defaultColumns: Column<Default>[] = [
     {
         key: "type",
         label: "Type",
-        render: (value) => {
-            const type = value as string;
-            const TypeIcon = getTypeIcon(type);
-
-            return (
-                <div className="flex items-center gap-1.5 text-sm text-textSecondary">
-                    <TypeIcon
-                        className="h-3.5 w-3.5 shrink-0 text-textMuted"
-                        strokeWidth={2}
-                    />
-                    {type}
-                </div>
-            );
-        },
     },
 
     {

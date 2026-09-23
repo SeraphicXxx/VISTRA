@@ -1,30 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-    ChevronDown,
-    Search,
-    SlidersHorizontal,
-} from "lucide-react";
+import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 
 import { useTableContext } from "/@/context/TableContext";
 import type { Column } from "/@/components/table/Table";
 
 interface DateFilterProps {
-    value: string | null;
-    onChange: (value: string | null) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
 }
 
-export function DateFilter({
-                               value,
-                               onChange,
-                           }: DateFilterProps) {
-    return (
-        <input
-            type="date"
-            value={value ?? ""}
-            onChange={(e) => onChange(e.target.value || null)}
-            className="
+export function DateFilter({ value, onChange }: DateFilterProps) {
+  return (
+    <input
+      type="date"
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value || null)}
+      className="
                 rounded-lg
-                border border-border
+                border border-primary/30
                 bg-surface
                 px-3 py-1.5
                 text-xs
@@ -35,58 +28,46 @@ export function DateFilter({
                 duration-150
                 focus:border-primary
             "
-        />
-    );
+    />
+  );
 }
 
 interface FilterDropdownProps {
-    label: string;
-    options: string[];
-    value: string | null;
-    onChange: (value: string | null) => void;
+  label: string;
+  options: string[];
+  value: string | null;
+  onChange: (value: string | null) => void;
 }
 
 export function FilterDropdown({
-                                   label,
-                                   options,
-                                   value,
-                                   onChange,
-                               }: FilterDropdownProps) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
+  label,
+  options,
+  value,
+  onChange,
+}: FilterDropdownProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (
-                ref.current &&
-                !ref.current.contains(event.target as Node)
-            ) {
-                setOpen(false);
-            }
-        }
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
 
-        document.addEventListener(
-            "mousedown",
-            handleClickOutside
-        );
+    document.addEventListener("mousedown", handleClickOutside);
 
-        return () => {
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
-        };
-    }, []);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-    return (
-        <div
-            ref={ref}
-            className="relative"
-        >
-            <button
-                type="button"
-                onClick={() => setOpen((current) => !current)}
-                className={`
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className={`
                     flex
                     items-center
                     gap-1.5
@@ -99,17 +80,17 @@ export function FilterDropdown({
                     transition-colors
                     duration-150
                     ${
-                    value
-                        ? "border-primary/30 bg-primary/5 text-primary"
-                        : "border-border bg-surface hover:border-primary/30 hover:text-textPrimary"
-                }
+                      value
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-primary/30 bg-surface hover:border-primary/30 hover:text-textPrimary"
+                    }
                 `}
-            >
-                <span>{label}</span>
+      >
+        <span>{label}</span>
 
-                {value && (
-                    <span
-                        className="
+        {value && (
+          <span
+            className="
                             max-w-[110px]
                             truncate
                             rounded-md
@@ -119,13 +100,13 @@ export function FilterDropdown({
                             font-semibold
                             text-primary
                         "
-                    >
-                        {value}
-                    </span>
-                )}
+          >
+            {value}
+          </span>
+        )}
 
-                <ChevronDown
-                    className={`
+        <ChevronDown
+          className={`
                         h-3.5
                         w-3.5
                         shrink-0
@@ -133,13 +114,13 @@ export function FilterDropdown({
                         duration-150
                         ${open ? "rotate-180" : ""}
                     `}
-                    strokeWidth={2}
-                />
-            </button>
+          strokeWidth={2}
+        />
+      </button>
 
-            {open && (
-                <div
-                    className="
+      {open && (
+        <div
+          className="
                         absolute
                         left-0
                         top-full
@@ -150,19 +131,19 @@ export function FilterDropdown({
                         overflow-y-auto
                         rounded-xl
                         border
-                        border-border
+                        border-primary
                         bg-surface
                         py-1
                         shadow-lg
                     "
-                >
-                    <button
-                        type="button"
-                        onClick={() => {
-                            onChange(null);
-                            setOpen(false);
-                        }}
-                        className={`
+        >
+          <button
+            type="button"
+            onClick={() => {
+              onChange(null);
+              setOpen(false);
+            }}
+            className={`
                             block
                             w-full
                             px-3 py-1.5
@@ -171,27 +152,27 @@ export function FilterDropdown({
                             transition-colors
                             duration-150
                             ${
-                            !value
+                              !value
                                 ? "font-semibold text-primary"
                                 : "text-textSecondary"
-                        }
+                            }
                             hover:bg-primary/5
                         `}
-                    >
-                        All {label}
-                    </button>
+          >
+            All {label}
+          </button>
 
-                    <div className="my-1 h-px bg-border" />
+          <div className="my-1 h-px bg-border" />
 
-                    {options.map((option) => (
-                        <button
-                            key={option}
-                            type="button"
-                            onClick={() => {
-                                onChange(option);
-                                setOpen(false);
-                            }}
-                            className={`
+          {options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+              }}
+              className={`
                                 block
                                 w-full
                                 truncate
@@ -201,82 +182,62 @@ export function FilterDropdown({
                                 transition-colors
                                 duration-150
                                 ${
-                                value === option
+                                  value === option
                                     ? "font-semibold text-primary"
                                     : "text-textSecondary"
-                            }
+                                }
                                 hover:bg-primary/5
                             `}
-                        >
-                            {option}
-                        </button>
-                    ))}
-                </div>
-            )}
+            >
+              {option}
+            </button>
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 }
 
 interface TableFiltersProps<T> {
-    columns: Column<T>[];
+  columns: Column<T>[];
 }
 
-export function TableFilters<T>({
-                                    columns,
-                                }: TableFiltersProps<T>) {
-    const {
-        search,
-        setSearch,
-        filters,
-        setFilter,
-        clearFilters,
-        run,
-    } = useTableContext<T>();
+export function TableFilters<T>({ columns }: TableFiltersProps<T>) {
+  const { search, setSearch, filters, setFilter, clearFilters, run } =
+    useTableContext<T>();
 
-    const filterableColumns = columns.filter(
-        (column) => column.filterType
-    );
+  const filterableColumns = columns.filter((column) => column.filterType);
 
-    const hasFilters =
-        search.trim() !== "" ||
-        Object.values(filters).some(
-            (value) => value !== null && value !== ""
-        );
+  const hasFilters =
+    search.trim() !== "" ||
+    Object.values(filters).some((value) => value !== null && value !== "");
 
-    return (
-        <div className="flex flex-wrap items-center gap-2 py-3">
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-textMuted">
-                <SlidersHorizontal
-                    className="h-3.5 w-3.5"
-                    strokeWidth={2}
-                />
+  return (
+    <div className="flex flex-wrap items-center gap-2 py-3">
 
-                Filter
-            </span>
-
-            <div className="relative">
-                <Search
-                    className="
+      <div className="relative">
+        <Search
+          className="
                         absolute
                         left-3
                         top-1/2
                         h-4 w-4
                         -translate-y-1/2
-                        text-textMuted
+                        text-primary
                     "
-                    strokeWidth={2}
-                />
+          strokeWidth={2}
+        />
 
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="
+        <input
+          type="text"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="
                         h-9
                         w-56
                         rounded-lg
-                        border border-border
+                        border border-primary
                         bg-surface
                         pl-9 pr-3
                         text-sm
@@ -284,71 +245,46 @@ export function TableFilters<T>({
                         outline-none
                         focus:border-primary
                     "
-                />
-            </div>
+        />
+      </div>
 
-            {filterableColumns.map((column) => {
-                const value =
-                    filters[column.key] ?? null;
+      {filterableColumns.map((column) => {
+        const value = filters[column.key] ?? null;
 
-                if (column.filterType === "date") {
-                    return (
-                        <DateFilter
-                            key={String(column.key)}
-                            value={value}
-                            onChange={(nextValue) =>
-                                setFilter(
-                                    column.key,
-                                    nextValue
-                                )
-                            }
-                        />
-                    );
-                }
+        if (column.filterType === "date") {
+          return (
+            <DateFilter
+              key={String(column.key)}
+              value={value}
+              onChange={(nextValue) => setFilter(column.key, nextValue)}
+            />
+          );
+        }
 
-                if (column.filterType === "select") {
-                    return (
-                        <FilterDropdown
-                            key={String(column.key)}
-                            label={column.label}
-                            options={column.options ?? []}
-                            value={value}
-                            onChange={(nextValue) =>
-                                setFilter(
-                                    column.key,
-                                    nextValue
-                                )
-                            }
-                        />
-                    );
-                }
+        if (column.filterType === "select") {
+          return (
+            <FilterDropdown
+              key={String(column.key)}
+              label={column.label}
+              options={column.options ?? []}
+              value={value}
+              onChange={(nextValue) => setFilter(column.key, nextValue)}
+            />
+          );
+        }
 
-                return null;
-            })}
+        return null;
+      })}
 
-            <button
-                type="button"
-                onClick={run}
-                className="
-                    h-9
-                    rounded-lg
-                    bg-primary
-                    px-4
-                    text-sm
-                    font-medium
-                    text-white
-                    transition
-                    hover:opacity-90
-                "
-            >
-                Run
-            </button>
+      <button className="inline-flex h-6 items-center gap-1.5 rounded-md bg-primaryDark px-2.5 text-xs font-medium text-white transition hover:bg-primary">
+        <SlidersHorizontal   className="h-3.5 w-3.5" />
+      </button>
 
-            {hasFilters && (
-                <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="
+      {hasFilters && (
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="
                         h-9
                         rounded-lg
                         border border-border
@@ -361,24 +297,22 @@ export function TableFilters<T>({
                         hover:border-primary/30
                         hover:text-primary
                     "
-                >
-                    Clear
-                </button>
-            )}
-        </div>
-    );
+        >
+          Clear
+        </button>
+      )}
+    </div>
+  );
 }
 
 export function removeNullFilters<T extends object>(
-    filters: T
+  filters: T,
 ): {
-    [K in keyof T]: Exclude<T[K], null>;
+  [K in keyof T]: Exclude<T[K], null>;
 } {
-    return Object.fromEntries(
-        Object.entries(filters).filter(
-            ([, value]) => value !== null
-        )
-    ) as {
-        [K in keyof T]: Exclude<T[K], null>;
-    };
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== null),
+  ) as {
+    [K in keyof T]: Exclude<T[K], null>;
+  };
 }

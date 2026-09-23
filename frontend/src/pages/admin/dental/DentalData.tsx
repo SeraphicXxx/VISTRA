@@ -99,31 +99,7 @@ export const DentalColumns: Column<DentalData>[] = [
         filterType: "date",
     },
 
-    {
-        key: "type",
-        label: "Type",
-        filterType: "select",
-        options: [
-            "Dental Consultation",
-            "Tooth Extraction",
-            "Oral Prophylaxis",
-            "Dental Filling",
-        ],
-        render: (value) => {
-            const type = value as string;
-            const TypeIcon = getTypeIcon(type);
 
-            return (
-                <div className="flex items-center gap-1.5 text-sm text-textSecondary">
-                    <TypeIcon
-                        className="h-3.5 w-3.5 shrink-0 text-textMuted"
-                        strokeWidth={2}
-                    />
-                    {type}
-                </div>
-            );
-        },
-    },
 
     {
         key: "status",

@@ -1,14 +1,19 @@
 import React, { useState } from "react";
-import { ArrowLeft, User, ClipboardList, Printer, Pencil } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  ClipboardList,
+  Printer,
+  Pencil,
+  FileText,
+  RefreshCw,
+} from "lucide-react";
 
 import { InfoField, getInitials } from "/@/utils/RecordInfo.jsx";
-import { EditRecordModal, patientEditFields } from "/@/components/editModal.jsx";
+import { EditRecordModal, statusEditFields } from "/@/components/editModal.jsx";
 import { StatusBadge } from "/@/components/StatusBadge.jsx";
 
 import { Patient, Visit, visitEditFields } from "/@/types/types";
-import { VisitTimeline } from "/@/components/VisitTimeline";
-import { VisitDetailModal } from "/@/components/VisitDetailModal";
-
 
 const examplePatient: Patient = {
   recordId: "MED-1042",
@@ -26,43 +31,34 @@ const examplePatient: Patient = {
   status: "cleared",
 };
 
-const exampleVisits: Visit[] = [
-  {
-    id: "v1",
-    date: "2026-02-14",
-    doctor: "Dr. Maria Santos",
-    complaint: "Mild fever, headache",
-    treatmentType: "Medicine",
-    treatment: "Paracetamol 500mg, rest advised",
-  },
-  {
-    id: "v2",
-    date: "2026-05-03",
-    doctor: "Dr. Ramon Cruz",
-    complaint: "Sprained ankle during PE",
-    treatmentType: "Procedure",
-    treatment: "Ice compress, elastic bandage applied",
-  },
-];
+// One record = one consultation session, so there is a single visit tied
+// to this patient record rather than a dated history of multiple visits.
+const exampleVisit: Visit = {
+  id: "v1",
+  date: "2026-02-14",
+  doctor: "Dr. Maria Santos",
+  complaint: "Mild fever, headache",
+  treatmentType: "Medicine",
+  treatment: "Paracetamol 500mg, rest advised",
+};
 
 interface PatientRecordViewProps {
   patient?: Patient;
-  visits?: Visit[];
+  visit?: Visit;
   onBack?: () => void;
   onSave?: (patient: Patient) => void;
 }
 
 export default function PatientRecordView({
   patient = examplePatient,
-  visits = exampleVisits,
+  visit = exampleVisit,
   onBack,
   onSave,
 }: PatientRecordViewProps) {
   const [patientData, setPatientData] = useState<Patient>(patient);
-  const [visitData, setVisitData] = useState<Visit[]>(visits);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
-  const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
+  const [visitData, setVisitData] = useState<Visit>(visit);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isEditingVisit, setIsEditingVisit] = useState(false);
 
   const handleBack = () => {
     if (onBack) {
@@ -72,9 +68,9 @@ export default function PatientRecordView({
     }
   };
 
-  const handleSaveRecord = (updatedPatient: Patient) => {
+  const handleSaveStatus = (updatedPatient: Patient) => {
     setPatientData(updatedPatient);
-    setIsEditOpen(false);
+    setIsStatusOpen(false);
 
     if (onSave) {
       onSave(updatedPatient);
@@ -82,45 +78,29 @@ export default function PatientRecordView({
   };
 
   const handleSaveVisit = (updatedVisit: Visit) => {
-    setVisitData((currentVisits) =>
-      currentVisits.map((visit) =>
-        visit.id === updatedVisit.id ? updatedVisit : visit
-      )
-    );
-
-    setEditingVisit(null);
+    setVisitData(updatedVisit);
+    setIsEditingVisit(false);
   };
 
   return (
     <div className="mx-auto w-full">
-      {isEditOpen && (
+      {isStatusOpen && (
         <EditRecordModal
-          title="Edit patient record"
-          fields={patientEditFields}
+          title="Update status"
+          fields={statusEditFields}
           data={patientData}
-          onClose={() => setIsEditOpen(false)}
-          onSave={handleSaveRecord}
+          onClose={() => setIsStatusOpen(false)}
+          onSave={handleSaveStatus}
         />
       )}
 
-      {editingVisit && (
+      {isEditingVisit && (
         <EditRecordModal
           title="Edit visit"
           fields={visitEditFields}
-          data={editingVisit}
-          onClose={() => setEditingVisit(null)}
+          data={visitData}
+          onClose={() => setIsEditingVisit(false)}
           onSave={handleSaveVisit}
-        />
-      )}
-
-      {viewingVisit && (
-        <VisitDetailModal
-          visit={viewingVisit}
-          onClose={() => setViewingVisit(null)}
-          onEdit={(visit) => {
-            setViewingVisit(null);
-            setEditingVisit(visit);
-          }}
         />
       )}
 
@@ -141,11 +121,11 @@ export default function PatientRecordView({
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setIsEditOpen(true)}
+                onClick={() => setIsStatusOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary text-white border border-border px-3 py-1.5 text-xs font-medium hover:bg-surfaceMuted"
               >
-                <Pencil className="h-3.5 w-3.5" />
-                Edit record
+                <RefreshCw className="h-3.5 w-3.5" />
+                Update status
               </button>
 
               <button
@@ -238,26 +218,47 @@ export default function PatientRecordView({
               <ClipboardList className="h-4 w-4 text-primary" />
 
               <h2 className="font-heading text-sm font-semibold text-primaryDark">
-                Visit Log
+                Consultation
               </h2>
             </div>
 
-            <span className="text-xs text-textMuted">
-              {visitData.length} visit{visitData.length === 1 ? "" : "s"}
-            </span>
+            <span className="text-xs text-textMuted">{visitData.date}</span>
           </div>
 
-          {visitData.length > 0 ? (
-            <VisitTimeline
-              visits={visitData}
-              onView={setViewingVisit}
-              onEdit={setEditingVisit}
-            />
-          ) : (
-            <div className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-textMuted">
-              No visits recorded yet.
+          <div className="rounded-xl border border-border p-5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-heading text-base font-semibold text-primaryDark">
+                {visitData.complaint}
+              </h3>
+
+              <button
+                type="button"
+                onClick={() => setIsEditingVisit(true)}
+                className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit
+              </button>
             </div>
-          )}
+
+            <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+              <InfoField label="Attending doctor" value={visitData.doctor} />
+              <InfoField
+                label="Treatment type"
+                value={visitData.treatmentType}
+              />
+            </div>
+
+            <div className="mt-4 rounded-lg border border-border bg-surfaceMuted/40 p-4">
+              <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-textMuted">
+                <FileText className="h-3.5 w-3.5" />
+                Treatment notes
+              </div>
+              <p className="text-sm text-textPrimary">
+                {visitData.treatment}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

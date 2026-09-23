@@ -12,6 +12,7 @@ export default function MedicalTab() {
             isLoading={false}
             icon={Stethoscope}
             data={medRecords}
+            
             columns={MedicalColumns}
             panelAddon={
                 <LinkButton
