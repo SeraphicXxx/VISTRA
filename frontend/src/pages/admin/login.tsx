@@ -68,7 +68,14 @@ export function LoginForm({
         />
 
         <div className="mt-5">
-          <div className="mb-1.5 flex items-center justify-between">
+
+          <PasswordInput
+              value={credentials.password}
+              onChange={onChange}
+              error={validationErrors.password}
+          />
+
+          <div className="mb-1.5 flex items-center justify-end">
             <a
                 href="#forgot-password"
                 className="text-xs font-medium text-primary transition-colors duration-200 hover:text-primaryDark"
@@ -76,12 +83,6 @@ export function LoginForm({
               Forgot password?
             </a>
           </div>
-
-          <PasswordInput
-              value={credentials.password}
-              onChange={onChange}
-              error={validationErrors.password}
-          />
         </div>
 
         <label className="mt-4 flex items-center gap-2 text-sm text-textSecondary">
