@@ -38,6 +38,7 @@ class DentalVisitCreateRequest(BaseModel):
     calculus_severity: str
     current_medications: str
     notes: str
+    status: str
 
     tooth_records: list[OdontogramCreateRequest]
 

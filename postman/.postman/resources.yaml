@@ -1,0 +1,16 @@
+workspace:
+  id: 12bf4677-5847-4fe7-87d5-dbd5f1deafe3
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/VISTRA API Tests: 50029254-ad5ecc2b-5f62-4ab4-9b0a-5bfcce774647
+  environments: {}
+
+localResources:
+  specs:
+    - ../postman/specs/VISTRA_API_TESTS/VISTRA_API_TESTS.yaml
+resourceNameMappings:
+  specs:
+    - ../postman/specs/VISTRA_API_TESTS/VISTRA_API_TESTS.yaml: VISTRA_API_TESTS

@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
             <div className="h-1 w-full bg-primary" aria-hidden="true"></div>
 
             <div className="flex flex-col items-center px-8 pt-8 text-center">
-              <a href={ROUTES.admin.dashboard.overview}>
+              <a href={ROUTES.staff.dashboard.overview}>
                 <Logo className="h-11" />
               </a>
 

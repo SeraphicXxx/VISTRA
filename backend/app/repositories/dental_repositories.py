@@ -14,6 +14,7 @@ class DentalRepositories:
                 "calculus_severity": data.calculus_severity,
                 "current_medications": data.current_medications,
                 "notes": data.notes,
+                "status": data.status,
                 "staff_id": staff_id,
             })
             .execute()
