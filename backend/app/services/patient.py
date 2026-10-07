@@ -134,7 +134,7 @@ def delete_patient(patient_id: str, supabase):
 
 
 @handle_service_returns
-def insert_patient_into_db(patient_data: Patient, supabase):
+def insert_patient_into_db(patient_data: Patient, supabase) -> dict:
     patient_repo = PatientRepository(supabase)
     response = patient_repo.create(patient_data)
 
@@ -145,7 +145,7 @@ def insert_patient_into_db(patient_data: Patient, supabase):
 
 
 @handle_service_returns
-def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase):
+def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase) -> dict:
     patient_repo = PatientRepository(supabase)
     response = patient_repo.create_profile(patient_profile)
 

@@ -1,6 +1,7 @@
 from app.database.database_client import supabase_admin
 from app.utils.email_utils import add_ucc_domain
 from fastapi import HTTPException, status
+from typing import NoReturn
 
 def create_auth_user(
     user_id: str,
@@ -58,7 +59,7 @@ def delete_auth_user(user_id: str):
         }
 
 
-def compensate_auth_user(user_id: str, db_message: str, rollback_prefix: str):
+def compensate_auth_user(user_id: str, db_message: str, rollback_prefix: str) -> NoReturn:
     """Roll back a provisioned auth user, always raising 500.
 
     Shared by create sagas (patient, staff): on DB failure after auth

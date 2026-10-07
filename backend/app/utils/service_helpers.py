@@ -1,9 +1,15 @@
+from collections.abc import Callable
 from functools import wraps
+from typing import ParamSpec, TypeVar
 
 from fastapi import HTTPException, status
 
+P = ParamSpec("P")
+R = TypeVar("R")
+T = TypeVar("T")
 
-def or_404(value, detail: str):
+
+def or_404(value: T, detail: str) -> T:
     if value:
         return value
     raise HTTPException(
@@ -12,7 +18,7 @@ def or_404(value, detail: str):
     )
 
 
-def handle_service_errors(fn):
+def handle_service_errors(fn: Callable[P, R]) -> Callable[P, R]:
     """Raise-contract: re-raise HTTPException, wrap other errors as 500."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -29,7 +35,7 @@ def handle_service_errors(fn):
     return wrapper
 
 
-def handle_service_returns(fn):
+def handle_service_returns(fn: Callable[P, R]) -> Callable[P, R]:
     """Return-contract: unexpected errors become {"success": False, ...}.
 
     Use ONLY for internal helpers whose callers consume the dict

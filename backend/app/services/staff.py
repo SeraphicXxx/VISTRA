@@ -51,7 +51,7 @@ def create_staff(request: CreateStaffRequest, supabase):
     }
 
 @handle_service_returns
-def insert_staff_into_db(staff_data : StaffData, supabase):
+def insert_staff_into_db(staff_data : StaffData, supabase) -> dict:
     staff_repo = StaffRepository(supabase)
     response = staff_repo.create(staff_data)
 
