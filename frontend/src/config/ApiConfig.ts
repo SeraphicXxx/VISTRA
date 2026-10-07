@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
         get_patient_by_id: (patientId: string) => `/patients/${patientId}/`,
     },
     appointment: {
+        create_appointment: "/appointments/",
         get_appointment: "/appointments/",
         get_appointment_by_id: (patient_id: string, appointment_id: string) => `/appointments/${patient_id}/${appointment_id}`,
     },

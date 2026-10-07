@@ -3,7 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 import { sessionManager } from "/@/utils/SessionManager";
-import { login, LoginRequest } from "/@/api/auth.api";
+import { login } from "/@/api/auth.api";
+import type { LoginRequest } from "/@/api/schema/AuthSchema";
 
 export const PATIENT_ID_PATTERN = /^\d{8}-[SFA]$/i;
 

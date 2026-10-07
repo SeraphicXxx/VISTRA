@@ -17,6 +17,7 @@ export interface AppointmentFilters {
     type?: string;
     course?: string;
     date?: string;
+    patient_id?: string;
 
     page?: number;
     page_size?: number;

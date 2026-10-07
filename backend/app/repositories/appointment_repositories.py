@@ -38,6 +38,7 @@ class AppointmentRepository:
                 count="exact"
             )
             .order("scheduled_start")
+            .eq("patient_id", filters.patient_id)
             .eq("status", filters.status)
             .eq("type", filters.type)
             .eq("course", filters.course)

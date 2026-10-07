@@ -23,3 +23,11 @@ export interface AppointmentSchema {
 
     course: string;
 }
+export interface CreateAppointmentRequest {
+    patient_id: string;
+    scheduled_start: string;
+    scheduled_end: string;
+    reason?: string | null;
+    location?: string | null;
+    notes?: string | null;
+}

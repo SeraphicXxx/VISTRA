@@ -1,7 +1,7 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {apiClient} from "/@/api/axios_client";
 import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {AppointmentSchema} from "/@/api/schema/AppointmentSchema";
+import {AppointmentSchema, CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 
 export async function getAllAppointments(
@@ -13,6 +13,23 @@ export async function getAllAppointments(
         {
             method: "GET",
             params: filters,
+            signal,
+        }
+    );
+}
+
+
+
+
+export async function createAppointment(
+    request: CreateAppointmentRequest,
+    signal?: AbortSignal
+){
+    return apiClient<ApiResponse<AppointmentSchema>>(
+        API_ENDPOINTS.appointment.create_appointment,
+        {
+            method: "POST",
+            data: request,
             signal,
         }
     );

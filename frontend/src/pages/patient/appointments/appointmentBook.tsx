@@ -9,19 +9,23 @@ import {
   Clock,
   FileCheck,
   FileText,
+  MapPin,
   RefreshCw,
   Smile,
   Stethoscope,
 } from "lucide-react";
 
 import {
-  addAppointment,
+  APPOINTMENT_LOCATIONS,
   APPOINTMENT_TYPES,
   DEFAULT_STUDENT_ID,
 } from "./appointmentsData";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts, todayISO, to12Hour } from "/@/utils/DateUtils";
+import { useCreateAppointment } from "/@/hooks/query/AppointmentQuery";
+import { getFieldErrors } from "/@/utils/Formatters";
+import axios from "axios";
 
 const INPUT_CLASS =
   "h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
@@ -80,9 +84,11 @@ export default function PatientBookAppointment() {
   const [type, setType] = useState(APPOINTMENT_TYPES[0]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [location, setLocation] = useState<string>(APPOINTMENT_LOCATIONS[0]);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const createAppointmentMutation = useCreateAppointment();
 
   const handleBack = () => navigate(ROUTES.patient.dashboard.appointments);
 
@@ -99,18 +105,42 @@ export default function PatientBookAppointment() {
       return;
     }
 
+    if (!location) {
+      setError("Please select a campus location.");
+      return;
+    }
+
     setError("");
     setIsSubmitting(true);
 
-    addAppointment(studentId, {
-      type,
-      date,
-      time: to12Hour(time),
-      notes: notes.trim() || undefined,
-    });
+    const start = new Date(`${date}T${time}:00`);
+    const end = new Date(start.getTime() + 30 * 60 * 1000);
+    const toLocalISO = (d: Date) => {
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+    };
+    const trimmedNotes = notes.trim();
 
-    setIsSubmitting(false);
-    navigate(ROUTES.patient.dashboard.appointments);
+    try {
+      await createAppointmentMutation.mutateAsync({
+        patient_id: studentId,
+        scheduled_start: toLocalISO(start),
+        scheduled_end: toLocalISO(end),
+        reason: type,
+        location,
+        notes: trimmedNotes || null,
+      });
+
+      navigate(ROUTES.patient.dashboard.appointments);
+    } catch (err) {
+      const payload = axios.isAxiosError(err) ? err.response?.data : err;
+      setError(
+        getFieldErrors(payload) ||
+          "Couldn't submit your request. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const dateParts = date ? getDateParts(date) : null;
@@ -163,7 +193,7 @@ export default function PatientBookAppointment() {
               <SummaryItem
                 icon={CalendarDays}
                 filled={!!dateParts}
-                value={dateParts ? `${dateParts.weekday}, ${dateParts.full}` : ""}
+                value={dateParts ? `${dateParts.weekday}, ${dateParts.short}` : ""}
                 placeholder="No date selected"
               />
               <SummaryItem
@@ -171,6 +201,12 @@ export default function PatientBookAppointment() {
                 filled={!!time}
                 value={time ? to12Hour(time) : ""}
                 placeholder="No time selected"
+              />
+              <SummaryItem
+                icon={MapPin}
+                filled={!!location}
+                value={location}
+                placeholder="No location selected"
               />
               <SummaryItem
                 icon={FileText}
@@ -291,6 +327,31 @@ export default function PatientBookAppointment() {
                   className={INPUT_CLASS}
                 />
               </div>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="location" className="mb-1.5 block text-sm font-semibold text-textPrimary">
+              Campus location
+            </label>
+            <div className="relative">
+              <MapPin
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
+                strokeWidth={2}
+              />
+              <select
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                required
+                className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                {APPOINTMENT_LOCATIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

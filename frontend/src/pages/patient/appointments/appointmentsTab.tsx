@@ -2,7 +2,16 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays, CalendarPlus, Clock } from "lucide-react";
 
-import { getMyAppointments, AppointmentStatus, STATUS_META, getEffectiveSlot, getViewPath, isUpcoming, resolveStudentId, } from "./appointmentsData";
+import {
+  getEffectiveSlot,
+  getViewPath,
+  isUpcoming,
+  mapBackendAppointmentToAppointment,
+  resolveStudentId,
+  STATUS_META,
+} from "./appointmentsData";
+import type { Appointment, AppointmentStatus } from "./appointmentsData";
+import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
 import { UpcomingFilter, UPCOMING_FILTERS, FilterOption, FilterBar, Column, } from "/@/utils/patientHelpers";
 import { daysUntilLabel, getDateParts } from "/@/utils/DateUtils";
 import { sessionManager } from "/@/utils/SessionManager";
@@ -12,9 +21,15 @@ export default function PatientAppointmentsTab() {
   const navigate = useNavigate();
   const studentId = resolveStudentId(sessionManager.getUser());
   const [upcomingFilter, setUpcomingFilter] = useState<UpcomingFilter>("all");
+  const {
+    data: appointmentsData,
+    isLoading,
+    isError,
+    refetch,
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100 });
 
   const { upcoming, history, counts } = useMemo(() => {
-    const all = getMyAppointments(studentId);
+    const all = (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment);
     const upcomingList = all
       .filter(isUpcoming)
       .sort((a, b) => getEffectiveSlot(a).date.localeCompare(getEffectiveSlot(b).date));
@@ -31,7 +46,7 @@ export default function PatientAppointmentsTab() {
       statusCounts[appointment.status] += 1;
     });
     return { upcoming: upcomingList, history: historyList, counts: statusCounts };
-  }, [studentId]);
+  }, [appointmentsData]);
 
   const filterOptions = useMemo<FilterOption<UpcomingFilter>[]>(
     () =>
@@ -62,6 +77,35 @@ export default function PatientAppointmentsTab() {
 
   const goToBook = () => navigate(ROUTES.patient.appointment.bookAppointment);
   const goToView = (id: string) => navigate(getViewPath(id));
+
+  if (isLoading) {
+    return (
+      <div className="w-full animate-pulse" aria-label="Loading">
+        <div className="h-48 rounded-3xl border border-border bg-surface" />
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="h-64 rounded-2xl border border-border bg-surface" />
+          <div className="h-64 rounded-2xl border border-border bg-surface" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="w-full rounded-2xl border border-border bg-surface p-10 text-center">
+        <p className="text-sm font-medium text-textPrimary">
+          Couldn't load your appointments.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

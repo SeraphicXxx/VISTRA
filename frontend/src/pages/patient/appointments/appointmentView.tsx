@@ -3,14 +3,14 @@ import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarPlus, Check, X } from "lucide-react";
 
 import {
-  getMyAppointments,
-  getAppointmentById,
+  mapBackendAppointmentToAppointment,
   Appointment,
   AppointmentStatus,
   STATUS_META,
   getEffectiveSlot,
   resolveStudentId,
 } from "./appointmentsData";
+import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
 import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts } from "/@/utils/DateUtils";
@@ -122,13 +122,47 @@ export default function PatientAppointmentView() {
   const studentId = resolveStudentId(sessionManager.getUser());
   const requestedId = params.id ?? searchParams.get("id") ?? undefined;
 
-  const appointments = getMyAppointments(studentId);
+  const {
+    data: appointmentsData,
+    isLoading,
+    isError,
+    refetch,
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100 });
+
   const appointment: Appointment | undefined = requestedId
-    ? getAppointmentById(studentId, requestedId)
-    : appointments[0];
+    ? (appointmentsData?.items ?? [])
+        .map(mapBackendAppointmentToAppointment)
+        .find((item) => item.id === requestedId)
+    : (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment)[0];
 
   const handleBack = () => navigate(ROUTES.patient.dashboard.appointments);
   const handleBook = () => navigate(ROUTES.patient.appointment.bookAppointment);
+
+  if (isLoading) {
+    return (
+      <div className="w-full animate-pulse" aria-label="Loading">
+        <div className="h-56 rounded-3xl border border-border bg-surface" />
+        <div className="mt-6 h-48 rounded-2xl border border-border bg-surface" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="w-full rounded-2xl border border-border bg-surface p-10 text-center">
+        <p className="text-sm font-medium text-textPrimary">
+          Couldn't load that appointment.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   if (!appointment) {
     return (

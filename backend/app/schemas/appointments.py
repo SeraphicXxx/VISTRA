@@ -21,6 +21,7 @@ class CreateAppointmentRequest(BaseModel):
     scheduled_end: datetime
     reason: str | None = None
     location: str | None = None
+    notes: str | None = None
 
 class UpdateAppointmentRequest(BaseModel):
     status: str | None = None

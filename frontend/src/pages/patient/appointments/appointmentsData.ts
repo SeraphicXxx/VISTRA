@@ -8,6 +8,8 @@ import {
 
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { todayISO } from "/@/utils/DateUtils";
+import type { AppointmentSchema } from "/@/api/schema/AppointmentSchema";
+import { to12Hour } from "/@/utils/DateUtils";
 
 export type AppointmentStatus =
   | "pending"
@@ -21,6 +23,7 @@ export interface Appointment {
   date: string;
   time: string;
   status: AppointmentStatus;
+  location?: string;
   notes?: string;
   rescheduledTo?: {
     date: string;
@@ -78,156 +81,46 @@ export const APPOINTMENT_TYPES = [
   "Fit to Work Certificate",
 ];
 
+export const APPOINTMENT_LOCATIONS = [
+  "UCC-South Campus",
+  "UCC-North Campus",
+] as const;
+
+export type AppointmentLocation = (typeof APPOINTMENT_LOCATIONS)[number];
+
 export const DEFAULT_STUDENT_ID = "20230518-S";
 
-const STORAGE_KEY = "vistra.patient.appointments";
-const FIRST_NEW_ID = 3005;
-
-const seedAppointments: Record<string, Appointment[]> = {
-  "20230518-S": [
-    {
-      id: "APT-3001",
-      type: "Dental Cleaning",
-      date: "2026-09-18",
-      time: "10:00 AM",
-      status: "approved",
-    },
-    {
-      id: "APT-3002",
-      type: "Medical Follow-up",
-      date: "2026-09-25",
-      time: "2:30 PM",
-      status: "pending",
-    },
-    {
-      id: "APT-3003",
-      type: "Fit to Work Certificate",
-      date: "2026-08-30",
-      time: "11:00 AM",
-      status: "rejected",
-      notes:
-        "Requested documents were incomplete. Please resubmit with your latest checkup results.",
-    },
-    {
-      id: "APT-3004",
-      type: "Dental Consultation",
-      date: "2026-09-10",
-      time: "9:00 AM",
-      status: "rescheduled",
-      rescheduledTo: {
-        date: "2026-09-14",
-        time: "1:00 PM",
-      },
-      notes:
-        "Original slot was unavailable due to a clinic closure.",
-    },
-  ],
-};
-
-function cloneSeed(): Record<string, Appointment[]> {
-  return JSON.parse(JSON.stringify(seedAppointments));
-}
-
-function loadStore(): Record<string, Appointment[]> {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-
-    if (raw) {
-      const parsed = JSON.parse(raw);
-
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        !Array.isArray(parsed)
-      ) {
-        return parsed as Record<string, Appointment[]>;
-      }
-    }
-  } catch {
-    return cloneSeed();
-  }
-
-  return cloneSeed();
-}
-
-const myAppointmentsStore: Record<string, Appointment[]> = loadStore();
-
-function saveStore(): void {
-  try {
-    sessionStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(myAppointmentsStore)
-    );
-  } catch {
-    return;
-  }
-}
-
-function generateId(): string {
-  let highest = FIRST_NEW_ID - 1;
-
-  Object.values(myAppointmentsStore).forEach((list) => {
-    list.forEach((appointment) => {
-      const value = Number(appointment.id.replace(/\D/g, ""));
-
-      if (!Number.isNaN(value) && value > highest) {
-        highest = value;
-      }
-    });
-  });
-
-  return `APT-${highest + 1}`;
-}
-
-export function getMyAppointments(
-  studentId: string
-): Appointment[] {
-  return myAppointmentsStore[studentId] ?? [];
-}
-
-export function getAppointmentById(
-  studentId: string,
-  id: string
-): Appointment | undefined {
-  return getMyAppointments(studentId).find(
-    (appointment) => appointment.id === id
-  );
-}
-
-export function addAppointment(
-  studentId: string,
-  data: {
-    type: string;
-    date: string;
-    time: string;
-    notes?: string;
-  }
+/**
+ * Backend (APPOINTMENT row) -> patient portal view model.
+ * Backend statuses: pending / confirmed / declined (+ legacy variants).
+ */
+export function mapBackendAppointmentToAppointment(
+  record: AppointmentSchema
 ): Appointment {
-  const appointment: Appointment = {
-    id: generateId(),
-    type: data.type,
-    date: data.date,
-    time: data.time,
-    notes: data.notes,
-    status: "pending",
+  const [date = "", rawTime = ""] = (record.scheduled_start ?? "").split("T");
+  const status = (record.status ?? "").toLowerCase();
+  const mappedStatus: AppointmentStatus =
+    status === "confirmed" || status === "approved" || status === "cleared"
+      ? "approved"
+      : status === "declined" || status === "rejected"
+        ? "rejected"
+        : "pending";
+
+  return {
+    id: String(record.id),
+    type: record.reason || "Appointment",
+    date,
+    time: to12Hour(rawTime.slice(0, 5)),
+    status: mappedStatus,
+    location: record.location ?? undefined,
+    notes: record.notes ?? undefined,
   };
-
-  myAppointmentsStore[studentId] = [
-    appointment,
-    ...(myAppointmentsStore[studentId] ?? []),
-  ];
-
-  saveStore();
-
-  return appointment;
 }
 
 export function resolveStudentId(user: any): string {
-  const sessionId = user?.patient_id ?? user?.student_id ?? "";
-
-  return getMyAppointments(sessionId).length > 0
-    ? sessionId
-    : DEFAULT_STUDENT_ID;
+  return (
+    user?.user_id ?? user?.patient_id ?? user?.student_id ?? DEFAULT_STUDENT_ID
+  );
 }
 
 export function getViewPath(id: string): string {

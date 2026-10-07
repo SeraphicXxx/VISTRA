@@ -26,7 +26,7 @@ class VisitFilter(PaginationParams):
 
 
 class FilterAppointment(VisitFilter):
-    pass
+    patient_id: str | None = None
 
 
 class FilterDental(VisitFilter):

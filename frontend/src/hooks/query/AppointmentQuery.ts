@@ -1,6 +1,16 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useQuery} from "@tanstack/react-query";
-import {getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {createAppointment, getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
+import type {CreateAppointmentRequest} from "/@/api/appointments.api";
+
+export function useCreateAppointment() {
+    return useMutation({
+        mutationFn: async (request: CreateAppointmentRequest) => {
+            const {data} = await createAppointment(request);
+            return data;
+        },
+    });
+}
 
 export function useAppointmentQuery(filters?: AppointmentFilters) {
     return useQuery({

@@ -8,11 +8,16 @@ import {
 } from "lucide-react";
 
 import PatientStatsGrid from "./stats";
-import { getMyAppointments, Appointment } from "../appointments/appointmentsData";
+import {
+  mapBackendAppointmentToAppointment,
+  resolveStudentId,
+  Appointment,
+} from "../appointments/appointmentsData";
 import { myMedicalRecords, myVisits } from "../medical/medicalData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
+import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
 import { ROUTES } from "/@/config/RoutePaths";
 import { formatDate } from "/@/utils/FormatDate";
 import { Visit } from "/@/types/types";
@@ -226,13 +231,19 @@ function RecentVisitsPanel({ visits }: { visits: Visit[] }) {
 export default function PatientOverviewTab() {
   const { searchQuery } = useOutletContext<OutletContextShape>();
   const user = sessionManager.getUser();
-  const sessionId: string = user?.user_id ?? "";
-  const studentId = myMedicalRecords[sessionId] ? sessionId : DEFAULT_STUDENT_ID;
+  const studentId = resolveStudentId(user);
+  const { data: appointmentsData } = useAppointmentQuery({
+    patient_id: studentId,
+    page_size: 100,
+  });
 
   const patientName = myMedicalRecords[studentId]?.name ?? "there";
 
   const visits = useMemo(() => myVisits[studentId] ?? [], [studentId]);
-  const appointments: Appointment[] = useMemo(() => getMyAppointments(studentId), [studentId]);
+  const appointments: Appointment[] = useMemo(
+    () => (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment),
+    [appointmentsData]
+  );
   const medicalStatus = myMedicalRecords[studentId]?.status;
 
   const sortedAppointments = useMemo(

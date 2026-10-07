@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { sessionManager } from "/@/utils/SessionManager";
 import { login } from "/@/api/auth.api";
-import { PasswordAndId } from "/@/api/schema/ApiResponseSchema"
+import { PasswordAndId } from "/@/api/schema/AuthSchema"
 import axios from "axios";
 /* -------------------------------------------------------------------------- */
 /* Types                                                                      */
