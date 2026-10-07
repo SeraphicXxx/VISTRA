@@ -2,9 +2,9 @@ from fastapi import HTTPException, status
 
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData, CreateStaffRequest
-from app.services.auth.user import create_auth_user, delete_auth_user
+from app.services.auth.user import create_auth_user, delete_auth_user, compensate_auth_user
 from app.utils.email_utils import remove_ucc_domain
-from app.utils.service_helpers import handle_service_errors, or_404
+from app.utils.service_helpers import handle_service_errors, handle_service_returns, or_404
 
 
 def create_staff(request: CreateStaffRequest, supabase):
@@ -17,7 +17,13 @@ def create_staff(request: CreateStaffRequest, supabase):
     )
 
     if not auth_response["success"]:
-        return auth_response
+        raise HTTPException(
+            status_code=auth_response.get(
+                "status_code",
+                status.HTTP_400_BAD_REQUEST,
+            ),
+            detail=auth_response["message"],
+        )
 
     user = auth_response["user"]
 
@@ -31,64 +37,38 @@ def create_staff(request: CreateStaffRequest, supabase):
 
     db_response = insert_staff_into_db(staff_data, supabase)
 
-    if db_response["success"]:
-        return {
-            "success": True,
-            "message": "Staff inserted into database"
-        }
-    
-    delete_response = delete_auth_user(user.id)
-
-    if delete_response["success"]:
-        return {
-            "success": False,
-            "message": db_response["message"]
-        }
+    if not db_response["success"]:
+        compensate_auth_user(
+            user.id,
+            db_response["message"],
+            "Failed to insert staff into database and failed to delete "
+            "user from auth",
+        )
 
     return {
-        "success": False,
-        "message": (
-            "Failed to insert staff into database and failed to delete "
-            f"user from auth: {delete_response['message']}"
-        )
+        "success": True,
+        "message": "Staff inserted into database"
     }
 
+@handle_service_returns
 def insert_staff_into_db(staff_data : StaffData, supabase):
-    try:
-        staff_repo = StaffRepository(supabase)
-        response = staff_repo.create(staff_data)
+    staff_repo = StaffRepository(supabase)
+    response = staff_repo.create(staff_data)
 
-        return {
-            "success": True,
-            "data": response.data
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response.data
+    }
 
+@handle_service_errors
 def get_staff_by_id(staff_id: str, supabase):
-    try:
-        staff_repo = StaffRepository(supabase)
-        response = staff_repo.get_by_id(staff_id)
+    staff_repo = StaffRepository(supabase)
+    response = staff_repo.get_by_id(staff_id)
 
-        if response:
-            return {
-                "success": True,
-                "data": response
-            }
-
-        return {
-            "success": False,
-            "message": f"Staff not found for {staff_id}"
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": or_404(response, f"Staff not found for {staff_id}"),
+    }
 
 
 @handle_service_errors

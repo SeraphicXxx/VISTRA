@@ -7,19 +7,19 @@ auth:
     token: "{{access_token}}"
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Missing patient reports failure\", function () {\r
+    code: "pm.test(\"Missing patient returns 404\", function () {\r
 
-      \    pm.response.to.have.status(200);\r
+      \    pm.response.to.have.status(404);\r
+
+      \    });\r
 
       \r
+
+      pm.test(\"Error detail is returned\", function () {\r
 
       \    const json = pm.response.json();\r
 
-      \r
-
-      \    pm.expect(json.success).to.eql(false);\r
-
-      \    pm.expect(json).to.have.property(\"message\");\r
+      \    pm.expect(json).to.have.property(\"detail\");\r
 
       \    });"
     language: text/javascript

@@ -3,41 +3,30 @@ from app.schemas.medical import MedicalVisitCreateRequest
 from app.utils.service_helpers import handle_service_errors, or_404
 
 
+@handle_service_errors
 def create_medical_record(request: MedicalVisitCreateRequest, supabase):
-    try:
-        medical_repository = MedicalRepositories(supabase)
+    medical_repository = MedicalRepositories(supabase)
 
-        medical_visit_id = medical_repository.create(request)
+    medical_visit_id = medical_repository.create(request)
 
-        if not medical_visit_id:
-            raise Exception("Failed to create medical record")
+    if not medical_visit_id:
+        raise Exception("Failed to create medical record")
 
-        return {
-            "success": True,
-            "medical_visit_id": medical_visit_id
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+    return {
+        "success": True,
+        "medical_visit_id": medical_visit_id
+    }
 
 
+@handle_service_errors
 def get_all_medical_visits(filters, supabase):
-    try:
-        medical_repository = MedicalRepositories(supabase)
-        response = medical_repository.get_medical_visits(filters)
+    medical_repository = MedicalRepositories(supabase)
+    response = medical_repository.get_medical_visits(filters)
 
-        return {
-            "success": True,
-            "data": response
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response
+    }
 
 
 @handle_service_errors

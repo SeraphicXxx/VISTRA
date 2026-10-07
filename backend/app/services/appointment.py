@@ -3,36 +3,26 @@ from app.schemas.appointments import Appointments, CreateAppointmentRequest, Upd
 from app.utils.service_helpers import handle_service_errors, or_404
 
 
+@handle_service_errors
 def create_appointment(request: CreateAppointmentRequest, supabase):
-    try:
-        appointment_repo = AppointmentRepository(supabase)
+    appointment_repo = AppointmentRepository(supabase)
 
-        response = appointment_repo.create_appointment(request.model_dump(mode="json"))
-        return {
-            "success": True,
-            "data": response
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    response = appointment_repo.create_appointment(request.model_dump(mode="json"))
+    return {
+        "success": True,
+        "data": response
+    }
 
 
+@handle_service_errors
 def get_all_appointments(filters, supabase):
-    try:
-        appointment_repo = AppointmentRepository(supabase)
-        response = appointment_repo.get_appointments(filters)
+    appointment_repo = AppointmentRepository(supabase)
+    response = appointment_repo.get_appointments(filters)
 
-        return {
-            "success": True,
-            "data": response
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response
+    }
 
 
 @handle_service_errors

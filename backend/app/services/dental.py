@@ -5,48 +5,37 @@ from app.utils.email_utils import staff_id_format
 from app.utils.service_helpers import handle_service_errors, or_404
 
 
+@handle_service_errors
 def create_dental_record(request: DentalVisitCreateRequest, supabase, current_user):
-    try:
-        staff_id = staff_id_format(current_user.email)
-        dental_repository = DentalRepositories(supabase)
+    staff_id = staff_id_format(current_user.email)
+    dental_repository = DentalRepositories(supabase)
 
-        dental_record_id = dental_repository.create(request, staff_id)
+    dental_record_id = dental_repository.create(request, staff_id)
 
-        if not dental_record_id:
-            raise Exception("Failed to create dental record")
+    if not dental_record_id:
+        raise Exception("Failed to create dental record")
 
-        dental_repository.create_odontogram(
-            request.tooth_records,
-            request.patient_id,
-            dental_record_id
-        )
+    dental_repository.create_odontogram(
+        request.tooth_records,
+        request.patient_id,
+        dental_record_id
+    )
 
-        return {
-            "success": True,
-            "dental_record_id": dental_record_id
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+    return {
+        "success": True,
+        "dental_record_id": dental_record_id
+    }
 
 
+@handle_service_errors
 def get_all_dental_visits(filters, supabase):
-    try:
-        dental_repository = DentalRepositories(supabase)
-        response = dental_repository.get_dental_visits(filters)
+    dental_repository = DentalRepositories(supabase)
+    response = dental_repository.get_dental_visits(filters)
 
-        return {
-            "success": True,
-            "data": response
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response
+    }
 
 
 @handle_service_errors

@@ -1,5 +1,6 @@
 from app.database.database_client import supabase_admin
 from app.utils.email_utils import add_ucc_domain
+from fastapi import HTTPException, status
 
 def create_auth_user(
     user_id: str,
@@ -55,3 +56,24 @@ def delete_auth_user(user_id: str):
             "success": False,
             "message": str(e)
         }
+
+
+def compensate_auth_user(user_id: str, db_message: str, rollback_prefix: str):
+    """Roll back a provisioned auth user, always raising 500.
+
+    Shared by create sagas (patient, staff): on DB failure after auth
+    creation, delete the auth user. Raises with the rollback failure
+    detail if cleanup fails, otherwise with the original DB message.
+    """
+    delete_response = delete_auth_user(user_id)
+
+    if not delete_response["success"]:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{rollback_prefix}: {delete_response['message']}",
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=db_message,
+    )

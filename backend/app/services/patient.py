@@ -3,62 +3,31 @@ from fastapi import status, HTTPException
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
 from app.schemas.response_dto.reponses import Response
-from app.services.auth.user import create_auth_user, delete_auth_user
+from app.services.auth.user import create_auth_user, delete_auth_user, compensate_auth_user
 from app.utils.email_utils import remove_ucc_domain
+from app.utils.service_helpers import handle_service_errors, handle_service_returns, or_404
 
 
+@handle_service_errors
 def get_all_patients(supabase):
-    try:
-        patient_repo = PatientRepository(supabase)
-        response = patient_repo.get_all()
+    patient_repo = PatientRepository(supabase)
+    response = patient_repo.get_all()
 
-        return {
-            "success": True,
-            "data": response
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response
+    }
 
 
+@handle_service_errors
 def get_patient_by_id(patient_id: str, supabase):
-    try:
-        patient_repo = PatientRepository(supabase)
-        response = patient_repo.get_by_id(patient_id)
+    patient_repo = PatientRepository(supabase)
+    response = patient_repo.get_by_id(patient_id)
 
-        if response:
-            return {
-                "success": True,
-                "data": response
-            }
-
-        return {
-            "success": False,
-            "message": f"Patient not found for {patient_id}"
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
-
-
-def _compensate_auth_user(user_id: str, db_message: str, rollback_prefix: str):
-    delete_response = delete_auth_user(user_id)
-
-    if not delete_response["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"{rollback_prefix}: {delete_response['message']}",
-        )
-
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=db_message,
-    )
+    return {
+        "success": True,
+        "data": or_404(response, f"Patient not found for {patient_id}"),
+    }
 
 
 def create_patient(request: CreatePatientRequest, supabase):
@@ -106,7 +75,7 @@ def create_patient(request: CreatePatientRequest, supabase):
     )
 
     if not insert_response["success"]:
-        _compensate_auth_user(
+        compensate_auth_user(
             user.id,
             insert_response["message"],
             "Failed to insert patient into database and failed "
@@ -123,7 +92,7 @@ def create_patient(request: CreatePatientRequest, supabase):
     )
 
     if not profile_response["success"]:
-        _compensate_auth_user(
+        compensate_auth_user(
             user.id,
             profile_response["message"],
             "Failed to insert patient profile and failed "
@@ -137,119 +106,73 @@ def create_patient(request: CreatePatientRequest, supabase):
     }
 
 
+@handle_service_errors
 def delete_patient(patient_id: str, supabase):
-    try:
-        patient_repo = PatientRepository(supabase)
-        existing = patient_repo.get_by_id(patient_id)
+    patient_repo = PatientRepository(supabase)
+    existing = patient_repo.get_by_id(patient_id)
+    or_404(existing, "Patient not found")
 
-        if not existing:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Patient not found"
-            )
+    patient_repo.delete_profile(patient_id)
+    deleted = patient_repo.delete(patient_id)
+    or_404(deleted, "Patient not found")
 
-        patient_repo.delete_profile(patient_id)
-        deleted = patient_repo.delete(patient_id)
+    delete_response = delete_auth_user(existing[0]["id"])
 
-        if not deleted:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Patient not found"
-            )
-
-        delete_response = delete_auth_user(existing[0]["id"])
-
-        if not delete_response["success"]:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    "Patient deleted from database but failed "
-                    f"to delete user from auth: {delete_response['message']}"
-                )
-            )
-
-        return {
-            "success": True,
-            "message": "Patient deleted successfully"
-        }
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
+    if not delete_response["success"]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=(
+                "Patient deleted from database but failed "
+                f"to delete user from auth: {delete_response['message']}"
+            )
         )
 
+    return {
+        "success": True,
+        "message": "Patient deleted successfully"
+    }
 
+
+@handle_service_returns
 def insert_patient_into_db(patient_data: Patient, supabase):
-    try:
-        patient_repo = PatientRepository(supabase)
-        response = patient_repo.create(patient_data)
+    patient_repo = PatientRepository(supabase)
+    response = patient_repo.create(patient_data)
 
-        return {
-            "success": True,
-            "data": response.data
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response.data
+    }
 
 
+@handle_service_returns
 def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase):
-    try:
-        patient_repo = PatientRepository(supabase)
-        response = patient_repo.create_profile(patient_profile)
+    patient_repo = PatientRepository(supabase)
+    response = patient_repo.create_profile(patient_profile)
 
-        return {
-            "success": True,
-            "data": response.data
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response.data
+    }
 
 
+@handle_service_errors
 def get_all_patient_profiles(supabase, filters):
-    try:
-        patient_repo = PatientRepository(supabase)
-        response = patient_repo.get_profiles(filters)
+    patient_repo = PatientRepository(supabase)
+    response = patient_repo.get_profiles(filters)
 
-        return {
-            "success": True,
-            "data": response
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }
+    return {
+        "success": True,
+        "data": response
+    }
 
 
+@handle_service_errors
 def get_patient_summary_record(supabase, patient_id):
-    try:
-        patient_repo = PatientRepository(supabase)
+    patient_repo = PatientRepository(supabase)
 
-        response = patient_repo.get_summary_records(patient_id)
+    response = patient_repo.get_summary_records(patient_id)
 
-        return Response(
-            success=True,
-            data=response.data
-        )
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e),
-        )
+    return Response(
+        success=True,
+        data=response.data
+    )
