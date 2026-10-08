@@ -30,9 +30,9 @@ export type MedicalRecords = Record<string, MedicalRecord>;
 export type MyVisits = Record<string, Visit[]>;
 
 export const myMedicalRecords: MedicalRecords = {
-    "20230518-S": {
+    "20230847-S": {
         recordId: "MED-1042",
-        studentId: "20230810-S",
+        studentId: "20230847-S",
         name: "Kenji Briones Chua",
         address: "123 Rizal Street",
         barangay: "Barangay San Isidro",
@@ -48,7 +48,7 @@ export const myMedicalRecords: MedicalRecords = {
 };
 
 export const myVisits: MyVisits = {
-    "20230518-S": [
+    "20230847-S": [
         {
             id: "v1",
             date: "2026-02-14",
