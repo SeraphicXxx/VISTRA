@@ -1,7 +1,7 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {createAppointment, getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
-import type {CreateAppointmentRequest} from "/@/api/appointments.api";
+import type {CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
 
 export function useCreateAppointment() {
     return useMutation({

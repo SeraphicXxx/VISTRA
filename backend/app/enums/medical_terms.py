@@ -12,3 +12,11 @@ class MedicalVisitStatus(str, Enum):
     RECOVERED = "recovered"
     REFERRED = "referred"
     ONGOING_TREATMENT = "ongoingTreatment"
+
+
+class MedicalTreatmentType(str, Enum):
+    MEDICINE = "Medicine"
+    PROCEDURE = "Procedure"
+    ADVICE = "Advice"
+    REFERRAL = "Referral"
+    OTHER = "Other"

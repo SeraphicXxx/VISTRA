@@ -1,6 +1,7 @@
-import {useState, type FormEvent} from "react";
+import type {FormEvent} from "react";
 import {Save, ArrowLeft, User, ClipboardList, Info} from "lucide-react";
-import {emptyDetails, type as visitTypeOptions} from "./medicalData";
+import {type as visitTypeOptions} from "./medicalData";
+import {useForm} from "/@/hooks/Form";
 import {statusEditFields} from "/@/components/editModal.jsx";
 import {ReadOnlyField} from "/@/utils/ReadOnlyField";
 import {StudentCombobox} from "/@/utils/StudentComboBox";
@@ -15,6 +16,7 @@ import type {
 import {useCreateMedicalVisit} from "/@/hooks/query/MedicalQuery";
 import {sessionManager} from "/@/utils/SessionManager";
 import {getFieldErrors} from "/@/utils/Formatters";
+import {treatmentTypeOptions} from "/@/types/types";
 
 const statusField = statusEditFields.find(
     (field: { key: string }) => field.key === "status"
@@ -54,13 +56,25 @@ interface PatientRecordFormProps {
     onSave?: (record: CreateMedicalVisit) => void;
 }
 
+interface MedicalRecFormValues {
+    selectedStudent: PatientProfile | null;
+    visitType: string;
+    treatmentType: string;
+    status: string;
+}
+
+const initialFormValues: MedicalRecFormValues = {
+    selectedStudent: null,
+    visitType: "",
+    treatmentType: "",
+    status: "",
+};
+
 export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
-    const [selectedStudent, setSelectedStudent] = useState<PatientProfile | null>(null);
-    const [visitType, setVisitType] = useState<string>("");
-    const [status, setStatus] = useState<string>("");
+    const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
+    const {selectedStudent, visitType, treatmentType, status} = form;
     const {rows: visitRows, addRow, removeRow, updateRow, resetRows} = useEditableRows(emptyVisitRow, 1);
     const createMedicalVisitMutation = useCreateMedicalVisit();
-
     const details = selectedStudent
         ? {
             course: selectedStudent.course ?? selectedStudent.department ?? "N/A",
@@ -83,9 +97,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     };
 
     const handleClear = (): void => {
-        setSelectedStudent(null);
-        setVisitType("");
-        setStatus("");
+        reset();
         resetRows();
     };
 
@@ -108,6 +120,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             staff_id: staffId,
             status,
             type: visitType,
+            treatment_type: treatmentType,
             visit_date: logRows[0]?.date || new Date().toISOString(),
             visit_log: logRows.map((row) => ({
                 complaint: row.complaint,
@@ -153,7 +166,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <StudentCombobox selectedStudent={selectedStudent} onSelect={setSelectedStudent}/>
+                <StudentCombobox selectedStudent={selectedStudent} onSelect={(student) => setField("selectedStudent", student)}/>
                 <ReadOnlyField id="course" label="Course" value={details?.course} placeholder="Select a student first"/>
                 <ReadOnlyField id="address" label="Address" value={details?.address} placeholder="Select a student first"/>
                 <ReadOnlyField id="barangay" label="Barangay" value={details?.barangay} placeholder="Select a student first"/>
@@ -170,7 +183,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                         id="type"
                         name="type"
                         value={visitType}
-                        onChange={(e) => setVisitType(e.target.value)}
+                        onChange={(e) => setField("visitType", e.target.value)}
                         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                         <option value="" disabled>Select Type</option>
@@ -181,12 +194,36 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                 </div>
 
                 <div>
+                    <FieldLabel htmlFor="treatmentType">
+                        Treatment Type
+                    </FieldLabel>
+
+                    <select
+                        id="treatmentType"
+                        name="treatmentType"
+                        value={treatmentType}
+                        onChange={(e) => setField("treatmentType", e.target.value)}
+                        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                        <option value="" disabled>
+                            Select Treatment Type
+                        </option>
+
+                        {treatmentTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
                     <FieldLabel htmlFor="status">Status</FieldLabel>
                     <select
                         id="status"
                         name="status"
                         value={status}
-                        onChange={(e) => setStatus(e.target.value)}
+                        onChange={(e) => setField("status", e.target.value)}
                         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                         <option value="" disabled>Select Status</option>

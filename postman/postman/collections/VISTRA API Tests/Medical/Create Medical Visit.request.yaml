@@ -17,6 +17,8 @@ body:
 
     \    \"type\": \"medicalConsultation\",\r
 
+    \    \"treatment_type\": \"Medicine\",\r
+
     \    \"visit_date\": \"2026-10-05T09:00:00\",\r
 
     \    \"visit_log\": [{\r

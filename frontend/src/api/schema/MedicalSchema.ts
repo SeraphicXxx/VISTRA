@@ -26,6 +26,7 @@ export interface CreateMedicalVisit {
     staff_id: string;
     status: string;
     type: string;
+    treatment_type: string;
     visit_date: string;
     visit_log: MedicalVisitLog[];
 }
