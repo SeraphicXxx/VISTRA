@@ -2,7 +2,7 @@ import {Status, StatusBadge} from "/@/components/StatusBadge";
 import {Column, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
 import React from "react";
-import {medicalStatuses} from "/@/types/Medical";
+import {medicalStatuses, medicalTypes} from "/@/types/Medical";
 
 export const medRecords: medData[] = [
   {
@@ -194,7 +194,7 @@ export const MedicalColumns: Column<medData>[] = [
     key: "type",
     label: "Type",
     filterType: "select",
-    options: type,
+    options: optionsFromMap(medicalTypes),
   },
 
   {

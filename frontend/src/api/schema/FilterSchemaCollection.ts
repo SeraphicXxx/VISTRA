@@ -41,6 +41,7 @@ export interface DentalVisitFilters {
 export interface MedicalVisitFilters {
     search?: string;
     status?: string;
+    type?: string;
     date?: string;
     course?: string;
 

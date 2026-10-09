@@ -13,9 +13,15 @@ def confirm_phone_number(phone: str) -> bool:
 def confirm_birthday(value: date) -> date:
     today = date.today()
 
-    hundred_years_ago = today.replace(year=today.year - 100)
+    try:
+        hundred_years_ago = today.replace(year=today.year - 100)
+    except ValueError:
+        # Feb 29 has no counterpart 100 years ago on non-leap years.
+        hundred_years_ago = today.replace(
+            year=today.year - 100, day=28
+        )
 
-    if value <= hundred_years_ago:
+    if value < hundred_years_ago:
         raise ValueError("Birthday must be for someone younger than 100 years old")
 
     return value

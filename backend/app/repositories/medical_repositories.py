@@ -14,12 +14,13 @@ class MedicalRepositories:
                 "medical_tab",
                 columns=(
                     "id, patient_id, patient_name, course, "
-                    "visit_date, staff_id, status"
+                    "visit_date, staff_id, status, type"
                 ),
                 count="exact",
             )
             .order("visit_date", desc=True)
             .eq("status", filters.status)
+            .eq("type", filters.type)
             .eq("course", filters.course)
         )
 
@@ -29,8 +30,7 @@ class MedicalRepositories:
         if filters.search:
             like = f"%{filters.search}%"
             query = query.or_(
-                f"patient_name.ilike.{like},"
-                f"patient_id.ilike.{like},"
+                f"patient_name.ilike.{like},patient_id.ilike.{like}"
             )
 
         response = (
@@ -61,6 +61,7 @@ class MedicalRepositories:
             self.supabase
             .table("medical_record_view")
             .select("*")
+            .eq("patient_id", patient_id)
             .eq("medical_visit_id", str(medical_visit_id))
             .limit(1)
             .execute()

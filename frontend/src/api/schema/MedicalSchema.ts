@@ -6,6 +6,7 @@ export interface MedicalVisitSchema {
     visit_date: string;
     staff_id: string;
     status: string;
+    type: string | null;
 }
 
 export interface MedicalRecordDetailSchema {

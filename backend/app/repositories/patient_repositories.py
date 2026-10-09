@@ -65,8 +65,7 @@ class PatientRepository:
 
         if filters.search:
             query.or_(
-                f"first_name.ilike.%{filters.search}%,"
-                f"last_name.ilike.%{filters.search}%,"
+                f"first_name.ilike.%{filters.search}%,last_name.ilike.%{filters.search}%,"
                 f"patient_id.ilike.%{filters.search}%"
             )
 

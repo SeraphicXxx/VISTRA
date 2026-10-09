@@ -63,9 +63,16 @@ class SupabaseQueryBuilder:
 
         return self
 
-    def or_(self, filters: str):
-        if filters:
-            self.query = self.query.or_(filters)
+    def or_(self, *filters: str):
+        parts = []
+        for f in filters:
+            if f:
+                cleaned = f.strip().strip(",")
+                if cleaned:
+                    parts.append(cleaned)
+
+        if parts:
+            self.query = self.query.or_(",".join(parts))
 
         return self
 

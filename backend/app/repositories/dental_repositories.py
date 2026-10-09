@@ -61,8 +61,7 @@ class DentalRepositories:
         if filters.search:
             like = f"%{filters.search}%"
             query = query.or_(
-                f"patient_name.ilike.{like},"
-                f"patient_id.ilike.{like},"
+                f"patient_name.ilike.{like},patient_id.ilike.{like}"
             )
 
         response = (

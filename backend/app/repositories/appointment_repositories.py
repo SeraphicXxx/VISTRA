@@ -20,11 +20,18 @@ class AppointmentRepository:
         return None
 
     def get_appointments(self, filters):
-        query = (
-            SupabaseQueryBuilder(
-                self.supabase,
-                "APPOINTMENT",
-                columns="""
+        use_course_filter = bool(getattr(filters, "course", None))
+        columns = """
+                    *,
+                    PATIENT!inner(
+                        PATIENT_PROFILE!inner(
+                            first_name,
+                            middle_name,
+                            last_name,
+                            course
+                        )
+                    )
+                """ if use_course_filter else """
                     *,
                     PATIENT(
                         PATIENT_PROFILE(
@@ -34,15 +41,24 @@ class AppointmentRepository:
                             course
                         )
                     )
-                """,
+                """
+        query = (
+            SupabaseQueryBuilder(
+                self.supabase,
+                "APPOINTMENT",
+                columns=columns,
                 count="exact"
             )
             .order("scheduled_start")
             .eq("patient_id", filters.patient_id)
             .eq("status", filters.status)
             .eq("type", filters.type)
-            .eq("course", filters.course)
         )
+
+        if use_course_filter:
+            query = query.eq(
+                "PATIENT.PATIENT_PROFILE.course", filters.course
+            )
 
         if filters.date:
             query = query.date_day("scheduled_start", filters.date)
@@ -122,8 +138,25 @@ class AppointmentRepository:
 
     @staticmethod
     def _map_appointment(appointment):
-        patient = appointment.pop("PATIENT", {})
-        profile = patient.get("PATIENT_PROFILE", {})
+        if not isinstance(appointment, dict):
+            return appointment
+
+        appointment = dict(appointment)
+        patient = appointment.pop("PATIENT", {}) or {}
+
+        if isinstance(patient, list):
+            patient = patient[0] if patient else {}
+
+        if not isinstance(patient, dict):
+            patient = {}
+
+        profile = patient.get("PATIENT_PROFILE", {}) or {}
+
+        if isinstance(profile, list):
+            profile = profile[0] if profile else {}
+
+        if not isinstance(profile, dict):
+            profile = {}
 
         return {
             **appointment,
