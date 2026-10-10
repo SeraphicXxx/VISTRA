@@ -1,21 +1,13 @@
-class StaffRepository:
+from app.repositories.base import BaseRepository
 
-    def __init__(self, supabase):
-        self.supabase = supabase
+
+class StaffRepository(BaseRepository):
 
     def get_by_id(self, staff_id: str):
-        response = (
-            self.supabase
-            .table("STAFF")
-            .select("*")
-            .eq("staff_id", staff_id)
-            .execute()
+        return self.fetch_one(
+            "STAFF",
+            filters={"staff_id": staff_id},
         )
-
-        if response:
-            return response.data
-
-        return None
 
     def create(self, staff_data):
         return (
@@ -26,20 +18,7 @@ class StaffRepository:
         )
 
     def get_staff(self):
-        response = (
-            self.supabase
-            .table("STAFF")
-            .select("*")
-            .execute()
-        )
-
-        return response.data
+        return self.fetch_all("STAFF")
 
     def delete(self, staff_id: str):
-        response = (
-            self.supabase.table("STAFF")
-            .delete()
-            .eq("staff_id", staff_id)
-            .execute()
-        )
-        return bool(response.data)
+        return self.delete_by_column("STAFF", "staff_id", staff_id)

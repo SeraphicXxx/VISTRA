@@ -1,76 +1,32 @@
+from app.repositories.base import BaseRepository, fetch_visit_tab
 from app.schemas.query import FilterMedical
-from app.schemas.response_dto.reponses import PaginatedResponse
-from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
-class MedicalRepositories:
-    def __init__(self, supabase):
-        self.supabase = supabase
+class MedicalRepositories(BaseRepository):
 
     def get_medical_visits(self, filters: FilterMedical):
-        query = (
-            SupabaseQueryBuilder(
-                self.supabase,
-                "medical_tab",
-                columns=(
-                    "id, patient_id, patient_name, course, "
-                    "visit_date, staff_id, status, type"
-                ),
-                count="exact",
-            )
-            .order("visit_date", desc=True)
-            .eq("status", filters.status)
-            .eq("type", filters.type)
-            .eq("course", filters.course)
-        )
-
-        if filters.date:
-            query = query.date_day("visit_date", filters.date)
-
-        if filters.search:
-            like = f"%{filters.search}%"
-            query = query.or_(
-                f"patient_name.ilike.{like},patient_id.ilike.{like}"
-            )
-
-        response = (
-            query
-            .paginate(filters.page, filters.page_size)
-            .build()
-            .execute()
-        )
-
-        return PaginatedResponse(
-            items=response.data or [],
-            total=response.count or 0,
-            page=filters.page,
-            page_size=filters.page_size,
+        return fetch_visit_tab(
+            self.supabase,
+            "medical_tab",
+            columns=(
+                "id, patient_id, patient_name, course, "
+                "visit_date, staff_id, status, type"
+            ),
+            filters=filters,
+            include_type=True,
         )
 
     def delete_visit(self, medical_visit_id: int):
-        response = (
-            self.supabase.table("MEDICAL_VISIT")
-            .delete()
-            .eq("id", medical_visit_id)
-            .execute()
-        )
-        return bool(response.data)
+        return self.delete_by_column("MEDICAL_VISIT", "id", medical_visit_id)
 
     def get_medical_record(self, patient_id: str, medical_visit_id: int):
-        response = (
-            self.supabase
-            .table("medical_record_view")
-            .select("*")
-            .eq("patient_id", patient_id)
-            .eq("medical_visit_id", str(medical_visit_id))
-            .limit(1)
-            .execute()
+        return self.fetch_one(
+            "medical_record_view",
+            filters={
+                "patient_id": patient_id,
+                "medical_visit_id": str(medical_visit_id),
+            },
         )
-
-        if not response.data:
-            return None
-
-        return response.data[0]
 
     def create(self, data, staff_id: str):
         response = (

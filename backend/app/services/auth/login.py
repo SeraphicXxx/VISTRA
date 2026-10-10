@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
 from app.database.database_client import supabase
-from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
+from app.utils.email_utils import add_ucc_domain, staff_id_format
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def login_user(request):
             "success": True,
             "user": {
                 "id": user.id,
-                "user_id": remove_ucc_domain(user.email).upper(),
+                "user_id": staff_id_format(user.email),
                 "email": user.email,
                 "role": role,
             },

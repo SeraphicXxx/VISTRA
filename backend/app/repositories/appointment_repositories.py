@@ -1,8 +1,8 @@
-from app.schemas.response_dto.reponses import PaginatedResponse
+from app.repositories.base import BaseRepository
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
-class AppointmentRepository:
+class AppointmentRepository(BaseRepository):
     def __init__(self, supabase):
         self.supabase = supabase
 
@@ -63,35 +63,18 @@ class AppointmentRepository:
         if filters.date:
             query = query.date_day("scheduled_start", filters.date)
 
-        response = (
-            query
-            .paginate(
-                filters.page,
-                filters.page_size,
-            )
-            .build()
-            .execute()
-        )
-
-        total = response.count or 0
-
-        items = [
+        result = self.fetch_page(query, filters.page, filters.page_size)
+        result.items = [
             self._map_appointment(appointment)
-            for appointment in response.data
+            for appointment in result.items
         ]
 
-        return PaginatedResponse(
-            items=items,
-            total=total,
-            page=filters.page,
-            page_size=filters.page_size,
-        )
+        return result
 
     def get_appointment_by_id(self, appointment_id: int, patient_id: str):
-        response = (
-            self.supabase
-            .table("APPOINTMENT")
-            .select("""
+        row = self.fetch_one(
+            "APPOINTMENT",
+            select="""
                 *,
                 PATIENT(
                     PATIENT_PROFILE(
@@ -101,17 +84,17 @@ class AppointmentRepository:
                         course
                     )
                 )
-            """)
-            .eq("id", appointment_id)
-            .eq("patient_id", patient_id)
-            .limit(1)
-            .execute()
+            """,
+            filters={
+                "id": appointment_id,
+                "patient_id": patient_id,
+            },
         )
 
-        if not response.data:
+        if row is None:
             return None
 
-        return self._map_appointment(response.data[0])
+        return self._map_appointment(row)
 
     def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
         response = (
@@ -128,13 +111,7 @@ class AppointmentRepository:
         return None
 
     def delete_appointment(self, appointment_id: int):
-        response = (
-            self.supabase.table("APPOINTMENT")
-            .delete()
-            .eq("id", appointment_id)
-            .execute()
-        )
-        return bool(response.data)
+        return self.delete_by_column("APPOINTMENT", "id", appointment_id)
 
     @staticmethod
     def _map_appointment(appointment):

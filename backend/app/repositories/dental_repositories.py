@@ -1,12 +1,8 @@
+from app.repositories.base import BaseRepository, fetch_visit_tab
 from app.schemas.query import FilterDental
-from app.schemas.response_dto.reponses import PaginatedResponse
-from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
-class DentalRepositories:
-    def __init__(self, supabase):
-        self.supabase = supabase
-
+class DentalRepositories(BaseRepository):
     def create(self, data, staff_id):
         response = (
             self.supabase
@@ -40,83 +36,31 @@ class DentalRepositories:
         return response.data
 
     def get_dental_visits(self, filters: FilterDental):
-        query = (
-            SupabaseQueryBuilder(
-                self.supabase,
-                "dental_tab",
-                columns=(
-                    "id, patient_id, patient_name, course, "
-                    "visit_date, staff_id, status"
-                ),
-                count="exact",
-            )
-            .order("visit_date", desc=True)
-            .eq("status", filters.status)
-            .eq("course", filters.course)
-        )
-
-        if filters.date:
-            query = query.date_day("visit_date", filters.date)
-
-        if filters.search:
-            like = f"%{filters.search}%"
-            query = query.or_(
-                f"patient_name.ilike.{like},patient_id.ilike.{like}"
-            )
-
-        response = (
-            query
-            .paginate(filters.page, filters.page_size)
-            .build()
-            .execute()
-        )
-
-        return PaginatedResponse(
-            items=response.data or [],
-            total=response.count or 0,
-            page=filters.page,
-            page_size=filters.page_size,
+        return fetch_visit_tab(
+            self.supabase,
+            "dental_tab",
+            columns=(
+                "id, patient_id, patient_name, course, "
+                "visit_date, staff_id, status"
+            ),
+            filters=filters,
         )
 
     def get_dental_record(self, patient_id: str, dental_visit_id: int):
-        response = (
-            self.supabase
-            .table("dental_record_view")
-            .select("*")
-            .eq("patient_id", patient_id)
-            .eq("dental_visit_id", str(dental_visit_id))
-            .limit(1)
-            .execute()
+        return self.fetch_one(
+            "dental_record_view",
+            filters={
+                "patient_id": patient_id,
+                "dental_visit_id": str(dental_visit_id),
+            },
         )
-
-        if not response.data:
-            return None
-
-        return response.data[0]
 
     def get_visit_by_id(self, dental_visit_id: int):
-        response = (
-            self.supabase
-            .table("DENTAL_VISIT")
-            .select("id")
-            .eq("id", dental_visit_id)
-            .limit(1)
-            .execute()
+        return self.fetch_one(
+            "DENTAL_VISIT",
+            select="id",
+            filters={"id": dental_visit_id},
         )
-
-        if not response.data:
-            return None
-
-        return response.data[0]
-
-    def delete_odontogram_by_visit(self, dental_visit_id: int):
-        response = (
-            self.supabase.table("ODONTOGRAM")
-            .delete()
-            .eq("dental_record_id", dental_visit_id)
-            .execute()
-        )
-        return response.data or []
 
     def delete_visit_cascade(self, dental_visit_id: int):
         # Atomic: odontogram + visit deleted in one transaction.
@@ -127,10 +71,4 @@ class DentalRepositories:
         ).execute()
 
     def delete_visit(self, dental_visit_id: int):
-        response = (
-            self.supabase.table("DENTAL_VISIT")
-            .delete()
-            .eq("id", dental_visit_id)
-            .execute()
-        )
-        return bool(response.data)
+        return self.delete_by_column("DENTAL_VISIT", "id", dental_visit_id)

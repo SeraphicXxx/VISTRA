@@ -1,36 +1,17 @@
-from app.schemas.response_dto.reponses import PaginatedResponse
+from app.repositories.base import BaseRepository
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
-class PatientRepository:
-
-    def __init__(self, supabase):
-        self.supabase = supabase
+class PatientRepository(BaseRepository):
 
     def get_by_id(self, patient_id: str):
-        response = (
-            self.supabase
-            .table("PATIENT")
-            .select("*")
-            .eq("patient_id", patient_id)
-            .limit(1)
-            .execute()
+        return self.fetch_one(
+            "PATIENT",
+            filters={"patient_id": patient_id},
         )
-
-        if response:
-            return response.data
-
-        return None
 
     def get_all(self):
-        response = (
-            self.supabase
-            .table("PATIENT")
-            .select("*")
-            .execute()
-        )
-
-        return response.data
+        return self.fetch_all("PATIENT")
 
     def create(self, patient_data):
         return (
@@ -49,7 +30,6 @@ class PatientRepository:
         )
 
     def get_profiles(self, filters):
-
         query = (
             SupabaseQueryBuilder(
                 self.supabase,
@@ -64,29 +44,12 @@ class PatientRepository:
         )
 
         if filters.search:
-            query.or_(
+            query = query.or_(
                 f"first_name.ilike.%{filters.search}%,last_name.ilike.%{filters.search}%,"
                 f"patient_id.ilike.%{filters.search}%"
             )
 
-        response = (
-            query
-            .paginate(
-                filters.page,
-                filters.page_size,
-            )
-            .build()
-            .execute()
-        )
-
-        total = response.count or 0
-
-        return PaginatedResponse(
-            items=response.data,
-            total=total,
-            page=filters.page,
-            page_size=filters.page_size,
-        )
+        return self.fetch_page(query, filters.page, filters.page_size)
 
     def get_summary_records(self, patient_id):
         return (
@@ -105,21 +68,3 @@ class PatientRepository:
             "delete_patient_records",
             {"p_patient_id": patient_id},
         ).execute()
-
-    def delete_profile(self, patient_id: str):
-        response = (
-            self.supabase.table("PATIENT_PROFILE")
-            .delete()
-            .eq("patient_id", patient_id)
-            .execute()
-        )
-        return bool(response.data)
-
-    def delete(self, patient_id: str):
-        response = (
-            self.supabase.table("PATIENT")
-            .delete()
-            .eq("patient_id", patient_id)
-            .execute()
-        )
-        return bool(response.data)

@@ -66,7 +66,7 @@ def confirm_not_blank(value: str) -> str:
 
 
 def confirm_mobile_number(value: str) -> str:
-    value = value.strip()
+    value = confirm_not_blank(value)
 
     if not value.isdigit():
         raise ValueError("Mobile number must contain only digits")

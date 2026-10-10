@@ -11,6 +11,28 @@ P = ParamSpec("P")
 R = TypeVar("R")
 T = TypeVar("T")
 
+_UNSET = object()
+
+
+def ok(data=_UNSET, message=None, **extra):
+    """Success envelope: {"success": True, ...}.
+
+    Pass data positionally for {"success": True, "data": ...},
+    message= for {"success": True, "message": ...}, and anything
+    else (e.g. medical_visit_id=) as keywords.
+    """
+    result = {"success": True}
+
+    if data is not _UNSET:
+        result["data"] = data
+
+    if message is not None:
+        result["message"] = message
+
+    result.update(extra)
+
+    return result
+
 
 def or_404(value: T, detail: str) -> T:
     if (

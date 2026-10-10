@@ -1,11 +1,16 @@
 from fastapi import status, HTTPException
 
+from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
 from app.schemas.response_dto.reponses import Response
-from app.services.auth.user import create_auth_user, delete_auth_user, compensate_auth_user
+from app.services.auth.user import (
+    compensate_auth_user,
+    delete_auth_or_500,
+    provision_auth_or_raise,
+)
 from app.utils.email_utils import remove_ucc_domain
-from app.utils.service_helpers import handle_service_errors, handle_service_returns, or_404
+from app.utils.service_helpers import handle_service_errors, ok, or_404
 
 
 @handle_service_errors
@@ -13,10 +18,7 @@ def get_all_patients(supabase):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_all()
 
-    return {
-        "success": True,
-        "data": response
-    }
+    return ok(response)
 
 
 @handle_service_errors
@@ -24,44 +26,31 @@ def get_patient_by_id(patient_id: str, supabase):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_by_id(patient_id)
 
-    return {
-        "success": True,
-        "data": or_404(response, f"Patient not found for {patient_id}"),
-    }
+    return ok(or_404(response, f"Patient not found for {patient_id}"))
 
 
-@handle_service_errors
-def create_patient(request: CreatePatientRequest, supabase):
-    patient_id = remove_ucc_domain(request.patient_id)
-
-    patient_repo = PatientRepository(supabase)
-
-    # 1. Check if patient already exists
-    existing_patient = patient_repo.get_by_id(patient_id)
-
-    if existing_patient:
+def ensure_patient_not_exists(patient_repo: PatientRepository, patient_id: str) -> None:
+    if patient_repo.get_by_id(patient_id):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Patient ID already exists",
         )
 
+
+@handle_service_errors
+def create_patient(request: CreatePatientRequest, supabase):
+    patient_id = remove_ucc_domain(request.patient_id)
+    patient_repo = PatientRepository(supabase)
+
+    # 1. Check if patient already exists
+    ensure_patient_not_exists(patient_repo, patient_id)
+
     # 2. Create Auth user
-    auth_response = create_auth_user(
-        user_id=patient_id,
-        password=request.password,
-        role=request.classification,
+    user = provision_auth_or_raise(
+        patient_id,
+        request.password,
+        request.classification,
     )
-
-    if not auth_response["success"]:
-        raise HTTPException(
-            status_code=auth_response.get(
-                "status_code",
-                status.HTTP_400_BAD_REQUEST,
-            ),
-            detail=auth_response["message"],
-        )
-
-    user = auth_response["user"]
 
     # 3. Insert PATIENT
     patient_data = Patient(
@@ -70,10 +59,7 @@ def create_patient(request: CreatePatientRequest, supabase):
         created_by=request.created_by,
     )
 
-    insert_response = insert_patient_into_db(
-        patient_data,
-        supabase,
-    )
+    insert_response = insert_model(supabase, "PATIENT", patient_data)
 
     if not insert_response["success"]:
         compensate_auth_user(
@@ -87,10 +73,7 @@ def create_patient(request: CreatePatientRequest, supabase):
     patient_profile = request.to_patient_profile()
 
     # 5. Insert patient profile
-    profile_response = insert_patient_profile_into_db(
-        patient_profile,
-        supabase,
-    )
+    profile_response = insert_model(supabase, "PATIENT_PROFILE", patient_profile)
 
     if not profile_response["success"]:
         compensate_auth_user(
@@ -101,10 +84,7 @@ def create_patient(request: CreatePatientRequest, supabase):
         )
 
     # Everything succeeded
-    return {
-        "success": True,
-        "message": "Patient created successfully",
-    }
+    return ok(message="Patient created successfully")
 
 
 @handle_service_errors
@@ -115,43 +95,9 @@ def delete_patient(patient_id: str, supabase):
 
     patient_repo.delete_patient_cascade(patient_id)
 
-    delete_response = delete_auth_user(existing[0]["id"])
+    delete_auth_or_500("Patient", existing["id"])
 
-    if not delete_response["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Patient deleted from database but failed "
-                f"to delete user from auth: {delete_response['message']}"
-            )
-        )
-
-    return {
-        "success": True,
-        "message": "Patient deleted successfully"
-    }
-
-
-@handle_service_returns
-def insert_patient_into_db(patient_data: Patient, supabase) -> dict:
-    patient_repo = PatientRepository(supabase)
-    response = patient_repo.create(patient_data)
-
-    return {
-        "success": True,
-        "data": response.data
-    }
-
-
-@handle_service_returns
-def insert_patient_profile_into_db(patient_profile: PatientProfile, supabase) -> dict:
-    patient_repo = PatientRepository(supabase)
-    response = patient_repo.create_profile(patient_profile)
-
-    return {
-        "success": True,
-        "data": response.data
-    }
+    return ok(message="Patient deleted successfully")
 
 
 @handle_service_errors
@@ -159,10 +105,7 @@ def get_all_patient_profiles(supabase, filters):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_profiles(filters)
 
-    return {
-        "success": True,
-        "data": response
-    }
+    return ok(response)
 
 
 @handle_service_errors
