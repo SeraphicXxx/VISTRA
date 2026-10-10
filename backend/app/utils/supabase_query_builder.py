@@ -17,7 +17,7 @@ class SupabaseQueryBuilder:
             .select(columns, count=count)
         )
 
-    FilterOp = Literal["eq", "neq", "gt", "gte", "lt", "lte"]
+    FilterOp = Literal["eq", "gte", "lt"]
 
     def _apply(self, op: FilterOp, column: str, value):
         if value is not None:
@@ -28,20 +28,11 @@ class SupabaseQueryBuilder:
     def eq(self, column: str, value):
         return self._apply("eq", column, value)
 
-    def neq(self, column: str, value):
-        return self._apply("neq", column, value)
-
-    def gt(self, column: str, value):
-        return self._apply("gt", column, value)
-
     def gte(self, column: str, value):
         return self._apply("gte", column, value)
 
     def lt(self, column: str, value):
         return self._apply("lt", column, value)
-
-    def lte(self, column: str, value):
-        return self._apply("lte", column, value)
 
     def date_day(self, column: str, value):
         """
@@ -59,12 +50,6 @@ class SupabaseQueryBuilder:
             .gte(column, str(day))
             .lt(column, str(day + timedelta(days=1)))
         )
-
-    def ilike(self, column: str, value: str):
-        if value:
-            self.query = self.query.ilike(column, value)
-
-        return self
 
     def or_(self, *filters: str):
         parts = []

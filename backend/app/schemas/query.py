@@ -33,5 +33,6 @@ class FilterDental(VisitFilter):
     pass
 
 
-class FilterMedical(VisitFilter):
-    pass
+# Intentionally identical to FilterDental today; split into a real
+# subclass if medical ever gains its own filter fields.
+FilterMedical = FilterDental

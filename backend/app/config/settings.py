@@ -21,10 +21,6 @@ class Config:
     PROD_FRONTEND_URL = os.getenv("PROD_FRONTEND_URL")
 
     @classmethod
-    def supabase_source(cls) -> str:
-        return "selfhosted" if cls.USE_SELFHOSTED_SUPABASE else "cloud"
-
-    @classmethod
     def _pick(cls, cloud_value, selfhosted_value):
         if cls.USE_SELFHOSTED_SUPABASE:
             return selfhosted_value

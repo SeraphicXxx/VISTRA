@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.database.database_client import supabase
 from app.utils.email_utils import add_ucc_domain, staff_id_format
@@ -17,7 +17,7 @@ def _resolve_identifier(request) -> str:
 
     if not raw or not str(raw).strip():
         raise HTTPException(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="identifier, email, staff_id, or patient_id is required",
         )
 
@@ -39,7 +39,7 @@ def login_user(request):
 
         if not user or not session:
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid email or password",
             )
 
@@ -68,6 +68,6 @@ def login_user(request):
         logger.exception("Login failed: %s", e)
 
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )

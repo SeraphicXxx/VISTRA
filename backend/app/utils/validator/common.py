@@ -1,14 +1,8 @@
 from datetime import date
 from enum import Enum
 from typing import TypeVar
-import re
 
 E = TypeVar("E", bound=Enum)
-
-def confirm_phone_number(phone: str) -> bool:
-    pattern = r"^((\+[0-9]{2})|0)[.\- ]?9[0-9]{2}[.\- ]?[0-9]{3}[.\- ]?[0-9]{4}$"
-    return bool(re.fullmatch(pattern, phone))
-
 
 def confirm_birthday(value: date) -> date:
     today = date.today()
@@ -25,26 +19,6 @@ def confirm_birthday(value: date) -> date:
         raise ValueError("Birthday must be for someone younger than 100 years old")
 
     return value
-
-
-def confirm_age(age: int, birthday: date) -> int:
-    today = date.today()
-
-    calculated_age = today.year - birthday.year
-
-    if (today.month, today.day) < (
-        birthday.month,
-         birthday.day,
-    ):
-        calculated_age -= 1
-
-    if age != calculated_age:
-        raise ValueError(
-            f"Age does not match birthday. "
-            f"Expected {calculated_age}, got {age}"
-        )
-
-    return age
 
 
 def confirm_enum(value: str, enum_class: type[E]) -> str:
