@@ -1,13 +1,16 @@
+from app.config.security import require_user_email
 from app.repositories.medical_repositories import MedicalRepositories
 from app.schemas.medical import MedicalVisitCreateRequest
+from app.utils.email_utils import staff_id_format
 from app.utils.service_helpers import handle_service_errors, or_404
 
 
 @handle_service_errors
-def create_medical_record(request: MedicalVisitCreateRequest, supabase):
+def create_medical_record(request: MedicalVisitCreateRequest, supabase, current_user):
+    staff_id = staff_id_format(require_user_email(current_user))
     medical_repository = MedicalRepositories(supabase)
 
-    medical_visit_id = medical_repository.create(request)
+    medical_visit_id = medical_repository.create(request, staff_id)
 
     if not medical_visit_id:
         raise Exception("Failed to create medical record")
@@ -44,9 +47,9 @@ def get_medical_record_by_id(patient_id: str, medical_visit_id: int, supabase):
 def delete_medical_visit(medical_visit_id: int, supabase):
     medical_repository = MedicalRepositories(supabase)
     deleted = medical_repository.delete_visit(medical_visit_id)
+    or_404(deleted, "Medical record not found")
 
-    if or_404(deleted, "Medical record not found"):
-        return {
-            "success": True,
-            "message": "Medical record deleted successfully"
-        }
+    return {
+        "success": True,
+        "message": "Medical record deleted successfully"
+    }

@@ -94,6 +94,21 @@ class DentalRepositories:
 
         return response.data[0]
 
+    def get_visit_by_id(self, dental_visit_id: int):
+        response = (
+            self.supabase
+            .table("DENTAL_VISIT")
+            .select("id")
+            .eq("id", dental_visit_id)
+            .limit(1)
+            .execute()
+        )
+
+        if not response.data:
+            return None
+
+        return response.data[0]
+
     def delete_odontogram_by_visit(self, dental_visit_id: int):
         response = (
             self.supabase.table("ODONTOGRAM")
@@ -102,6 +117,14 @@ class DentalRepositories:
             .execute()
         )
         return response.data or []
+
+    def delete_visit_cascade(self, dental_visit_id: int):
+        # Atomic: odontogram + visit deleted in one transaction.
+        # Requires migration 20261010120000_cascade_deletes.
+        self.supabase.rpc(
+            "delete_dental_visit",
+            {"p_visit_id": dental_visit_id},
+        ).execute()
 
     def delete_visit(self, dental_visit_id: int):
         response = (

@@ -1,5 +1,6 @@
 from app.schemas.dental import DentalVisitCreateRequest
 
+from app.config.security import require_user_email
 from app.repositories.dental_repositories import DentalRepositories
 from app.utils.email_utils import staff_id_format
 from app.utils.service_helpers import handle_service_errors, or_404
@@ -7,7 +8,7 @@ from app.utils.service_helpers import handle_service_errors, or_404
 
 @handle_service_errors
 def create_dental_record(request: DentalVisitCreateRequest, supabase, current_user):
-    staff_id = staff_id_format(current_user.email)
+    staff_id = staff_id_format(require_user_email(current_user))
     dental_repository = DentalRepositories(supabase)
 
     dental_record_id = dental_repository.create(request, staff_id)
@@ -41,14 +42,16 @@ def get_all_dental_visits(filters, supabase):
 @handle_service_errors
 def delete_dental_visit(dental_visit_id: int, supabase):
     dental_repository = DentalRepositories(supabase)
-    dental_repository.delete_odontogram_by_visit(dental_visit_id)
-    deleted = dental_repository.delete_visit(dental_visit_id)
+    or_404(
+        dental_repository.get_visit_by_id(dental_visit_id),
+        "Dental record not found",
+    )
+    dental_repository.delete_visit_cascade(dental_visit_id)
 
-    if or_404(deleted, "Dental record not found"):
-        return {
-            "success": True,
-            "message": "Dental record deleted successfully"
-        }
+    return {
+        "success": True,
+        "message": "Dental record deleted successfully"
+    }
 
 
 @handle_service_errors

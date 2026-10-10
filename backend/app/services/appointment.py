@@ -52,9 +52,9 @@ def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, s
 def delete_appointment(appointment_id: int, supabase):
     appointment_repo = AppointmentRepository(supabase)
     response = appointment_repo.delete_appointment(appointment_id)
+    or_404(response, "Appointment not found")
 
-    if or_404(response, "Appointment not found"):
-        return {
-            "success": True,
-            "message": "Appointment deleted successfully"
-        }
+    return {
+        "success": True,
+        "message": "Appointment deleted successfully"
+    }

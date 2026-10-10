@@ -7,6 +7,7 @@ from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, handle_service_returns, or_404
 
 
+@handle_service_errors
 def create_staff(request: CreateStaffRequest, supabase):
     staff_id = remove_ucc_domain(request.staff_id)
 

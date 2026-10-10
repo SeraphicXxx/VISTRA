@@ -72,11 +72,11 @@ class MedicalRepositories:
 
         return response.data[0]
 
-    def create(self, data):
+    def create(self, data, staff_id: str):
         response = (
             self.supabase
             .table("MEDICAL_VISIT")
-            .insert(data.to_db_dict())
+            .insert(data.to_db_dict(staff_id))
             .execute()
         )
 

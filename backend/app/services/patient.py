@@ -30,6 +30,7 @@ def get_patient_by_id(patient_id: str, supabase):
     }
 
 
+@handle_service_errors
 def create_patient(request: CreatePatientRequest, supabase):
     patient_id = remove_ucc_domain(request.patient_id)
 
@@ -112,9 +113,7 @@ def delete_patient(patient_id: str, supabase):
     existing = patient_repo.get_by_id(patient_id)
     or_404(existing, "Patient not found")
 
-    patient_repo.delete_profile(patient_id)
-    deleted = patient_repo.delete(patient_id)
-    or_404(deleted, "Patient not found")
+    patient_repo.delete_patient_cascade(patient_id)
 
     delete_response = delete_auth_user(existing[0]["id"])
 

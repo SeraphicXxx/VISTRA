@@ -1,6 +1,9 @@
 from fastapi import HTTPException
 
 from app.database.database_client import supabase
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def auth_refresh_token(request):
@@ -26,7 +29,7 @@ def auth_refresh_token(request):
         raise
 
     except Exception as e:
-        print(f"Token refresh error: {e}")
+        logger.exception("Token refresh failed: %s", e)
 
         raise HTTPException(
             status_code=401,

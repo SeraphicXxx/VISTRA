@@ -1,8 +1,11 @@
 from collections.abc import Callable
 from functools import wraps
+import logging
 from typing import ParamSpec, TypeVar
 
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -10,26 +13,37 @@ T = TypeVar("T")
 
 
 def or_404(value: T, detail: str) -> T:
-    if value:
-        return value
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=detail,
-    )
+    if (
+        value is None
+        or value is False
+        or (isinstance(value, (list, dict, set)) and len(value) == 0)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=detail,
+        )
+
+    return value
 
 
 def handle_service_errors(fn: Callable[P, R]) -> Callable[P, R]:
-    """Raise-contract: re-raise HTTPException, wrap other errors as 500."""
+    """Raise-contract: re-raise HTTPException, wrap other errors."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except HTTPException:
             raise
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=str(e),
+            )
         except Exception as e:
+            logger.exception("Unhandled error in %s: %s", fn.__name__, e)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=str(e),
+                detail="Internal server error",
             )
 
     return wrapper
@@ -47,9 +61,10 @@ def handle_service_returns(fn: Callable[P, R]) -> Callable[P, R]:
         try:
             return fn(*args, **kwargs)
         except Exception as e:
+            logger.exception("Unhandled error in %s: %s", fn.__name__, e)
             return {
                 "success": False,
-                "message": str(e),
+                "message": "Internal operation failed",
             }
 
     return wrapper

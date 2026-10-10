@@ -2,6 +2,9 @@ from fastapi import HTTPException
 
 from app.database.database_client import supabase
 from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_identifier(request) -> str:
@@ -62,7 +65,7 @@ def login_user(request):
         raise
 
     except Exception as e:
-        print(f"Login error: {e}")
+        logger.exception("Login failed: %s", e)
 
         raise HTTPException(
             status_code=401,

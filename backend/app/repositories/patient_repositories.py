@@ -98,6 +98,14 @@ class PatientRepository:
             .execute()
         )
 
+    def delete_patient_cascade(self, patient_id: str):
+        # Atomic: profile + patient deleted in one transaction.
+        # Requires migration 20261010120000_cascade_deletes.
+        self.supabase.rpc(
+            "delete_patient_records",
+            {"p_patient_id": patient_id},
+        ).execute()
+
     def delete_profile(self, patient_id: str):
         response = (
             self.supabase.table("PATIENT_PROFILE")

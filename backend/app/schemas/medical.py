@@ -11,20 +11,19 @@ class MedicalVisitLog(BaseModel):
 
 class MedicalVisitCreateRequest(BaseModel):
     patient_id: str
-    staff_id: str
     status: MedicalVisitStatus
     type: MedicalVisitTypes
     treatment_type: MedicalTreatmentType
     visit_date: datetime
     visit_log: list[MedicalVisitLog]
 
-    def to_db_dict(self) -> dict:
+    def to_db_dict(self, staff_id: str) -> dict:
         first_log = self.visit_log[0] if self.visit_log else None
         visit_date_iso = self.visit_date.isoformat()
 
         return {
             "patient_id": self.patient_id,
-            "staff_id": self.staff_id,
+            "staff_id": staff_id,
             "type": self.type.value,
             "visit_date": visit_date_iso,
             "treatment_type": self.treatment_type.value,
