@@ -2,7 +2,7 @@ from app.repositories.base import BaseRepository, fetch_visit_tab
 from app.schemas.query import FilterMedical
 
 
-class MedicalRepositories(BaseRepository):
+class MedicalRepository(BaseRepository):
 
     def get_medical_visits(self, filters: FilterMedical):
         return fetch_visit_tab(

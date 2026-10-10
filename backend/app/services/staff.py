@@ -8,10 +8,11 @@ from app.services.auth.user import (
 )
 from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
+from supabase import Client
 
 
 @handle_service_errors
-def create_staff(request: CreateStaffRequest, supabase):
+def create_staff(request: CreateStaffRequest, supabase: Client):
     staff_id = remove_ucc_domain(request.staff_id)
 
     user = provision_auth_or_raise(staff_id, request.password, "staff")
@@ -38,15 +39,15 @@ def create_staff(request: CreateStaffRequest, supabase):
 
 
 @handle_service_errors
-def get_staff_by_id(staff_id: str, supabase):
+def get_staff_by_id(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
     response = staff_repo.get_by_id(staff_id)
 
-    return ok(or_404(response, f"Staff not found for {staff_id}"))
+    return ok(or_404(response, "Staff not found"))
 
 
 @handle_service_errors
-def delete_staff(staff_id: str, supabase):
+def delete_staff(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
     existing = staff_repo.get_by_id(staff_id)
     or_404(existing, "Staff not found")

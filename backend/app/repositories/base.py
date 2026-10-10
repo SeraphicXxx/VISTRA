@@ -1,6 +1,6 @@
 import logging
 
-from app.schemas.response_dto.reponses import PaginatedResponse
+from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 logger = logging.getLogger(__name__)

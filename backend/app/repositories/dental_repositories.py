@@ -2,7 +2,7 @@ from app.repositories.base import BaseRepository, fetch_visit_tab
 from app.schemas.query import FilterDental
 
 
-class DentalRepositories(BaseRepository):
+class DentalRepository(BaseRepository):
     def create(self, data, staff_id):
         response = (
             self.supabase

@@ -1,9 +1,10 @@
 from fastapi import status, HTTPException
+from supabase import Client
 
 from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
-from app.schemas.patient import Patient, CreatePatientRequest, PatientProfile
-from app.schemas.response_dto.reponses import Response
+from app.schemas.patient import Patient, CreatePatientRequest
+from app.schemas.query import FilterPatient
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
@@ -14,7 +15,7 @@ from app.utils.service_helpers import handle_service_errors, ok, or_404
 
 
 @handle_service_errors
-def get_all_patients(supabase):
+def get_all_patients(supabase: Client):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_all()
 
@@ -22,11 +23,11 @@ def get_all_patients(supabase):
 
 
 @handle_service_errors
-def get_patient_by_id(patient_id: str, supabase):
+def get_patient_by_id(patient_id: str, supabase: Client):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_by_id(patient_id)
 
-    return ok(or_404(response, f"Patient not found for {patient_id}"))
+    return ok(or_404(response, "Patient not found"))
 
 
 def ensure_patient_not_exists(patient_repo: PatientRepository, patient_id: str) -> None:
@@ -38,7 +39,7 @@ def ensure_patient_not_exists(patient_repo: PatientRepository, patient_id: str) 
 
 
 @handle_service_errors
-def create_patient(request: CreatePatientRequest, supabase):
+def create_patient(request: CreatePatientRequest, supabase: Client):
     patient_id = remove_ucc_domain(request.patient_id)
     patient_repo = PatientRepository(supabase)
 
@@ -88,7 +89,7 @@ def create_patient(request: CreatePatientRequest, supabase):
 
 
 @handle_service_errors
-def delete_patient(patient_id: str, supabase):
+def delete_patient(patient_id: str, supabase: Client):
     patient_repo = PatientRepository(supabase)
     existing = patient_repo.get_by_id(patient_id)
     or_404(existing, "Patient not found")
@@ -101,7 +102,7 @@ def delete_patient(patient_id: str, supabase):
 
 
 @handle_service_errors
-def get_all_patient_profiles(supabase, filters):
+def get_all_patient_profiles(supabase: Client, filters: FilterPatient):
     patient_repo = PatientRepository(supabase)
     response = patient_repo.get_profiles(filters)
 
@@ -109,12 +110,9 @@ def get_all_patient_profiles(supabase, filters):
 
 
 @handle_service_errors
-def get_patient_summary_record(supabase, patient_id):
+def get_patient_summary_record(supabase: Client, patient_id: str):
     patient_repo = PatientRepository(supabase)
 
     response = patient_repo.get_summary_records(patient_id)
 
-    return Response(
-        success=True,
-        data=response.data
-    )
+    return ok(response.data)

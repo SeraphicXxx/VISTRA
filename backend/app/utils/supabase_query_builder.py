@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Literal
 
 
 class SupabaseQueryBuilder:
@@ -16,7 +17,9 @@ class SupabaseQueryBuilder:
             .select(columns, count=count)
         )
 
-    def _apply(self, op: str, column: str, value):
+    FilterOp = Literal["eq", "neq", "gt", "gte", "lt", "lte"]
+
+    def _apply(self, op: FilterOp, column: str, value):
         if value is not None:
             self.query = getattr(self.query, op)(column, value)
 

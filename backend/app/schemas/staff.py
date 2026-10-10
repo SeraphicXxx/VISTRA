@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class CreateStaffRequest(BaseModel):
@@ -8,18 +7,18 @@ class CreateStaffRequest(BaseModel):
     password: str
     position: str
     last_name: str
-    middle_name: Optional[str] = None
-    specialty: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[str] = None
+    middle_name: str | None = None
+    specialty: str | None = None
+    phone: str | None = None
+    email: str | None = None
 
 class StaffData(BaseModel):
     id: str
     staff_id: str
     first_name: str
     last_name: str
-    middle_name: Optional[str] = None
+    middle_name: str | None = None
     position: str
-    specialty: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[str] = None
+    specialty: str | None = None
+    phone: str | None = None
+    email: str | None = None

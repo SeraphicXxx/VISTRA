@@ -9,14 +9,6 @@ class StaffRepository(BaseRepository):
             filters={"staff_id": staff_id},
         )
 
-    def create(self, staff_data):
-        return (
-            self.supabase
-            .table("STAFF")
-            .insert(staff_data.model_dump())
-            .execute()
-        )
-
     def get_staff(self):
         return self.fetch_all("STAFF")
 

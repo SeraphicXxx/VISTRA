@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class MedicalVisitTypes(str, Enum):
+class MedicalVisitType(str, Enum):
     MEDICAL_CONSULTATION = "medicalConsultation"
     FOLLOWUP = "followUp"
 

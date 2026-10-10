@@ -1,10 +1,9 @@
-from typing import Optional
 from pydantic import BaseModel
 
 
 class SeparatedName(BaseModel):
     first_name: str
-    middle_name: Optional[str] = None
+    middle_name: str | None = None
     last_name: str
 
 

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.enums.medical_terms import MedicalVisitTypes, MedicalVisitStatus, MedicalTreatmentType
+from app.enums.medical_terms import MedicalVisitType, MedicalVisitStatus, MedicalTreatmentType
 
 
 class MedicalVisitLog(BaseModel):
@@ -12,7 +12,7 @@ class MedicalVisitLog(BaseModel):
 class MedicalVisitCreateRequest(BaseModel):
     patient_id: str
     status: MedicalVisitStatus
-    type: MedicalVisitTypes
+    type: MedicalVisitType
     treatment_type: MedicalTreatmentType
     visit_date: datetime
     visit_log: list[MedicalVisitLog]
@@ -43,4 +43,4 @@ class MedicalVisitTab(BaseModel):
     visit_date: datetime
     staff_id: str
     status: MedicalVisitStatus
-    type: MedicalVisitTypes
+    type: MedicalVisitType
