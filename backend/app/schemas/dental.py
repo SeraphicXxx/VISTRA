@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 
 
+DENTITION_PERMANENT = "permanent"
+
+
 class OdontogramCreateRequest(BaseModel):
     tooth_number: int
     condition: str
@@ -11,7 +14,7 @@ class OdontogramCreateRequest(BaseModel):
         return {
             "patient_id": patient_id,
             "tooth_number": self.tooth_number,
-            "is_permanent": self.dentition == "permanent",
+            "is_permanent": self.dentition == DENTITION_PERMANENT,
             "condition": self.condition,
             "notes": self.notes,
             "dental_record_id": dental_record_id,

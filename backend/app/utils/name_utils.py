@@ -8,11 +8,12 @@ class SeparatedName(BaseModel):
 
 
 def separate_name(full_name: str) -> SeparatedName:
+    """Parse 'LAST, FIRST[, MIDDLE]' (comma-separated, last name first)."""
     parts = [part.strip() for part in full_name.split(",")]
 
-    if len(parts) < 2:
+    if len(parts) < 2 or not parts[0] or not parts[1]:
         raise ValueError(
-            "Name must contain at least a last name and first name"
+            "Name must be in 'LAST, FIRST' format separated by a comma"
         )
 
     last_name = parts[0]

@@ -1,8 +1,4 @@
 from datetime import date
-from enum import Enum
-from typing import TypeVar
-
-E = TypeVar("E", bound=Enum)
 
 def confirm_birthday(value: date) -> date:
     today = date.today()
@@ -21,11 +17,11 @@ def confirm_birthday(value: date) -> date:
     return value
 
 
-def confirm_enum(value: str, enum_class: type[E]) -> str:
-    if value not in [item.value for item in enum_class]:
-        raise ValueError(
-            f"Value must be one of: {', '.join(item.value for item in enum_class)}"
-        )
+def confirm_enum(value: str, enum_class) -> str:
+    valid = [item.value for item in enum_class]
+
+    if value not in valid:
+        raise ValueError(f"Value must be one of: {', '.join(valid)}")
 
     return value
 

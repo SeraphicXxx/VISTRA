@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
 from app.utils.name_utils import separate_name
-from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_enum, confirm_birthday
+from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
 
 
 class Patient(BaseModel):
@@ -21,49 +21,16 @@ class PatientProfile(BaseModel):
     middle_name: str | None = None
     last_name: str
     birthday: date
-    age: float
-    sex: str
+    age: int
+    sex: Sex
     complete_address: str
     barangay: str
-    civil_status: str
+    civil_status: CivilStatus
     course: str | None = None
     contact_no: str | None = None
     school_year: str | None = None
     department: str | None = None
     person_type: str | None = None
-
-
-class PatientMedicalHistory(BaseModel):
-    id: int
-    patient_id: str
-    hospitalization_operation: str | None = None
-    hospitalization_year: str | None = None
-    diagnosis: str | None = None
-    allergy_medicine: str | None = None
-    allergy_food: str | None = None
-    smoking: bool | None = None
-    vaping: bool | None = None
-    alcohol_intake: bool | None = None
-    last_menstrual_period: str | None = "N/A"
-    family_planning_method: str | None = None
-
-
-class PatientVitalSigns(BaseModel):
-    id: int
-    patient_id: str
-    temperature: float | None = None
-    blood_pressure: float | None = None
-    heart_rate: float | None = None
-    respiratory_rate: float | None = None
-    eyes: float | None = None
-    recorded_at: date | None = None
-
-
-class PatientFamilyMedicalHistory(BaseModel):
-    id: int
-    patient_id: str
-    condition: str | None = "NONE"
-    other_condition: str | None = "NONE"
 
 
 class CreatePatientRequest(BaseModel):
@@ -79,8 +46,8 @@ class CreatePatientRequest(BaseModel):
 
     mobile_number: str = Field(..., min_length=10, max_length=15)
 
-    sex: str
-    civil_status: str
+    sex: Sex
+    civil_status: CivilStatus
     classification: str
 
     course: str | None = None
@@ -116,6 +83,13 @@ class CreatePatientRequest(BaseModel):
     def validate_not_blank(cls, value: str):
         return confirm_not_blank(value)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name_format(cls, value: str) -> str:
+        separate_name(value)
+
+        return value
+
     @field_validator("birthday")
     @classmethod
     def validate_birthday(cls, value: date):
@@ -125,16 +99,6 @@ class CreatePatientRequest(BaseModel):
     @classmethod
     def validate_mobile(cls, value: str) -> str:
         return confirm_mobile_number(value)
-
-    @field_validator("sex")
-    @classmethod
-    def validate_sex(cls, value: str):
-        return confirm_enum(value, Sex)
-
-    @field_validator("civil_status")
-    @classmethod
-    def validate_civil_status(cls, value: str):
-        return confirm_enum(value, CivilStatus)
 
 class PatientRecord(BaseModel):
     id: int

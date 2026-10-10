@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class Appointments(BaseModel):
@@ -23,7 +23,16 @@ class CreateAppointmentRequest(BaseModel):
     location: str | None = None
     notes: str | None = None
 
+    @model_validator(mode="after")
+    def check_range(self):
+        if self.scheduled_end <= self.scheduled_start:
+            raise ValueError("scheduled_end must be after scheduled_start")
+
+        return self
+
 class UpdateAppointmentRequest(BaseModel):
     status: str | None = None
     reason: str | None = None
     location: str | None = None
+    notes: str | None = None
+    decline_reason: str | None = None
