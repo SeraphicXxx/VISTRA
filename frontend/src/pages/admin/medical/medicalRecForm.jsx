@@ -319,7 +319,7 @@ export default function PatientRecordForm({ onSave }) {
           </h2>
         </div>
 
-        <EditableRowsTable
+        {/* <EditableRowsTable
           columns={visitLogColumns}
           rows={visitRows}
           onChangeField={updateRow}
@@ -327,7 +327,7 @@ export default function PatientRecordForm({ onSave }) {
           onRemoveRow={removeRow}
           disableAdd={!selectedStudent}
           disableRemove={visitRows.length === 1}
-        />
+        /> */}
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
