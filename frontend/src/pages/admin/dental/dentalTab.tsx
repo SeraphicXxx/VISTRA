@@ -34,7 +34,7 @@ export default function DentalTab({setFilters}: DentalTabProps) {
     return (
 
         <DefaultTablePreset<DentalData>
-            title="Dental"
+            title="Dental Records"
             icon={Syringe}
             isLoading={isLoading}
             data={dental}

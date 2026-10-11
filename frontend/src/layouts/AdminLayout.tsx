@@ -7,12 +7,13 @@ import { AdminAnimStyles } from "/@/components/adminanim.jsx";
 
 const HIDDEN_HEADER_PATHS = [
     "/staff/medical/new",
-    "/staff/medical/records/view",
+    "/staff/medical/view",
     "/staff/dental/new",
-    "/staff/dental/records/view",
+    "/staff/dental/view",
     "/staff/patient/new",
-    "/staff/appointment/view",
-    "/staff/patient/record/view",
+    "/staff/appointments/view/",
+    "/staff/patients/new",
+    "/staff/patients/record/",
 ];
 
 export default function AdminLayout() {

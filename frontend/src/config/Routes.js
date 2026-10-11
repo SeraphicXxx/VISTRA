@@ -3,10 +3,9 @@ import {
     LayoutDashboard,
     CalendarDays,
     HeartPulse,
-    Stethoscope,
     UsersRound,
 } from "lucide-react";
-
+import { TbDental } from "react-icons/tb";
 export const AdminRoutes = [
     {
         path: ROUTES.staff.dashboard.overview,
@@ -23,7 +22,7 @@ export const AdminRoutes = [
     {
         path: ROUTES.staff.dashboard.dental,
         label: "Dental Records",
-        icon: Stethoscope,
+        icon: TbDental,
         component: "dental",
     },
     {
@@ -36,6 +35,6 @@ export const AdminRoutes = [
         path: ROUTES.staff.dashboard.patients,
         label: "Patient Management",
         icon: UsersRound,
-        component: "patients"
+        component: "patients",
     },
 ];

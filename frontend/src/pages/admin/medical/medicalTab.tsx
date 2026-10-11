@@ -33,7 +33,7 @@ export default function MedicalTab({setFilters}: MedicalTabProps) {
 
     return (
         <DefaultTablePreset<medData>
-            title="Medical"
+            title="Medical Records"
             icon={Stethoscope}
             isLoading={isLoading}
             data={rows}
