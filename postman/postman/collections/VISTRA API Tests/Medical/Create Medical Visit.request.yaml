@@ -21,13 +21,9 @@ body:
 
     \    \"visit_date\": \"2026-10-05T09:00:00\",\r
 
-    \    \"visit_log\": [{\r
+    \    \"complaint\": \"Fever, headache since morning\",\r
 
-    \        \"complaint\": \"Fever, headache since morning\",\r
-
-    \        \"treatment\": \"Paracetamol 500mg, rest advised\"\r
-
-    \    }]\r
+    \    \"treatment\": \"Paracetamol 500mg, rest advised\"\r
 
     }"
 scripts:
