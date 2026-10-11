@@ -5,33 +5,24 @@ from pydantic import BaseModel
 from app.enums.medical_terms import MedicalVisitType, MedicalVisitStatus, MedicalTreatmentType
 
 
-class MedicalVisitLog(BaseModel):
-    complaint: str
-    treatment: str
-
 class MedicalVisitCreateRequest(BaseModel):
     patient_id: str
     status: MedicalVisitStatus
     type: MedicalVisitType
     treatment_type: MedicalTreatmentType
     visit_date: datetime
-    visit_log: list[MedicalVisitLog]
+    complaint: str
+    treatment: str
 
     def to_db_dict(self, staff_id: str) -> dict:
-        first_log = self.visit_log[0] if self.visit_log else None
-        visit_date_iso = self.visit_date.isoformat()
-
         return {
             "patient_id": self.patient_id,
             "staff_id": staff_id,
             "type": self.type.value,
-            "visit_date": visit_date_iso,
+            "visit_date": self.visit_date.isoformat(),
             "treatment_type": self.treatment_type.value,
-            "visit_log": {
-                "date": visit_date_iso,
-                "complaint": first_log.complaint if first_log else "",
-                "treatment": first_log.treatment if first_log else "",
-            },
+            "complaint": self.complaint,
+            "treatment": self.treatment,
             "status": self.status.value,
         }
 

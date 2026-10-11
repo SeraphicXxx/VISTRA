@@ -6,13 +6,8 @@ import {statusEditFields} from "/@/components/editModal.jsx";
 import {ReadOnlyField} from "/@/utils/ReadOnlyField";
 import {StudentCombobox} from "/@/utils/StudentComboBox";
 import {FieldLabel} from "/@/utils/FieldLabel";
-import {EditableRowsTable} from "/@/utils/EditableRowsTable";
-import {useEditableRows} from "/@/utils/useEditableRows";
 import type {PatientProfile} from "/@/api/schema/PatientSchema";
-import type {
-    CreateMedicalVisit,
-    MedicalVisitLog,
-} from "/@/api/schema/MedicalSchema";
+import type {CreateMedicalVisit} from "/@/api/schema/MedicalSchema";
 import {useCreateMedicalVisit} from "/@/hooks/query/MedicalQuery";
 import {sessionManager} from "/@/utils/SessionManager";
 import {getFieldErrors} from "/@/utils/Formatters";
@@ -23,35 +18,6 @@ const statusField = statusEditFields.find(
 );
 const statusOptions: string[] = statusField?.options ?? [];
 
-interface VisitLogColumn {
-    key: string;
-    header: string;
-    type: string;
-    width?: string;
-    placeholder?: string;
-}
-
-const visitLogColumns: VisitLogColumn[] = [
-    {key: "date", header: "Date", type: "date", width: "w-40"},
-    {
-        key: "complaint",
-        header: "Complaint / Findings",
-        type: "textarea",
-        placeholder: "e.g. Fever, headache since morning"
-    },
-    {key: "treatment", header: "Treatment", type: "textarea", placeholder: "e.g. Paracetamol 500mg, rest advised"},
-];
-
-interface VisitFormRow extends MedicalVisitLog {
-    date: string;
-}
-
-const emptyVisitRow = (): VisitFormRow => ({
-    date: "",
-    complaint: "",
-    treatment: "",
-});
-
 interface PatientRecordFormProps {
     onSave?: (record: CreateMedicalVisit) => void;
 }
@@ -61,19 +27,26 @@ interface MedicalRecFormValues {
     visitType: string;
     treatmentType: string;
     status: string;
+    visitDate: string;
+    complaint: string;
+    treatment: string;
 }
+
+const todayInputValue = () => new Date().toISOString().slice(0, 10);
 
 const initialFormValues: MedicalRecFormValues = {
     selectedStudent: null,
     visitType: "",
     treatmentType: "",
     status: "",
+    visitDate: todayInputValue(),
+    complaint: "",
+    treatment: "",
 };
 
 export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
-    const {selectedStudent, visitType, treatmentType, status} = form;
-    const {rows: visitRows, addRow, removeRow, updateRow, resetRows} = useEditableRows(emptyVisitRow, 1);
+    const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
     const details = selectedStudent
         ? {
@@ -98,7 +71,6 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
     const handleClear = (): void => {
         reset();
-        resetRows();
     };
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
@@ -111,21 +83,15 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             return;
         }
 
-        const logRows = visitRows.filter(
-            (row) => row.date || row.complaint || row.treatment
-        );
-
         const record: CreateMedicalVisit = {
             patient_id: selectedStudent.patient_id,
             staff_id: staffId,
             status,
             type: visitType,
             treatment_type: treatmentType,
-            visit_date: logRows[0]?.date || new Date().toISOString(),
-            visit_log: logRows.map((row) => ({
-                complaint: row.complaint,
-                treatment: row.treatment,
-            })),
+            visit_date: visitDate ? new Date(visitDate).toISOString() : new Date().toISOString(),
+            complaint,
+            treatment,
         };
 
         if (onSave) onSave(record);
@@ -235,20 +201,52 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             </div>
 
             <div className="mt-10">
-                <div className="mb-0 flex items-center gap-2 border-t border-border pt-6">
+                <div className="mb-4 flex items-center gap-2 border-t border-border pt-6">
                     <ClipboardList className="h-4 w-4 text-primaryDark" strokeWidth={2}/>
                     <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">Visit Log</h2>
                 </div>
 
-                <EditableRowsTable
-                    columns={visitLogColumns}
-                    rows={visitRows}
-                    onChangeField={updateRow}
-                    onAddRow={addRow}
-                    onRemoveRow={removeRow}
-                    disableAdd={!selectedStudent}
-                    disableRemove={visitRows.length === 1}
-                />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <FieldLabel htmlFor="visitDate">Visit Date</FieldLabel>
+                        <input
+                            id="visitDate"
+                            name="visitDate"
+                            type="date"
+                            value={visitDate}
+                            onChange={(e) => setField("visitDate", e.target.value)}
+                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4">
+                    <div>
+                        <FieldLabel htmlFor="complaint">Complaint / Findings</FieldLabel>
+                        <textarea
+                            id="complaint"
+                            name="complaint"
+                            value={complaint}
+                            onChange={(e) => setField("complaint", e.target.value)}
+                            placeholder="e.g. Fever, headache since morning"
+                            rows={3}
+                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                    </div>
+
+                    <div>
+                        <FieldLabel htmlFor="treatment">Treatment</FieldLabel>
+                        <textarea
+                            id="treatment"
+                            name="treatment"
+                            value={treatment}
+                            onChange={(e) => setField("treatment", e.target.value)}
+                            placeholder="e.g. Paracetamol 500mg, rest advised"
+                            rows={3}
+                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">

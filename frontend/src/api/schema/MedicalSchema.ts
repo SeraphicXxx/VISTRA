@@ -17,11 +17,6 @@ export interface MedicalRecordDetailSchema {
     staff_name: string | null;
 }
 
-export interface MedicalVisitLog {
-    complaint: string;
-    treatment: string;
-}
-
 export interface CreateMedicalVisit {
     patient_id: string;
     staff_id: string;
@@ -29,7 +24,8 @@ export interface CreateMedicalVisit {
     type: string;
     treatment_type: string;
     visit_date: string;
-    visit_log: MedicalVisitLog[];
+    complaint: string;
+    treatment: string;
 }
 
 export interface CreateMedicalVisitResponse {
