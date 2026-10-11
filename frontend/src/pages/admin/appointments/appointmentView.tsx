@@ -209,7 +209,6 @@ export default function AppointmentDetailView() {
 
     const confirmDecline = (): void => {
         applyStatus("declined");
-        console.log(form.declined, form.reason)
     };
 
     return (

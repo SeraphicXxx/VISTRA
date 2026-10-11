@@ -38,7 +38,6 @@ export default function StaffPageHeader({
         staffData,
         isLoading,
     } = useStaffInfo(staffId);
-    console.log(staffData);
     const clinicState = getClinicOperationState();
 
     return (

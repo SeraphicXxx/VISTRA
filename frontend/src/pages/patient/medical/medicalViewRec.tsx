@@ -10,8 +10,6 @@ import { ROUTES } from "/@/config/RoutePaths.js";
 import { Visit } from "/@/types/types";
 import { myMedicalRecords, myVisits, emptyMedicalRecord } from "./medicalData";
 
-const DEBUG = false;
-
 export default function PatientMedicalRecordView() {
   const navigate = useNavigate();
 
@@ -21,13 +19,6 @@ export default function PatientMedicalRecordView() {
 
   const patientData = myMedicalRecords[studentId] ?? emptyMedicalRecord;
   const visitData = myVisits[studentId] ?? [];
-
-  if (DEBUG) {
-    console.log("sessionId:", sessionId);
-    console.log("studentId:", studentId);
-    console.log("patientData:", patientData);
-    console.log("visitData:", visitData);
-  }
 
   const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
 

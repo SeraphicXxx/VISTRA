@@ -40,7 +40,6 @@ function AppRoutes() {
                 <Route element={<PublicLayout/>}>
                     <Route path="/" element={<LandingPage/>}/>
                     <Route path="*" element={<PageNotFound/>}/>
-                    {/*<Route path="/DEMO/" element={<DemoPage />} />*/}
                 </Route>
 
                 {/* Admin Showcase / Login */}

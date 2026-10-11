@@ -2,7 +2,6 @@ import {DentalStatus, Dentition, ToothCondition} from "/@/types/Dental"
 
 export interface ToothSchema {
     id: number;
-    appointment_id: number;
     patient_id: string;
     tooth_number: number;
     dentition: Dentition | null;
@@ -12,7 +11,7 @@ export interface ToothSchema {
 
 export type CreateToothRequest = Omit<
     ToothSchema,
-    "id" | "appointment_id" | "patient_id"
+    "id" | "patient_id"
 >;
 
 export interface CreateDentalVisit {

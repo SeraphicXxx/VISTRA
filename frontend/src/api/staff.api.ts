@@ -1,4 +1,4 @@
-import {apiClient} from "/@/api/client";
+import {apiClient} from "/@/api/axios_client";
 import { API_ENDPOINTS } from "/@/config/ApiConfig.js";
 import { StaffModel } from "/@/repository/StaffModel.js";
 import { ApiResponse } from "/@/api/schema/ApiResponseSchema"

@@ -97,8 +97,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         if (onSave) onSave(record);
 
         createMedicalVisitMutation.mutate(record, {
-            onSuccess: (data) => {
-                console.log("Medical visit created:", data);
+            onSuccess: () => {
                 handleClear();
                 handleBack();
             },

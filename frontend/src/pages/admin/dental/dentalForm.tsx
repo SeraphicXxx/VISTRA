@@ -443,11 +443,7 @@ export default function DentalRecordForm() {
             patient_id: selectedStudent.patient_id,
             tooth_records: Object.values(toothRecords),
         };
-        console.log(record);
         createDentalVisitMutation.mutate(record, {
-            onSuccess: (data) => {
-                console.log("Dental visit created:", data);
-            },
             onError: (error) => {
                 console.error("Failed to create dental visit:", getFieldErrors(error));
             },
