@@ -1,7 +1,7 @@
-import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema} from "/@/api/schema/DentalSchema";
-import {createDentalVisit, getDentalRecordById, getDentalVisit} from "/@/api/dental.api";
+import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema, UpdateDentalVisit} from "/@/api/schema/DentalSchema";
+import {createDentalVisit, getDentalRecordById, getDentalVisit, updateDentalVisit} from "/@/api/dental.api";
 
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {ApiMessageResponse} from "/@/api/schema/ApiResponseSchema";
@@ -29,5 +29,22 @@ export function useDentalVisitDetail(patientId?: string, dentalId?: string) {
         },
         enabled: Boolean(patientId && dentalId),
         refetchOnWindowFocus: false,
+    });
+}
+
+export function useUpdateDentalVisit() {
+    return useMutation({
+        mutationFn: async ({
+            patientId,
+            dentalId,
+            payload,
+        }: {
+            patientId: string;
+            dentalId: string;
+            payload: UpdateDentalVisit;
+        }) => {
+            const {data} = await updateDentalVisit(patientId, dentalId, payload);
+            return data;
+        },
     });
 }

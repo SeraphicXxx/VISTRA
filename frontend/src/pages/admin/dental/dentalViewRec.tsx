@@ -7,7 +7,6 @@ import {
   upperTeeth,
   lowerTeeth,
 } from "/@/components/teethDesign.jsx";
-import LoadingPage from "/@/components/LoadingPage";
 import { StatusBadge } from "/@/components/StatusBadge";
 import {
   EditRecordModal,
@@ -15,8 +14,10 @@ import {
   statusEditFields,
 } from "/@/components/editModal";
 import { ToothEditModal } from "/@/components/ToothEditModal.jsx";
-import { useDentalVisitDetail } from "/@/hooks/query/DentalQuery";
+import { useDentalVisitDetail, useUpdateDentalVisit } from "/@/hooks/query/DentalQuery";
 import { formatDate } from "/@/utils/FormatDate";
+import { getFieldErrors } from "/@/utils/Formatters";
+import type { UpdateDentalVisit, UpdateToothRecord } from "/@/api/schema/DentalSchema";
 
 interface DentalNotFoundProps {
   patientId?: string | null;
@@ -54,6 +55,63 @@ export function DentalNotFound({ patientId, dentalId }: DentalNotFoundProps) {
   );
 }
 
+export function DentalRecordSkeleton() {
+  return (
+    <div
+      className="mx-auto w-full animate-pulse"
+      aria-busy="true"
+      aria-label="Loading dental record"
+    >
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="relative p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div className="h-4 w-28 rounded bg-border" />
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-24 rounded-lg bg-surface" />
+              <div className="h-7 w-20 rounded-lg bg-surface" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 shrink-0 rounded-full bg-surface" />
+            <div className="min-w-0">
+              <div className="h-7 w-52 rounded bg-surface" />
+              <div className="mt-2 h-3 w-36 rounded bg-surface" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          <div className="mb-4 h-4 w-36 rounded bg-surface" />
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <div className="h-2.5 w-20 rounded bg-border" />
+                <div className="h-4 w-32 rounded bg-surface" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm lg:col-span-2">
+          <div className="mb-4 h-4 w-44 rounded bg-surface" />
+          <div className="grid grid-cols-2 gap-4 border-b border-border pb-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <div className="h-2.5 w-20 rounded bg-border" />
+                <div className="h-4 w-28 rounded bg-surface" />
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 h-40 rounded-xl border border-border bg-background" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DentalRecordView() {
   const { patientId, dentalId } = useParams<{
     patientId: string;
@@ -64,11 +122,14 @@ export default function DentalRecordView() {
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
   const [examForm, setExamForm] = useState<Record<string, any>>({});
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const updateVisitMutation = useUpdateDentalVisit();
 
   const {
     data: record,
     isLoading,
     isError,
+    refetch,
   } = useDentalVisitDetail(patientId ?? "", dentalId ?? "");
 
   const toothRecords = useMemo(() => {
@@ -93,7 +154,7 @@ export default function DentalRecordView() {
   }
 
   if (isLoading) {
-    return <LoadingPage />;
+    return <DentalRecordSkeleton />;
   }
 
   if (isError || !record) {
@@ -114,7 +175,124 @@ export default function DentalRecordView() {
       medication: record.medication ?? "",
       notes: record.notes ?? "",
     });
+    setSaveError(null);
     setIsExamModalOpen(true);
+  };
+
+  const persistUpdate = (
+    payload: UpdateDentalVisit,
+    onDone: () => void
+  ): void => {
+    if (!patientId || !dentalId) return;
+
+    if (
+      Object.keys(payload).length === 0 ||
+      (Object.keys(payload).length === 1 && payload.tooth_records?.length === 0)
+    ) {
+      onDone();
+      return;
+    }
+
+    setSaveError(null);
+    updateVisitMutation.mutate(
+      { patientId, dentalId, payload },
+      {
+        onSuccess: () => {
+          onDone();
+          void refetch();
+        },
+        onError: (error) => {
+          setSaveError(getFieldErrors(error));
+        },
+      }
+    );
+  };
+
+  const handleSaveStatus = (form: Record<string, any>): void => {
+    const status = String(form.status ?? "").trim();
+
+    if (!status || status === record.status) {
+      setIsStatusModalOpen(false);
+      return;
+    }
+
+    persistUpdate({ status }, () => setIsStatusModalOpen(false));
+  };
+
+  const handleSaveExam = (form: Record<string, any>): void => {
+    const text = (value: unknown): string | undefined => {
+      const trimmed = String(value ?? "").trim();
+      return trimmed || undefined;
+    };
+
+    const payload: UpdateDentalVisit = {};
+    const date = text(form.date);
+    const lastVisit = text(form.lastVisit);
+    const brushFrequency = text(form.brushFrequency);
+    const calculus = text(form.calculus);
+    const medication = text(form.medication);
+    const notes = text(form.notes);
+
+    if (date && date !== (record.dental_visit_date ?? "")) {
+      payload.visit_date = date;
+    }
+
+    if (lastVisit && lastVisit !== (record.last_visit ?? "")) {
+      payload.last_dental_visit = lastVisit;
+    }
+
+    if (form.floss === "Yes" || form.floss === "No") {
+      const floss = form.floss === "Yes";
+
+      if (floss !== (record.floss === "Yes")) {
+        payload.floss = floss;
+      }
+    }
+
+    if (brushFrequency && brushFrequency !== (record.brush_frequency ?? "")) {
+      payload.brushing_frequency = brushFrequency;
+    }
+
+    if (calculus && calculus !== (record.calculus ?? "")) {
+      payload.calculus_severity = calculus;
+    }
+
+    if (medication && medication !== (record.medication ?? "")) {
+      payload.current_medications = medication;
+    }
+
+    if (notes && notes !== (record.notes ?? "")) {
+      payload.notes = notes;
+    }
+
+    persistUpdate(payload, () => setIsExamModalOpen(false));
+  };
+
+  const handleSaveTooth = (form: {
+    dentition: string;
+    condition: string;
+    notes: string;
+  }): void => {
+    if (selectedTooth === null) return;
+
+    const existingId = record.tooth_records.find(
+      (tooth) => tooth.tooth_number === selectedTooth
+    )?.id;
+
+    const toothRecord: UpdateToothRecord = {
+      tooth_number: selectedTooth,
+      is_permanent: form.dentition === "permanent",
+      condition: form.condition,
+      notes: form.notes?.trim() ? form.notes : null,
+    };
+
+    if (existingId !== undefined) {
+      toothRecord.id = existingId;
+    }
+
+    persistUpdate({ tooth_records: [toothRecord] }, () =>
+      setSelectedTooth(null)
+    );
   };
 
   const address = record.address
@@ -123,6 +301,12 @@ export default function DentalRecordView() {
 
   return (
     <>
+      {saveError && (
+        <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
+          {saveError}
+        </div>
+      )}
+
       <div className="mx-auto w-full">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
@@ -350,17 +534,19 @@ export default function DentalRecordView() {
           fields={statusEditFields}
           data={{ status: record.status }}
           onClose={() => setIsStatusModalOpen(false)}
-          onSave={() => setIsStatusModalOpen(false)}
+          onSave={handleSaveStatus}
+          isSaving={updateVisitMutation.isPending}
         />
       )}
 
       {isExamModalOpen && (
         <EditRecordModal
           title="Edit dental examination"
-          fields={dentalEditFields}
+          fields={dentalEditFields.filter((field) => field.key !== "status")}
           data={examForm}
           onClose={() => setIsExamModalOpen(false)}
-          onSave={() => setIsExamModalOpen(false)}
+          onSave={handleSaveExam}
+          isSaving={updateVisitMutation.isPending}
         />
       )}
 
@@ -369,7 +555,8 @@ export default function DentalRecordView() {
           toothNumber={selectedTooth}
           record={toothRecords[selectedTooth]}
           onClose={() => setSelectedTooth(null)}
-          onSave={() => setSelectedTooth(null)}
+          onSave={handleSaveTooth}
+          isSaving={updateVisitMutation.isPending}
         />
       )}
     </>

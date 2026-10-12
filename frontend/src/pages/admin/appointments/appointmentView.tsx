@@ -13,7 +13,6 @@ import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
 
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
-import LoadingPage from "/@/components/LoadingPage";
 import {useAppointmentByIdQuery} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
 
@@ -150,6 +149,57 @@ type interviewForm = {
     reason: string
 }
 
+export function AppointmentDetailSkeleton() {
+    return (
+        <div
+            className="mx-auto w-full animate-pulse"
+            aria-busy="true"
+            aria-label="Loading appointment"
+        >
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+                <div className="relative p-6 sm:p-8">
+                    <div className="mb-6 flex items-start justify-between gap-4">
+                        <div className="h-4 w-32 rounded bg-border" />
+                    </div>
+
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-5">
+                            <div className="h-16 w-16 shrink-0 rounded-full bg-surface" />
+                            <div>
+                                <div className="h-7 w-52 rounded bg-surface" />
+                                <div className="mt-2 h-3 w-36 rounded bg-surface" />
+                            </div>
+                        </div>
+
+                        <div className="h-7 w-28 rounded-full bg-surface" />
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+                <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+                    <div className="mb-2 h-4 w-40 rounded bg-surface" />
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border bg-surfaceMuted/30 px-4 py-3">
+                            <div className="h-2.5 w-24 rounded bg-border" />
+                            <div className="mt-2 h-4 w-32 rounded bg-surface" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
+                    <div className="mb-4 h-4 w-44 rounded bg-surface" />
+                    <div className="h-20 rounded-xl border border-dashed border-border bg-surfaceMuted/20" />
+                    <div className="mt-6 flex flex-wrap gap-2">
+                        <div className="h-9 w-44 rounded-lg bg-surface" />
+                        <div className="h-9 w-28 rounded-lg bg-surface" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function AppointmentDetailView() {
     const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
     const { form, setField } = useForm<interviewForm>({
@@ -176,7 +226,7 @@ export default function AppointmentDetailView() {
     );
 
     if (isLoading) {
-        return <LoadingPage/>
+        return <AppointmentDetailSkeleton/>
     }
 
     if (!appointmentDetails) {

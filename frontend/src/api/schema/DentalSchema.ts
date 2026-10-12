@@ -62,4 +62,24 @@ export interface DentalRecordDetailSchema {
     tooth_records: ToothSchema[];
 }
 
+export interface UpdateToothRecord {
+    id?: number;
+    tooth_number?: number;
+    is_permanent?: boolean;
+    condition?: string;
+    notes?: string | null;
+}
+
+export interface UpdateDentalVisit {
+    visit_date?: string;
+    last_dental_visit?: string;
+    floss?: boolean;
+    brushing_frequency?: string;
+    calculus_severity?: string;
+    current_medications?: string;
+    status?: string;
+    notes?: string;
+    tooth_records?: UpdateToothRecord[];
+}
+
 

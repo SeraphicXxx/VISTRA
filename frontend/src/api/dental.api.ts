@@ -1,4 +1,4 @@
-import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema} from "/@/api/schema/DentalSchema";
+import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema, UpdateDentalVisit} from "/@/api/schema/DentalSchema";
 import {ApiMessageResponse, ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
@@ -41,6 +41,22 @@ export async function getDentalRecordById(
         API_ENDPOINTS.dental.get_dental_record(patientId, dentalId),
         {
             method: "GET",
+            signal
+        }
+    );
+}
+
+export async function updateDentalVisit(
+    patientId: string,
+    dentalId: string,
+    payload: UpdateDentalVisit,
+    signal?: AbortSignal
+) {
+    return apiClient<ApiResponse<unknown>>(
+        API_ENDPOINTS.dental.update_dental_visit(patientId, dentalId),
+        {
+            method: "PATCH",
+            data: payload,
             signal
         }
     );
