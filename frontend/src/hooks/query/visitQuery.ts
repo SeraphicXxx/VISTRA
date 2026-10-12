@@ -40,3 +40,43 @@ export function createMutationHook<C, R>(
         });
     };
 }
+
+export function createDetailQueryHook<D>(
+    queryKeyPrefix: string,
+    fetchById: (patientId: string, recordId: string, signal?: AbortSignal) => Promise<ClientResult<ApiResponse<D>>>,
+    missingMessage: string,
+) {
+    return function useVisitDetailQuery(patientId?: string, recordId?: string) {
+        return useQuery({
+            queryKey: [`${queryKeyPrefix}-detail`, patientId, recordId],
+            queryFn: async ({signal}): Promise<D | null> => {
+                const {data} = await fetchById(
+                    patientId as string,
+                    recordId as string,
+                    signal
+                );
+
+                if (!data.data) {
+                    throw new Error(missingMessage);
+                }
+
+                return data.data;
+            },
+            enabled: Boolean(patientId && recordId),
+            refetchOnWindowFocus: false,
+        });
+    };
+}
+
+export function createUpdateMutationHook<A, R>(
+    updateFn: (args: A, signal?: AbortSignal) => Promise<ClientResult<R>>,
+) {
+    return function useUpdateVisit() {
+        return useMutation({
+            mutationFn: async (args: A) => {
+                const {data} = await updateFn(args);
+                return data;
+            },
+        });
+    };
+}

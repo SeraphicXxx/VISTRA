@@ -1,8 +1,10 @@
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile} from "/@/api/patient.api";
-import {UpdatePatientProfile} from "/@/api/schema/PatientSchema";
+import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {useDebounce} from "/@/hooks/Debouncer";
+import {createListQueryHook, createUpdateMutationHook} from "/@/hooks/query/visitQuery";
 
 /**
  * Handles patient server state.
@@ -14,38 +16,14 @@ import {useDebounce} from "/@/hooks/Debouncer";
  * - garbage collection
  * - refetching
  */
-export function usePatientQuery(filters?: PatientFilters) {
-    return useQuery({
-        queryKey: ["patients", filters],
-
-        queryFn: async ({signal}) => fetchPatientProfiles(filters, signal),
-        refetchOnWindowFocus: false,
-    });
-}
+export const usePatientQuery = createListQueryHook<PatientFilters, PaginatedData<PatientProfile>>(
+    "patients",
+    getAllPatientProfiles,
+    "Patient data is missing",
+);
 
 export function usePatientDebouncedQuery(filters?: PatientFilters) {
-    const debouncedFilters = useDebounce(filters, 500);
-
-    return useQuery({
-        queryKey: ["patients", debouncedFilters],
-
-        queryFn: async ({ signal }) => fetchPatientProfiles(debouncedFilters, signal),
-
-        refetchOnWindowFocus: false,
-    });
-}
-
-async function fetchPatientProfiles(filters?: PatientFilters, signal?: AbortSignal) {
-    const {data} = await getAllPatientProfiles(
-        filters,
-        signal
-    );
-
-    if (!data.data) {
-        throw new Error("Patient data is missing");
-    }
-
-    return data.data;
+    return usePatientQuery(useDebounce(filters, 500));
 }
 
 export function usePatientRecordSummaryQuery(patientId: string) {
@@ -70,17 +48,11 @@ export function usePatientRecordSummaryQuery(patientId: string) {
     });
 }
 
-export function useUpdatePatientProfile() {
-    return useMutation({
-        mutationFn: async ({
-            patientId,
-            payload,
-        }: {
-            patientId: string;
-            payload: UpdatePatientProfile;
-        }) => {
-            const {data} = await updatePatientProfile(patientId, payload);
-            return data;
-        },
-    });
+interface UpdatePatientProfileArgs {
+    patientId: string;
+    payload: UpdatePatientProfile;
 }
+
+export const useUpdatePatientProfile = createUpdateMutationHook<UpdatePatientProfileArgs, unknown>(
+    (args) => updatePatientProfile(args.patientId, args.payload)
+);
