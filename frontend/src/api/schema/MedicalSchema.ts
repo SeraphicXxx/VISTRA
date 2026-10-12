@@ -37,3 +37,10 @@ export interface CreateMedicalVisitResponse {
     medical_visit_id?: number;
     error?: string;
 }
+
+export interface UpdateMedicalVisit {
+    visit_date?: string;
+    status?: string;
+    complaint?: string;
+    treatment?: string;
+}

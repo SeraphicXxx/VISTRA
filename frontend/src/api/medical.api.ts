@@ -2,7 +2,7 @@ import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
-import {CreateMedicalVisit, CreateMedicalVisitResponse, MedicalRecordDetailSchema, MedicalVisitSchema} from "/@/api/schema/MedicalSchema";
+import {CreateMedicalVisit, CreateMedicalVisitResponse, MedicalRecordDetailSchema, MedicalVisitSchema, UpdateMedicalVisit} from "/@/api/schema/MedicalSchema";
 
 export async function createMedicalVisit(
     record: CreateMedicalVisit,
@@ -41,6 +41,22 @@ export async function getMedicalRecordById(
         API_ENDPOINTS.medical.get_medical_record(patientId, medicalId),
         {
             method: "GET",
+            signal
+        }
+    );
+}
+
+export async function updateMedicalVisit(
+    patientId: string,
+    medicalId: string,
+    payload: UpdateMedicalVisit,
+    signal?: AbortSignal
+) {
+    return apiClient<ApiResponse<unknown>>(
+        API_ENDPOINTS.medical.update_medical_visit(patientId, medicalId),
+        {
+            method: "PATCH",
+            data: payload,
             signal
         }
     );

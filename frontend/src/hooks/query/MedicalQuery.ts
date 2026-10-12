@@ -1,8 +1,8 @@
-import {createMedicalVisit, getMedicalRecordById, getMedicalVisit} from "/@/api/medical.api";
+import {createMedicalVisit, getMedicalRecordById, getMedicalVisit, updateMedicalVisit} from "/@/api/medical.api";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
-import {CreateMedicalVisit, MedicalRecordDetailSchema, MedicalVisitSchema} from "/@/api/schema/MedicalSchema";
+import {CreateMedicalVisit, MedicalRecordDetailSchema, MedicalVisitSchema, UpdateMedicalVisit} from "/@/api/schema/MedicalSchema";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {createListQueryHook, createMutationHook} from "/@/hooks/query/visitQuery";
 import {CreateMedicalVisitResponse} from "/@/api/schema/MedicalSchema";
 
@@ -28,5 +28,22 @@ export function useMedicalVisitDetail(patientId?: string, medicalId?: string) {
         },
         enabled: Boolean(patientId && medicalId),
         refetchOnWindowFocus: false,
+    });
+}
+
+export function useUpdateMedicalVisit() {
+    return useMutation({
+        mutationFn: async ({
+            patientId,
+            medicalId,
+            payload,
+        }: {
+            patientId: string;
+            medicalId: string;
+            payload: UpdateMedicalVisit;
+        }) => {
+            const {data} = await updateMedicalVisit(patientId, medicalId, payload);
+            return data;
+        },
     });
 }

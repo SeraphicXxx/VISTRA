@@ -5,9 +5,10 @@ import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 import { InfoField, getInitials } from "/@/utils/RecordInfo";
 import { StatusBadge } from "/@/components/StatusBadge";
 import { EditRecordModal, statusEditFields } from "/@/components/editModal";
-import { useMedicalVisitDetail } from "/@/hooks/query/MedicalQuery";
-import type { MedicalRecordDetailSchema } from "/@/api/schema/MedicalSchema";
+import { useMedicalVisitDetail, useUpdateMedicalVisit } from "/@/hooks/query/MedicalQuery";
+import type { MedicalRecordDetailSchema, UpdateMedicalVisit } from "/@/api/schema/MedicalSchema";
 import { formatDate } from "/@/utils/FormatDate";
+import { getFieldErrors } from "/@/utils/Formatters";
 
 /*
  * Dummy-data toggle: set VITE_USE_DUMMY_MEDICAL=true in
@@ -31,7 +32,6 @@ const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
 
 const consultationEditFields = [
   { key: "visitDate", label: "Visit date", type: "date" },
-  { key: "staffName", label: "Attending staff" },
   {
     key: "complaint",
     label: "Complaint / findings",
@@ -45,6 +45,16 @@ const consultationEditFields = [
     span: true,
   },
 ];
+
+/*
+ * Status modal options are display labels ("Not Cleared"); the
+ * endpoint takes backend keys ("notCleared"). Labels map 1:1 by
+ * lowercasing the first letter and stripping spaces.
+ */
+function toBackendStatus(label: string): string {
+  const trimmed = label.trim();
+  return trimmed.charAt(0).toLowerCase() + trimmed.slice(1).replace(/\s+/g, "");
+}
 
 interface MedicalNotFoundProps {
   patientId?: string | null;
@@ -165,11 +175,14 @@ export default function PatientRecordView() {
   const [consultationForm, setConsultationForm] = useState<
     Record<string, any>
   >({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const updateVisitMutation = useUpdateMedicalVisit();
 
   const {
     data: fetchedVisit,
     isLoading,
     isError,
+    refetch,
   } = useMedicalVisitDetail(
     USE_DUMMY_DATA ? undefined : patientId,
     USE_DUMMY_DATA ? undefined : medicalId
@@ -195,16 +208,91 @@ export default function PatientRecordView() {
 
   const openConsultationEdit = () => {
     setConsultationForm({
-      visitDate: visit.visit_date ?? "",
-      staffName: visit.staff_name ?? "",
+      visitDate: visit.visit_date
+        ? visit.visit_date.slice(0, 10)
+        : new Date().toISOString().slice(0, 10),
       complaint: visit.complaint ?? "",
       treatment: visit.treatment ?? "",
     });
+    setSaveError(null);
     setIsConsultationModalOpen(true);
+  };
+
+  const persistUpdate = (
+    payload: UpdateMedicalVisit,
+    onDone: () => void
+  ): void => {
+    if (USE_DUMMY_DATA || !patientId || !medicalId) {
+      onDone();
+      return;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      onDone();
+      return;
+    }
+
+    setSaveError(null);
+    updateVisitMutation.mutate(
+      { patientId, medicalId, payload },
+      {
+        onSuccess: () => {
+          onDone();
+          void refetch();
+        },
+        onError: (error) => {
+          setSaveError(getFieldErrors(error));
+        },
+      }
+    );
+  };
+
+  const handleSaveStatus = (form: Record<string, any>): void => {
+    const status = toBackendStatus(String(form.status ?? ""));
+
+    if (!status || status === visit.status) {
+      setIsStatusModalOpen(false);
+      return;
+    }
+
+    persistUpdate({ status }, () => setIsStatusModalOpen(false));
+  };
+
+  const handleSaveConsultation = (form: Record<string, any>): void => {
+    const text = (value: unknown): string | undefined => {
+      const trimmed = String(value ?? "").trim();
+      return trimmed || undefined;
+    };
+
+    const payload: UpdateMedicalVisit = {};
+    const visitDate = text(form.visitDate);
+    const complaint = text(form.complaint);
+    const treatment = text(form.treatment);
+    const currentDate = visit.visit_date?.slice(0, 10) ?? "";
+
+    if (visitDate && visitDate !== currentDate) {
+      payload.visit_date = visitDate;
+    }
+
+    if (complaint && complaint !== (visit.complaint ?? "")) {
+      payload.complaint = complaint;
+    }
+
+    if (treatment && treatment !== (visit.treatment ?? "")) {
+      payload.treatment = treatment;
+    }
+
+    persistUpdate(payload, () => setIsConsultationModalOpen(false));
   };
 
   return (
     <>
+      {saveError && (
+        <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
+          {saveError}
+        </div>
+      )}
+
       <div className="mx-auto w-full">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
@@ -337,7 +425,8 @@ export default function PatientRecordView() {
           fields={statusEditFields}
           data={{ status: visit.status }}
           onClose={() => setIsStatusModalOpen(false)}
-          onSave={() => setIsStatusModalOpen(false)}
+          onSave={handleSaveStatus}
+          isSaving={updateVisitMutation.isPending}
         />
       )}
 
@@ -347,7 +436,8 @@ export default function PatientRecordView() {
           fields={consultationEditFields}
           data={consultationForm}
           onClose={() => setIsConsultationModalOpen(false)}
-          onSave={() => setIsConsultationModalOpen(false)}
+          onSave={handleSaveConsultation}
+          isSaving={updateVisitMutation.isPending}
         />
       )}
     </>
