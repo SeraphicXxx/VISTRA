@@ -1,24 +1,20 @@
-import {useState} from "react";
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
+import {AppointmentSchema} from "/@/api/schema/AppointmentSchema";
 import {useAppointmentQuery} from "/@/hooks/query/AppointmentQuery";
 import {AppointmentProvider} from "/@/context/PaginatedContext";
 import AppointmentsTab from "/@/pages/admin/appointments/appointmentsTab";
 import AppointmentDetailView from "/@/pages/admin/appointments/appointmentView";
+import {createVisitPage} from "/@/components/VisitPage";
 
-export function AppointmentPage() {
-    const [filters, setFilters] = useState<AppointmentFilters>({
+export const AppointmentPage = createVisitPage<AppointmentFilters, AppointmentSchema>({
+    initialFilters: {
         page: 1,
         page_size: 10,
-    });
-    const appointmentQuery = useAppointmentQuery(filters);
-
-    return (
-        <AppointmentProvider query={appointmentQuery}>
-            <AppointmentsTab setFilters={setFilters}/>
-        </AppointmentProvider>
-    );
-
-}
+    },
+    useListQuery: useAppointmentQuery,
+    Provider: AppointmentProvider,
+    Tab: AppointmentsTab,
+});
 
 export function AppointmentDetailPage() {
     return (

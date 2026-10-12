@@ -1,35 +1,18 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {createAppointment, getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
-import type {CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
+import type {AppointmentSchema, CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
+import {ApiResponse} from "/@/api/schema/ApiResponseSchema";
+import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {createListQueryHook, createMutationHook} from "/@/hooks/query/visitQuery";
 
-export function useCreateAppointment() {
-    return useMutation({
-        mutationFn: async (request: CreateAppointmentRequest) => {
-            const {data} = await createAppointment(request);
-            return data;
-        },
-    });
-}
+export const useCreateAppointment = createMutationHook<CreateAppointmentRequest, ApiResponse<AppointmentSchema>>(createAppointment);
 
-export function useAppointmentQuery(filters?: AppointmentFilters) {
-    return useQuery({
-        queryKey: ["appointments", filters],
-        queryFn: async ({signal}) => {
-            const {data} = await getAllAppointments(
-                filters,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Appointment data is missing");
-            }
-
-            return data.data;
-        },
-        refetchOnWindowFocus: false,
-    })
-}
+export const useAppointmentQuery = createListQueryHook<AppointmentFilters, PaginatedData<AppointmentSchema>>(
+    "appointments",
+    getAllAppointments,
+    "Appointment data is missing",
+);
 
 export function useAppointmentByIdQuery(
     appointmentId: string,

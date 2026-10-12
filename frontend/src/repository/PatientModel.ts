@@ -1,57 +1,24 @@
 import { PatientProfile } from "/@/api/schema/PatientSchema";
 import {patientData} from "/@/pages/admin/patients/patientsData";
+import {joinName} from "/@/utils/joinName";
 
+export function toPatientDashboardRecord(profile: PatientProfile): patientData {
+    return {
+        id: profile.patient_id,
 
-interface PatientRecord {
-    id: string;
-    title: string;
-    date: string;
-    details: string;
-    provider: string;
-}
+        name: joinName([
+            profile.first_name,
+            profile.middle_name,
+            profile.last_name,
+        ]),
 
+        patient_id: profile.patient_id,
 
-interface PatientRecords {
-    medical: PatientRecord[];
-    dental: PatientRecord[];
-    appointment: PatientRecord[];
-}
+        user_type: profile.person_type,
 
-export class PatientModel {
-    private PatientProfile: PatientProfile;
+        course_department: profile.course || profile.department ? `${profile.course || ""}  ${profile.department || ""}` : "N/A",
 
-    constructor(patientProfile: PatientProfile) {
-        this.PatientProfile = patientProfile;
-    }
+        year_section: profile.school_year ?? "N/A",
 
-    dataViewPatientDashboardRecord(): patientData {
-        return {
-            id: this.PatientProfile.patient_id,
-
-            name: [
-                this.PatientProfile.first_name,
-                this.PatientProfile.middle_name,
-                this.PatientProfile.last_name,
-            ]
-                .filter(Boolean)
-                .join(" "),
-
-            patient_id: this.PatientProfile.patient_id,
-
-            user_type: this.PatientProfile.person_type,
-
-            course_department: this.PatientProfile.course || this.PatientProfile.department ? `${this.PatientProfile.course || ""}  ${this.PatientProfile.department || ""}` : "N/A",
-
-            year_section: this.PatientProfile.school_year ?? "N/A",
-
-        };
-    }
-
-    dataViewPatientRecords(): PatientRecords {
-        return {
-            medical: [],
-            dental: [],
-            appointment: [],
-        };
-    }
+    };
 }

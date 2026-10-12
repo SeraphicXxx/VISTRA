@@ -1,13 +1,10 @@
-import {useMemo} from "react";
-import {ChevronRight, Plus, Stethoscope} from "lucide-react";
+import {Stethoscope} from "lucide-react";
 import {medData, MedicalColumns} from "./medicalData";
 import {ROUTES} from "/@/config/RoutePaths.js";
-import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
-import {HyperlinkText, LinkButton} from "/@/components/Button";
-import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useMedicalContext} from "/@/context/PaginatedContext";
-import {removeNullFilters} from "/@/components/Filters";
-import {MedicalModel} from "/@/repository/MedicalModel";
+import {toMedicalTableRow} from "/@/repository/MedicalModel";
+import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {VisitTab} from "/@/components/VisitTab";
 
 interface MedicalTabProps {
     setFilters: (filters: MedicalVisitFilters) => void;
@@ -15,57 +12,30 @@ interface MedicalTabProps {
 
 export default function MedicalTab({setFilters}: MedicalTabProps) {
     const {
-        items: medical,
+        items,
         totalPages,
         page,
         isLoading,
     } = useMedicalContext();
 
-    const rows = useMemo(
-        () =>
-            medical.map((visit) => {
-                const medicalModel = new MedicalModel(visit);
-
-                return medicalModel.UiTableFormat();
-            }),
-        [medical]
-    );
-
     return (
-        <DefaultTablePreset<medData>
+        <VisitTab
             title="Medical Records"
             icon={Stethoscope}
-            isLoading={isLoading}
-            data={rows}
             columns={MedicalColumns}
+            items={items}
+            toRow={toMedicalTableRow}
+            isLoading={isLoading}
             totalPages={totalPages}
             page={page}
-            panelAddon={
-                <LinkButton
-                    title={`New Medical Record`}
-                    route={`${ROUTES.staff.medical.createNewRecord}`}
-                    icon={Plus}
-                />
+            createAction={{
+                title: "New Medical Record",
+                route: ROUTES.staff.medical.createNewRecord,
+            }}
+            buildViewLink={(record: medData) =>
+                ROUTES.staff.medical.view.build(record.patient_id, record.id)
             }
-            renderAction={
-                (record) => (
-                    <HyperlinkText
-                        title={`View`}
-                        link={`${ROUTES.staff.medical.view.build(record.patient_id, record.id)}`}
-                        icon={ChevronRight}
-                    />
-                )
-
-            }
-            onRun={(search, filters, page, pageSize) =>
-                setFilters({
-                    search,
-                    ...removeNullFilters(filters),
-                    page,
-                    page_size: pageSize,
-                })
-            }
+            setFilters={setFilters}
         />
-
     );
 }

@@ -1,35 +1,18 @@
-import {useMutation, useQuery} from "@tanstack/react-query";
 import {createMedicalVisit, getMedicalRecordById, getMedicalVisit} from "/@/api/medical.api";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
-import {CreateMedicalVisit, MedicalRecordDetailSchema} from "/@/api/schema/MedicalSchema";
+import {CreateMedicalVisit, MedicalRecordDetailSchema, MedicalVisitSchema} from "/@/api/schema/MedicalSchema";
+import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {useQuery} from "@tanstack/react-query";
+import {createListQueryHook, createMutationHook} from "/@/hooks/query/visitQuery";
+import {CreateMedicalVisitResponse} from "/@/api/schema/MedicalSchema";
 
-export function useCreateMedicalVisit() {
-    return useMutation({
-        mutationFn: async (record: CreateMedicalVisit) => {
-            const {data} = await createMedicalVisit(record);
-            return data;
-        },
-    });
-}
+export const useCreateMedicalVisit = createMutationHook<CreateMedicalVisit, CreateMedicalVisitResponse>(createMedicalVisit);
 
-export function useMedicalQuery(filters?: MedicalVisitFilters) {
-    return useQuery({
-        queryKey: ["medical", filters],
-        queryFn: async ({signal}) => {
-            const {data} = await getMedicalVisit(
-                filters,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Medical data is missing");
-            }
-
-            return data.data;
-        },
-        refetchOnWindowFocus: false,
-    });
-}
+export const useMedicalQuery = createListQueryHook<MedicalVisitFilters, PaginatedData<MedicalVisitSchema>>(
+    "medical",
+    getMedicalVisit,
+    "Medical data is missing",
+);
 
 export function useMedicalVisitDetail(patientId?: string, medicalId?: string) {
     return useQuery({

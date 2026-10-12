@@ -1,35 +1,19 @@
-import {CreateDentalVisit, DentalRecordDetailSchema} from "/@/api/schema/DentalSchema";
+import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema} from "/@/api/schema/DentalSchema";
 import {createDentalVisit, getDentalRecordById, getDentalVisit} from "/@/api/dental.api";
 
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {AppointmentFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {useQuery} from "@tanstack/react-query";
+import {DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {ApiMessageResponse} from "/@/api/schema/ApiResponseSchema";
+import {createListQueryHook, createMutationHook} from "/@/hooks/query/visitQuery";
 
-export function useCreateDentalVisit() {
-    return useMutation({
-        mutationFn: async (record: CreateDentalVisit) => {
-            const { data } = await createDentalVisit(record);
-            return data;
-        },
-    });
-}
+export const useCreateDentalVisit = createMutationHook<CreateDentalVisit, ApiMessageResponse>(createDentalVisit);
 
-export function useDentalQuery(filters?: DentalVisitFilters ) {
-    return useQuery({
-        queryKey: ["dental", filters],
-        queryFn: async ({signal}) => {
-            const {data} = await getDentalVisit(
-                filters,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Dental data is missing");
-            }
-
-            return data.data;
-        }
-    })
-}
+export const useDentalQuery = createListQueryHook<DentalVisitFilters, PaginatedData<DentalVisitSchema>>(
+    "dental",
+    getDentalVisit,
+    "Dental data is missing",
+);
 
 export function useDentalVisitDetail(patientId?: string, dentalId?: string) {
     return useQuery({

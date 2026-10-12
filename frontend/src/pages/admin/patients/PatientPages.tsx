@@ -3,21 +3,18 @@ import {PatientProvider} from "/@/context/PaginatedContext";
 import {usePatientQuery} from "/@/hooks/query/PatientQuery";
 import ViewStudentRecord from "/@/pages/admin/patients/ViewStudentRecord";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useState} from "react";
+import {PatientProfile} from "/@/api/schema/PatientSchema";
+import {createVisitPage} from "/@/components/VisitPage";
 
-export function PatientsPage() {
-    const [filters, setFilters] = useState<PatientFilters>({
+export const PatientsPage = createVisitPage<PatientFilters, PatientProfile>({
+    initialFilters: {
         page: 1,
         page_size: 10,
-    });
-    const patientQuery = usePatientQuery(filters);
-
-    return (
-        <PatientProvider query={patientQuery}>
-            <PatientsTab setFilters={setFilters} />
-        </PatientProvider>
-    );
-}
+    },
+    useListQuery: usePatientQuery,
+    Provider: PatientProvider,
+    Tab: PatientsTab,
+});
 
 export function ViewPatientRecord() {
     const patientQuery = usePatientQuery();

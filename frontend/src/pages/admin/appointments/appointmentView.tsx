@@ -12,12 +12,12 @@ import {
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
 
-import {AppointmentModel} from "/@/repository/AppointmentModel";
+import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import LoadingPage from "/@/components/LoadingPage";
 import {useAppointmentByIdQuery} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
 
-type AppointmentStatus = "pending" | "confirmed" | "declined";
+type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
 interface AppointmentUiModel {
     id: string | number;
@@ -27,7 +27,7 @@ interface AppointmentUiModel {
     notes?: string
     time: string;
     type: string;
-    status: AppointmentStatus;
+    status: AdminAppointmentStatus;
 }
 
 interface InfoFieldProps {
@@ -44,7 +44,7 @@ interface StatusMeta {
     dot: string;
 }
 
-const STATUS_META: Record<AppointmentStatus, StatusMeta> = {
+const STATUS_META: Record<AdminAppointmentStatus, StatusMeta> = {
     pending: {
         label: "Pending",
         icon: Hourglass,
@@ -145,7 +145,7 @@ export function AppointmentNotFound({
 }
 
 type interviewForm = {
-    status: AppointmentStatus
+    status: AdminAppointmentStatus
     declined: boolean
     reason: string
 }
@@ -187,9 +187,7 @@ export default function AppointmentDetailView() {
             />
         );
     }
-    const appointmentModel = new AppointmentModel(appointmentDetails);
-
-    const appointment = appointmentModel.UiPageFormat() as AppointmentUiModel;
+    const appointment = toAppointmentPageFormat(appointmentDetails) as AppointmentUiModel;
 
 
 
@@ -200,7 +198,7 @@ export default function AppointmentDetailView() {
     };
 
     const applyStatus = (
-        next: AppointmentStatus
+        next: AdminAppointmentStatus
     ): void => {
         setField("status", next);
         setField("declined", next === "declined");

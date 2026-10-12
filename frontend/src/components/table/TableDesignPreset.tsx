@@ -1,4 +1,4 @@
-import React from "react";
+import React, {type ComponentType} from "react";
 import { Pagination } from "@mui/material";
 import { TableFilters } from "/@/components/Filters";
 import {
@@ -17,6 +17,7 @@ interface TablePresetProps<T> {
   title: string;
   subtitle?: string;
   panelAddon?: React.ReactNode;
+  icon?: ComponentType<{ className?: string }>;
   data: T[];
   isLoading: boolean;
   columns: Column<T>[];
