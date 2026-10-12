@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { usePatientRecordSummaryQuery } from "/@/hooks/query/PatientQuery";
+import { usePatientRecordSummaryQuery, useUpdatePatientProfile } from "/@/hooks/query/PatientQuery";
 import { PatientRecordTab } from "/@/types/types";
-import LoadingPage from "/@/components/LoadingPage";
 import { formatDate } from "/@/utils/FormatDate";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal";
+import { getFieldErrors } from "/@/utils/Formatters";
+import type { PatientInfo, UpdatePatientProfile } from "/@/api/schema/PatientSchema";
 
 const TABS: { key: PatientRecordTab; label: string }[] = [
   { key: "medical", label: "Medical" },
@@ -39,6 +40,116 @@ function InfoItem({
   );
 }
 
+/*
+ * Map the edit-modal form (UI field names) to the PATCH
+ * /patients/{id}/ payload (API field names), including only
+ * changed, non-blank values. name/studentId/yearSection are
+ * display-only: the endpoint does not accept them.
+ */
+function buildProfilePayload(
+  form: Record<string, any>,
+  patient: PatientInfo | undefined
+): UpdatePatientProfile {
+  const text = (value: unknown): string | undefined => {
+    const trimmed = String(value ?? "").trim();
+    return trimmed || undefined;
+  };
+
+  const changed = (next: string | undefined, current: unknown): boolean =>
+    next !== undefined && next !== String(current ?? "");
+
+  const payload: UpdatePatientProfile = {};
+  const birthday = text(form.birthday);
+  const mobileNumber = text(form.mobileNumber);
+  const barangay = text(form.barangay);
+  const address = text(form.address);
+
+  if (birthday && changed(birthday, patient?.birthday)) {
+    payload.birthday = birthday;
+  }
+
+  const age = Number(form.age);
+  if (
+    form.age !== "" &&
+    form.age !== undefined &&
+    Number.isFinite(age) &&
+    age !== patient?.age
+  ) {
+    payload.age = age;
+  }
+
+  const sex = text(form.sex);
+  if (sex && changed(sex, patient?.sex)) {
+    payload.sex = sex;
+  }
+
+  const civilStatus = text(form.civilStatus);
+  if (civilStatus && changed(civilStatus, patient?.civil_status)) {
+    payload.civil_status = civilStatus;
+  }
+
+  if (mobileNumber && changed(mobileNumber, patient?.mobile_number)) {
+    payload.mobile_number = mobileNumber;
+  }
+
+  if (barangay && changed(barangay, patient?.barangay)) {
+    payload.barangay = barangay;
+  }
+
+  if (address && changed(address, patient?.address)) {
+    payload.complete_address = address;
+  }
+
+  return payload;
+}
+
+function RecordViewSkeleton() {
+  return (
+    <div
+      className="mx-auto flex w-full max-w-6xl animate-pulse flex-col gap-5"
+      aria-busy="true"
+      aria-label="Loading patient record"
+    >
+      <div className="h-4 w-28 rounded bg-border" />
+
+      <section className="rounded-xl border border-border bg-white shadow-card">
+        <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="h-12 w-12 shrink-0 rounded-lg bg-surface" />
+            <div className="min-w-0">
+              <div className="h-5 w-48 rounded bg-surface" />
+              <div className="mt-2 h-3 w-32 rounded bg-surface" />
+            </div>
+          </div>
+          <div className="h-9 w-32 shrink-0 rounded-md bg-surface" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-border bg-background/60 px-6 py-5 sm:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2">
+              <div className="h-2.5 w-16 rounded bg-border" />
+              <div className="h-4 w-24 rounded bg-surface" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-white shadow-card">
+        <div className="flex gap-6 border-b border-border px-6 pb-3 pt-4">
+          {["Medical", "Dental", "Appointments"].map((tab) => (
+            <div key={tab} className="h-4 w-20 rounded bg-surface" />
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 px-6 py-5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-4 w-full rounded bg-surface" />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function NotFound({ id, onBack }: { id: string; onBack: () => void }) {
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-2 rounded-xl border border-border bg-white p-10 text-center">
@@ -67,11 +178,14 @@ export default function ViewStudentRecord() {
     data: patientInfo,
     isLoading,
     isError,
+    refetch,
   } = usePatientRecordSummaryQuery(id ?? "");
 
   const [activeTab, setActiveTab] = useState<PatientRecordTab>("medical");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<Record<string, any>>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const updateProfileMutation = useUpdatePatientProfile();
 
   const patient = patientInfo?.data;
   const handleBack = () => navigate(-1);
@@ -103,10 +217,36 @@ export default function ViewStudentRecord() {
       barangay: patient?.barangay ?? "",
       address: patient?.address ?? "",
     });
+    setSaveError(null);
     setIsEditModalOpen(true);
   };
 
-  if (isLoading) return <LoadingPage />;
+  const handleSavePersonalInfo = (form: Record<string, any>) => {
+    if (!id) return;
+
+    const payload = buildProfilePayload(form, patient);
+
+    if (Object.keys(payload).length === 0) {
+      setIsEditModalOpen(false);
+      return;
+    }
+
+    setSaveError(null);
+    updateProfileMutation.mutate(
+      { patientId: id, payload },
+      {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          void refetch();
+        },
+        onError: (error) => {
+          setSaveError(getFieldErrors(error));
+        },
+      }
+    );
+  };
+
+  if (isLoading) return <RecordViewSkeleton />;
 
   if (!patientInfo || isError) {
     return <NotFound id={id ?? ""} onBack={handleBack} />;
@@ -270,13 +410,21 @@ export default function ViewStudentRecord() {
       </div>
 
       {isEditModalOpen && (
-        <EditRecordModal
-          title="Edit Personal Information"
-          fields={patientEditFields}
-          data={editForm}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={() => setIsEditModalOpen(false)}
-        />
+        <>
+          {saveError && (
+            <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
+              {saveError}
+            </div>
+          )}
+          <EditRecordModal
+            title="Edit Personal Information"
+            fields={patientEditFields}
+            data={editForm}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleSavePersonalInfo}
+            isSaving={updateProfileMutation.isPending}
+          />
+        </>
       )}
     </>
   );

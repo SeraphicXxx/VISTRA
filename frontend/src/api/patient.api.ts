@@ -1,7 +1,7 @@
 import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig.js";
 import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
-import {CreatePatientSchema, PatientProfile, PatientInfo} from "/@/api/schema/PatientSchema";
+import {CreatePatientSchema, PatientProfile, PatientInfo, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
 
 export const createPatientAccount = async (
@@ -42,6 +42,21 @@ export async function getPatientSummaryRecord(
         API_ENDPOINTS.patient.get_summary_record(patientId),
         {
             method: "GET",
+            signal,
+        }
+    );
+}
+
+export async function updatePatientProfile(
+    patientId: string,
+    payload: UpdatePatientProfile,
+    signal?: AbortSignal
+) {
+    return apiClient<ApiResponse<PatientProfile>>(
+        API_ENDPOINTS.patient.update_patient_profile(patientId),
+        {
+            method: "PATCH",
+            data: payload,
             signal,
         }
     );

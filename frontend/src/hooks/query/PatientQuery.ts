@@ -1,6 +1,7 @@
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord} from "/@/api/patient.api";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile} from "/@/api/patient.api";
+import {UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {useDebounce} from "/@/hooks/Debouncer";
 
 /**
@@ -66,5 +67,20 @@ export function usePatientRecordSummaryQuery(patientId: string) {
 
         enabled: Boolean(patientId),
         refetchOnWindowFocus: false,
+    });
+}
+
+export function useUpdatePatientProfile() {
+    return useMutation({
+        mutationFn: async ({
+            patientId,
+            payload,
+        }: {
+            patientId: string;
+            payload: UpdatePatientProfile;
+        }) => {
+            const {data} = await updatePatientProfile(patientId, payload);
+            return data;
+        },
     });
 }
