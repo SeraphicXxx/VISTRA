@@ -3,7 +3,7 @@ from supabase import Client
 
 from app.config.security import get_current_user
 from app.database.database_client import get_supabase_for_user
-from app.schemas.medical import MedicalVisitCreateRequest
+from app.schemas.medical import MedicalVisitCreateRequest, MedicalVisitUpdateRequest
 from app.schemas.query import FilterMedical
 from app.services.medical import (
     get_all_medical_visits,
@@ -11,6 +11,7 @@ from app.services.medical import (
 )
 from app.services.medical import create_medical_record as create_medical_record_service
 from app.services.medical import delete_medical_visit as delete_medical_visit_service
+from app.services.medical import update_medical_visit as update_medical_visit_service
 
 protected_medical_router = APIRouter(
     prefix="/medical",
@@ -51,3 +52,15 @@ def delete_medical_visit(
         supabase: Client = Depends(get_supabase_for_user)
 ):
     return delete_medical_visit_service(medical_visit_id, supabase)
+
+
+@protected_medical_router.patch("/{patient_id}/{medical_visit_id}/")
+def update_medical_visit(
+        patient_id: str,
+        medical_visit_id: int,
+        request: MedicalVisitUpdateRequest,
+        supabase: Client = Depends(get_supabase_for_user)
+):
+    return update_medical_visit_service(
+        patient_id, medical_visit_id, request, supabase,
+    )

@@ -2,7 +2,7 @@ from supabase import Client
 
 from app.config.security import require_user_email
 from app.repositories.medical_repositories import MedicalRepository
-from app.schemas.medical import MedicalVisitCreateRequest
+from app.schemas.medical import MedicalVisitCreateRequest, MedicalVisitUpdateRequest
 from app.schemas.query import FilterMedical
 from app.schemas.user import CurrentUser
 from app.utils.email_utils import staff_id_format
@@ -45,3 +45,26 @@ def delete_medical_visit(medical_visit_id: int, supabase: Client):
     or_404(deleted, "Medical record not found")
 
     return ok(message="Medical record deleted successfully")
+
+
+@handle_service_errors
+def update_medical_visit(
+    patient_id: str,
+    medical_visit_id: int,
+    request: MedicalVisitUpdateRequest,
+    supabase: Client,
+):
+    medical_repository = MedicalRepository(supabase)
+    or_404(
+        medical_repository.get_medical_record(patient_id, medical_visit_id),
+        "Medical record not found",
+    )
+
+    updated = or_404(
+        medical_repository.update_visit(
+            medical_visit_id, request.to_visit_update(),
+        ),
+        "Medical record not found",
+    )
+
+    return ok(updated)

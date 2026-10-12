@@ -1,4 +1,7 @@
+from typing import Any
+
 from app.repositories.base import BaseRepository, fetch_visit_tab
+from app.schemas.medical import EDITABLE_MEDICAL_VISIT_COLUMNS
 from app.schemas.query import FilterMedical
 
 
@@ -18,6 +21,26 @@ class MedicalRepository(BaseRepository):
 
     def delete_visit(self, medical_visit_id: int):
         return self.delete_by_column("MEDICAL_VISIT", "id", medical_visit_id)
+
+    def update_visit(self, medical_visit_id: int, visit_data: dict[str, Any]):
+        updatable = {
+            key: value
+            for key, value in (visit_data or {}).items()
+            if key in EDITABLE_MEDICAL_VISIT_COLUMNS
+        }
+
+        if not updatable:
+            raise ValueError(
+                "No updatable fields provided. Allowed: "
+                + ", ".join(sorted(EDITABLE_MEDICAL_VISIT_COLUMNS))
+            )
+
+        return self.update_by_column(
+            "MEDICAL_VISIT",
+            "id",
+            medical_visit_id,
+            updatable,
+        )
 
     def get_medical_record(self, patient_id: str, medical_visit_id: int):
         return self.fetch_one(

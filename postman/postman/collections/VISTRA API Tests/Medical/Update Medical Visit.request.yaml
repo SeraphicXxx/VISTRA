@@ -1,0 +1,43 @@
+$kind: http-request
+url: "{{base_url}}/medical/20230847-S/{{medical_visit_id}}/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"status\": \"recovered\",\r
+
+    \    \"complaint\": \"Postman edit\",\r
+
+    \    \"treatment\": \"Rest and fluids\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Update medical visit returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Visit fields are updated\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    pm.expect(json.data.status).to.eql(\"recovered\");\r
+
+      \    pm.expect(json.data.complaint).to.eql(\"Postman edit\");\r
+
+      \    });"
+    language: text/javascript
+order: 9570

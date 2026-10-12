@@ -5,6 +5,14 @@ from pydantic import BaseModel
 from app.enums.medical_terms import MedicalVisitType, MedicalVisitStatus, MedicalTreatmentType
 
 
+EDITABLE_MEDICAL_VISIT_COLUMNS = frozenset({
+    "visit_date",
+    "status",
+    "complaint",
+    "treatment",
+})
+
+
 class MedicalVisitCreateRequest(BaseModel):
     patient_id: str
     status: MedicalVisitStatus
@@ -35,3 +43,19 @@ class MedicalVisitTab(BaseModel):
     staff_id: str
     status: MedicalVisitStatus
     type: MedicalVisitType
+
+
+class MedicalVisitUpdateRequest(BaseModel):
+    visit_date: datetime | None = None
+    status: MedicalVisitStatus | None = None
+    complaint: str | None = None
+    treatment: str | None = None
+
+    def to_visit_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(
+                mode="json", exclude_unset=True
+            ).items()
+            if key in EDITABLE_MEDICAL_VISIT_COLUMNS and value is not None
+        }
