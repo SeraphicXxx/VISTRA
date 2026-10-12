@@ -15,7 +15,11 @@ export interface PatientLoginFormState {
 
 export function usePatientLogin() {
     const mutation = useMutation({
-        mutationFn: (request: LoginRequest) => login(request),
+        mutationFn: async (request: LoginRequest) => {
+            const {data} = await login(request);
+
+            return data;
+        },
         onSuccess: (data) => {
             sessionManager.setLogin(
                 data.access_token,

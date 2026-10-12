@@ -3,13 +3,13 @@ import { LoginRequest, LoginStaffResponse } from "/@/api/schema/AuthSchema";
 import {sendResource} from "/@/api/resource";
 
 export const login = async (
-    request: LoginRequest
-): Promise<LoginStaffResponse> => {
-    const result = await sendResource<LoginStaffResponse>(
+    request: LoginRequest,
+    signal?: AbortSignal
+) => {
+    return sendResource<LoginStaffResponse>(
         "POST",
         API_ENDPOINTS.auth.login,
         request,
+        signal,
     );
-
-    return result.data;
 };

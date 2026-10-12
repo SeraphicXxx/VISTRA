@@ -8,15 +8,9 @@ export interface LoginRequest {
     password: string;
 }
 
-export interface PasswordAndId {
-    email: string;
-    password: string;
-}
-
 export interface LoginStaffResponse {
+    success: boolean;
+    user: SessionUser;
     access_token: string;
     refresh_token: string;
-    token_type: string;
-    detail: string
-    user: SessionUser;
 }
