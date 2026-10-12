@@ -33,10 +33,14 @@ def get_appointment_by_id(appointment_id: int, patient_id: str, supabase: Client
 
 
 @handle_service_errors
-def update_appointment(appointment_id: int, request: UpdateAppointmentRequest, supabase: Client):
+def update_appointment(patient_id: str, appointment_id: int, request: UpdateAppointmentRequest, supabase: Client):
     appointment_repo = AppointmentRepository(supabase)
+    or_404(
+        appointment_repo.get_appointment_by_id(appointment_id, patient_id),
+        "Appointment not found",
+    )
     response = appointment_repo.update_appointment(appointment_id,
-                                                   request.model_dump(mode="json", exclude_unset=True))
+                                                   request.to_appointment_update())
 
     return ok(or_404(response, "Appointment not found"))
 

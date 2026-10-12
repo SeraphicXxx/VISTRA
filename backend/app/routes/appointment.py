@@ -30,9 +30,9 @@ def get_appointments(filters: FilterAppointment = Depends(), supabase: Client = 
 def get_appointment(patient_id: str, appointment_id: int, supabase: Client = Depends(get_supabase_for_user)):
     return get_appointment_by_id(appointment_id , patient_id, supabase)
 
-@protected_appointment_router.patch("/{appointment_id}/")
-def update_appointment(appointment_id: int, request: UpdateAppointmentRequest,supabase: Client = Depends(get_supabase_for_user)):
-    return update_appointment_service(appointment_id, request, supabase)
+@protected_appointment_router.patch("/{patient_id}/{appointment_id}/")
+def update_appointment(patient_id: str, appointment_id: int, request: UpdateAppointmentRequest,supabase: Client = Depends(get_supabase_for_user)):
+    return update_appointment_service(patient_id, appointment_id, request, supabase)
 
 @protected_appointment_router.delete("/{appointment_id}/")
 def delete_appointment(appointment_id: int,supabase: Client = Depends(get_supabase_for_user)):

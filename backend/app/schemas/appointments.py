@@ -30,9 +30,20 @@ class CreateAppointmentRequest(BaseModel):
 
         return self
 
+
+EDITABLE_APPOINTMENT_COLUMNS = frozenset({
+    "status",
+    "decline_reason",
+})
+
+
 class UpdateAppointmentRequest(BaseModel):
     status: str | None = None
-    reason: str | None = None
-    location: str | None = None
-    notes: str | None = None
     decline_reason: str | None = None
+
+    def to_appointment_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(exclude_unset=True).items()
+            if key in EDITABLE_APPOINTMENT_COLUMNS and value is not None
+        }

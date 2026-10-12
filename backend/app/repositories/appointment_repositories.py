@@ -1,4 +1,5 @@
 from app.repositories.base import BaseRepository
+from app.schemas.appointments import EDITABLE_APPOINTMENT_COLUMNS
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
@@ -97,10 +98,22 @@ class AppointmentRepository(BaseRepository):
         return self._map_appointment(row)
 
     def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
+        updatable = {
+            key: value
+            for key, value in (updated_appointment_data or {}).items()
+            if key in EDITABLE_APPOINTMENT_COLUMNS
+        }
+
+        if not updatable:
+            raise ValueError(
+                "No updatable fields provided. Allowed: "
+                + ", ".join(sorted(EDITABLE_APPOINTMENT_COLUMNS))
+            )
+
         response = (
             self.supabase
             .table("APPOINTMENT")
-            .update(updated_appointment_data)
+            .update(updatable)
             .eq("id", appointment_id)
             .execute()
         )
