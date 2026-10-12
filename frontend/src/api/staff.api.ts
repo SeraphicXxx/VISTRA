@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from "/@/config/ApiConfig.js";
+import { API_ENDPOINTS } from "/@/config/ApiConfig";
 import { ApiResponse } from "/@/api/schema/ApiResponseSchema";
 import { StaffData } from "/@/api/schema/StaffSchema";
 import {getResource} from "/@/api/resource";

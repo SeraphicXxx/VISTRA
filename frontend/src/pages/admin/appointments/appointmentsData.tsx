@@ -1,4 +1,5 @@
-import {Status, StatusBadge, statusLabels} from "/@/components/StatusBadge";
+import {StatusBadge} from "/@/components/StatusBadge";
+import {AppointmentStatus, appointmentStatuses} from "/@/types/Appointment";
 import {Column, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
 import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
 import React from "react";
@@ -148,7 +149,7 @@ export interface AppointmentTableFormat {
     course: string;
     time: string;
     type: string;
-    status: Status;
+    status: AppointmentStatus;
 }
 
 export interface AppointmentPageFormat {
@@ -161,7 +162,7 @@ export interface AppointmentPageFormat {
     type: string;
     notes: string | null;
     declineReason: string | null;
-    status: Status;
+    status: AppointmentStatus;
 }
 
 export const AppointmentsColumns: Column<AppointmentTableFormat>[] = [
@@ -234,13 +235,9 @@ export const AppointmentsColumns: Column<AppointmentTableFormat>[] = [
         key: "status",
         label: "Status",
         filterType: "select",
-        options: optionsFromMap({
-            pending: statusLabels.pending,
-            confirmed: statusLabels.confirmed,
-            declined: statusLabels.declined,
-        }),
+        options: optionsFromMap(appointmentStatuses),
         render: (value) => (
-            <StatusBadge status={value as Status}/>
+            <StatusBadge status={value as AppointmentStatus}/>
         ),
 
     },

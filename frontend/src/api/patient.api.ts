@@ -1,13 +1,13 @@
-import {API_ENDPOINTS} from "/@/config/ApiConfig.js";
+import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile, PatientInfo, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
 import {getResource, listResource, sendResource} from "/@/api/resource";
 
-export const createPatientAccount = async (
+export async function createPatientAccount(
     request: CreatePatientSchema,
     signal?: AbortSignal
-): Promise<ApiMessageResponse> => {
+): Promise<ApiMessageResponse> {
     const {data} = await sendResource<ApiMessageResponse>(
         "POST",
         API_ENDPOINTS.patient.create_patient,
@@ -16,7 +16,7 @@ export const createPatientAccount = async (
     );
 
     return data;
-};
+}
 
 export function getAllPatientProfiles(
     filters?: PatientFilters,
