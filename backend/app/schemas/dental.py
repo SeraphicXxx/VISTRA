@@ -1,7 +1,26 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
 DENTITION_PERMANENT = "permanent"
+
+EDITABLE_VISIT_COLUMNS = frozenset({
+    "visit_date",
+    "last_dental_visit",
+    "floss",
+    "brushing_frequency",
+    "calculus_severity",
+    "current_medications",
+    "status",
+    "notes",
+})
+
+EDITABLE_ODONTOGRAM_COLUMNS = frozenset({
+    "is_permanent",
+    "condition",
+    "notes",
+})
 
 
 class OdontogramCreateRequest(BaseModel):
@@ -44,6 +63,44 @@ class DentalVisitCreateRequest(BaseModel):
             "notes": self.notes,
             "status": self.status,
             "staff_id": staff_id,
+        }
+
+
+class OdontogramUpdateRequest(BaseModel):
+    id: int | None = None
+    tooth_number: int | None = None
+    is_permanent: bool | None = None
+    condition: str | None = None
+    notes: str | None = None
+
+    def to_tooth_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(exclude_unset=True).items()
+            if key in EDITABLE_ODONTOGRAM_COLUMNS
+            and value is not None
+        }
+
+
+class DentalVisitUpdateRequest(BaseModel):
+    visit_date: datetime | None = None
+    last_dental_visit: str | None = None
+    floss: bool | None = None
+    brushing_frequency: str | None = None
+    calculus_severity: str | None = None
+    current_medications: str | None = None
+    status: str | None = None
+    notes: str | None = None
+
+    tooth_records: list[OdontogramUpdateRequest] | None = None
+
+    def to_visit_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(
+                mode="json", exclude_unset=True
+            ).items()
+            if key in EDITABLE_VISIT_COLUMNS and value is not None
         }
 
 

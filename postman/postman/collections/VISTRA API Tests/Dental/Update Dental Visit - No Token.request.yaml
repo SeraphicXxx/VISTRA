@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base_url}}/dental/20230847-S/{{dental_visit_id}}/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: ""
+body:
+  type: json
+  content: "{\r
+
+    \    \"notes\": \"Postman edit\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Unauthenticated request returns 401\", function () {\r
+
+      \    pm.response.to.have.status(401);\r
+
+      \    });"
+    language: text/javascript
+order: 9330

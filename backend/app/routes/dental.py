@@ -9,7 +9,8 @@ from app.services.dental import (
 )
 from app.services.dental import create_dental_record as create_dental_record_service
 from app.services.dental import delete_dental_visit as delete_dental_visit_service
-from app.schemas.dental import DentalVisitCreateRequest
+from app.services.dental import update_dental_visit as update_dental_visit_service
+from app.schemas.dental import DentalVisitCreateRequest, DentalVisitUpdateRequest
 from app.schemas.query import FilterDental
 
 protected_dental_router = APIRouter(
@@ -51,3 +52,15 @@ def delete_dental_visit(
         supabase: Client = Depends(get_supabase_for_user)
 ):
     return delete_dental_visit_service(dental_visit_id, supabase)
+
+
+@protected_dental_router.patch("/{patient_id}/{dental_visit_id}/")
+def update_dental_visit(
+        patient_id: str,
+        dental_visit_id: int,
+        request: DentalVisitUpdateRequest,
+        supabase: Client = Depends(get_supabase_for_user)
+):
+    return update_dental_visit_service(
+        patient_id, dental_visit_id, request, supabase,
+    )
