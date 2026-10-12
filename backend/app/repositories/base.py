@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
@@ -26,7 +27,7 @@ class BaseRepository:
         table: str,
         column: str,
         value,
-        data: dict,
+        data: dict[str, Any],
     ):
         response = (
             self.supabase

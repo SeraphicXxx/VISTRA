@@ -112,7 +112,7 @@ def update_patient_profile(
 
     updated = patient_repo.update_profile(
         patient_id,
-        request.model_dump(mode="json", exclude_unset=True),
+        request.to_profile_update(),
     )
 
     return ok(or_404(updated, "Patient profile not found"))

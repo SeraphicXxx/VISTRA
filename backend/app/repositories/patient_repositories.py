@@ -1,6 +1,7 @@
+from typing import Any
+
 from app.repositories.base import BaseRepository
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
-
 
 class PatientRepository(BaseRepository):
 
@@ -53,34 +54,10 @@ class PatientRepository(BaseRepository):
             {"p_patient_id": patient_id},
         ).execute()
 
-    def update_profile(self, patient_id: str, profile_data: dict):
-        field_map = {
-            "birthday": "birthday",
-            "age": "age",
-            "sex": "sex",
-            "civil_status": "civil_status",
-            "mobile_number": "contact_no",
-            "contact_no": "contact_no",
-            "barangay": "barangay",
-            "complete_address": "complete_address",
-        }
-
-        updatable = {
-            field_map[key]: value
-            for key, value in (profile_data or {}).items()
-            if key in field_map
-        }
-
-        if not updatable:
-            raise ValueError(
-                "No updatable fields provided. Allowed: "
-                "birthday, age, sex, civil_status, mobile_number, "
-                "barangay, complete_address"
-            )
-
+    def update_profile(self, patient_id: str, profile_data: dict[str, Any]):
         return self.update_by_column(
             "PATIENT_PROFILE",
             "patient_id",
             patient_id,
-            updatable,
+            profile_data,
         )

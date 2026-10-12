@@ -1,7 +1,8 @@
 from datetime import date
+from typing import Any, ClassVar
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
@@ -110,12 +111,34 @@ class UpdatePatientProfileRequest(BaseModel):
     barangay: str | None = Field(default=None, min_length=1, max_length=100)
     complete_address: str | None = Field(default=None, min_length=1, max_length=255)
 
-    @model_validator(mode="after")
-    def require_at_least_one_field(self):
-        if not self.model_dump(exclude_unset=True):
-            raise ValueError("At least one field must be provided")
+    # Request field -> PATIENT_PROFILE column. Single source of
+    # truth for which fields are editable (mirrors to_patient_profile).
+    PROFILE_UPDATE_MAP: ClassVar[dict[str, str]] = {
+        "birthday": "birthday",
+        "age": "age",
+        "sex": "sex",
+        "civil_status": "civil_status",
+        "mobile_number": "contact_no",
+        "barangay": "barangay",
+        "complete_address": "complete_address",
+    }
 
-        return self
+    def to_profile_update(self) -> dict[str, Any]:
+        updatable = {
+            self.PROFILE_UPDATE_MAP[key]: value
+            for key, value in self.model_dump(
+                mode="json", exclude_unset=True
+            ).items()
+            if key in self.PROFILE_UPDATE_MAP
+        }
+
+        if not updatable:
+            raise ValueError(
+                "At least one of the following fields must be provided: "
+                + ", ".join(self.PROFILE_UPDATE_MAP)
+            )
+
+        return updatable
 
     @field_validator("barangay", "complete_address")
     @classmethod
