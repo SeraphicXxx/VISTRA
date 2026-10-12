@@ -1,63 +1,53 @@
 import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema, UpdateDentalVisit} from "/@/api/schema/DentalSchema";
 import {ApiMessageResponse, ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {getResource, listResource, sendResource} from "/@/api/resource";
 
-export async function createDentalVisit(
+export function createDentalVisit(
     record: CreateDentalVisit,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiMessageResponse>(
+    return sendResource<ApiMessageResponse>(
+        "POST",
         API_ENDPOINTS.dental.create_dental_visit,
-        {
-            method: "POST",
-            data: record,
-            signal
-        }
+        record,
+        signal
     );
 }
 
-export async function getDentalVisit(
+export function getDentalVisit(
     filter?: DentalVisitFilters,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiResponse<PaginatedData<DentalVisitSchema>>>(
+    return listResource<ApiResponse<PaginatedData<DentalVisitSchema>>>(
         API_ENDPOINTS.dental.get_dental_visit,
-        {
-            method: "GET",
-            params: filter,
-            signal
-        }
+        filter,
+        signal
     );
 }
 
-export async function getDentalRecordById(
+export function getDentalRecordById(
     patientId: string,
     dentalId: string,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiResponse<DentalRecordDetailSchema>>(
+    return getResource<ApiResponse<DentalRecordDetailSchema>>(
         API_ENDPOINTS.dental.get_dental_record(patientId, dentalId),
-        {
-            method: "GET",
-            signal
-        }
+        signal
     );
 }
 
-export async function updateDentalVisit(
+export function updateDentalVisit(
     patientId: string,
     dentalId: string,
     payload: UpdateDentalVisit,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiResponse<unknown>>(
+    return sendResource<ApiResponse<unknown>>(
+        "PATCH",
         API_ENDPOINTS.dental.update_dental_visit(patientId, dentalId),
-        {
-            method: "PATCH",
-            data: payload,
-            signal
-        }
+        payload,
+        signal
     );
 }
