@@ -7,7 +7,7 @@ export const getStaffById = async (
     staffId: string,
     signal?: AbortSignal
 ): Promise<StaffModel> => {
-    const { data: apiResponse } = await apiClient<ApiResponse<StaffModel[]>>(
+    const { data: apiResponse } = await apiClient<ApiResponse<StaffModel>>(
         API_ENDPOINTS.staff.getStaffById(staffId),
         {
             method: "GET",
@@ -15,9 +15,9 @@ export const getStaffById = async (
         }
     );
 
-    if (!apiResponse.data || apiResponse.data.length === 0 || !apiResponse) {
+    if (!apiResponse.data || !apiResponse) {
         throw new Error(`Staff not found for ${staffId}`);
     }
 
-    return new StaffModel(apiResponse.data[0]);
+    return new StaffModel(apiResponse.data);
 };
