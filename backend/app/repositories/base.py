@@ -21,6 +21,26 @@ class BaseRepository:
 
         return bool(response.data)
 
+    def update_by_column(
+        self,
+        table: str,
+        column: str,
+        value,
+        data: dict,
+    ):
+        response = (
+            self.supabase
+            .table(table)
+            .update(data)
+            .eq(column, value)
+            .execute()
+        )
+
+        if not response.data:
+            return None
+
+        return response.data[0]
+
     def fetch_one(self, table: str, select: str = "*", filters: dict | None = None):
         query = self.supabase.table(table).select(select)
 

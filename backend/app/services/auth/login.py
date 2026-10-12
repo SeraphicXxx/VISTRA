@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 
 from app.database.database_client import supabase
 from app.utils.email_utils import add_ucc_domain, staff_id_format
+from app.utils.service_helpers import ok
 import logging
 
 logger = logging.getLogger(__name__)
@@ -49,17 +50,16 @@ def login_user(request):
         else:
             role = getattr(app_metadata, "role", None)
 
-        return {
-            "success": True,
-            "user": {
+        return ok(
+            user={
                 "id": user.id,
                 "user_id": staff_id_format(user.email),
                 "email": user.email,
                 "role": role,
             },
-            "access_token": session.access_token,
-            "refresh_token": session.refresh_token,
-        }
+            access_token=session.access_token,
+            refresh_token=session.refresh_token,
+        )
 
     except HTTPException:
         raise

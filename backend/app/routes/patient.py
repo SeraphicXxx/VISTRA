@@ -3,12 +3,13 @@ from supabase import Client
 
 from app.config.security import get_current_user
 from app.database.database_client import get_supabase_for_user
-from app.schemas.patient import CreatePatientRequest
+from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
     get_patient_summary_record
 from app.services.patient import create_patient as create_patient_service
 from app.services.patient import delete_patient as delete_patient_service
+from app.services.patient import update_patient_profile as update_patient_profile_service
 
 protected_patient_router = APIRouter(
     prefix="/patients",
@@ -39,3 +40,11 @@ def profile_summary(patient_id: str ,supabase: Client = Depends(get_supabase_for
 @protected_patient_router.delete("/{patient_id}/")
 def delete_patient(patient_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return delete_patient_service(patient_id, supabase)
+
+@protected_patient_router.patch("/{patient_id}/")
+def update_patient_profile(
+    patient_id: str,
+    request: UpdatePatientProfileRequest,
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    return update_patient_profile_service(patient_id, request, supabase)

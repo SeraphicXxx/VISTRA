@@ -62,6 +62,13 @@ export interface PatientInfo {
     course?: string;
     department?: string;
     school_year?: string;
+    birthday?: string;
+    age?: number;
+    sex?: string;
+    civil_status?: string;
+    mobile_number?: string;
+    barangay?: string;
+    address?: string;
     appointment: PatientRecord[];
     medical: PatientRecord[];
     dental: PatientRecord[];

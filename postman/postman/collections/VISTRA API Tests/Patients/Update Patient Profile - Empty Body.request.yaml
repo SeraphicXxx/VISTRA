@@ -1,0 +1,31 @@
+$kind: http-request
+url: "{{base_url}}/patients/20230847-S/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Empty body returns 422\", function () {\r
+
+      \    pm.response.to.have.status(422);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Validation detail is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json).to.have.property(\"detail\");\r
+
+      \    });"
+    language: text/javascript
+order: 7910

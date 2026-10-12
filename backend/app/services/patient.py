@@ -3,7 +3,7 @@ from supabase import Client
 
 from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
-from app.schemas.patient import Patient, CreatePatientRequest
+from app.schemas.patient import Patient, CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient
 from app.services.auth.user import (
     compensate_auth_user,
@@ -99,6 +99,23 @@ def delete_patient(patient_id: str, supabase: Client):
     delete_auth_or_500("Patient", existing["id"])
 
     return ok(message="Patient deleted successfully")
+
+
+@handle_service_errors
+def update_patient_profile(
+    patient_id: str,
+    request: UpdatePatientProfileRequest,
+    supabase: Client,
+):
+    patient_repo = PatientRepository(supabase)
+    or_404(patient_repo.get_by_id(patient_id), "Patient not found")
+
+    updated = patient_repo.update_profile(
+        patient_id,
+        request.model_dump(mode="json", exclude_unset=True),
+    )
+
+    return ok(or_404(updated, "Patient profile not found"))
 
 
 @handle_service_errors

@@ -1,0 +1,35 @@
+$kind: http-request
+url: "{{base_url}}/patients/DOES-NOT-EXIST/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"barangay\": \"Commonwealth\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Missing patient returns 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Error detail is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json).to.have.property(\"detail\");\r
+
+      \    });"
+    language: text/javascript
+order: 7940

@@ -15,6 +15,10 @@ export interface MedicalRecordDetailSchema {
     status: string;
     course: string | null;
     staff_name: string | null;
+    visit_date: string | null;
+    complaint: string | null;
+    treatment: string | null;
+    treatment_type: string | null;
 }
 
 export interface CreateMedicalVisit {

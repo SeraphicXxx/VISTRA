@@ -18,11 +18,7 @@ import { formatDate } from "/@/utils/FormatDate";
 const USE_DUMMY_DATA =
   import.meta.env.VITE_USE_DUMMY_MEDICAL === "true";
 
-const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema & {
-  visit_date?: string | null;
-  complaint?: string | null;
-  treatment?: string | null;
-} = {
+const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
   medical_visit_id: "1042",
   patient_name: "Kenji Chua",
   status: "Cleared",
@@ -31,6 +27,7 @@ const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema & {
   visit_date: "2026-10-11",
   complaint: "Fever, headache since morning",
   treatment: "Paracetamol 500mg, rest advised",
+  treatment_type: "Medicine",
 };
 
 const consultationEditFields = [

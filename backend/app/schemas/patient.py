@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
@@ -98,6 +98,47 @@ class CreatePatientRequest(BaseModel):
     @field_validator("mobile_number")
     @classmethod
     def validate_mobile(cls, value: str) -> str:
+        return confirm_mobile_number(value)
+
+
+class UpdatePatientProfileRequest(BaseModel):
+    birthday: date | None = None
+    age: int | None = Field(default=None, ge=0, le=150)
+    sex: Sex | None = None
+    civil_status: CivilStatus | None = None
+    mobile_number: str | None = Field(default=None, min_length=10, max_length=15)
+    barangay: str | None = Field(default=None, min_length=1, max_length=100)
+    complete_address: str | None = Field(default=None, min_length=1, max_length=255)
+
+    @model_validator(mode="after")
+    def require_at_least_one_field(self):
+        if not self.model_dump(exclude_unset=True):
+            raise ValueError("At least one field must be provided")
+
+        return self
+
+    @field_validator("barangay", "complete_address")
+    @classmethod
+    def validate_not_blank(cls, value: str | None):
+        if value is None:
+            return value
+
+        return confirm_not_blank(value)
+
+    @field_validator("birthday")
+    @classmethod
+    def validate_birthday(cls, value: date | None):
+        if value is None:
+            return value
+
+        return confirm_birthday(value)
+
+    @field_validator("mobile_number")
+    @classmethod
+    def validate_mobile(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+
         return confirm_mobile_number(value)
 
 class PatientRecord(BaseModel):
