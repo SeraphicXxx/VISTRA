@@ -1,18 +1,15 @@
-import {apiClient} from "/@/api/axios_client";
 import { API_ENDPOINTS } from "/@/config/ApiConfig.js";
 import { StaffModel } from "/@/repository/StaffModel.js";
 import { ApiResponse } from "/@/api/schema/ApiResponseSchema"
+import {getResource} from "/@/api/resource";
 
 export const getStaffById = async (
     staffId: string,
     signal?: AbortSignal
 ): Promise<StaffModel> => {
-    const { data: apiResponse } = await apiClient<ApiResponse<StaffModel>>(
+    const { data: apiResponse } = await getResource<ApiResponse<StaffModel>>(
         API_ENDPOINTS.staff.getStaffById(staffId),
-        {
-            method: "GET",
-            signal,
-        }
+        signal,
     );
 
     if (!apiResponse.data || !apiResponse) {
