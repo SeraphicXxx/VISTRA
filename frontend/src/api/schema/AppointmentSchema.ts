@@ -31,3 +31,8 @@ export interface CreateAppointmentRequest {
     location?: string | null;
     notes?: string | null;
 }
+
+export interface UpdateAppointmentRequest {
+    status?: string;
+    decline_reason?: string | null;
+}

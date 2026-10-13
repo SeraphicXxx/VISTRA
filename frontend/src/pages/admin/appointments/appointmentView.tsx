@@ -3,7 +3,6 @@ import {
     CheckCircle2,
     XCircle,
     Hourglass,
-    RotateCcw,
     CalendarDays,
     Clock,
     ClipboardList,
@@ -11,10 +10,13 @@ import {
 } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
+import {useState} from "react";
 
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
-import {useAppointmentByIdQuery} from "/@/hooks/query/AppointmentQuery";
+import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
+import {getFieldErrors} from "/@/utils/Formatters";
+import {Modal} from "/@/components/editModal";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -144,9 +146,78 @@ export function AppointmentNotFound({
 }
 
 type interviewForm = {
-    status: AdminAppointmentStatus
     declined: boolean
     reason: string
+}
+
+function StatusConfirmModal({
+  action,
+  isSaving,
+  onClose,
+  onConfirm,
+}: {
+  action: { status: AdminAppointmentStatus; decline_reason?: string };
+  isSaving: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const isDecline = action.status === "declined";
+
+  return (
+    <Modal
+      title={isDecline ? "Decline appointment?" : "Confirm appointment?"}
+      onClose={onClose}
+      maxWidth="max-w-sm"
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSaving}
+            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isSaving}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 ${
+              isDecline ? "bg-danger hover:opacity-90" : "bg-primary hover:opacity-90"
+            }`}
+          >
+            {isSaving && (
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
+            )}
+            {isSaving
+              ? "Saving..."
+              : isDecline
+                ? "Confirm decline"
+                : "Confirm appointment"}
+          </button>
+        </>
+      }
+    >
+      <p className="text-sm text-textSecondary">
+        {isDecline
+          ? "The student will be notified that this appointment was declined."
+          : "The student will be notified that this appointment is confirmed."}
+      </p>
+
+      {action.decline_reason && (
+        <div className="mt-3 rounded-lg border border-border bg-surfaceMuted/40 p-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-textMuted">
+            Reason
+          </p>
+          <p className="text-sm text-textPrimary">{action.decline_reason}</p>
+        </div>
+      )}
+    </Modal>
+  );
 }
 
 export function AppointmentDetailSkeleton() {
@@ -203,10 +274,15 @@ export function AppointmentDetailSkeleton() {
 export default function AppointmentDetailView() {
     const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
     const { form, setField } = useForm<interviewForm>({
-        status: "pending",
         declined: false,
         reason: "",
     });
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [confirmAction, setConfirmAction] = useState<{
+        status: AdminAppointmentStatus;
+        decline_reason?: string;
+    } | null>(null);
+    const updateAppointmentMutation = useUpdateAppointment();
     if (!appointmentId || !patientId) {
         return (
             <AppointmentNotFound
@@ -220,6 +296,7 @@ export default function AppointmentDetailView() {
         data: appointmentDetails,
         isLoading,
         isError,
+        refetch,
     } = useAppointmentByIdQuery(
         patientId,
         appointmentId
@@ -239,27 +316,75 @@ export default function AppointmentDetailView() {
     }
     const appointment = toAppointmentPageFormat(appointmentDetails) as AppointmentUiModel;
 
+    const serverStatus: AdminAppointmentStatus =
+        appointment.status === "confirmed" || appointment.status === "declined"
+            ? appointment.status
+            : "pending";
 
+    const isDecided = serverStatus !== "pending";
 
-    const meta = STATUS_META[form.status];
+    const meta = STATUS_META[serverStatus];
 
     const handleBack = (): void => {
         window.history.back();
     };
 
-    const applyStatus = (
-        next: AdminAppointmentStatus
+    const persistStatus = (
+        status: AdminAppointmentStatus,
+        decline_reason?: string,
+        onDone: () => void = () => {}
     ): void => {
-        setField("status", next);
-        setField("declined", next === "declined");
+        if (!patientId || !appointmentId) return;
+
+        setSaveError(null);
+        updateAppointmentMutation.mutate(
+            {
+                patientId,
+                appointmentId,
+                payload: decline_reason ? { status, decline_reason } : { status },
+            },
+            {
+                onSuccess: () => {
+                    setField("declined", false);
+                    setField("reason", "");
+                    onDone();
+                    void refetch();
+                },
+                onError: (error) => {
+                    setSaveError(getFieldErrors(error));
+                },
+            }
+        );
     };
 
-
     const confirmDecline = (): void => {
-        applyStatus("declined");
+        const reason = form.reason.trim();
+        setConfirmAction({ status: "declined", decline_reason: reason || undefined });
     };
 
     return (
+        <>
+            {saveError && (
+                <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
+                    {saveError}
+                </div>
+            )}
+
+            {confirmAction && (
+                <StatusConfirmModal
+                    action={confirmAction}
+                    isSaving={updateAppointmentMutation.isPending}
+                    onClose={() => setConfirmAction(null)}
+                    onConfirm={() =>
+                        persistStatus(
+                            confirmAction.status,
+                            confirmAction.decline_reason,
+                            () => setConfirmAction(null)
+                        )
+                    }
+                />
+            )}
+
         <div className="mx-auto w-full">
 
             <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
@@ -432,7 +557,14 @@ export default function AppointmentDetailView() {
 
                         {/* Decline reason */}
 
-                        {form.declined ? (
+                        {isDecided ? (
+
+                            <div className="rounded-xl border border-border bg-surfaceMuted/40 px-4 py-3 text-xs text-textMuted">
+                                This appointment has been {serverStatus}. Status
+                                can no longer be changed.
+                            </div>
+
+                        ) : form.declined ? (
 
                             <div className="rounded-xl border border-danger/25 bg-danger/5 p-4">
 
@@ -463,10 +595,11 @@ export default function AppointmentDetailView() {
                                     <button
                                         type="button"
                                         onClick={confirmDecline}
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         <XCircle className="h-3.5 w-3.5"/>
-                                        Confirm decline
+                                        {updateAppointmentMutation.isPending ? "Saving..." : "Confirm decline"}
                                     </button>
 
 
@@ -476,7 +609,8 @@ export default function AppointmentDetailView() {
                                             setField("declined", false);
                                             setField("reason", "");
                                         }}
-                                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         Cancel
                                     </button>
@@ -491,17 +625,18 @@ export default function AppointmentDetailView() {
 
                                 {/* Confirm */}
 
-                                {form.status !== "confirmed" && (
+                                {serverStatus !== "confirmed" && (
 
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            applyStatus("confirmed")
+                                            setConfirmAction({ status: "confirmed" })
                                         }
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         <CheckCircle2 className="h-3.5 w-3.5"/>
-                                        Confirm appointment
+                                        {updateAppointmentMutation.isPending ? "Saving..." : "Confirm appointment"}
                                     </button>
 
                                 )}
@@ -509,35 +644,18 @@ export default function AppointmentDetailView() {
 
                                 {/* Decline */}
 
-                                {form.status !== "declined" && (
+                                {serverStatus !== "declined" && (
 
                                     <button
                                         type="button"
                                         onClick={() =>
                                             setField("declined", true)
                                         }
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         <XCircle className="h-3.5 w-3.5"/>
                                         Decline
-                                    </button>
-
-                                )}
-
-
-                                {/* Reset */}
-
-                                {form.status !== "pending" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            applyStatus("pending")
-                                        }
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
-                                    >
-                                        <RotateCcw className="h-3.5 w-3.5"/>
-                                        Reset to pending
                                     </button>
 
                                 )}
@@ -553,5 +671,6 @@ export default function AppointmentDetailView() {
             </div>
 
         </div>
+        </>
     );
 }

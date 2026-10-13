@@ -34,6 +34,7 @@ class CreateAppointmentRequest(BaseModel):
 EDITABLE_APPOINTMENT_COLUMNS = frozenset({
     "status",
     "decline_reason",
+    "staff_id",
 })
 
 

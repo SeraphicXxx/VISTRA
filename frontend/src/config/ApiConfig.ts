@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
         create_appointment: "/appointments/",
         get_appointment: "/appointments/",
         get_appointment_by_id: (patient_id: string, appointment_id: string) => `/appointments/${patient_id}/${appointment_id}`,
+        update_appointment: (patient_id: string, appointment_id: string) => `/appointments/${patient_id}/${appointment_id}/`,
     },
     dental: {
         create_dental_visit: "/dental/",

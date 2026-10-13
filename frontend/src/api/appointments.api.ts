@@ -1,6 +1,6 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {AppointmentSchema, CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
+import {AppointmentSchema, CreateAppointmentRequest, UpdateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {getResource, listResource, sendResource} from "/@/api/resource";
 
@@ -34,6 +34,20 @@ export function getAppointmentById(
 ){
     return getResource<ApiResponse<AppointmentSchema>>(
         API_ENDPOINTS.appointment.get_appointment_by_id(patientId, appointmentId),
+        signal
+    );
+}
+
+export function updateAppointment(
+    patientId: string,
+    appointmentId: string,
+    payload: UpdateAppointmentRequest,
+    signal?: AbortSignal
+){
+    return sendResource<ApiResponse<AppointmentSchema>>(
+        "PATCH",
+        API_ENDPOINTS.appointment.update_appointment(patientId, appointmentId),
+        payload,
         signal
     );
 }
