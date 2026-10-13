@@ -112,6 +112,7 @@ export const sessionManager = {
 
     logout(): void {
         this.remove(SESSION_KEYS.ACCESS_TOKEN);
+        this.remove(SESSION_KEYS.REFRESH_TOKEN);
         this.remove(SESSION_KEYS.USER);
     },
 };
