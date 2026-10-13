@@ -11,6 +11,7 @@ export class StaffModel {
     phone: string | null;
     email: string;
     created_at: string;
+    is_active: boolean;
 
     constructor(data: StaffData) {
         this.id = data.id;
@@ -23,6 +24,7 @@ export class StaffModel {
         this.phone = data.phone;
         this.email = data.email;
         this.created_at = data.created_at;
+        this.is_active = data.is_active;
     }
 
     getDisplayName(): string {

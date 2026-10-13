@@ -8,9 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def mark_staff_active(email: str) -> None:
-    """Flip STAFF.is_active on staff login. Best-effort: presence
-    tracking must never fail authentication."""
+def set_staff_active(email: str, active: bool) -> None:
+    """Set STAFF.is_active from the login duty choice. Best-effort:
+    presence tracking must never fail authentication."""
     try:
         from app.database.database_client import supabase_admin
 
@@ -18,7 +18,7 @@ def mark_staff_active(email: str) -> None:
             return
 
         supabase_admin.table("STAFF").update(
-            {"is_active": True}
+            {"is_active": active}
         ).eq(
             "staff_id", staff_id_format(email)
         ).execute()
@@ -68,8 +68,9 @@ def login_user(request):
         else:
             role = getattr(app_metadata, "role", None)
 
-        if role == "staff":
-            mark_staff_active(user.email)
+        if role == "staff" and request.on_duty:
+            # Only the cron job may flip the flag back to false.
+            set_staff_active(user.email, True)
 
         return ok(
             user={

@@ -10,9 +10,19 @@ import { Calendar, FileText, ShieldCheck, User } from "lucide-react";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { Logo } from "/@/components/Logo.jsx";
 import { useLogin, useLoginForm } from "/@/hooks/UseLogin.js";
+import type { LoginRequest } from "/@/api/schema/AuthSchema";
 import { useNavigate } from "react-router-dom";
 import { FormInput, PasswordInput } from "/@/components/InputCollection";
 import { LoginButton } from "/@/components/Button";
+import { Modal } from "/@/components/editModal";
+import { getStaffById } from "/@/api/staff.api";
+
+function toStaffId(identifier: string): string {
+  return identifier
+    .trim()
+    .replace(/@ucc\.com$/i, "")
+    .toUpperCase();
+}
 import {
   AdminAnimStyles,
   HeartbeatLine,
@@ -48,10 +58,7 @@ function greeting() {
 }
 
 interface LoginFormProps {
-  credentials: {
-    email: string;
-    password: string;
-  };
+  credentials: LoginRequest;
   validationErrors: {
     email?: string;
     password?: string;
@@ -111,7 +118,7 @@ export function LoginForm({
           name="email"
           type="text"
           autoComplete="username"
-          value={credentials.email}
+          value={credentials.email ?? ""}
           onChange={onChange}
           placeholder="e.g. UCC-2481"
           error={validationErrors.email}
@@ -315,16 +322,38 @@ export default function AdminLoginPage() {
     useLoginForm();
 
   const { login, isLoading, isError, error } = useLogin();
+  const [isDutyModalOpen, setIsDutyModalOpen] = useState(false);
+
+  const doLogin = async (on_duty: boolean) => {
+    try {
+      await login({ ...credentials, on_duty });
+      setIsDutyModalOpen(false);
+      navigate(ROUTES.staff.dashboard.overview);
+    } catch {}
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validate()) return;
 
+    // Staff already on duty skip the prompt entirely; only the
+    // 5pm cronjob can flip the flag back to false.
     try {
-      await login(credentials);
-      navigate(ROUTES.staff.dashboard.overview);
-    } catch {}
+      const staffId = toStaffId(
+        credentials.identifier ?? credentials.email ?? ""
+      );
+      const { data } = await getStaffById(staffId);
+
+      if (data.data?.is_active) {
+        await doLogin(true);
+        return;
+      }
+    } catch {
+      // Unknown staff or lookup failure: fall through to the modal.
+    }
+
+    setIsDutyModalOpen(true);
   };
 
   return (
@@ -338,6 +367,40 @@ export default function AdminLoginPage() {
         onChange={handleChange}
         onSubmit={handleSubmit}
       />
+
+      {isDutyModalOpen && (
+        <Modal
+          title="Are you on duty?"
+          onClose={() => !isLoading && setIsDutyModalOpen(false)}
+          maxWidth="max-w-sm"
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => doLogin(false)}
+                disabled={isLoading}
+                className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Not on duty
+              </button>
+
+              <button
+                type="button"
+                onClick={() => doLogin(true)}
+                disabled={isLoading}
+                className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoading ? "Signing in..." : "Yes, on duty"}
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-textSecondary">
+            Your active status will be shown to the clinic while you are
+            signed in, and it will remain until 5pm.
+          </p>
+        </Modal>
+      )}
     </AdminLoginLayout>
   );
 }

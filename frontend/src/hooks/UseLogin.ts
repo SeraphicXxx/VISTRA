@@ -24,6 +24,7 @@ export function useLogin() {
             const {data} = await login({
                 identifier: credentials.identifier ?? credentials.email,
                 password: credentials.password,
+                on_duty: credentials.on_duty ?? false,
             });
 
             return data;

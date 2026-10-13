@@ -7,6 +7,7 @@ class LoginRequest(BaseModel):
     patient_id: str | None = None
     staff_id: str | None = None
     password: str
+    on_duty: bool = False
 
     @model_validator(mode="after")
     def check_identifier(self):

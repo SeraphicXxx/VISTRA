@@ -5,6 +5,7 @@ import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {LogOut, Menu, X, UserRound, ChevronRight} from "lucide-react";
 
 import {useSidebar} from "/@/hooks/UseSidebar";
+import {useStaffInfo} from "/@/hooks/StaffInfo";
 
 import {sessionManager} from "/@/utils/SessionManager";
 
@@ -166,6 +167,8 @@ function NavSection({
 
 function UserCard({onSignOut}: { onSignOut: () => void }) {
     const user = sessionManager.getUser();
+    const {staffData} = useStaffInfo(user?.user_id ?? "");
+    const onDuty = staffData?.is_active ?? false;
 
     return (
         <div className="mt-auto pt-6 mb-2">
@@ -182,9 +185,9 @@ function UserCard({onSignOut}: { onSignOut: () => void }) {
                         </p>
 
                         <div className="mt-1.5 flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-success"/>
+                            <span className={`h-1.5 w-1.5 rounded-full ${onDuty ? "bg-success" : "bg-danger"}`}/>
                             <span className="text-[11px] font-medium text-text/60">
-                Available
+                {onDuty ? "On Duty" : "Off Duty"}
               </span>
                         </div>
                     </div>

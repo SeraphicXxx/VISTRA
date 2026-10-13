@@ -6,6 +6,7 @@ export interface LoginRequest {
     patient_id?: string;
     staff_id?: string;
     password: string;
+    on_duty?: boolean;
 }
 
 export interface LoginStaffResponse {
