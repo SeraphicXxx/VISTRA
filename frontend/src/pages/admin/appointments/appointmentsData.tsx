@@ -1,7 +1,6 @@
 import {StatusBadge} from "/@/components/StatusBadge";
 import {AppointmentStatus, appointmentStatuses} from "/@/types/Appointment";
-import {Column, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
-import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
+import {Column, StudentCell, courseFilterOptions, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
 import React from "react";
 
 export const APPOINTMENTS: AppointmentTableFormat[] = [
@@ -169,38 +168,13 @@ export const AppointmentsColumns: Column<AppointmentTableFormat>[] = [
     {
         key: "student",
         label: "Student",
-        render: (value) => {
-            const student = value as string;
-
-            return (
-                <div className="flex items-center gap-2.5">
-          <span
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(student)}`}
-          >
-      {getInitials(student)}
-      </span>
-
-                    <span className="text-sm font-medium text-textPrimary">
-          {student}
-          </span>
-                </div>
-            );
-        },
+        render: (value) => <StudentCell name={value as string} />,
     },
     {
         key: "course",
         label: "Course",
         filterType: "select",
-        options: optionsFromValues([
-            "BS Computer Science",
-            "BS Business Administration",
-            "BS Psychology",
-            "BS Nursing",
-            "BS Information Technology",
-            "BS Education",
-            "BS Accountancy",
-
-        ]),
+        options: courseFilterOptions,
     },
     {
         key: "time",

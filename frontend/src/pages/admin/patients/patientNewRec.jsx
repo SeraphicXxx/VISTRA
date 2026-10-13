@@ -24,6 +24,27 @@ import {
 import { useSavePatient } from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 
+const ID_FIELDS = {
+  student: {
+    label: "Student ID",
+    placeholder: "20230786-S",
+    pattern: STUDENT_ID_PATTERN,
+    validate: validateStudentId,
+  },
+  faculty: {
+    label: "Faculty ID",
+    placeholder: "F-2023-045",
+    pattern: FACULTY_ID_PATTERN,
+    validate: validateFacultyId,
+  },
+  staff: {
+    label: "Admin ID",
+    placeholder: "A-2023-045",
+    pattern: ADMIN_ID_PATTERN,
+    validate: validateAdminId,
+  },
+};
+
 export default function NewPatientRecordForm() {
   const {
     mutateAsync: savePatient,
@@ -33,27 +54,23 @@ export default function NewPatientRecordForm() {
 
   const saveErrorMessage = getFieldErrors(saveError);
   const [classification, setClassification] = useState("student");
-  const [studentIdError, setStudentIdError] = useState("");
-  const [facultyIdError, setFacultyIdError] = useState("");
-  const [adminIdError, setAdminIdError] = useState("");
+  const [idError, setIdError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleClassificationChange = (value) => {
+    setClassification(value);
+    setIdError("");
+  };
+
+  const handleIdBlur = (e) => {
+    const field = ID_FIELDS[classification] ?? ID_FIELDS.student;
+    setIdError(field.validate(e.target.value));
+  };
 
   const handleBack = () => {
     if (typeof window !== "undefined") {
       window.history.back();
     }
-  };
-
-  const handleStudentIdBlur = (e) => {
-    setStudentIdError(validateStudentId(e.target.value));
-  };
-
-  const handleFacultyIdBlur = (e) => {
-    setFacultyIdError(validateFacultyId(e.target.value));
-  };
-
-  const handleAdminIdBlur = (e) => {
-    setAdminIdError(validateAdminId(e.target.value));
   };
 
   const handleSubmit = async (e) => {
@@ -74,6 +91,7 @@ export default function NewPatientRecordForm() {
   const isStudent = classification === "student";
   const isFaculty = classification === "faculty";
   const isAdmin = classification === "staff";
+  const idField = ID_FIELDS[classification] ?? ID_FIELDS.student;
 
   return (
       <form
@@ -104,7 +122,7 @@ export default function NewPatientRecordForm() {
         <div className="mb-6">
           <ClassificationToggle
               value={classification}
-              onChange={setClassification}
+              onChange={handleClassificationChange}
           />
         </div>
 
@@ -129,65 +147,23 @@ export default function NewPatientRecordForm() {
             />
           </div>
 
-          {/* Student ID */}
-          {isStudent && (
-              <FormInput
-                  id="studentId"
-                  name="patient_id"
-                  label="Student ID"
-                  type="text"
-                  placeholder="20230786-S"
-                  pattern={STUDENT_ID_PATTERN}
-                  required
-                  error={studentIdError}
-                  onBlur={handleStudentIdBlur}
-                  onChange={() => {
-                    if (studentIdError) {
-                      setStudentIdError("");
-                    }
-                  }}
-              />
-          )}
-
-          {/* Faculty ID */}
-          {isFaculty && (
-              <FormInput
-                  id="facultyId"
-                  name="patient_id"
-                  label="Faculty ID"
-                  type="text"
-                  placeholder="F-2023-045"
-                  pattern={FACULTY_ID_PATTERN}
-                  required
-                  error={facultyIdError}
-                  onBlur={handleFacultyIdBlur}
-                  onChange={() => {
-                    if (facultyIdError) {
-                      setFacultyIdError("");
-                    }
-                  }}
-              />
-          )}
-
-          {/* Admin ID */}
-          {isAdmin && (
-              <FormInput
-                  id="adminId"
-                  name="patient_id"
-                  label="Admin ID"
-                  type="text"
-                  placeholder="A-2023-045"
-                  pattern={ADMIN_ID_PATTERN}
-                  required
-                  error={adminIdError}
-                  onBlur={handleAdminIdBlur}
-                  onChange={() => {
-                    if (adminIdError) {
-                      setAdminIdError("");
-                    }
-                  }}
-              />
-          )}
+          {/* Classification ID */}
+          <FormInput
+              id="patientId"
+              name="patient_id"
+              label={idField.label}
+              type="text"
+              placeholder={idField.placeholder}
+              pattern={idField.pattern}
+              required
+              error={idError}
+              onBlur={handleIdBlur}
+              onChange={() => {
+                if (idError) {
+                  setIdError("");
+                }
+              }}
+          />
 
           <FormInput
               id="birthday"
@@ -209,7 +185,7 @@ export default function NewPatientRecordForm() {
           />
 
           {/* Password */}
-          <div>
+          <div className="relative">
             <FormInput
                 id="password"
                 name="password"

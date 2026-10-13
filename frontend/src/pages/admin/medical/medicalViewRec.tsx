@@ -9,6 +9,7 @@ import { useMedicalVisitDetail, useUpdateMedicalVisit } from "/@/hooks/query/Med
 import type { MedicalRecordDetailSchema, UpdateMedicalVisit } from "/@/api/schema/MedicalSchema";
 import { formatDate } from "/@/utils/FormatDate";
 import { getFieldErrors } from "/@/utils/Formatters";
+import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 
 /*
  * Dummy-data toggle: set VITE_USE_DUMMY_MEDICAL=true in
@@ -287,11 +288,7 @@ export default function PatientRecordView() {
 
   return (
     <>
-      {saveError && (
-        <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
-          {saveError}
-        </div>
-      )}
+      <SaveErrorBanner message={saveError} />
 
       <div className="mx-auto w-full">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">

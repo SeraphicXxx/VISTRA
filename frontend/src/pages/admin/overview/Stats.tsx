@@ -1,8 +1,9 @@
+import {useMemo} from "react";
 import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/utils/statsCard";
 
 
  function WeeklyAppointments() {
-  const maxValue = Math.max(...weeklyData.map((item) => item.value));
+  const maxValue = Math.max(1, ...weeklyData.map((item) => item.value));
 
   return (
     <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
@@ -34,11 +35,9 @@ import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/ut
 
               <div className="flex h-full w-full items-end">
                 <div
-                  className="w-full rounded-t-lg bg-primary/15 transition-all duration-300 hover:bg-primary/25"
+                  className="w-full rounded-t-lg bg-primary/70 transition-all duration-300"
                   style={{ height }}
-                >
-                  <div className="h-full w-full rounded-t-lg bg-primary/70" />
-                </div>
+                />
               </div>
 
               <span className="text-[11px] font-medium text-textMuted">
@@ -57,7 +56,18 @@ function VisitOverview() {
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
 
-  let offset = 0;
+  const segments = useMemo(() => {
+    let offset = 0;
+
+    return visitData.map((item) => {
+      const dash = total > 0 ? (item.value / total) * circumference : 0;
+      const currentOffset = offset;
+
+      offset += dash;
+
+      return { item, dash, currentOffset };
+    });
+  }, [circumference, total]);
 
   return (
     <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
@@ -90,28 +100,20 @@ function VisitOverview() {
               className="text-background"
             />
 
-            {visitData.map((item) => {
-              const percentage = item.value / total;
-              const dash = percentage * circumference;
-              const currentOffset = offset;
-
-              offset += dash;
-
-              return (
-                <circle
-                  key={item.label}
-                  cx="60"
-                  cy="60"
-                  r={radius}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="18"
-                  strokeDasharray={`${dash} ${circumference - dash}`}
-                  strokeDashoffset={-currentOffset}
-                  className={item.color.replace("bg-", "text-")}
-                />
-              );
-            })}
+            {segments.map(({ item, dash, currentOffset }) => (
+              <circle
+                key={item.label}
+                cx="60"
+                cy="60"
+                r={radius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="18"
+                strokeDasharray={`${dash} ${circumference - dash}`}
+                strokeDashoffset={-currentOffset}
+                className={item.color.replace("bg-", "text-")}
+              />
+            ))}
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">

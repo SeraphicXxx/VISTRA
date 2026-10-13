@@ -1,8 +1,6 @@
 import {Status, StatusBadge} from "/@/components/StatusBadge";
 
-import {Column} from "/@/components/table/Table";
-
-import {avatarColor, getInitials} from "/@/components/avatar";
+import {Column, StudentCell, courseFilterOptions} from "/@/components/table/Table";
 
 export const dentalRecords: DentalData[] = [
 
@@ -76,44 +74,14 @@ export const DentalColumns: Column<DentalData>[] = [
     {
         key: "student",
         label: "Student",
-        render: (value) => {
-
-            const student = value as string;
-
-            return (
-
-                <div className="flex items-center gap-2.5">
-
-                    <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(student)}`}
-                    >
-                        {getInitials(student)}
-                    </span>
-
-                    <span className="text-sm font-medium text-textPrimary">
-                        {student}
-                    </span>
-
-                </div>
-
-            );
-
-        },
+        render: (value) => <StudentCell name={value as string} />,
     },
 
     {
         key: "course",
         label: "Course",
         filterType: "select",
-        options: [
-            "BS Computer Science",
-            "BS Business Administration",
-            "BS Psychology",
-            "BS Nursing",
-            "BS Information Technology",
-            "BS Education",
-            "BS Accountancy",
-        ],
+        options: courseFilterOptions,
     },
 
     {

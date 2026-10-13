@@ -1,4 +1,4 @@
-import React, {useMemo} from "react";
+import {useMemo, type ComponentType, type ReactNode} from "react";
 import {FileText, Stethoscope, Calendar} from "lucide-react";
 import StatsGrid from "./Stats";
 import {AppointmentTableFormat} from "/@/pages/admin/appointments/appointmentsData";
@@ -38,7 +38,23 @@ function RecentBadge({count}: { count: number }) {
     );
 }
 
-function ConsultationCard({entry}: { entry: ConsultationEntry }) {
+interface VisitCardEntry {
+    id: string;
+    student: string;
+    type: string;
+    time: string;
+    status: Status;
+}
+
+function VisitCard({
+    entry,
+    icon: Icon,
+    meta,
+}: {
+    entry: VisitCardEntry;
+    icon: ComponentType<{ className?: string; strokeWidth?: number | string }>;
+    meta?: ReactNode;
+}) {
     return (
         <>
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -48,7 +64,7 @@ function ConsultationCard({entry}: { entry: ConsultationEntry }) {
                             {entry.student}
                         </p>
 
-                        <DepartmentBadge department={entry.department}/>
+                        {meta}
                     </div>
 
                     <p className="mt-0.5 break-words text-xs text-textMuted">
@@ -62,10 +78,36 @@ function ConsultationCard({entry}: { entry: ConsultationEntry }) {
             </div>
 
             <div className="mt-2 flex items-center gap-1.5 text-xs text-primary">
-                <FileText className="h-3.5 w-3.5" strokeWidth={2}/>
+                <Icon className="h-3.5 w-3.5" strokeWidth={2}/>
                 {statusLabels[entry.status] ?? entry.status}
             </div>
         </>
+    );
+}
+
+function VisitEmptyState({
+    icon: Icon,
+    title,
+    hint,
+}: {
+    icon: ComponentType<{ className?: string; strokeWidth?: number | string }>;
+    title: string;
+    hint: string;
+}) {
+    return (
+        <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" strokeWidth={2}/>
+            </span>
+
+            <p className="text-sm font-medium text-textPrimary">
+                {title}
+            </p>
+
+            <p className="text-xs text-textMuted">
+                {hint}
+            </p>
+        </div>
     );
 }
 
@@ -74,21 +116,19 @@ function ConsultationsList({entries}: { entries: ConsultationEntry[] }) {
         <CardList
             items={entries}
             keyExtractor={(entry) => entry.id}
-            renderItem={(entry) => <ConsultationCard entry={entry}/>}
+            renderItem={(entry) => (
+                <VisitCard
+                    entry={entry}
+                    icon={FileText}
+                    meta={<DepartmentBadge department={entry.department}/>}
+                />
+            )}
             emptyState={
-                <div className="flex flex-col items-center gap-2 py-10 text-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Stethoscope className="h-5 w-5" strokeWidth={2}/>
-                    </span>
-
-                    <p className="text-sm font-medium text-textPrimary">
-                        No consultations yet
-                    </p>
-
-                    <p className="text-xs text-textMuted">
-                        Walk-ins and clinic visits will show up here as they're checked in.
-                    </p>
-                </div>
+                <VisitEmptyState
+                    icon={Stethoscope}
+                    title="No consultations yet"
+                    hint="Walk-ins and clinic visits will show up here as they're checked in."
+                />
             }
         />
     );
@@ -141,7 +181,7 @@ function ConsultationPanel({medical, dental, loading, isError, onRetry}: {
             ...dental.items.map(mapDentalToOverview),
         ];
         return merged
-            .sort((a, b) => +new Date(b.visitDate) - +new Date(a.visitDate))
+            .sort((a, b) => (new Date(b.visitDate).getTime() || 0) - (new Date(a.visitDate).getTime() || 0))
             .slice(0, 8);
     }, [medical, dental]);
 
@@ -167,55 +207,18 @@ function ConsultationPanel({medical, dental, loading, isError, onRetry}: {
     );
 }
 
-function AppointmentCard({entry}: { entry: AppointmentTableFormat }) {
-    return (
-        <>
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <p className="truncate text-sm font-medium text-textPrimary">
-                            {entry.student}
-                        </p>
-                    </div>
-
-                    <p className="mt-0.5 break-words text-xs text-textMuted">
-                        {entry.type}
-                    </p>
-                </div>
-
-                <span className="shrink-0 whitespace-nowrap text-xs font-medium text-textSecondary">
-                    {entry.time}
-                </span>
-            </div>
-
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-primary">
-                <Calendar className="h-3.5 w-3.5" strokeWidth={2}/>
-                {statusLabels[entry.status] ?? entry.status}
-            </div>
-        </>
-    );
-}
-
 function AppointmentsList({entries}: { entries: AppointmentTableFormat[] }) {
     return (
         <CardList
             items={entries}
             keyExtractor={(entry) => entry.id}
-            renderItem={(entry) => <AppointmentCard entry={entry}/>}
+            renderItem={(entry) => <VisitCard entry={entry} icon={Calendar}/>}
             emptyState={
-                <div className="flex flex-col items-center gap-2 py-10 text-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Calendar className="h-5 w-5" strokeWidth={2}/>
-                    </span>
-
-                    <p className="text-sm font-medium text-textPrimary">
-                        No appointments yet
-                    </p>
-
-                    <p className="text-xs text-textMuted">
-                        Booked and walk-in appointments will show up here.
-                    </p>
-                </div>
+                <VisitEmptyState
+                    icon={Calendar}
+                    title="No appointments yet"
+                    hint="Booked and walk-in appointments will show up here."
+                />
             }
         />
     );

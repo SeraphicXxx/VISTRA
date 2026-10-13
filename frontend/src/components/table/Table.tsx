@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { avatarColor, getInitials } from "/@/components/avatar";
+
 export interface ColumnFilterOption {
     value: string;
     label: string;
@@ -16,6 +18,32 @@ export function optionsFromMap<T extends Record<string, string>>(
         value,
         label,
     }));
+}
+
+export const courseFilterOptions: ColumnFilterOption[] = optionsFromValues([
+    "BS Computer Science",
+    "BS Business Administration",
+    "BS Psychology",
+    "BS Nursing",
+    "BS Information Technology",
+    "BS Education",
+    "BS Accountancy",
+]);
+
+export function StudentCell({ name }: { name: string }) {
+    return (
+        <div className="flex items-center gap-2.5">
+            <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(name)}`}
+            >
+                {getInitials(name)}
+            </span>
+
+            <span className="text-sm font-medium text-textPrimary">
+                {name}
+            </span>
+        </div>
+    );
 }
 
 export type ColumnType = "select" | "date";

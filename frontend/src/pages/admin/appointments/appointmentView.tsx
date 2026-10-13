@@ -16,6 +16,8 @@ import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
 import {getFieldErrors} from "/@/utils/Formatters";
+import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
+import {getInitials} from "/@/utils/RecordInfo";
 import {Modal} from "/@/components/editModal";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
@@ -70,16 +72,6 @@ const STATUS_META: Record<AdminAppointmentStatus, StatusMeta> = {
         dot: "bg-danger",
     },
 };
-
-function getInitials(name: string = ""): string {
-    return name
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase();
-}
 
 function InfoField({
                        icon: Icon,
@@ -369,11 +361,7 @@ export default function AppointmentDetailView() {
 
     return (
         <>
-            {saveError && (
-                <div className="fixed inset-x-0 top-4 z-[60] mx-auto w-fit max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2 text-xs font-medium text-danger shadow-lg">
-                    {saveError}
-                </div>
-            )}
+            <SaveErrorBanner message={saveError} />
 
             {confirmAction && (
                 <StatusConfirmModal
@@ -628,42 +616,29 @@ export default function AppointmentDetailView() {
 
                             <div className="flex flex-wrap gap-2">
 
-                                {/* Confirm */}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setConfirmAction({ status: "confirmed" })
+                                    }
+                                    disabled={updateAppointmentMutation.isPending}
+                                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <CheckCircle2 className="h-3.5 w-3.5"/>
+                                    {updateAppointmentMutation.isPending ? "Saving..." : "Confirm appointment"}
+                                </button>
 
-                                {effectiveStatus !== "confirmed" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setConfirmAction({ status: "confirmed" })
-                                        }
-                                        disabled={updateAppointmentMutation.isPending}
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                                    >
-                                        <CheckCircle2 className="h-3.5 w-3.5"/>
-                                        {updateAppointmentMutation.isPending ? "Saving..." : "Confirm appointment"}
-                                    </button>
-
-                                )}
-
-
-                                {/* Decline */}
-
-                                {effectiveStatus !== "declined" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setField("declined", true)
-                                        }
-                                        disabled={updateAppointmentMutation.isPending}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-60"
-                                    >
-                                        <XCircle className="h-3.5 w-3.5"/>
-                                        Decline
-                                    </button>
-
-                                )}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setField("declined", true)
+                                    }
+                                    disabled={updateAppointmentMutation.isPending}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <XCircle className="h-3.5 w-3.5"/>
+                                    Decline
+                                </button>
 
                             </div>
 

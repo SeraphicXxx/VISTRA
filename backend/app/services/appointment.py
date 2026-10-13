@@ -2,7 +2,7 @@ from supabase import Client
 
 from app.config.security import require_user_email
 from app.repositories.appointment_repositories import AppointmentRepository
-from app.schemas.appointments import Appointments, CreateAppointmentRequest, UpdateAppointmentRequest
+from app.schemas.appointments import CreateAppointmentRequest, UpdateAppointmentRequest
 from app.schemas.query import FilterAppointment
 from app.schemas.user import CurrentUser
 from app.utils.email_utils import staff_id_format
