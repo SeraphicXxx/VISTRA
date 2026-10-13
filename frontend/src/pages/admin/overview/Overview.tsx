@@ -1,6 +1,6 @@
 import {useMemo, type ComponentType, type ReactNode} from "react";
 import {FileText, Stethoscope, Calendar} from "lucide-react";
-import StatsGrid from "./Stats";
+import StatsGrid, {StatsGridSkeleton} from "./Stats";
 import {AppointmentTableFormat} from "/@/pages/admin/appointments/appointmentsData";
 import PanelHeader from "/@/components/OverviewHeader.jsx";
 import {
@@ -9,7 +9,8 @@ import {
 import {Status, statusLabels} from "/@/components/StatusBadge";
 import {CardList} from "/@/components/CardList";
 import {CountUp} from "/@/components/adminanim.jsx";
-import {useOverviewData} from "/@/hooks/query/OverviewQuery";
+import {useOverviewData, useOverviewStats} from "/@/hooks/query/OverviewQuery";
+import type {StatData} from "/@/utils/statsCard";
 import {
     mapAppointmentToTable,
     mapDentalToOverview,
@@ -257,14 +258,49 @@ function AppointmentsPanel({appointments, loading, isError, onRetry}: {
     );
 }
 
+function deltaString(today: number, yesterday: number): string | undefined {
+    const diff = today - yesterday;
+
+    if (diff === 0) return undefined;
+
+    return `${diff > 0 ? "+" : ""}${diff} vs yesterday`;
+}
+
 export default function OverviewTab() {
     const {data, isLoading, isFetching, isError, refetch} = useOverviewData(APPOINTMENT_LIMIT, 8);
     const loading = isLoading || (isFetching && !data);
     const retry = () => refetch();
+    const {data: statsRow, isLoading: statsLoading} = useOverviewStats();
+
+    const stats: StatData[] = statsRow ? [
+        {
+            id: "today",
+            value: statsRow.appointments_today,
+            delta: deltaString(statsRow.appointments_today, statsRow.appointments_yesterday),
+        },
+        { id: "consultations", value: statsRow.in_consultation },
+        { id: "records", value: statsRow.records_today },
+        { id: "activity", value: statsRow.active_staff },
+    ] : [];
+
+    const visitMix = statsRow ? [
+        { label: "Medical", value: statsRow.visit_mix.medical, color: "bg-primary" },
+        { label: "Dental", value: statsRow.visit_mix.dental, color: "bg-primaryDark" },
+        { label: "OJT", value: statsRow.visit_mix.ojt, color: "bg-height" },
+        { label: "Other", value: statsRow.visit_mix.other, color: "bg-weight" },
+    ] : undefined;
 
     return (
         <>
-            <StatsGrid stats={[]}/>
+            {statsLoading && !statsRow ? (
+                <StatsGridSkeleton />
+            ) : (
+                <StatsGrid
+                    stats={stats}
+                    weekly={statsRow?.weekly_appointments}
+                    visitMix={visitMix}
+                />
+            )}
             <div className="reveal-group mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <ConsultationPanel medical={data?.medical} dental={data?.dental} loading={loading} isError={isError} onRetry={retry}/>
                 <AppointmentsPanel appointments={data?.appointments} loading={loading} isError={isError} onRetry={retry}/>

@@ -8,6 +8,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def mark_staff_active(email: str) -> None:
+    """Flip STAFF.is_active on staff login. Best-effort: presence
+    tracking must never fail authentication."""
+    try:
+        from app.database.database_client import supabase_admin
+
+        if supabase_admin is None:
+            return
+
+        supabase_admin.table("STAFF").update(
+            {"is_active": True}
+        ).eq(
+            "staff_id", staff_id_format(email)
+        ).execute()
+    except Exception as e:
+        logger.warning("Staff presence update failed: %s", e)
+
+
 def _resolve_identifier(request) -> str:
     raw = (
         getattr(request, "identifier", None)
@@ -49,6 +67,9 @@ def login_user(request):
             role = app_metadata.get("role")
         else:
             role = getattr(app_metadata, "role", None)
+
+        if role == "staff":
+            mark_staff_active(user.email)
 
         return ok(
             user={

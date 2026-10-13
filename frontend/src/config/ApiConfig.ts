@@ -47,5 +47,8 @@ export const API_ENDPOINTS = {
         get_medical_visit: `${API_V1}/medical/`,
         get_medical_record: (patientId: string, medicalId: string) => `${API_V1}/medical/${patientId}/${medicalId}`,
         update_medical_visit: (patientId: string, medicalId: string) => `${API_V1}/medical/${patientId}/${medicalId}/`,
+    },
+    overview: {
+        get_stats: `${API_V1}/overview/stats/`,
     }
 };

@@ -2,11 +2,28 @@ import {useMemo} from "react";
 import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/utils/statsCard";
 
 
- function WeeklyAppointments() {
-  const maxValue = Math.max(1, ...weeklyData.map((item) => item.value));
+ function WeeklyAppointments({ data }: { data?: { day: string; value: number }[] }) {
+  const rows = useMemo(() => {
+    const source = data && data.length > 0 ? data : weeklyData;
+    const order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    return [...source].sort(
+      (a, b) => order.indexOf(a.day) - order.indexOf(b.day)
+    );
+  }, [data]);
+  const maxValue = Math.max(1, ...rows.map((item) => item.value));
 
   return (
     <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+      <style>
+        {`@keyframes chart-bar-grow {
+          from { transform: scaleY(0); }
+          to { transform: scaleY(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chart-bar { animation: none !important; }
+        }`}
+      </style>
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-heading text-base font-semibold text-textPrimary">
@@ -21,7 +38,7 @@ import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/ut
       </div>
 
       <div className="mt-8 flex h-52 items-end gap-3">
-        {weeklyData.map((item) => {
+        {rows.map((item, index) => {
           const height = `${(item.value / maxValue) * 100}%`;
 
           return (
@@ -35,8 +52,13 @@ import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/ut
 
               <div className="flex h-full w-full items-end">
                 <div
-                  className="w-full rounded-t-lg bg-primary/70 transition-all duration-300"
-                  style={{ height }}
+                  className="chart-bar w-full origin-bottom rounded-t-lg bg-primary/70"
+                  style={{
+                    height,
+                    animation:
+                      "chart-bar-grow 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both",
+                    animationDelay: `${index * 70}ms`,
+                  }}
                 />
               </div>
 
@@ -51,15 +73,18 @@ import {STAT_CONFIG, StatsGridProps, weeklyData, visitData,StatCard} from "/@/ut
   );
 }
 
-function VisitOverview() {
-  const total = visitData.reduce((sum, item) => sum + item.value, 0);
+function VisitOverview({ data }: {
+  data?: { label: string; value: number; color: string }[];
+}) {
+  const rows = data && data.length > 0 ? data : visitData;
+  const total = rows.reduce((sum, item) => sum + item.value, 0);
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
 
   const segments = useMemo(() => {
     let offset = 0;
 
-    return visitData.map((item) => {
+    return rows.map((item) => {
       const dash = total > 0 ? (item.value / total) * circumference : 0;
       const currentOffset = offset;
 
@@ -67,7 +92,7 @@ function VisitOverview() {
 
       return { item, dash, currentOffset };
     });
-  }, [circumference, total]);
+  }, [circumference, total, data]);
 
   return (
     <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
@@ -128,7 +153,7 @@ function VisitOverview() {
         </div>
 
         <div className="flex-1 space-y-3">
-          {visitData.map((item) => (
+          {rows.map((item) => (
             <div
               key={item.label}
               className="flex items-center justify-between"
@@ -155,7 +180,58 @@ function VisitOverview() {
 }
 
 
-export default function StatsGrid({ stats }: StatsGridProps) {
+export function StatsGridSkeleton() {
+  return (
+    <div
+      className="animate-pulse space-y-5"
+      aria-busy="true"
+      aria-label="Loading overview stats"
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-border bg-white p-5 shadow-sm"
+          >
+            <div className="h-3 w-2/3 rounded bg-border" />
+            <div className="mt-3 h-8 w-16 rounded bg-border" />
+            <div className="mt-4 h-1.5 rounded-full bg-background" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-white p-5 shadow-sm xl:col-span-2">
+          <div className="h-4 w-40 rounded bg-border" />
+          <div className="mt-8 flex h-52 items-end gap-3">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-full rounded-t-lg bg-border"
+                style={{ height: `${30 + ((i * 37) % 60)}%` }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+          <div className="h-4 w-32 rounded bg-border" />
+          <div className="mx-auto mt-7 h-36 w-36 rounded-full bg-border" />
+          <div className="mt-6 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-3 rounded bg-border" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function StatsGrid({ stats, weekly, visitMix }: StatsGridProps & {
+  weekly?: { day: string; value: number }[];
+  visitMix?: { label: string; value: number; color: string }[];
+}) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -175,10 +251,10 @@ export default function StatsGrid({ stats }: StatsGridProps) {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <WeeklyAppointments />
+          <WeeklyAppointments data={weekly} />
         </div>
 
-        <VisitOverview />
+        <VisitOverview data={visitMix} />
       </div>
 
     </div>

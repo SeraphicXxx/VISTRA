@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllAppointments } from "/@/api/appointments.api";
 import { getDentalVisit } from "/@/api/dental.api";
 import { getMedicalVisit } from "/@/api/medical.api";
+import { getOverviewStats } from "/@/api/overview.api";
 
 /**
  * Overview panel server state.
@@ -37,6 +38,24 @@ export function useOverviewData(appointmentLimit = 6, consultationLimit = 8) {
         refetchOnMount: false,
         staleTime: 60_000,
         gcTime: 5 * 60_000,
+        retry: 1,
+    });
+}
+
+export function useOverviewStats() {
+    return useQuery({
+        queryKey: ["overview-stats"],
+        queryFn: async ({ signal }) => {
+            const { data } = await getOverviewStats(signal);
+
+            if (!data.data) {
+                throw new Error("Overview stats are missing");
+            }
+
+            return data.data;
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 60_000,
         retry: 1,
     });
 }
