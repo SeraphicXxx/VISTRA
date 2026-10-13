@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { ReadOnlyField } from "/@/utils/ReadOnlyField";
 
@@ -51,14 +51,46 @@ export function Modal({
   footer,
   maxWidth = "max-w-2xl",
 }) {
+  const overlayRef = useRef(null);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    overlayRef.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 180,
+      easing: "ease-out",
+      fill: "both",
+    });
+
+    dialogRef.current?.animate(
+      [
+        { opacity: 0, transform: "translateY(12px) scale(0.97)" },
+        { opacity: 1, transform: "translateY(0) scale(1)" },
+      ],
+      {
+        duration: 220,
+        easing: "cubic-bezier(0.2, 0.7, 0.2, 1)",
+        fill: "both",
+      }
+    );
+  }, []);
+
   return (
     <div
+      ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
+        ref={dialogRef}
         className={`max-h-[90vh] w-full ${maxWidth} overflow-y-auto rounded-2xl border border-border bg-surface shadow-lg`}
       >
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
