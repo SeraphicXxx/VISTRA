@@ -44,7 +44,7 @@ Frontend `frontend/.env`: `VITE_LOCAL_API_URL` (`http://127.0.0.1:8000`), `VITE_
 - Add endpoint: router in `routes/<domain>.py` (prefix e.g. `/patients`, `Depends(get_current_user)` if protected) → function in `services/<domain>.py` → query in `repositories/<domain>_repositories.py`. Reuse `PaginatedResponse` / `Response` from `schemas/response_dto/reponses.py`.
 - DB: Supabase only. Use `get_supabase_for_user` dependency for RLS; `supabase_admin` only for auth admin (`services/auth/user.py`). Tables are UPPERCASE: `PATIENT`, `PATIENT_PROFILE`, `STAFF`, `APPOINTMENT`, `DENTAL_VISIT`, `ODONTOGRAM`, view `patient_summary`.
 - Auth: Supabase Auth. Staff email convention `@ucc.com` via `utils/email_utils.py` (`add_ucc_domain`, `staff_id_format`). `security.py:get_current_user` validates Bearer via `supabase.auth.get_user()`. Roles in `app_metadata.role`.
-- Follow `backend/versioning plan` for version bumps: breaking=X.0.0, feature=0.X.0, fix=0.0.X. Live `main.py` has no `/api/v1` prefix – do not add versioning without migrating frontend `ApiConfig.ts`.
+- Follow `backend/versioning plan` for version bumps: breaking=X.0.0, feature=0.X.0, fix=0.0.X. Routes are dual-mounted in `main.py`: legacy unversioned (deprecated) + `/api/v1` (`API_V1_PREFIX`); new clients must use v1. Health is special: `/api/health` (permanent probe) + `/api/v1/health`.
 - Known bug: `schemas/patient.py` references `confirm_birthday`/`confirm_age` but does not import them – fix import from `utils/validator/common.py` before touching patient validation.
 
 ## Frontend conventions

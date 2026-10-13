@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/patients/20230847-S/"
+url: "{{base_url}}/{{api_version}}/patients/20230847-S/"
 method: PATCH
 auth:
   type: bearer

@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/staff/"
+url: "{{base_url}}/{{api_version}}/staff/"
 method: POST
 auth:
   type: bearer
