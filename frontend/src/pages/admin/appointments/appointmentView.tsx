@@ -282,6 +282,8 @@ export default function AppointmentDetailView() {
         status: AdminAppointmentStatus;
         decline_reason?: string;
     } | null>(null);
+    const [optimisticStatus, setOptimisticStatus] =
+        useState<AdminAppointmentStatus | null>(null);
     const updateAppointmentMutation = useUpdateAppointment();
     if (!appointmentId || !patientId) {
         return (
@@ -321,9 +323,10 @@ export default function AppointmentDetailView() {
             ? appointment.status
             : "pending";
 
-    const isDecided = serverStatus !== "pending";
+    const effectiveStatus = optimisticStatus ?? serverStatus;
+    const isDecided = effectiveStatus !== "pending";
 
-    const meta = STATUS_META[serverStatus];
+    const meta = STATUS_META[effectiveStatus];
 
     const handleBack = (): void => {
         window.history.back();
@@ -337,6 +340,7 @@ export default function AppointmentDetailView() {
         if (!patientId || !appointmentId) return;
 
         setSaveError(null);
+        setOptimisticStatus(status);
         updateAppointmentMutation.mutate(
             {
                 patientId,
@@ -351,6 +355,7 @@ export default function AppointmentDetailView() {
                     void refetch();
                 },
                 onError: (error) => {
+                    setOptimisticStatus(null);
                     setSaveError(getFieldErrors(error));
                 },
             }
@@ -560,7 +565,7 @@ export default function AppointmentDetailView() {
                         {isDecided ? (
 
                             <div className="rounded-xl border border-border bg-surfaceMuted/40 px-4 py-3 text-xs text-textMuted">
-                                This appointment has been {serverStatus}. Status
+                                This appointment has been {effectiveStatus}. Status
                                 can no longer be changed.
                             </div>
 
@@ -625,7 +630,7 @@ export default function AppointmentDetailView() {
 
                                 {/* Confirm */}
 
-                                {serverStatus !== "confirmed" && (
+                                {effectiveStatus !== "confirmed" && (
 
                                     <button
                                         type="button"
@@ -644,7 +649,7 @@ export default function AppointmentDetailView() {
 
                                 {/* Decline */}
 
-                                {serverStatus !== "declined" && (
+                                {effectiveStatus !== "declined" && (
 
                                     <button
                                         type="button"
