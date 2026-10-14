@@ -1,4 +1,5 @@
 from fastapi import status, HTTPException
+from postgrest.exceptions import APIError
 from supabase import Client
 
 from app.repositories.base import insert_model
@@ -97,7 +98,18 @@ def delete_patient(patient_id: str, supabase: Client):
     existing = patient_repo.get_by_id(patient_id)
     or_404(existing, "Patient not found")
 
-    patient_repo.delete_patient_cascade(patient_id)
+    try:
+        patient_repo.delete_patient_cascade(patient_id)
+    except APIError as e:
+        # A RESTRICT child added without RPC coverage must read as a
+        # conflict, not an "Unhandled error" 500.
+        if getattr(e, "code", None) == "23503":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Patient has linked records that block deletion",
+            )
+
+        raise
 
     delete_auth_or_500("Patient", existing["id"])
 
