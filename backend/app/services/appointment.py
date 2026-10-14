@@ -37,11 +37,10 @@ def get_appointment_by_id(appointment_id: int, patient_id: str, supabase: Client
 
 @handle_service_errors
 def update_appointment(patient_id: str, appointment_id: int, request: UpdateAppointmentRequest, supabase: Client, current_user: CurrentUser):
+    # Scope is enforced at the route (staff-only endpoint); the empty
+    # update result below is the not-found signal, so no pre-read.
+    # patient_id stays in the signature for the route contract.
     appointment_repo = AppointmentRepository(supabase)
-    or_404(
-        appointment_repo.get_appointment_by_id(appointment_id, patient_id),
-        "Appointment not found",
-    )
     staff_id = staff_id_format(require_user_email(current_user))
     response = appointment_repo.update_appointment(appointment_id,
                                                    {**request.to_appointment_update(),
