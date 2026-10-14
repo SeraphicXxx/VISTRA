@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/appointments/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{patientA_access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Patient lists appointments: 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Only own appointments are returned", function () {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.success).to.eql(true);
+          pm.expect(jsonData.data.items).to.be.an("array");
+          jsonData.data.items.forEach(function (item) {
+              pm.expect(item.patient_id).to.eql(pm.environment.get("patient_id"));
+          });
+      });
+    language: text/javascript
+order: 8090

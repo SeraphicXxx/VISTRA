@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/dental/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{patientA_access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Patient blocked from dental list: 403", function () {
+          pm.response.to.have.status(403);
+      });
+    language: text/javascript
+order: 8170

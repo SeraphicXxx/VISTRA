@@ -12,6 +12,12 @@ values:
     value: ''
   - key: patient_id
     value: ''
+  - key: patientB_id
+    value: ''
+  - key: patientA_access_token
+    value: ''
+  - key: patientB_access_token
+    value: ''
   - key: patient_birthday
     value: ''
   - key: patient_age
