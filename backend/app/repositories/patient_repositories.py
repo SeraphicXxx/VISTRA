@@ -11,6 +11,13 @@ class PatientRepository(BaseRepository):
             filters={"patient_id": patient_id},
         )
 
+    def get_by_auth_id(self, auth_id: str):
+        """PATIENT row for an auth uid (PATIENT.id == auth.uid())."""
+        return self.fetch_one(
+            "PATIENT",
+            filters={"id": auth_id},
+        )
+
     def get_all(self):
         return self.fetch_all("PATIENT")
 
