@@ -3,17 +3,28 @@ import logging
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 
+from app.config.jwks import JWKSUnavailable, TokenRejected, verify_access_token
 from app.database.database_client import security, supabase
 from app.schemas.user import CurrentUser, PATIENT_ROLES, STAFF_ROLE, Role
 
 logger = logging.getLogger(__name__)
 
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> CurrentUser:
-    access_token = credentials.credentials
+def _current_user_from_claims(user_id: str | None, email, role) -> CurrentUser:
+    # Legacy free-text roles predate the canonical set: coerce them
+    # to None (authenticated but unauthorized) instead of letting
+    # Pydantic raise a 500 on the Literal. require_* gates then 403.
+    if role != STAFF_ROLE and role not in PATIENT_ROLES:
+        role = None
 
+    return CurrentUser(
+        id=user_id,
+        email=email,
+        role=role,
+    )
+
+
+def _get_current_user_remote(access_token: str) -> CurrentUser:
     try:
         response = supabase.auth.get_user(access_token)
     except HTTPException:
@@ -39,16 +50,31 @@ def get_current_user(
         else getattr(app_metadata, "role", None)
     )
 
-    # Legacy free-text roles predate the canonical set: coerce them
-    # to None (authenticated but unauthorized) instead of letting
-    # Pydantic raise a 500 on the Literal. require_* gates then 403.
-    if role != STAFF_ROLE and role not in PATIENT_ROLES:
-        role = None
+    return _current_user_from_claims(user.id, user.email, role)
 
-    return CurrentUser(
-        id=user.id,
-        email=user.email,
-        role=role,
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> CurrentUser:
+    access_token = credentials.credentials
+
+    try:
+        claims = verify_access_token(access_token)
+    except TokenRejected as e:
+        logger.warning("Local token validation failed: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired access token",
+        )
+    except JWKSUnavailable:
+        return _get_current_user_remote(access_token)
+
+    app_metadata = claims.get("app_metadata") or {}
+
+    return _current_user_from_claims(
+        claims.get("sub"),
+        claims.get("email"),
+        app_metadata.get("role"),
     )
 
 
