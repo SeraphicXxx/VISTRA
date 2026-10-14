@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     auth:{
         login: `${API_V1}/auth/login/`,
         refresh_token: `${API_V1}/auth/refresh/`,
+        logout: `${API_V1}/auth/logout/`,
     },
     staff: {
         create_staff: `${API_V1}/staff/`,

@@ -6,7 +6,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { sessionManager } from "/@/utils/SessionManager.ts";
+import { logoutSession } from "/@/hooks/UseLogout";
 import { PatientRoutes } from "/@/config/PatientRoutes.js";
 import { ROUTES } from "/@/config/RoutePaths.js";
 
@@ -36,8 +36,8 @@ const SidebarLink = forwardRef(function SidebarLink({ item, onNavigate }, ref) {
 
 export default function PatientSidebar() {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    sessionManager.logout();
+  const handleLogout = async () => {
+    await logoutSession();
     close();
     navigate(ROUTES.public.home);
   };

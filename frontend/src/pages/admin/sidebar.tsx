@@ -8,6 +8,7 @@ import {useSidebar} from "/@/hooks/UseSidebar";
 import {useStaffInfo} from "/@/hooks/StaffInfo";
 
 import {sessionManager} from "/@/utils/SessionManager";
+import {logoutSession} from "/@/hooks/UseLogout";
 
 import {AdminRoutes} from "/@/config/Routes";
 
@@ -256,8 +257,8 @@ export default function Sidebar() {
     const {isOpen, open, close} = useSidebar(firstLinkRef);
     const [isSignOutOpen, setIsSignOutOpen] = useState(false);
 
-    const handleLogout = (): void => {
-        sessionManager.logout();
+    const handleLogout = async (): Promise<void> => {
+        await logoutSession();
         setIsSignOutOpen(false);
         close();
         navigate(ROUTES.public.home);
