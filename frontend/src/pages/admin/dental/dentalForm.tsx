@@ -1,3 +1,4 @@
+import {useState} from "react";
 import {ArrowLeft, Save, Stethoscope, Info} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
 import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
@@ -10,6 +11,7 @@ import {getFieldErrors} from "/@/utils/Formatters";
 import {useCreateDentalVisit} from "/@/hooks/query/DentalQuery";
 import {CreateDentalVisit} from "/@/api/schema/DentalSchema";
 import {statusEditFields} from "/@/components/editModal.jsx";
+import {ConfirmModal} from "/@/components/ConfirmModal";
 
 const statusOptions = statusEditFields.find((f) => f.key === "status")?.options ?? [];
 
@@ -17,12 +19,11 @@ const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilep
 
 const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis / Periodontal Disease", "Debris", "Calculus", "Cleft Lip / Palate", "Others (Supernumerary/Mesiodens)", "No. of Permanent Teeth Present", "No. of Permanent Sound Present", "No. of Decayed Teeth (D)", "No. of Missing Teeth (M)", "No. of Filled Teeth (F)", "No. of Teeth for Extraction (X)", "No. of DMFX Teeth", "No. of Temporary Teeth Present"];
 
-const  dentalStudentFields = [
+const dentalStudentFields = [
     {id: "age", label: "Age"},
     {id: "sex", label: "Gender"},
     {id: "year_section", label: "Year and section / course / department", span: "sm:col-span-3"},
 ];
-
 
 function DentalConditionSection() {
     return (
@@ -66,7 +67,7 @@ function DentalConditionSection() {
     );
 }
 
-function RecordFormFooter({onBack,}: { onBack: () => void }) {
+function RecordFormFooter({onBack}: { onBack: () => void }) {
     return (
         <>
             <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
@@ -414,6 +415,8 @@ export default function DentalRecordForm() {
         clearTooth,
     } = useDentalRecordForm();
 
+    const [pendingRecord, setPendingRecord] = useState<CreateDentalVisit | null>(null);
+
     const handleBack = () => {
         window.history.back();
     };
@@ -443,6 +446,15 @@ export default function DentalRecordForm() {
             patient_id: selectedStudent.patient_id,
             tooth_records: Object.values(toothRecords),
         };
+
+        setPendingRecord(record);
+    };
+
+    const saveRecord = () => {
+        const record = pendingRecord;
+        setPendingRecord(null);
+        if (!record) return;
+
         console.log(record);
         createDentalVisitMutation.mutate(record, {
             onSuccess: (data) => {
@@ -498,6 +510,16 @@ export default function DentalRecordForm() {
                     onSubmit={saveTooth}
                     onClear={clearTooth}
                     onClose={closeTooth}
+                />
+            )}
+
+            {pendingRecord !== null && (
+                <ConfirmModal
+                    title="Save dental record?"
+                    message="Make sure all information is accurate. This record will be stored in the system for future reference."
+                    confirmLabel="Save record"
+                    onConfirm={saveRecord}
+                    onCancel={() => setPendingRecord(null)}
                 />
             )}
         </form>

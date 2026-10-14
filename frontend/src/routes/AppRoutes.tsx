@@ -16,7 +16,7 @@ import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute";
 import GuestRoute from "/@/routes/GuestRoute";
-import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx";
+import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
 import ProtectedPatientRoute from "/@/routes/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
@@ -31,6 +31,7 @@ import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
+
 
 
 function AppRoutes() {

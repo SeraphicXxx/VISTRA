@@ -45,6 +45,9 @@ export const ROUTES = {
             createNewRecord: "/staff/patients/new",
             patientRecordTab: "/staff/patients/record",
         },
+        accessControl: {
+            manageStaff: "/staff/Access-Control-Management/new-staff",
+        },
     },
 
     patient: {

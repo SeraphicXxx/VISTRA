@@ -1,6 +1,6 @@
 import {Status, StatusBadge, statusLabels} from "/@/components/StatusBadge";
 import {Column, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
-import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
+import {avatarColor, getInitials} from "/@/components/avatar";
 import React from "react";
 
 export const APPOINTMENTS: AppointmentTableFormat[] = [
