@@ -30,6 +30,7 @@ import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
+import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
 
 
 function AppRoutes() {
@@ -77,6 +78,10 @@ function AppRoutes() {
                         <Route
                             path={ROUTES.staff.dashboard.patients}
                             element={<PatientsPage/>}
+                        />
+                        <Route
+                            path={ROUTES.staff.dashboard.accessControl}
+                            element={<RoleManagementPage/>}
                         />
                         <Route
                             path={ROUTES.staff.patient.createNewRecord}

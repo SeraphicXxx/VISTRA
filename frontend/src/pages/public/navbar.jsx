@@ -5,7 +5,7 @@ import { UserLogoClickable } from "/@/components/Button.jsx";
 import { ROUTES } from "/@/config/RoutePaths";
 import {Link } from "react-router-dom";
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 
 const NAV_LINKS = [

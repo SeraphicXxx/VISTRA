@@ -12,6 +12,7 @@ export const ROUTES = {
             dental: "/staff/dashboard/dental",
             appointments: "/staff/dashboard/appointments",
             patients: "/staff/dashboard/patients",
+            accessControl: "/staff/dashboard/Access-Control-Management",
         },
         medical: {
             createNewRecord: "/staff/medical/new",

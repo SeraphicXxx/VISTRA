@@ -38,7 +38,6 @@ export default function PatientsTab({setFilters}: PatientsTabProps) {
     return (
         <DefaultTablePreset<patientData>
             title="Patients"
-            icon={UserRound}
             data={patientTableRecords}
             isLoading={isLoading}
             columns={patientColumns}
