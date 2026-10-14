@@ -18,8 +18,8 @@ def mark_staff_on_duty(email: str) -> None:
     scope check may read it.
 
     One-way only: nothing in the login path may set is_active back
-    to False. Only the 5pm clock-out trigger
-    (POST /api/v1/internal/cron/clock-out) clears presence.
+    to False. Clearing is owned by the Postgres 5pm cron, with the
+    emergency endpoint as manual override.
     """
     try:
         from app.database.database_client import supabase_admin

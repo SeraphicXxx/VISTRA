@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.config.security import require_cron_secret
+from app.config.security import require_staff
 from app.services.staff import clock_out_all_staff as clock_out_all_staff_service
 
 
@@ -11,13 +11,14 @@ internal_router = APIRouter(
 
 
 @internal_router.post(
-    "/cron/clock-out",
-    dependencies=[Depends(require_cron_secret)],
+    "/emergency/clock-out-all",
+    dependencies=[Depends(require_staff)],
 )
-def cron_clock_out():
-    """5pm trigger: end the duty day for all active staff.
+def emergency_clock_out_all():
+    """Manual emergency clock-out: end the duty day for all staff.
 
-    Machine-to-machine only (X-Cron-Secret). This is the sole code
-    path that sets STAFF.is_active back to False.
+    Staff-JWT guarded (staff are the system admins). Normal clearing
+    is owned by the Postgres 5pm cron; this exists for stuck flags
+    and other emergencies. Returns how many rows flipped.
     """
     return clock_out_all_staff_service()

@@ -66,10 +66,10 @@ def delete_staff(staff_id: str, supabase: Client):
 def clock_out_all_staff():
     """Clear STAFF.is_active for everyone currently on duty.
 
-    ONLY the 5pm trigger (POST /api/v1/internal/cron/clock-out,
-    X-Cron-Secret) may call this. Uses the service-role client on
-    purpose: presence is operational state, and the trigger carries
-    no user JWT. Returns how many rows flipped.
+    Called by the Postgres 5pm cron (direct DB update) and by the
+    manual emergency endpoint (POST /api/v1/internal/emergency/
+    clock-out-all). Uses the service-role client on purpose:
+    presence is operational state. Returns how many rows flipped.
     """
     admin = get_supabase_admin()
 

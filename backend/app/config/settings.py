@@ -15,11 +15,6 @@ class Config:
 
     USE_SELFHOSTED_SUPABASE = os.getenv("USE_SELFHOSTED_SUPABASE", "false").lower() == "true"
 
-    # Shared secret for the internal 5pm clock-out trigger
-    # (X-Cron-Secret header on POST /api/v1/internal/cron/clock-out).
-    # Never commit a value; set it in backend/.env (gitignored).
-    CRON_SECRET = os.getenv("CRON_SECRET")
-
     IS_PROD = os.getenv("IS_PROD", "false").lower() == "true"
 
     LOCAL_FRONTEND_URL = os.getenv("LOCAL_FRONTEND_URL")

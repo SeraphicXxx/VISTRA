@@ -1,10 +1,8 @@
-import hmac
 import logging
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 
-from app.config.settings import Config
 from app.database.database_client import security, supabase
 from app.schemas.user import CurrentUser, PATIENT_ROLES, STAFF_ROLE, Role
 
@@ -95,27 +93,3 @@ require_staff = require_role("staff")
 # Any non-staff system user (student/professor/faculty).
 # Usage: `current_user: CurrentUser = Depends(require_patient)`.
 require_patient = require_role("student", "professor", "faculty")
-
-
-def require_cron_secret(request: Request) -> None:
-    """Guard for machine-trigger endpoints (5pm clock-out).
-
-    Authenticates via shared secret, not user JWTs: the scheduler
-    sends `X-Cron-Secret: <CRON_SECRET>`. Missing server secret is
-    503 (same convention as the privilege key); mismatch is 403.
-    """
-    secret = Config.CRON_SECRET
-
-    if not secret:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Cron trigger not configured (missing CRON_SECRET)",
-        )
-
-    presented = request.headers.get("X-Cron-Secret", "")
-
-    if not hmac.compare_digest(presented, secret):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid cron trigger secret",
-        )
