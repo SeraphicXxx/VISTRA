@@ -1,16 +1,51 @@
 from typing import Literal
 
+from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 
-# Canonical backend roles. JWT `app_metadata.role` must be one of
-# these; anything else is treated as unauthorized by require_role().
-# Free-form patient `classification` (student/faculty/...) is stored
-# separately as PATIENT_PROFILE.person_type, never as the auth role.
-Role = Literal["staff", "patient"]
+# Canonical backend roles, mirrored in JWT `app_metadata.role`.
+# "staff" is the system admin; student/professor/faculty are system
+# users. RLS policies and require_* gates key on these exact strings.
+Role = Literal["staff", "student", "professor", "faculty"]
 
 STAFF_ROLE: Role = "staff"
-PATIENT_ROLE: Role = "patient"
+STUDENT_ROLE: Role = "student"
+PROFESSOR_ROLE: Role = "professor"
+FACULTY_ROLE: Role = "faculty"
+
+# Non-staff system users, for "any patient-type" checks.
+PATIENT_ROLES: frozenset[Role] = frozenset(
+    {STUDENT_ROLE, PROFESSOR_ROLE, FACULTY_ROLE}
+)
+
+# Patient-form classification keys -> canonical role.
+# "staff" is the Admin toggle: admins are staff. "faculty" covers
+# professors until the form distinguishes them; classification
+# detail itself persists as PATIENT_PROFILE.person_type.
+CLASSIFICATION_ROLE_MAP: dict[str, Role] = {
+    "student": STUDENT_ROLE,
+    "faculty": FACULTY_ROLE,
+    "staff": STAFF_ROLE,
+}
+
+
+def role_for_classification(classification: str) -> Role:
+    """Map a patient-form classification to its canonical role.
+
+    Rejects unknown values instead of minting arbitrary JWT roles.
+    """
+    try:
+        return CLASSIFICATION_ROLE_MAP[classification]
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=(
+                "Unknown classification: "
+                f"{classification!r}. Expected one of "
+                f"{sorted(CLASSIFICATION_ROLE_MAP)}."
+            ),
+        )
 
 
 class CurrentUser(BaseModel):

@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app.database.database_client import security, supabase
-from app.schemas.user import CurrentUser, Role
+from app.schemas.user import CurrentUser, PATIENT_ROLES, STAFF_ROLE, Role
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,12 @@ def get_current_user(
         if isinstance(app_metadata, dict)
         else getattr(app_metadata, "role", None)
     )
+
+    # Legacy free-text roles predate the canonical set: coerce them
+    # to None (authenticated but unauthorized) instead of letting
+    # Pydantic raise a 500 on the Literal. require_* gates then 403.
+    if role != STAFF_ROLE and role not in PATIENT_ROLES:
+        role = None
 
     return CurrentUser(
         id=user.id,
@@ -79,3 +85,7 @@ def require_role(*allowed: Role):
 # Shorthand for the most common case: staff-only endpoints.
 # Usage: `current_user: CurrentUser = Depends(require_staff)`.
 require_staff = require_role("staff")
+
+# Any non-staff system user (student/professor/faculty).
+# Usage: `current_user: CurrentUser = Depends(require_patient)`.
+require_patient = require_role("student", "professor", "faculty")
