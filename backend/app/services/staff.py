@@ -5,6 +5,7 @@ from app.schemas.user import STAFF_ROLE
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
+    get_supabase_admin,
     provision_auth_or_raise,
 )
 from app.utils.email_utils import remove_ucc_domain
@@ -59,3 +60,26 @@ def delete_staff(staff_id: str, supabase: Client):
     delete_auth_or_500("Staff", existing["id"])
 
     return ok(message="Staff deleted successfully")
+
+
+@handle_service_errors
+def clock_out_all_staff():
+    """Clear STAFF.is_active for everyone currently on duty.
+
+    ONLY the 5pm trigger (POST /api/v1/internal/cron/clock-out,
+    X-Cron-Secret) may call this. Uses the service-role client on
+    purpose: presence is operational state, and the trigger carries
+    no user JWT. Returns how many rows flipped.
+    """
+    admin = get_supabase_admin()
+
+    response = (
+        admin.table("STAFF")
+        .update({"is_active": False})
+        .eq("is_active", True)
+        .execute()
+    )
+
+    clocked_out = len(response.data or [])
+
+    return ok(message=f"Clocked out {clocked_out} staff", count=clocked_out)

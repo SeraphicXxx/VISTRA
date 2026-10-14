@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.settings import Config
-from app.routes import health, auth, staff, patient, appointment, dental, medical, overview
+from app.routes import health, auth, staff, patient, appointment, dental, medical, overview, internal
 
 app = FastAPI(
     title="VISTRA API",
-    version="4.0.0"
+    version="4.1.0"
 )
 app.add_middleware(
     CORSMiddleware,
@@ -38,3 +38,6 @@ app.include_router(medical.protected_medical_router, deprecated=True)
 app.include_router(medical.protected_medical_router, prefix=API_V1_PREFIX)
 app.include_router(overview.protected_overview_router, deprecated=True)
 app.include_router(overview.protected_overview_router, prefix=API_V1_PREFIX)
+# New machine-trigger endpoints are v1-only: the legacy mount is
+# deprecated from birth and gains no new surface.
+app.include_router(internal.internal_router, prefix=API_V1_PREFIX)

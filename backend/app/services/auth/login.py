@@ -9,13 +9,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def set_staff_active(email: str, active: bool) -> None:
+def mark_staff_on_duty(email: str) -> None:
     """Set STAFF.is_active from the login duty choice. Best-effort:
     presence tracking must never fail authentication.
 
     This is an operational availability flag for UI display (sidebar
     duty dot) — never an authorization input. No require_* gate or
-    scope check may read it."""
+    scope check may read it.
+
+    One-way only: nothing in the login path may set is_active back
+    to False. Only the 5pm clock-out trigger
+    (POST /api/v1/internal/cron/clock-out) clears presence.
+    """
     try:
         from app.database.database_client import supabase_admin
 
@@ -23,7 +28,7 @@ def set_staff_active(email: str, active: bool) -> None:
             return
 
         supabase_admin.table("STAFF").update(
-            {"is_active": active}
+            {"is_active": True}
         ).eq(
             "staff_id", staff_id_format(email)
         ).execute()
@@ -74,10 +79,9 @@ def login_user(request):
             role = getattr(app_metadata, "role", None)
 
         if role == STAFF_ROLE and request.on_duty:
-            # Only the cron job may flip the flag back to false.
-            # on_duty gates this presence write only: staff-role
+            # Presence write only (see mark_staff_on_duty): staff-role
             # membership (not duty state) is what authorizes requests.
-            set_staff_active(user.email, True)
+            mark_staff_on_duty(user.email)
 
         return ok(
             user={
