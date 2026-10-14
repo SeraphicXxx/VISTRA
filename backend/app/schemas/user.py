@@ -29,15 +29,24 @@ CLASSIFICATION_ROLE_MAP: dict[str, Role] = {
     "staff": STAFF_ROLE,
 }
 
+# Accepted resolver inputs: form keys plus common variants
+# ("Student" from API clients, "admin" label, explicit professor).
+_CLASSIFICATION_ALIASES: dict[str, Role] = {
+    **CLASSIFICATION_ROLE_MAP,
+    "professor": PROFESSOR_ROLE,
+    "admin": STAFF_ROLE,
+}
+
 
 def role_for_classification(classification: str) -> Role:
     """Map a patient-form classification to its canonical role.
 
-    Rejects unknown values instead of minting arbitrary JWT roles.
+    Case-insensitive; rejects unknown values instead of minting
+    arbitrary JWT roles.
     """
-    try:
-        return CLASSIFICATION_ROLE_MAP[classification]
-    except KeyError:
+    key = (classification or "").strip().lower()
+
+    if key not in _CLASSIFICATION_ALIASES:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
@@ -46,6 +55,8 @@ def role_for_classification(classification: str) -> Role:
                 f"{sorted(CLASSIFICATION_ROLE_MAP)}."
             ),
         )
+
+    return _CLASSIFICATION_ALIASES[key]
 
 
 class CurrentUser(BaseModel):
