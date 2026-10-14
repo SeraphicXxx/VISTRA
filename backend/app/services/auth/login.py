@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.database.database_client import supabase
+from app.schemas.user import STAFF_ROLE
 from app.utils.email_utils import add_ucc_domain, staff_id_format
 from app.utils.service_helpers import ok
 import logging
@@ -10,7 +11,11 @@ logger = logging.getLogger(__name__)
 
 def set_staff_active(email: str, active: bool) -> None:
     """Set STAFF.is_active from the login duty choice. Best-effort:
-    presence tracking must never fail authentication."""
+    presence tracking must never fail authentication.
+
+    This is an operational availability flag for UI display (sidebar
+    duty dot) — never an authorization input. No require_* gate or
+    scope check may read it."""
     try:
         from app.database.database_client import supabase_admin
 
@@ -68,8 +73,10 @@ def login_user(request):
         else:
             role = getattr(app_metadata, "role", None)
 
-        if role == "staff" and request.on_duty:
+        if role == STAFF_ROLE and request.on_duty:
             # Only the cron job may flip the flag back to false.
+            # on_duty gates this presence write only: staff-role
+            # membership (not duty state) is what authorizes requests.
             set_staff_active(user.email, True)
 
         return ok(

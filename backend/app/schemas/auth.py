@@ -7,6 +7,9 @@ class LoginRequest(BaseModel):
     patient_id: str | None = None
     staff_id: str | None = None
     password: str
+    # Presence signal only: offered "on duty" at login flips
+    # STAFF.is_active (best-effort). It never affects the issued
+    # role or any authorization decision (see security.py).
     on_duty: bool = False
 
     @model_validator(mode="after")

@@ -67,7 +67,11 @@ def require_role(*allowed: Role):
 
     Authentication (valid token) is checked first via get_current_user;
     this adds authorization: 403 when the JWT role is missing or not
-    in `allowed`. Nothing uses this yet — Phase 1 foundation.
+    in `allowed`.
+
+    Authorization inputs are role + ownership (see services/access.py)
+    ONLY. `on_duty` / `STAFF.is_active` are presence signals for UI
+    display and must never appear in a require_* or scope path.
     """
 
     def check_role(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
