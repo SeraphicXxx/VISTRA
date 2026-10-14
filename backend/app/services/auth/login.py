@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 
 from app.database.database_client import supabase
 from app.schemas.user import STAFF_ROLE
+from app.services.auth.user import get_supabase_admin
 from app.utils.email_utils import add_ucc_domain, staff_id_format
 from app.utils.service_helpers import ok
 import logging
@@ -22,12 +23,14 @@ def mark_staff_on_duty(email: str) -> None:
     emergency endpoint as manual override.
     """
     try:
-        from app.database.database_client import supabase_admin
+        admin = get_supabase_admin()
+    except HTTPException:
+        # Privilege key unconfigured: presence stays untouched,
+        # login proceeds (same as before).
+        return
 
-        if supabase_admin is None:
-            return
-
-        supabase_admin.table("STAFF").update(
+    try:
+        admin.table("STAFF").update(
             {"is_active": True}
         ).eq(
             "staff_id", staff_id_format(email)

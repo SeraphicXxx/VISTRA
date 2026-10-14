@@ -7,6 +7,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Service-role allowlist. `supabase_admin` bypasses RLS: every use
+# must be one of these trusted server-side operations, reached only
+# through get_supabase_admin() below —
+#   - auth provisioning / deletion (create_auth_user, delete_auth_user)
+#   - session revocation (services/auth/session.py logout_user)
+#   - presence writes (login mark_staff_on_duty, staff clock_out_all_staff)
+# Rules: fixed table/column identifiers only (never client-supplied);
+# no user-JWT data-plane reads/writes through this client; direct
+# `supabase_admin` imports outside database_client/user.py fail CI
+# (see .github/workflows/postman.yaml guard-service-role).
+
 
 def get_supabase_admin():
     if supabase_admin is None:
