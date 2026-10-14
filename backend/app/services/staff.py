@@ -1,6 +1,7 @@
 from app.repositories.base import insert_model
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import StaffData, CreateStaffRequest
+from app.schemas.user import STAFF_ROLE
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
@@ -15,7 +16,7 @@ from supabase import Client
 def create_staff(request: CreateStaffRequest, supabase: Client):
     staff_id = remove_ucc_domain(request.staff_id)
 
-    user = provision_auth_or_raise(staff_id, request.password, "staff")
+    user = provision_auth_or_raise(staff_id, request.password, STAFF_ROLE)
 
     staff_data = StaffData(
         id=user.id,

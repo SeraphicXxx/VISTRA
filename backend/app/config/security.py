@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app.database.database_client import security, supabase
-from app.schemas.user import CurrentUser
+from app.schemas.user import CurrentUser, Role
 
 logger = logging.getLogger(__name__)
 
@@ -54,3 +54,28 @@ def require_user_email(current_user: CurrentUser) -> str:
         )
 
     return current_user.email
+
+
+def require_role(*allowed: Role):
+    """Dependency factory enforcing canonical backend roles.
+
+    Authentication (valid token) is checked first via get_current_user;
+    this adds authorization: 403 when the JWT role is missing or not
+    in `allowed`. Nothing uses this yet — Phase 1 foundation.
+    """
+
+    def check_role(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+        if current_user.role not in allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions for this resource",
+            )
+
+        return current_user
+
+    return check_role
+
+
+# Shorthand for the most common case: staff-only endpoints.
+# Usage: `current_user: CurrentUser = Depends(require_staff)`.
+require_staff = require_role("staff")

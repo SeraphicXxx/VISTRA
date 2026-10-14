@@ -5,6 +5,7 @@ from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient
+from app.schemas.user import PATIENT_ROLE
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
@@ -46,11 +47,13 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
     # 1. Check if patient already exists
     ensure_patient_not_exists(patient_repo, patient_id)
 
-    # 2. Create Auth user
+    # 2. Create Auth user. JWT role is always the canonical
+    # "patient"; free-form classification lives on separately as
+    # PATIENT_PROFILE.person_type (see to_patient_profile).
     user = provision_auth_or_raise(
         patient_id,
         request.password,
-        request.classification,
+        PATIENT_ROLE,
     )
 
     # 3. Insert PATIENT
