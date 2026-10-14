@@ -18,9 +18,9 @@ scripts:
           pm.expect(jsonData.count).to.be.a("number");
       });
 
-      // NOTE: clears STAFF.is_active for everyone on duty. Keep this
-      // request last in the run (highest order): it mutates global
-      // presence state. Normal clearing is owned by the Postgres 5pm
+      // NOTE: clears STAFF.is_active for everyone on duty. It runs
+      // last inside the Staff folder; later folders never assert on
+      // presence flags. Normal clearing is owned by the Postgres 5pm
       // cron; this is the manual emergency override.
     language: text/javascript
-order: 99900
+order: 6300

@@ -18,7 +18,8 @@ scripts:
       });
 
       // NOTE: logout revokes the session server-side (global sign-out).
-      // It runs here, right after Refresh, while the access token is
-      // fresh. Do not move it before other Auth requests.
+      // It lives here, last in the Appointments folder (the final
+      // folder in the run), so no later request ever runs on a
+      // revoked session. Do not move it earlier.
     language: text/javascript
-order: 3600
+order: 8800
