@@ -49,6 +49,16 @@ function toMember(staff: StaffModel): Member {
   };
 }
 
+function rolesToPermissions(roles: AccessPermission[]): StaffPermissions {
+  return {
+    dental_module: roles.includes("Dental Records"),
+    medical_module: roles.includes("Medical Records"),
+    appointment_module: roles.includes("Appointments"),
+    patient_module: roles.includes("Patient Records"),
+    staff_module: roles.includes("Staff Management"),
+  };
+}
+
 const PAGE_SIZE = 10;
 
 type PendingEdit = { role: JobRole; roles: AccessPermission[] };
@@ -143,9 +153,7 @@ export function RoleManagementPage() {
 
   const handleConfirmSave = async (id: string, edit: PendingEdit) => {
     const current = members.find((m) => m.id === id);
-    const payload = Object.fromEntries(
-      PERMISSION_LABELS.map(({key, label}) => [key, edit.roles.includes(label)]),
-    );
+    const payload = rolesToPermissions(edit.roles);
     await saveAccess({
       staffId: id,
       payload: {
@@ -163,9 +171,7 @@ export function RoleManagementPage() {
   };
 
   const handleAddStaff = async (data: NewStaffData) => {
-    const permissions = Object.fromEntries(
-      PERMISSION_LABELS.map(({key, label}) => [key, data.roles.includes(label)]),
-    );
+    const permissions = rolesToPermissions(data.roles);
     await createStaff({
       staff_id: data.idNumber,
       first_name: data.firstName,
