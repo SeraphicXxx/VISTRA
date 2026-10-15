@@ -1,3 +1,7 @@
+# Supabase CLI local state
+supabase/.temp/
+supabase/supabase/.temp/
+
 # Logs
 logs
 *.log
