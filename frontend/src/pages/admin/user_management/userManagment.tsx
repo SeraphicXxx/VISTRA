@@ -6,6 +6,13 @@ import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
+function fullName(data: Pick<NewStaffData, "firstName" | "middleName" | "lastName">): string {
+  return [data.firstName, data.middleName, data.lastName]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 type JobRole =
   | "Super Administrator"
   | "Admin"
@@ -163,7 +170,16 @@ export function RoleManagementPage() {
   };
 
   const handleAddStaff = (data: NewStaffData) => {
-    setMembers((prev) => [...prev, { ...data, id: String(Date.now()) }]);
+    setMembers((prev) => [
+      ...prev,
+      {
+        id: String(Date.now()),
+        name: fullName(data),
+        idNumber: data.idNumber,
+        role: data.role,
+        roles: data.roles,
+      },
+    ]);
     setIsNewOpen(false);
   };
 
@@ -356,7 +372,7 @@ export function RoleManagementPage() {
           message={
             confirm.kind === "save"
               ? `Update the role and access permissions for ${confirm.name}?`
-              : `Add ${confirm.data.name} as a new staff member?`
+              : `Add ${fullName(confirm.data)} as a new staff member?`
           }
           confirmLabel={confirm.kind === "save" ? "Save" : "Add"}
           onConfirm={runConfirm}

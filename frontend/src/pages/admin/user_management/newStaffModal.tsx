@@ -17,7 +17,9 @@ export type AccessPermission =
     | "Staff Management";
 
 export interface NewStaffData {
-    name: string;
+    lastName: string;
+    firstName: string;
+    middleName: string;
     idNumber: string;
     role: JobRole;
     roles: AccessPermission[];
@@ -40,7 +42,7 @@ export const PERMISSIONS: AccessPermission[] = [
     "Staff Management",
 ];
 
-type FieldKey = "name" | "idNumber" | "role";
+type FieldKey = "lastName" | "firstName" | "middleName" | "idNumber" | "role";
 
 const fields: {
     key: FieldKey;
@@ -49,13 +51,17 @@ const fields: {
     type?: "select";
     options?: string[];
 }[] = [
-    {key: "name", label: "Full name", required: true},
+    {key: "lastName", label: "Last name", required: true},
+    {key: "firstName", label: "First name", required: true},
+    {key: "middleName", label: "Middle name"},
     {key: "idNumber", label: "Staff ID", required: true},
     {key: "role", label: "Role", type: "select", options: JOB_ROLES},
 ];
 
 const emptyForm: NewStaffData = {
-    name: "",
+    lastName: "",
+    firstName: "",
+    middleName: "",
     idNumber: "",
     role: JOB_ROLES[0],
     roles: [],
