@@ -1,10 +1,13 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Pencil, Plus, Trash2} from "lucide-react";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {Column} from "/@/components/table/Table";
 import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
+import {useDeleteStaff, useStaffList} from "/@/hooks/query/StaffQuery";
+import type {StaffPermissions} from "/@/api/schema/StaffSchema";
+import type {StaffModel} from "/@/repository/StaffModel";
 
 function fullName(data: Pick<NewStaffData, "firstName" | "middleName" | "lastName">): string {
   return [data.firstName, data.middleName, data.lastName]
@@ -54,43 +57,27 @@ export interface Member {
   roles: Access_permission[];
 }
 
-const SAMPLE_MEMBERS: Member[] = [
-  {
-    id: "1",
-    name: "Kenji Chua",
-    idNumber: "STF-001",
-    role: "Nurse",
-    roles: ["Medical Records"],
-  },
-  {
-    id: "2",
-    name: "Angel Emie Jane Bien",
-    idNumber: "STF-002",
-    role: "Admin",
-    roles: ["Appointments", "Patient Records"],
-  },
-  {
-    id: "3",
-    name: "Gillian Marc Lorenzo",
-    idNumber: "STF-003",
-    role: "Super Administrator",
-    roles: [...PERMISSIONS],
-  },
-  {
-    id: "4",
-    name: "Cjay Gonzales",
-    idNumber: "STF-004",
-    role: "Doctor",
-    roles: ["Medical Records", "Dental Records"],
-  },
-  {
-    id: "5",
-    name: "Joshua Lapitan",
-    idNumber: "STF-005",
-    role: "Dentist",
-    roles: ["Dental Records", "Appointments"],
-  },
+const PERMISSION_LABELS: { key: keyof StaffPermissions; label: Access_permission }[] = [
+  {key: "medical_module", label: "Medical Records"},
+  {key: "dental_module", label: "Dental Records"},
+  {key: "appointment_module", label: "Appointments"},
+  {key: "patient_module", label: "Patient Records"},
+  {key: "staff_module", label: "Staff Management"},
 ];
+
+function toMember(staff: StaffModel): Member {
+  const perms = staff.permissions;
+  return {
+    id: staff.staff_id,
+    name: staff.getFullName(),
+    idNumber: staff.staff_id,
+    // Legacy rows predate the role column: fall back until backfilled.
+    role: (staff.role as JobRole | null) ?? "Clinic OJT",
+    roles: perms
+    ? PERMISSION_LABELS.filter(({key}) => perms[key]).map(({label}) => label)
+    : [],
+  };
+}
 
 const PAGE_SIZE = 10;
 
@@ -99,6 +86,7 @@ type PendingEdit = { role: JobRole; roles: Access_permission[] };
 type ConfirmState =
   | { kind: "save"; id: string; name: string; edit: PendingEdit }
   | { kind: "add"; data: NewStaffData }
+  | { kind: "delete"; id: string; name: string }
   | null;
 
 function MemberCell({ member }: { member: Member }) {
@@ -137,7 +125,9 @@ function PermissionCheckbox({
 }
 
 export function RoleManagementPage() {
-  const [members, setMembers] = useState<Member[]>(SAMPLE_MEMBERS);
+  const {data: staffList, isLoading: staffLoading, error: staffError} = useStaffList();
+  const {mutateAsync: deleteStaff} = useDeleteStaff();
+  const [members, setMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(1);
   const [isNewOpen, setIsNewOpen] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
@@ -145,6 +135,12 @@ export function RoleManagementPage() {
     {},
   );
   const [pending, setPending] = useState<Record<string, PendingEdit>>({});
+
+  useEffect(() => {
+    if (staffList) {
+      setMembers(staffList.map(toMember));
+    }
+  }, [staffList]);
 
   const totalPages = Math.max(1, Math.ceil(members.length / PAGE_SIZE));
 
@@ -183,13 +179,21 @@ export function RoleManagementPage() {
     setIsNewOpen(false);
   };
 
-  const runConfirm = () => {
+  const runConfirm = async () => {
     if (!confirm) return;
 
-    if (confirm.kind === "save") {
-      handleConfirmSave(confirm.id, confirm.edit);
-    } else {
-      handleAddStaff(confirm.data);
+    try {
+      if (confirm.kind === "save") {
+        handleConfirmSave(confirm.id, confirm.edit);
+      } else if (confirm.kind === "add") {
+        handleAddStaff(confirm.data);
+      } else {
+        await deleteStaff(confirm.id);
+        clearPending(confirm.id);
+      }
+    } catch (error) {
+      console.error("Staff action failed:", error);
+      return;
     }
 
     setConfirm(null);
@@ -313,6 +317,7 @@ export function RoleManagementPage() {
         <button
           type="button"
           aria-label={`Delete ${m.name}`}
+          onClick={() => setConfirm({kind: "delete", id: m.id, name: m.name})}
           className="transition hover:text-rose-600"
         >
           <Trash2 className="h-4 w-4" />
@@ -337,6 +342,12 @@ export function RoleManagementPage() {
 
   return (
     <>
+      {staffError && members.length === 0 && (
+        <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-textMuted">
+          Couldn't load staff. Check the connection and try again.
+        </div>
+      )}
+
       <DefaultTablePreset<Member>
         title="Access & Permissions"
         subtitle="Manage staff roles and access permissions."
@@ -351,7 +362,7 @@ export function RoleManagementPage() {
           </button>
         }
         data={members}
-        isLoading={false}
+        isLoading={staffLoading}
         columns={columns}
         renderAction={renderAction}
         totalPages={totalPages}
@@ -368,13 +379,23 @@ export function RoleManagementPage() {
 
       {confirm && (
         <ConfirmModal
-          title={confirm.kind === "save" ? "Save changes?" : "Add new staff?"}
+          title={
+            confirm.kind === "save"
+              ? "Save changes?"
+              : confirm.kind === "add"
+                ? "Add new staff?"
+                : "Delete staff?"
+          }
           message={
             confirm.kind === "save"
               ? `Update the role and access permissions for ${confirm.name}?`
-              : `Add ${fullName(confirm.data)} as a new staff member?`
+              : confirm.kind === "add"
+                ? `Add ${fullName(confirm.data)} as a new staff member?`
+                : `Delete ${confirm.name}? Their login and staff record will be removed.`
           }
-          confirmLabel={confirm.kind === "save" ? "Save" : "Add"}
+          confirmLabel={
+            confirm.kind === "save" ? "Save" : confirm.kind === "add" ? "Add" : "Delete"
+          }
           onConfirm={runConfirm}
           onCancel={() => setConfirm(null)}
         />

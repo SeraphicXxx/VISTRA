@@ -15,6 +15,8 @@ from app.services.auth.user import (
 )
 from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
+from fastapi import status, HTTPException
+from postgrest.exceptions import APIError
 from supabase import Client
 
 
@@ -63,6 +65,13 @@ def create_staff(request: CreateStaffRequest, supabase: Client):
 
 
 @handle_service_errors
+def get_all_staff(supabase: Client):
+    staff_repo = StaffRepository(supabase)
+
+    return ok(staff_repo.get_all_with_permissions())
+
+
+@handle_service_errors
 def get_staff_by_id(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
     record = or_404(staff_repo.get_by_id(staff_id), "Staff not found")
@@ -76,7 +85,19 @@ def delete_staff(staff_id: str, supabase: Client):
     existing = staff_repo.get_by_id(staff_id)
     or_404(existing, "Staff not found")
 
-    deleted = staff_repo.delete(staff_id)
+    try:
+        deleted = staff_repo.delete(staff_id)
+    except APIError as e:
+        # Staff referenced by appointments (RESTRICT) must read as a
+        # conflict, not an "Unhandled error" 500.
+        if getattr(e, "code", None) == "23503":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Staff has linked records that block deletion",
+            )
+
+        raise
+
     or_404(deleted, "Staff not found")
 
     delete_auth_or_500("Staff", existing["id"])

@@ -13,6 +13,27 @@ export const getStaffById = (
     );
 };
 
+export const getAllStaff = (
+    signal?: AbortSignal
+) => {
+    return getResource<ApiResponse<StaffData[]>>(
+        API_ENDPOINTS.staff.get_all_staff,
+        signal,
+    );
+};
+
+export const deleteStaff = (
+    staffId: string,
+    signal?: AbortSignal
+) => {
+    return sendResource<ApiResponse<unknown>>(
+        "DELETE",
+        API_ENDPOINTS.staff.delete_staff(staffId),
+        undefined,
+        signal,
+    );
+};
+
 export const updateStaffPermissions = (
     staffId: string,
     payload: UpdateStaffPermissions,

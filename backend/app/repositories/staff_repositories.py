@@ -9,6 +9,26 @@ class StaffRepository(BaseRepository):
             filters={"staff_id": staff_id},
         )
 
+    def get_all_with_permissions(self):
+        """All STAFF rows with their STAFF_PERMISSIONS merged.
+
+        Two roundtrips regardless of row count (no per-row lookup):
+        staff tables stay small (tens of rows), so this stays
+        unpaginated — the table UI pages client-side. permissions is
+        None for legacy rows without a permissions record.
+        """
+        staff_rows = self.fetch_all("STAFF") or []
+        perm_rows = self.fetch_all("STAFF_PERMISSIONS") or []
+
+        perms_by_staff_id = {
+            row["staff_id"]: row for row in perm_rows if row.get("staff_id")
+        }
+
+        return [
+            {**row, "permissions": perms_by_staff_id.get(row.get("staff_id"))}
+            for row in staff_rows
+        ]
+
     def get_permissions(self, staff_id: str):
         """STAFF_PERMISSIONS row, or None for legacy rows / denied reads."""
         return self.fetch_one(
