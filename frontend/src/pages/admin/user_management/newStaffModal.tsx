@@ -10,7 +10,6 @@ export type JobRole =
     | "Clinic OJT";
 
 export type AccessPermission =
-    | "Overview"
     | "Medical Records"
     | "Dental Records"
     | "Appointments"
@@ -34,7 +33,6 @@ export const JOB_ROLES: JobRole[] = [
 ];
 
 export const PERMISSIONS: AccessPermission[] = [
-    "Overview",
     "Medical Records",
     "Dental Records",
     "Appointments",

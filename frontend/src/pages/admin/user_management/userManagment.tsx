@@ -24,7 +24,6 @@ const JOB_ROLES: JobRole[] = [
 ];
 
 type Access_permission =
-  | "Overview"
   | "Medical Records"
   | "Dental Records"
   | "Appointments"
@@ -32,7 +31,6 @@ type Access_permission =
   | "Staff Management";
 
 const PERMISSIONS: Access_permission[] = [
-  "Overview",
   "Medical Records",
   "Dental Records",
   "Appointments",
@@ -55,14 +53,14 @@ const SAMPLE_MEMBERS: Member[] = [
     name: "Kenji Chua",
     idNumber: "STF-001",
     role: "Nurse",
-    roles: ["Overview", "Medical Records"],
+    roles: ["Medical Records"],
   },
   {
     id: "2",
     name: "Angel Emie Jane Bien",
     idNumber: "STF-002",
     role: "Admin",
-    roles: ["Overview", "Appointments", "Patient Records"],
+    roles: ["Appointments", "Patient Records"],
   },
   {
     id: "3",
