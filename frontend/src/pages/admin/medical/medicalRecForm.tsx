@@ -1,4 +1,4 @@
-import type {FormEvent} from "react";
+import {useState, type FormEvent} from "react";
 import {Save, ArrowLeft, User, ClipboardList, Info} from "lucide-react";
 import {type as visitTypeOptions} from "./medicalData";
 import {useForm} from "/@/hooks/Form";
@@ -12,6 +12,7 @@ import {useCreateMedicalVisit} from "/@/hooks/query/MedicalQuery";
 import {sessionManager} from "/@/utils/SessionManager";
 import {getFieldErrors} from "/@/utils/Formatters";
 import {treatmentTypeOptions} from "/@/types/types";
+import {ConfirmModal} from "/@/components/ConfirmModal";
 
 const statusField = statusEditFields.find(
     (field: { key: string }) => field.key === "status"
@@ -48,6 +49,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
     const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const details = selectedStudent
         ? {
             course: selectedStudent.course ?? selectedStudent.department ?? "N/A",
@@ -75,6 +77,12 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
+        if (!selectedStudent) return;
+        setIsConfirmOpen(true);
+    };
+
+    const saveRecord = (): void => {
+        setIsConfirmOpen(false);
         if (!selectedStudent) return;
 
         const staffId = sessionManager.getUser()?.user_id ?? "";
@@ -273,6 +281,16 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2}/>
                 <span>Please ensure all information is accurate before saving. This record will be stored in the system for future reference.</span>
             </div>
+
+            {isConfirmOpen && (
+                <ConfirmModal
+                    title="Save medical record?"
+                    message="Make sure all information is accurate. This record will be stored in the system for future reference."
+                    confirmLabel="Save record"
+                    onConfirm={saveRecord}
+                    onCancel={() => setIsConfirmOpen(false)}
+                />
+            )}
         </form>
     );
 }

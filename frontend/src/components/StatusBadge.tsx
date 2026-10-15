@@ -157,5 +157,80 @@ export function StatusBadge({ status }: StatusBadgeProps) {
             {label}
         </span>
   );
+
+  
+}
+export const staffStatusConfig = {
+  active: {
+    label: "Active",
+    className: "border-success/30 bg-success/10 text-success",
+  },
+  nonLogin: {
+    label: "Non-login",
+    className: "border-border bg-surfaceMuted text-textSecondary",
+  },
+  unconfirmed: {
+    label: "Unconfirmed",
+    className: "border-warning/30 bg-warning/10 text-warning",
+  },
+} as const;
+
+export type StaffStatus = keyof typeof staffStatusConfig;
+
+const STAFF_STATUS_ALIASES: Record<string, StaffStatus> = {
+  "non-login": "nonLogin",
+  "non login": "nonLogin",
+};
+
+export function resolveStaffStatus(value: unknown): StaffStatus | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const raw = value.trim();
+
+  if (!raw) {
+    return null;
+  }
+
+  if (raw in staffStatusConfig) {
+    return raw as StaffStatus;
+  }
+
+  const lowered = raw.toLowerCase();
+
+  for (const [key, config] of Object.entries(staffStatusConfig)) {
+    if (config.label.toLowerCase() === lowered) {
+      return key as StaffStatus;
+    }
+  }
+
+  return STAFF_STATUS_ALIASES[lowered] ?? null;
+}
+
+interface StaffStatusBadgeProps {
+  status: string;
+}
+
+export function StaffStatusBadge({ status }: StaffStatusBadgeProps) {
+  const resolved = resolveStaffStatus(status);
+
+  if (!resolved) {
+    return (
+      <span className="inline-flex items-center rounded-full border border-border bg-surfaceMuted px-2.5 py-1 text-xs font-medium text-textSecondary">
+        {status || "—"}
+      </span>
+    );
+  }
+
+  const { label, className } = staffStatusConfig[resolved];
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${className}`}
+    >
+      {label}
+    </span>
+  );
 }
 
