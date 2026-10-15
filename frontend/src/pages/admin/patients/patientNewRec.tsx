@@ -15,16 +15,14 @@ import MedicalHistoryForm from "/@/components/MedicalHistoryForm";
 import {
     STUDENT_ID_PATTERN,
     FACULTY_ID_PATTERN,
-    ADMIN_ID_PATTERN,
     validateStudentId,
     validateFacultyId,
-    validateAdminId,
 } from "/@/utils/NewPatientValidation.jsx";
 import {useSavePatient} from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
-type Classification = "student" | "faculty" | "staff";
+type Classification = "student" | "faculty";
 type PatientRecord = Record<string, FormDataEntryValue>;
 
 const ID_FIELDS: Record<Classification, {
@@ -44,12 +42,6 @@ const ID_FIELDS: Record<Classification, {
         placeholder: "F-2023-045",
         pattern: FACULTY_ID_PATTERN,
         validate: validateFacultyId,
-    },
-    staff: {
-        label: "Admin ID",
-        placeholder: "A-2023-045",
-        pattern: ADMIN_ID_PATTERN,
-        validate: validateAdminId,
     },
 };
 

@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
@@ -49,7 +49,10 @@ class CreatePatientRequest(BaseModel):
 
     sex: Sex
     civil_status: CivilStatus
-    classification: str
+    # Patient endpoint creates system users only. Admin/staff
+    # accounts are the staff-management page's responsibility
+    # (POST /staff/); anything else 422s here.
+    classification: Literal["student", "faculty"]
 
     course: str | None = None
     school_year: str | None = None
@@ -78,6 +81,14 @@ class CreatePatientRequest(BaseModel):
             person_type=self.classification,
 
         )
+
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, value):
+        if isinstance(value, str):
+            return value.strip().lower()
+
+        return value
 
     @field_validator("patient_id", "name", "address", "barangay")
     @classmethod
