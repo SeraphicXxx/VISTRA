@@ -3,7 +3,7 @@ import {Modal, FormField} from "/@/components/editModal";
 
 export type JobRole =
     | "Super Administrator"
-    | "Staff"
+    | "Admin"
     | "Doctor"
     | "Nurse"
     | "Dentist"
@@ -37,7 +37,7 @@ export interface NewStaffData {
 
 export const JOB_ROLES: JobRole[] = [
     "Super Administrator",
-    "Staff",
+    "Admin",
     "Doctor",
     "Nurse",
     "Dentist",

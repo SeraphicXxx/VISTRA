@@ -9,6 +9,7 @@ interface ConfirmModalProps {
     confirmLabel?: string;
     cancelLabel?: string;
     tone?: ConfirmTone;
+    isConfirming?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -24,6 +25,7 @@ export function ConfirmModal({
                                  confirmLabel = "Confirm",
                                  cancelLabel = "Cancel",
                                  tone = "default",
+                                 isConfirming = false,
                                  onConfirm,
                                  onCancel,
                              }: ConfirmModalProps) {
@@ -37,7 +39,8 @@ export function ConfirmModal({
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                        disabled={isConfirming}
+                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {cancelLabel}
                     </button>
@@ -45,9 +48,16 @@ export function ConfirmModal({
                     <button
                         type="button"
                         onClick={onConfirm}
-                        className={`rounded-lg px-4 py-2 text-xs font-semibold text-white ${CONFIRM_TONE_CLASSES[tone]}`}
+                        disabled={isConfirming}
+                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70 ${CONFIRM_TONE_CLASSES[tone]}`}
                     >
-                        {confirmLabel}
+                        {isConfirming && (
+                            <span
+                                aria-hidden="true"
+                                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                            />
+                        )}
+                        {isConfirming ? "Saving…" : confirmLabel}
                     </button>
                 </>
             }

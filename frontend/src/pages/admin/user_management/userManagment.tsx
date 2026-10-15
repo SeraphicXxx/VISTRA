@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Pencil, Plus, Trash2} from "lucide-react";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {Column} from "/@/components/table/Table";
-import {NewStaffModal, NewStaffData} from "./newStaffModal";
+import {NewStaffModal, NewStaffData, JobRole, AccessPermission, JOB_ROLES, PERMISSIONS} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 import {useCreateStaff, useDeleteStaff, useStaffList, useUpdateStaffAccess} from "/@/hooks/query/StaffQuery";
@@ -18,48 +18,16 @@ function fullName(data: Pick<NewStaffData, "firstName" | "middleName" | "lastNam
     .join(" ");
 }
 
-type JobRole =
-  | "Super Administrator"
-  | "Admin"
-  | "Doctor"
-  | "Nurse"
-  | "Dentist"
-  | "Clinic OJT";
-
-const JOB_ROLES: JobRole[] = [
-  "Super Administrator",
-  "Admin",
-  "Doctor",
-  "Nurse",
-  "Dentist",
-  "Clinic OJT",
-];
-
-type Access_permission =
-  | "Medical Records"
-  | "Dental Records"
-  | "Appointments"
-  | "Patient Records"
-  | "Staff Management";
-
-const PERMISSIONS: Access_permission[] = [
-  "Medical Records",
-  "Dental Records",
-  "Appointments",
-  "Patient Records",
-  "Staff Management",
-];
-
 export interface Member {
   id: string;
   name: string;
   avatarUrl?: string;
   idNumber: string;
   role: JobRole;
-  roles: Access_permission[];
+  roles: AccessPermission[];
 }
 
-const PERMISSION_LABELS: { key: keyof StaffPermissions; label: Access_permission }[] = [
+const PERMISSION_LABELS: { key: keyof StaffPermissions; label: AccessPermission }[] = [
   {key: "medical_module", label: "Medical Records"},
   {key: "dental_module", label: "Dental Records"},
   {key: "appointment_module", label: "Appointments"},
@@ -83,7 +51,7 @@ function toMember(staff: StaffModel): Member {
 
 const PAGE_SIZE = 10;
 
-type PendingEdit = { role: JobRole; roles: Access_permission[] };
+type PendingEdit = { role: JobRole; roles: AccessPermission[] };
 
 type ConfirmState =
   | { kind: "save"; id: string; name: string; edit: PendingEdit }
@@ -137,6 +105,7 @@ export function RoleManagementPage() {
   const debouncedSearch = useDebounce(search, 400);
   const [isNewOpen, setIsNewOpen] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [editingMembers, setEditingMembers] = useState<Record<string, boolean>>(
     {},
   );
@@ -221,7 +190,9 @@ export function RoleManagementPage() {
   };
 
   const runConfirm = async () => {
-    if (!confirm) return;
+    if (!confirm || isConfirming) return;
+
+    setIsConfirming(true);
 
     try {
       if (confirm.kind === "save") {
@@ -239,6 +210,8 @@ export function RoleManagementPage() {
       console.error("Staff action failed:", error);
       toast.error("Action failed. Check the connection and try again.");
       return;
+    } finally {
+      setIsConfirming(false);
     }
 
     setConfirm(null);
@@ -446,6 +419,7 @@ export function RoleManagementPage() {
           }
           onConfirm={runConfirm}
           onCancel={() => setConfirm(null)}
+          isConfirming={isConfirming}
         />
       )}
     </>
