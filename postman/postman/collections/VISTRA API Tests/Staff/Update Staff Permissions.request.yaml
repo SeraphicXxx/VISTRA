@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/staff/{{user_id}}/permissions"
+url: "{{base_url}}/{{api_version}}/staff/{{created_staff_id}}/permissions"
 method: PATCH
 auth:
   type: bearer
@@ -13,11 +13,7 @@ body:
 
     \    \"dental_module\": false,\r
 
-    \    \"appointment_module\": true,\r
-
-    \    \"patient_module\": true,\r
-
-    \    \"staff_module\": false\r
+    \    \"appointment_module\": true\r
 
     }"
 scripts:
@@ -27,11 +23,12 @@ scripts:
           pm.response.to.have.status(200);
       });
 
-      pm.test("Updated flags are echoed", function () {
+      pm.test("Partial flags are stored, rest untouched", function () {
           var jsonData = pm.response.json();
           pm.expect(jsonData.success).to.eql(true);
           pm.expect(jsonData.data.medical_module).to.eql(true);
           pm.expect(jsonData.data.dental_module).to.eql(false);
+          pm.expect(jsonData.data.patient_module).to.eql(false);
       });
     language: text/javascript
 order: 6050

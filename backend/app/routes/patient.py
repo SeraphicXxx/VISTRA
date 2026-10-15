@@ -5,7 +5,7 @@ from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient
-from app.services.access import enforce_patient_scope, get_patient_scope
+from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
     get_patient_summary_record
 from app.services.patient import create_patient as create_patient_service
@@ -15,7 +15,7 @@ from app.services.patient import update_patient_profile as update_patient_profil
 protected_patient_router = APIRouter(
     prefix="/patients",
     tags=["Patients"],
-    dependencies=[Depends(get_current_user)]
+    dependencies=[Depends(require_module("patient"))]
 )
 
 @protected_patient_router.get("/", dependencies=[Depends(require_staff)])

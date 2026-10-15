@@ -3,6 +3,7 @@ from supabase import Client
 
 from app.config.security import require_staff
 from app.schemas.staff import CreateStaffRequest, UpdateStaffPermissionsRequest
+from app.services.access import require_module
 from app.services.staff import get_all_staff
 from app.services.staff import get_staff_by_id
 from app.services.staff import create_staff as create_staff_service
@@ -16,11 +17,11 @@ protected_staff_router = APIRouter(
     dependencies=[Depends(require_staff)]
 )
 
-@protected_staff_router.get("/")
+@protected_staff_router.get("/", dependencies=[Depends(require_module("staff"))])
 def list_staff(supabase: Client = Depends(get_supabase_for_user)):
     return get_all_staff(supabase)
 
-@protected_staff_router.post("/")
+@protected_staff_router.post("/", dependencies=[Depends(require_module("staff"))])
 def create_staff(request: CreateStaffRequest, supabase: Client = Depends(get_supabase_for_user)):
     return create_staff_service(request, supabase)
 
@@ -28,11 +29,11 @@ def create_staff(request: CreateStaffRequest, supabase: Client = Depends(get_sup
 def get_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return get_staff_by_id(staff_id, supabase)
 
-@protected_staff_router.delete("/{staff_id}/")
+@protected_staff_router.delete("/{staff_id}/", dependencies=[Depends(require_module("staff"))])
 def delete_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return delete_staff_service(staff_id, supabase)
 
-@protected_staff_router.patch("/{staff_id}/permissions")
+@protected_staff_router.patch("/{staff_id}/permissions", dependencies=[Depends(require_module("staff"))])
 def update_staff_permissions(
     staff_id: str,
     request: UpdateStaffPermissionsRequest,

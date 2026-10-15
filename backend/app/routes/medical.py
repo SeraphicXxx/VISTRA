@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from supabase import Client
 
 from app.config.security import get_current_user, require_staff
+from app.services.access import require_module
 from app.database.database_client import get_supabase_for_user
 from app.schemas.medical import MedicalVisitCreateRequest, MedicalVisitUpdateRequest
 from app.schemas.query import FilterMedical
@@ -16,7 +17,7 @@ from app.services.medical import update_medical_visit as update_medical_visit_se
 protected_medical_router = APIRouter(
     prefix="/medical",
     tags=["Medical"],
-    dependencies=[Depends(require_staff)]
+    dependencies=[Depends(require_staff), Depends(require_module("medical"))]
 )
 
 

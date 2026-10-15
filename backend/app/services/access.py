@@ -1,10 +1,61 @@
 from fastapi import Depends, HTTPException, status
 from supabase import Client
 
-from app.config.security import get_current_user
+from app.config.security import get_current_user, require_user_email
 from app.database.database_client import get_supabase_for_user
 from app.repositories.patient_repositories import PatientRepository
+from app.repositories.staff_repositories import StaffRepository
 from app.schemas.user import CurrentUser, PATIENT_ROLES, STAFF_ROLE
+from app.utils.email_utils import staff_id_format
+
+
+# Domain router -> STAFF_PERMISSIONS column. Overview has no column:
+# it is implicit base access for any authenticated staff.
+MODULE_COLUMNS = {
+    "medical": "medical_module",
+    "dental": "dental_module",
+    "appointment": "appointment_module",
+    "patient": "patient_module",
+    "staff": "staff_module",
+}
+
+
+def require_module(module: str):
+    """Dependency factory enforcing STAFF_PERMISSIONS module flags.
+
+    Patient-type roles pass through untouched: their per-endpoint
+    scoped rules (ownership) apply downstream. Staff must hold the
+    flag; missing permissions row (legacy) or False reads as denial.
+    No super-admin bypass: all-flags rows express full access.
+    Costs one STAFF_PERMISSIONS read per staff request.
+    """
+    column = MODULE_COLUMNS[module]
+
+    def check_module(
+        current_user: CurrentUser = Depends(get_current_user),
+        supabase: Client = Depends(get_supabase_for_user),
+    ) -> CurrentUser:
+        if current_user.role in PATIENT_ROLES:
+            return current_user
+
+        if current_user.role != STAFF_ROLE:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions for this resource",
+            )
+
+        staff_id = staff_id_format(require_user_email(current_user))
+        perms = StaffRepository(supabase).get_permissions(staff_id)
+
+        if not perms or not perms.get(column):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Staff access requires the {column} permission",
+            )
+
+        return current_user
+
+    return check_module
 
 
 def get_patient_scope(

@@ -1,0 +1,41 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/staff/{{user_id}}/permissions"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"medical_module\": true,\r
+
+    \    \"dental_module\": true,\r
+
+    \    \"appointment_module\": true,\r
+
+    \    \"patient_module\": true,\r
+
+    \    \"staff_module\": true\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Grant all permissions returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("All flags granted", function () {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.success).to.eql(true);
+          pm.expect(jsonData.data.medical_module).to.eql(true);
+          pm.expect(jsonData.data.staff_module).to.eql(true);
+      });
+
+      // NOTE: seeds the runner's staff identity ({{user_id}}) with full
+      // module access. Runs before any module-gated request: without
+      // it, staff calls 403 once module enforcement is active.
+    language: text/javascript
+order: 950
