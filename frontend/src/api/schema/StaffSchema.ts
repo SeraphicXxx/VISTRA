@@ -8,6 +8,10 @@ export interface StaffPermissions {
 
 export type UpdateStaffPermissions = Partial<StaffPermissions>;
 
+export interface UpdateStaffAccess extends UpdateStaffPermissions {
+    role?: string;
+}
+
 export interface CreateStaffRequest {
     staff_id: string;
     first_name: string;

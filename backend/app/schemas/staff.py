@@ -12,10 +12,13 @@ class StaffPermissionsInput(BaseModel):
     staff_module: bool = False
 
 
-class UpdateStaffPermissionsRequest(BaseModel):
-    """Partial update: at least one flag required (service 422s
-    otherwise). Absent flags are left untouched."""
+class UpdateStaffAccessRequest(BaseModel):
+    """Combined role + permissions update for the user-management
+    save action. At least one field required (service 422s on an
+    empty body). Absent flags are left untouched; legacy rows
+    without a permissions record are healed by insert."""
 
+    role: str | None = None
     dental_module: bool | None = None
     medical_module: bool | None = None
     appointment_module: bool | None = None
@@ -25,16 +28,11 @@ class UpdateStaffPermissionsRequest(BaseModel):
     def to_permissions_update(self) -> dict:
         return {
             key: value
-            for key, value in self.model_dump().items()
+            for key, value in self.model_dump(
+                exclude={"role"}
+            ).items()
             if value is not None
         }
-
-
-class UpdateStaffRoleRequest(BaseModel):
-    """Job-role update (user-management role select). Free text by
-    design: job titles evolve in product, not in migrations."""
-
-    role: str
 
 
 class CreateStaffRequest(BaseModel):

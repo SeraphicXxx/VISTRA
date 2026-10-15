@@ -2,14 +2,13 @@ from fastapi import APIRouter, Depends
 from supabase import Client
 
 from app.config.security import require_staff
-from app.schemas.staff import CreateStaffRequest, UpdateStaffPermissionsRequest, UpdateStaffRoleRequest
+from app.schemas.staff import CreateStaffRequest, UpdateStaffAccessRequest
 from app.services.access import require_module
 from app.services.staff import get_all_staff
 from app.services.staff import get_staff_by_id
 from app.services.staff import create_staff as create_staff_service
 from app.services.staff import delete_staff as delete_staff_service
-from app.services.staff import update_staff_permissions as update_staff_permissions_service
-from app.services.staff import update_staff_role as update_staff_role_service
+from app.services.staff import update_staff_access as update_staff_access_service
 from app.database.database_client import get_supabase_for_user
 
 protected_staff_router = APIRouter(
@@ -34,18 +33,10 @@ def get_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
 def delete_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return delete_staff_service(staff_id, supabase)
 
-@protected_staff_router.patch("/{staff_id}/permissions", dependencies=[Depends(require_module("staff"))])
-def update_staff_permissions(
+@protected_staff_router.patch("/{staff_id}/access", dependencies=[Depends(require_module("staff"))])
+def update_staff_access(
     staff_id: str,
-    request: UpdateStaffPermissionsRequest,
+    request: UpdateStaffAccessRequest,
     supabase: Client = Depends(get_supabase_for_user),
 ):
-    return update_staff_permissions_service(staff_id, request, supabase)
-
-@protected_staff_router.patch("/{staff_id}/role", dependencies=[Depends(require_module("staff"))])
-def update_staff_role(
-    staff_id: str,
-    request: UpdateStaffRoleRequest,
-    supabase: Client = Depends(get_supabase_for_user),
-):
-    return update_staff_role_service(staff_id, request, supabase)
+    return update_staff_access_service(staff_id, request, supabase)

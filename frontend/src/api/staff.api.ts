@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from "/@/config/ApiConfig";
 import { ApiResponse } from "/@/api/schema/ApiResponseSchema";
-import { StaffData, StaffPermissions, UpdateStaffPermissions, CreateStaffRequest } from "/@/api/schema/StaffSchema";
+import { StaffData, StaffPermissions, UpdateStaffAccess, CreateStaffRequest } from "/@/api/schema/StaffSchema";
 import {getResource, sendResource} from "/@/api/resource";
 
 export const createStaff = (
@@ -46,28 +46,15 @@ export const deleteStaff = (
     );
 };
 
-export const updateStaffPermissions = (
+export const updateStaffAccess = (
     staffId: string,
-    payload: UpdateStaffPermissions,
+    payload: UpdateStaffAccess,
     signal?: AbortSignal
 ) => {
-    return sendResource<ApiResponse<StaffPermissions>>(
+    return sendResource<ApiResponse<{role?: string | null; permissions?: StaffPermissions | null}>>(
         "PATCH",
-        API_ENDPOINTS.staff.update_staff_permissions(staffId),
+        API_ENDPOINTS.staff.update_staff_access(staffId),
         payload,
-        signal,
-    );
-};
-
-export const updateStaffRole = (
-    staffId: string,
-    role: string,
-    signal?: AbortSignal
-) => {
-    return sendResource<ApiResponse<StaffData>>(
-        "PATCH",
-        API_ENDPOINTS.staff.update_staff_role(staffId),
-        {role},
         signal,
     );
 };

@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/staff/{{created_staff_id}}/permissions"
+url: "{{base_url}}/{{api_version}}/staff/{{created_staff_id}}/access"
 method: PATCH
 auth:
   type: bearer
@@ -8,6 +8,8 @@ auth:
 body:
   type: json
   content: "{\r
+
+    \    \"role\": \"Doctor\",\r
 
     \    \"medical_module\": true,\r
 
@@ -19,16 +21,17 @@ body:
 scripts:
   - type: afterResponse
     code: |+
-      pm.test("Update permissions returns 200", function () {
+      pm.test("Update access returns 200", function () {
           pm.response.to.have.status(200);
       });
 
-      pm.test("Partial flags are stored, rest untouched", function () {
+      pm.test("Role and flags are echoed", function () {
           var jsonData = pm.response.json();
           pm.expect(jsonData.success).to.eql(true);
-          pm.expect(jsonData.data.medical_module).to.eql(true);
-          pm.expect(jsonData.data.dental_module).to.eql(false);
-          pm.expect(jsonData.data.patient_module).to.eql(false);
+          pm.expect(jsonData.data.role).to.eql("Doctor");
+          pm.expect(jsonData.data.permissions.medical_module).to.eql(true);
+          pm.expect(jsonData.data.permissions.dental_module).to.eql(false);
+          pm.expect(jsonData.data.permissions.patient_module).to.eql(false);
       });
     language: text/javascript
 order: 6050

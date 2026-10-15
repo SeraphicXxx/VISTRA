@@ -5,7 +5,7 @@ import {Column} from "/@/components/table/Table";
 import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
-import {useCreateStaff, useDeleteStaff, useStaffList, useUpdateStaffPermissions, useUpdateStaffRole} from "/@/hooks/query/StaffQuery";
+import {useCreateStaff, useDeleteStaff, useStaffList, useUpdateStaffAccess} from "/@/hooks/query/StaffQuery";
 import {useDebounce} from "/@/hooks/Debouncer";
 import {toast} from "react-toastify";
 import type {StaffPermissions} from "/@/api/schema/StaffSchema";
@@ -130,8 +130,7 @@ export function RoleManagementPage() {
   const {data: staffList, isLoading: staffLoading, error: staffError} = useStaffList();
   const {mutateAsync: deleteStaff} = useDeleteStaff();
   const {mutateAsync: createStaff} = useCreateStaff();
-  const {mutateAsync: savePermissions} = useUpdateStaffPermissions();
-  const {mutateAsync: saveRole} = useUpdateStaffRole();
+  const {mutateAsync: saveAccess} = useUpdateStaffAccess();
   const [members, setMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -178,11 +177,13 @@ export function RoleManagementPage() {
     const payload = Object.fromEntries(
       PERMISSION_LABELS.map(({key, label}) => [key, edit.roles.includes(label)]),
     );
-    await savePermissions({staffId: id, payload});
-
-    if (!current || edit.role !== current.role) {
-      await saveRole({staffId: id, role: edit.role});
-    }
+    await saveAccess({
+      staffId: id,
+      payload: {
+        ...payload,
+        ...(!current || edit.role !== current.role ? {role: edit.role} : {}),
+      },
+    });
 
     setMembers((prev) =>
       prev.map((m) =>

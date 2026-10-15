@@ -4,8 +4,7 @@ from app.schemas.staff import (
     StaffData,
     CreateStaffRequest,
     StaffPermissionsInput,
-    UpdateStaffPermissionsRequest,
-    UpdateStaffRoleRequest,
+    UpdateStaffAccessRequest,
 )
 from app.schemas.user import STAFF_ROLE
 from app.services.auth.user import (
@@ -112,43 +111,41 @@ def delete_staff(staff_id: str, supabase: Client):
 
 
 @handle_service_errors
-def update_staff_permissions(
+def update_staff_access(
     staff_id: str,
-    request: UpdateStaffPermissionsRequest,
+    request: UpdateStaffAccessRequest,
     supabase: Client,
 ):
     staff_repo = StaffRepository(supabase)
     or_404(staff_repo.get_by_id(staff_id), "Staff not found")
 
-    payload = request.to_permissions_update()
+    data: dict = {}
+    flags = request.to_permissions_update()
 
-    if not payload:
+    if request.role is None and not flags:
         raise ValueError(
-            "No permission fields provided. Allowed: dental_module, "
+            "No update fields provided. Allowed: role, dental_module, "
             "medical_module, appointment_module, patient_module, "
             "staff_module."
         )
 
-    updated = staff_repo.update_permissions(staff_id, payload)
-
-    if updated is None:
-        # Legacy row predating permissions: heal by inserting.
-        updated = staff_repo.insert_permissions(staff_id, payload)
-
-    return ok(or_404(updated, "Staff permissions not found"))
-
-
-@handle_service_errors
-def update_staff_role(staff_id: str, request: UpdateStaffRoleRequest, supabase: Client):
-    staff_repo = StaffRepository(supabase)
-    or_404(staff_repo.get_by_id(staff_id), "Staff not found")
-
-    return ok(
+    if request.role is not None:
         or_404(
             staff_repo.update_role(staff_id, request.role),
             "Staff not found",
         )
-    )
+        data["role"] = request.role
+
+    if flags:
+        updated = staff_repo.update_permissions(staff_id, flags)
+
+        if updated is None:
+            # Legacy row predating permissions: heal by inserting.
+            updated = staff_repo.insert_permissions(staff_id, flags)
+
+        data["permissions"] = or_404(updated, "Staff permissions not found")
+
+    return ok(data)
 
 
 @handle_service_errors
