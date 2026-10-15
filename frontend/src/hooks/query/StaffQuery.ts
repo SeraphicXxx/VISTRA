@@ -1,6 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {StaffModel} from "/@/repository/StaffModel";
-import {deleteStaff, getAllStaff} from "/@/api/staff.api";
+import {deleteStaff, getAllStaff, updateStaffPermissions, updateStaffRole} from "/@/api/staff.api";
+import type {UpdateStaffPermissions} from "/@/api/schema/StaffSchema";
 
 export function useStaffList() {
     return useQuery({
@@ -24,6 +25,34 @@ export function useDeleteStaff() {
     return useMutation({
         mutationFn: async (staffId: string) => {
             const {data} = await deleteStaff(staffId);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["staff"]});
+        },
+    });
+}
+
+export function useUpdateStaffPermissions() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({staffId, payload}: {staffId: string; payload: UpdateStaffPermissions}) => {
+            const {data} = await updateStaffPermissions(staffId, payload);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["staff"]});
+        },
+    });
+}
+
+export function useUpdateStaffRole() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({staffId, role}: {staffId: string; role: string}) => {
+            const {data} = await updateStaffRole(staffId, role);
             return data;
         },
         onSuccess: () => {

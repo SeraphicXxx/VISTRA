@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
         getStaffById: (staffId: string) => `${API_V1}/staff/${staffId}/`,
         delete_staff: (staffId: string) => `${API_V1}/staff/${staffId}/`,
         update_staff_permissions: (staffId: string) => `${API_V1}/staff/${staffId}/permissions`,
+        update_staff_role: (staffId: string) => `${API_V1}/staff/${staffId}/role`,
     },
     patient: {
         get_patients: `${API_V1}/patients/`,

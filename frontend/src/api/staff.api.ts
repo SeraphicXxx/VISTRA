@@ -46,3 +46,16 @@ export const updateStaffPermissions = (
         signal,
     );
 };
+
+export const updateStaffRole = (
+    staffId: string,
+    role: string,
+    signal?: AbortSignal
+) => {
+    return sendResource<ApiResponse<StaffData>>(
+        "PATCH",
+        API_ENDPOINTS.staff.update_staff_role(staffId),
+        {role},
+        signal,
+    );
+};

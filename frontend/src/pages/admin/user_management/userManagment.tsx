@@ -5,7 +5,9 @@ import {Column} from "/@/components/table/Table";
 import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
-import {useDeleteStaff, useStaffList} from "/@/hooks/query/StaffQuery";
+import {useDeleteStaff, useStaffList, useUpdateStaffPermissions, useUpdateStaffRole} from "/@/hooks/query/StaffQuery";
+import {useDebounce} from "/@/hooks/Debouncer";
+import {toast} from "react-toastify";
 import type {StaffPermissions} from "/@/api/schema/StaffSchema";
 import type {StaffModel} from "/@/repository/StaffModel";
 
@@ -127,8 +129,12 @@ function PermissionCheckbox({
 export function RoleManagementPage() {
   const {data: staffList, isLoading: staffLoading, error: staffError} = useStaffList();
   const {mutateAsync: deleteStaff} = useDeleteStaff();
+  const {mutateAsync: savePermissions} = useUpdateStaffPermissions();
+  const {mutateAsync: saveRole} = useUpdateStaffRole();
   const [members, setMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const [isNewOpen, setIsNewOpen] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [editingMembers, setEditingMembers] = useState<Record<string, boolean>>(
@@ -142,7 +148,17 @@ export function RoleManagementPage() {
     }
   }, [staffList]);
 
-  const totalPages = Math.max(1, Math.ceil(members.length / PAGE_SIZE));
+  const visibleMembers = useMemo(() => {
+    const query = debouncedSearch.trim().toLowerCase();
+    if (!query) return members;
+    return members.filter((m) =>
+      [m.name, m.idNumber, m.role].some((value) =>
+        value.toLowerCase().includes(query),
+      ),
+    );
+  }, [members, debouncedSearch]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleMembers.length / PAGE_SIZE));
 
   const getCurrent = (m: Member): PendingEdit =>
     pending[m.id] ?? { role: m.role, roles: m.roles };
@@ -156,7 +172,17 @@ export function RoleManagementPage() {
     setEditingMembers((prev) => ({ ...prev, [id]: false }));
   };
 
-  const handleConfirmSave = (id: string, edit: PendingEdit) => {
+  const handleConfirmSave = async (id: string, edit: PendingEdit) => {
+    const current = members.find((m) => m.id === id);
+    const payload = Object.fromEntries(
+      PERMISSION_LABELS.map(({key, label}) => [key, edit.roles.includes(label)]),
+    );
+    await savePermissions({staffId: id, payload});
+
+    if (!current || edit.role !== current.role) {
+      await saveRole({staffId: id, role: edit.role});
+    }
+
     setMembers((prev) =>
       prev.map((m) =>
         m.id === id ? { ...m, role: edit.role, roles: edit.roles } : m,
@@ -184,15 +210,19 @@ export function RoleManagementPage() {
 
     try {
       if (confirm.kind === "save") {
-        handleConfirmSave(confirm.id, confirm.edit);
+        await handleConfirmSave(confirm.id, confirm.edit);
+        toast.success("Permissions updated");
       } else if (confirm.kind === "add") {
         handleAddStaff(confirm.data);
+        toast.success("Staff member added");
       } else {
         await deleteStaff(confirm.id);
         clearPending(confirm.id);
+        toast.success("Staff member deleted");
       }
     } catch (error) {
       console.error("Staff action failed:", error);
+      toast.error("Action failed. Check the connection and try again.");
       return;
     }
 
@@ -361,13 +391,16 @@ export function RoleManagementPage() {
             Add New Staff
           </button>
         }
-        data={members}
+        data={visibleMembers}
         isLoading={staffLoading}
         columns={columns}
         renderAction={renderAction}
         totalPages={totalPages}
         page={page}
-        onRun={(_search, _filters, nextPage) => setPage(nextPage)}
+        onRun={(nextSearch, _filters, nextPage) => {
+          setSearch(nextSearch);
+          setPage(nextPage);
+        }}
       />
 
       {isNewOpen && (

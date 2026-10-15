@@ -5,6 +5,7 @@ from app.schemas.staff import (
     CreateStaffRequest,
     StaffPermissionsInput,
     UpdateStaffPermissionsRequest,
+    UpdateStaffRoleRequest,
 )
 from app.schemas.user import STAFF_ROLE
 from app.services.auth.user import (
@@ -135,6 +136,19 @@ def update_staff_permissions(
         updated = staff_repo.insert_permissions(staff_id, payload)
 
     return ok(or_404(updated, "Staff permissions not found"))
+
+
+@handle_service_errors
+def update_staff_role(staff_id: str, request: UpdateStaffRoleRequest, supabase: Client):
+    staff_repo = StaffRepository(supabase)
+    or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+
+    return ok(
+        or_404(
+            staff_repo.update_role(staff_id, request.role),
+            "Staff not found",
+        )
+    )
 
 
 @handle_service_errors

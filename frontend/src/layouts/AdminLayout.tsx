@@ -3,7 +3,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "/@/pages/admin/sidebar";
 import StaffPageHeader from "/@/components/StaffPageHeader";
 import { sessionManager } from "/@/utils/SessionManager";
-import { AdminAnimStyles } from "/@/components/adminanim.jsx";
+import {ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const HIDDEN_HEADER_PATHS = [
     "/staff/medical/new",
@@ -54,6 +55,8 @@ export default function AdminLayout() {
                     </div>
                 </main>
             </div>
+
+            <ToastContainer position="bottom-right" autoClose={4000} />
         </div>
     );
 }

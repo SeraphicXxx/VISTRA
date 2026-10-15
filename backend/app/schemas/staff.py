@@ -30,6 +30,13 @@ class UpdateStaffPermissionsRequest(BaseModel):
         }
 
 
+class UpdateStaffRoleRequest(BaseModel):
+    """Job-role update (user-management role select). Free text by
+    design: job titles evolve in product, not in migrations."""
+
+    role: str
+
+
 class CreateStaffRequest(BaseModel):
     staff_id: str
     first_name: str

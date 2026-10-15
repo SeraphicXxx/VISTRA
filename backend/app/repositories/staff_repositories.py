@@ -57,6 +57,14 @@ class StaffRepository(BaseRepository):
             perms,
         )
 
+    def update_role(self, staff_id: str, role: str):
+        return self.update_by_column(
+            "STAFF",
+            "staff_id",
+            staff_id,
+            {"role": role},
+        )
+
     def get_staff(self):
         return self.fetch_all("STAFF")
 
