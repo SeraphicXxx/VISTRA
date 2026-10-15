@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "/@/pages/admin/sidebar";
 import StaffPageHeader from "/@/components/StaffPageHeader";
 import { sessionManager } from "/@/utils/SessionManager";
+import { AdminAnimStyles } from "/@/components/adminanim.jsx";
 import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
