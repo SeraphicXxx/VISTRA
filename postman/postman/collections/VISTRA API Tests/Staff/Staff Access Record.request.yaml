@@ -1,0 +1,26 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/staff/{{user_id}}/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Staff access record returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Name data, role, and permissions are returned", function () {
+          var jsonData = pm.response.json();
+          var data = jsonData.data;
+          pm.expect(jsonData.success).to.eql(true);
+          pm.expect(data).to.have.property("first_name");
+          pm.expect(data).to.have.property("middle_name");
+          pm.expect(data).to.have.property("last_name");
+          pm.expect(data).to.have.property("role");
+          pm.expect(data).to.have.property("permissions");
+      });
+    language: text/javascript
+order: 1100

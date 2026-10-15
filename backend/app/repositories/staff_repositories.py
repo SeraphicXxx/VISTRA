@@ -9,6 +9,13 @@ class StaffRepository(BaseRepository):
             filters={"staff_id": staff_id},
         )
 
+    def get_permissions(self, staff_id: str):
+        """STAFF_PERMISSIONS row, or None for legacy rows / denied reads."""
+        return self.fetch_one(
+            "STAFF_PERMISSIONS",
+            filters={"staff_id": staff_id},
+        )
+
     def get_staff(self):
         return self.fetch_all("STAFF")
 

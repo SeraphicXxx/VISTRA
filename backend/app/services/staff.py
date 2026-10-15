@@ -43,9 +43,9 @@ def create_staff(request: CreateStaffRequest, supabase: Client):
 @handle_service_errors
 def get_staff_by_id(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
-    response = staff_repo.get_by_id(staff_id)
+    record = or_404(staff_repo.get_by_id(staff_id), "Staff not found")
 
-    return ok(or_404(response, "Staff not found"))
+    return ok({**record, "permissions": staff_repo.get_permissions(staff_id)})
 
 
 @handle_service_errors
