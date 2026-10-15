@@ -98,7 +98,8 @@ export function ClassificationToggle({
 }) {
   const options = [
     { key: "student", label: "Student" },
-    { key: "faculty", label: "Faculty / Professor" },
+    { key: "faculty", label: "Faculty" },
+    { key: "professor", label: "Professor" },
   ];
 
   return (
@@ -111,7 +112,7 @@ export function ClassificationToggle({
         id="classification"
         role="radiogroup"
         aria-label="Classification"
-        className="grid w-full grid-cols-2 gap-1 rounded-xl border border-border bg-background p-1 sm:inline-grid sm:w-auto"
+        className="grid w-full grid-cols-3 gap-1 rounded-xl border border-border bg-background p-1 sm:inline-grid sm:w-auto"
       >
         {options.map((opt) => {
           const active = value === opt.key;

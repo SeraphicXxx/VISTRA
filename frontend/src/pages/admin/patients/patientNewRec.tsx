@@ -22,7 +22,7 @@ import {useSavePatient} from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
-type Classification = "student" | "faculty";
+type Classification = "student" | "faculty" | "professor";
 type PatientRecord = Record<string, FormDataEntryValue>;
 
 const ID_FIELDS: Record<Classification, {
@@ -39,6 +39,12 @@ const ID_FIELDS: Record<Classification, {
     },
     faculty: {
         label: "Faculty ID",
+        placeholder: "F-2023-045",
+        pattern: FACULTY_ID_PATTERN,
+        validate: validateFacultyId,
+    },
+    professor: {
+        label: "Professor ID",
         placeholder: "F-2023-045",
         pattern: FACULTY_ID_PATTERN,
         validate: validateFacultyId,
@@ -60,6 +66,7 @@ export default function NewPatientRecordForm() {
 
     const isStudent = classification === "student";
     const isFaculty = classification === "faculty";
+    const isProfessor = classification === "professor";
     const idField = ID_FIELDS[classification];
     const PasswordIcon = showPassword ? EyeOff : Eye;
 
@@ -277,7 +284,7 @@ export default function NewPatientRecordForm() {
                 </div>
             )}
 
-            {isFaculty && (
+            {(isFaculty || isProfessor) && (
                 <div className="mt-8 border-t border-border pt-6">
                     <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
                         Employment Details
