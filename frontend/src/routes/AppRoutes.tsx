@@ -30,6 +30,7 @@ import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
+import RequireModule from "/@/routes/RequireModule";
 
 
 
@@ -57,38 +58,38 @@ function AppRoutes() {
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<AdminLayout/>}>
                         <Route path={ROUTES.staff.dashboard.overview} element={<OverviewTab/>}/>
-                        <Route path={ROUTES.staff.dashboard.medical} element={<MedicalPage/>}/>
-                        <Route path={ROUTES.staff.medical.createNewRecord} element={<PatientRecordForm/>}/>
-                        <Route path={ROUTES.staff.medical.view.route} element={<PatientRecordView/>}/>
+                        <Route path={ROUTES.staff.dashboard.medical} element={<RequireModule module="medical_module"><MedicalPage/></RequireModule>}/>
+                        <Route path={ROUTES.staff.medical.createNewRecord} element={<RequireModule module="medical_module"><PatientRecordForm/></RequireModule>}/>
+                        <Route path={ROUTES.staff.medical.view.route} element={<RequireModule module="medical_module"><PatientRecordView/></RequireModule>}/>
 
-                        <Route path={ROUTES.staff.dashboard.dental} element={<DentalPage/>}/>
-                        <Route path={ROUTES.staff.dental.createNewRecord} element={<DentalRecordForm/>}/>
-                        <Route path={ROUTES.staff.dental.view.route} element={<DentalRecordView/>}/>
+                        <Route path={ROUTES.staff.dashboard.dental} element={<RequireModule module="dental_module"><DentalPage/></RequireModule>}/>
+                        <Route path={ROUTES.staff.dental.createNewRecord} element={<RequireModule module="dental_module"><DentalRecordForm/></RequireModule>}/>
+                        <Route path={ROUTES.staff.dental.view.route} element={<RequireModule module="dental_module"><DentalRecordView/></RequireModule>}/>
 
                         <Route
                             path={ROUTES.staff.dashboard.appointments}
-                            element={<AppointmentPage/>}
+                            element={<RequireModule module="appointment_module"><AppointmentPage/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.appointments.view.route}
-                            element={<AppointmentDetailPage/>}
+                            element={<RequireModule module="appointment_module"><AppointmentDetailPage/></RequireModule>}
                         />
 
                         <Route
                             path={ROUTES.staff.dashboard.patients}
-                            element={<PatientsPage/>}
+                            element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.dashboard.accessControl}
-                            element={<RoleManagementPage/>}
+                            element={<RequireModule module="staff_module"><RoleManagementPage/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.patient.createNewRecord}
-                            element={<NewPatientRecordForm/>}
+                            element={<RequireModule module="patient_module"><NewPatientRecordForm/></RequireModule>}
                         />
                         <Route
                             path={`${ROUTES.staff.patient.patientRecordTab}/:id`}
-                            element={<ViewPatientRecord/>}
+                            element={<RequireModule module="patient_module"><ViewPatientRecord/></RequireModule>}
                         />
                     </Route>
                 </Route>
