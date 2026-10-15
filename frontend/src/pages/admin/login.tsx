@@ -323,12 +323,20 @@ export default function AdminLoginPage() {
 
   const { login, isLoading, isError, error } = useLogin();
   const [isDutyModalOpen, setIsDutyModalOpen] = useState(false);
+  const [isCheckingPresence, setIsCheckingPresence] = useState(false);
+  const isBusy = isLoading || isCheckingPresence;
 
-  const doLogin = async (on_duty: boolean) => {
+  const skipToDashboard = (): void => {
+    setIsDutyModalOpen(false);
+    navigate(ROUTES.staff.dashboard.overview);
+  };
+
+  const confirmOnDuty = async (): Promise<void> => {
+    // Second sign-in with on_duty flips is_active; the fresh
+    // session replaces the one from the initial login.
     try {
-      await login({ ...credentials, on_duty });
-      setIsDutyModalOpen(false);
-      navigate(ROUTES.staff.dashboard.overview);
+      await login({ ...credentials, on_duty: true });
+      skipToDashboard();
     } catch {}
   };
 
@@ -337,20 +345,30 @@ export default function AdminLoginPage() {
 
     if (!validate()) return;
 
-    // Staff already on duty skip the prompt entirely; only the
-    // 5pm cronjob can flip the flag back to false.
+    // Authenticate first (presence lookup needs a session), then
+    // decide on the duty prompt: staff already flagged active skip
+    // it entirely — only the 5pm cronjob can flip the flag back.
+    try {
+      await login({ ...credentials, on_duty: false });
+    } catch {
+      return;
+    }
+
     try {
       const staffId = toStaffId(
         credentials.identifier ?? credentials.email ?? ""
       );
+      setIsCheckingPresence(true);
       const { data } = await getStaffById(staffId);
 
       if (data.data?.is_active) {
-        await doLogin(true);
+        navigate(ROUTES.staff.dashboard.overview);
         return;
       }
     } catch {
       // Unknown staff or lookup failure: fall through to the modal.
+    } finally {
+      setIsCheckingPresence(false);
     }
 
     setIsDutyModalOpen(true);
@@ -361,7 +379,7 @@ export default function AdminLoginPage() {
       <LoginForm
         credentials={credentials}
         validationErrors={validationErrors}
-        isLoading={isLoading}
+        isLoading={isBusy}
         isError={isError}
         error={error}
         onChange={handleChange}
@@ -377,7 +395,7 @@ export default function AdminLoginPage() {
             <>
               <button
                 type="button"
-                onClick={() => doLogin(false)}
+                onClick={skipToDashboard}
                 disabled={isLoading}
                 className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -386,7 +404,7 @@ export default function AdminLoginPage() {
 
               <button
                 type="button"
-                onClick={() => doLogin(true)}
+                onClick={() => void confirmOnDuty()}
                 disabled={isLoading}
                 className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
               >
