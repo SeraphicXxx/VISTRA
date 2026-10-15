@@ -8,6 +8,7 @@ import {useSidebar} from "/@/hooks/UseSidebar";
 import {useStaffInfo} from "/@/hooks/StaffInfo";
 
 import {sessionManager} from "/@/utils/SessionManager";
+import type {StaffPermissions} from "/@/api/schema/StaffSchema";
 import {logoutSession} from "/@/hooks/UseLogout";
 
 import {AdminRoutes} from "/@/config/Routes";
@@ -27,7 +28,20 @@ interface SidebarRouteItem {
     }>;
     isShortcut?: boolean;
     activePaths?: string[];
+    component?: string;
 }
+
+// Route component key -> STAFF_PERMISSIONS flag. Overview has no
+// flag (implicit base access) and always shows; unknown keys hide
+// (fail closed), mirroring the backend require_module() matrix.
+const COMPONENT_MODULES: Record<string, keyof StaffPermissions | null> = {
+    overview: null,
+    medical: "medical_module",
+    dental: "dental_module",
+    appointments: "appointment_module",
+    patients: "patient_module",
+    members: "staff_module",
+};
 
 function isRouteActive(
     item: SidebarRouteItem,
@@ -257,15 +271,23 @@ export default function Sidebar() {
     const {isOpen, open, close} = useSidebar(firstLinkRef);
     const [isSignOutOpen, setIsSignOutOpen] = useState(false);
 
+    const navStaff = useStaffInfo(sessionManager.getUser()?.user_id ?? "").staffData;
+    const visibleRoutes = (AdminRoutes as SidebarRouteItem[]).filter((item) => {
+        const flag = item.component ? COMPONENT_MODULES[item.component] : undefined;
+        if (flag === null) return true;
+        if (!flag) return false;
+        return !!navStaff?.permissions?.[flag];
+    });
+
+    const mainRoutes = visibleRoutes.filter((item) => !item.isShortcut);
+    const shortcuts = visibleRoutes.filter((item) => item.isShortcut);
+
     const handleLogout = async (): Promise<void> => {
         await logoutSession();
         setIsSignOutOpen(false);
         close();
         navigate(ROUTES.public.home);
     };
-
-    const mainRoutes = (AdminRoutes as SidebarRouteItem[]).filter((item) => !item.isShortcut);
-    const shortcuts = (AdminRoutes as SidebarRouteItem[]).filter((item) => item.isShortcut);
 
     return (
         <>
