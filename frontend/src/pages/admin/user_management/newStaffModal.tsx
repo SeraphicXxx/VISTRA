@@ -17,13 +17,10 @@ export type AccessPermission =
     | "Patient Records"
     | "Staff Management";
 
-export type StaffStatus = "Active" | "Non-login" | "Unconfirmed";
-
 export interface NewStaffData {
     name: string;
     idNumber: string;
     role: JobRole;
-    status: StaffStatus;
     roles: AccessPermission[];
 }
 
@@ -45,9 +42,7 @@ export const PERMISSIONS: AccessPermission[] = [
     "Staff Management",
 ];
 
-export const STAFF_STATUSES: StaffStatus[] = ["Active", "Non-login", "Unconfirmed"];
-
-type FieldKey = "name" | "idNumber" | "role" | "status";
+type FieldKey = "name" | "idNumber" | "role";
 
 const fields: {
     key: FieldKey;
@@ -59,14 +54,12 @@ const fields: {
     {key: "name", label: "Full name", required: true},
     {key: "idNumber", label: "Staff ID", required: true},
     {key: "role", label: "Role", type: "select", options: JOB_ROLES},
-    {key: "status", label: "Status", type: "select", options: STAFF_STATUSES},
 ];
 
 const emptyForm: NewStaffData = {
     name: "",
     idNumber: "",
     role: JOB_ROLES[0],
-    status: "Unconfirmed",
     roles: [],
 };
 

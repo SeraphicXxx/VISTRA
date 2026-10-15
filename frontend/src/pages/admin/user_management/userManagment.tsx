@@ -2,7 +2,6 @@ import React, {useMemo, useState} from "react";
 import {Pencil, Plus, Trash2} from "lucide-react";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {Column} from "/@/components/table/Table";
-import {StaffStatusBadge} from "/@/components/StatusBadge";
 import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
@@ -41,8 +40,6 @@ const PERMISSIONS: Access_permission[] = [
   "Staff Management",
 ];
 
-type MemberStatus = "Active" | "Non-login" | "Unconfirmed";
-
 export interface Member {
   id: string;
   name: string;
@@ -50,7 +47,6 @@ export interface Member {
   idNumber: string;
   role: JobRole;
   roles: Access_permission[];
-  status: MemberStatus;
 }
 
 const SAMPLE_MEMBERS: Member[] = [
@@ -60,7 +56,6 @@ const SAMPLE_MEMBERS: Member[] = [
     idNumber: "STF-001",
     role: "Nurse",
     roles: ["Overview", "Medical Records"],
-    status: "Active",
   },
   {
     id: "2",
@@ -68,7 +63,6 @@ const SAMPLE_MEMBERS: Member[] = [
     idNumber: "STF-002",
     role: "Admin",
     roles: ["Overview", "Appointments", "Patient Records"],
-    status: "Non-login",
   },
   {
     id: "3",
@@ -76,7 +70,6 @@ const SAMPLE_MEMBERS: Member[] = [
     idNumber: "STF-003",
     role: "Super Administrator",
     roles: [...PERMISSIONS],
-    status: "Unconfirmed",
   },
   {
     id: "4",
@@ -84,7 +77,6 @@ const SAMPLE_MEMBERS: Member[] = [
     idNumber: "STF-004",
     role: "Doctor",
     roles: ["Medical Records", "Dental Records"],
-    status: "Active",
   },
   {
     id: "5",
@@ -92,7 +84,6 @@ const SAMPLE_MEMBERS: Member[] = [
     idNumber: "STF-005",
     role: "Dentist",
     roles: ["Dental Records", "Appointments"],
-    status: "Unconfirmed",
   },
 ];
 
@@ -265,11 +256,6 @@ export function RoleManagementPage() {
             {m.idNumber}
           </span>
         ),
-      },
-      {
-        key: "status",
-        label: "Status",
-        render: (_value, m) => <StaffStatusBadge status={m.status} />,
       },
     ],
     [pending, editingMembers],
