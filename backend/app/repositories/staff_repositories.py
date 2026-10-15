@@ -62,3 +62,6 @@ class StaffRepository(BaseRepository):
 
     def delete(self, staff_id: str):
         return self.delete_by_column("STAFF", "staff_id", staff_id)
+
+    def delete_permissions(self, staff_id: str):
+        return self.delete_by_column("STAFF_PERMISSIONS", "staff_id", staff_id)

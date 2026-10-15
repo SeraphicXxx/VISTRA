@@ -85,11 +85,16 @@ def delete_staff(staff_id: str, supabase: Client):
     existing = staff_repo.get_by_id(staff_id)
     or_404(existing, "Staff not found")
 
+    # Permissions row first: its FK is NO ACTION, so deleting STAFF
+    # while it exists would 409 on our own permissions record.
+    # Absent for legacy rows — None is fine.
+    staff_repo.delete_permissions(staff_id)
+
     try:
         deleted = staff_repo.delete(staff_id)
     except APIError as e:
-        # Staff referenced by appointments (RESTRICT) must read as a
-        # conflict, not an "Unhandled error" 500.
+        # Remaining NO ACTION children (e.g. appointments) block the
+        # delete to conserve history: conflict, not a 500.
         if getattr(e, "code", None) == "23503":
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
