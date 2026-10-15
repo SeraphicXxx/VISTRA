@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {StaffModel} from "/@/repository/StaffModel";
-import {deleteStaff, getAllStaff, updateStaffPermissions, updateStaffRole} from "/@/api/staff.api";
-import type {UpdateStaffPermissions} from "/@/api/schema/StaffSchema";
+import {deleteStaff, getAllStaff, updateStaffPermissions, updateStaffRole, createStaff} from "/@/api/staff.api";
+import type {UpdateStaffPermissions, CreateStaffRequest} from "/@/api/schema/StaffSchema";
 
 export function useStaffList() {
     return useQuery({
@@ -25,6 +25,20 @@ export function useDeleteStaff() {
     return useMutation({
         mutationFn: async (staffId: string) => {
             const {data} = await deleteStaff(staffId);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["staff"]});
+        },
+    });
+}
+
+export function useCreateStaff() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (payload: CreateStaffRequest) => {
+            const {data} = await createStaff(payload);
             return data;
         },
         onSuccess: () => {

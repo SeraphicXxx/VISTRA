@@ -16,12 +16,22 @@ export type AccessPermission =
     | "Patient Records"
     | "Staff Management";
 
+export const STAFF_POSITIONS: string[] = [
+    "Physicians",
+    "Registered Nurses",
+    "Nurse Practitioners",
+    "Physician Assistants",
+    "Intern",
+];
+
 export interface NewStaffData {
     lastName: string;
     firstName: string;
     middleName: string;
     idNumber: string;
     role: JobRole;
+    position: string;
+    password: string;
     roles: AccessPermission[];
 }
 
@@ -42,13 +52,13 @@ export const PERMISSIONS: AccessPermission[] = [
     "Staff Management",
 ];
 
-type FieldKey = "lastName" | "firstName" | "middleName" | "idNumber" | "role";
+type FieldKey = "lastName" | "firstName" | "middleName" | "idNumber" | "role" | "position" | "password";
 
 const fields: {
     key: FieldKey;
     label: string;
     required?: boolean;
-    type?: "select";
+    type?: "select" | "password";
     options?: string[];
 }[] = [
     {key: "lastName", label: "Last name", required: true},
@@ -56,6 +66,8 @@ const fields: {
     {key: "middleName", label: "Middle name"},
     {key: "idNumber", label: "Staff ID", required: true},
     {key: "role", label: "Role", type: "select", options: JOB_ROLES},
+    {key: "position", label: "Position", type: "select", options: STAFF_POSITIONS, required: true},
+    {key: "password", label: "Password", type: "password", required: true},
 ];
 
 const emptyForm: NewStaffData = {
@@ -64,6 +76,8 @@ const emptyForm: NewStaffData = {
     middleName: "",
     idNumber: "",
     role: JOB_ROLES[0],
+    position: "",
+    password: "",
     roles: [],
 };
 

@@ -5,7 +5,7 @@ import {Column} from "/@/components/table/Table";
 import {NewStaffModal, NewStaffData} from "./newStaffModal";
 import {avatarColor, getInitials} from "/@/components/avatar";
 import {ConfirmModal} from "/@/components/ConfirmModal";
-import {useDeleteStaff, useStaffList, useUpdateStaffPermissions, useUpdateStaffRole} from "/@/hooks/query/StaffQuery";
+import {useCreateStaff, useDeleteStaff, useStaffList, useUpdateStaffPermissions, useUpdateStaffRole} from "/@/hooks/query/StaffQuery";
 import {useDebounce} from "/@/hooks/Debouncer";
 import {toast} from "react-toastify";
 import type {StaffPermissions} from "/@/api/schema/StaffSchema";
@@ -129,6 +129,7 @@ function PermissionCheckbox({
 export function RoleManagementPage() {
   const {data: staffList, isLoading: staffLoading, error: staffError} = useStaffList();
   const {mutateAsync: deleteStaff} = useDeleteStaff();
+  const {mutateAsync: createStaff} = useCreateStaff();
   const {mutateAsync: savePermissions} = useUpdateStaffPermissions();
   const {mutateAsync: saveRole} = useUpdateStaffRole();
   const [members, setMembers] = useState<Member[]>([]);
@@ -191,11 +192,24 @@ export function RoleManagementPage() {
     clearPending(id);
   };
 
-  const handleAddStaff = (data: NewStaffData) => {
+  const handleAddStaff = async (data: NewStaffData) => {
+    const permissions = Object.fromEntries(
+      PERMISSION_LABELS.map(({key, label}) => [key, data.roles.includes(label)]),
+    );
+    await createStaff({
+      staff_id: data.idNumber,
+      first_name: data.firstName,
+      middle_name: data.middleName.trim() || undefined,
+      last_name: data.lastName,
+      password: data.password,
+      position: data.position,
+      role: data.role,
+      permissions,
+    });
     setMembers((prev) => [
       ...prev,
       {
-        id: String(Date.now()),
+        id: data.idNumber,
         name: fullName(data),
         idNumber: data.idNumber,
         role: data.role,
@@ -213,7 +227,7 @@ export function RoleManagementPage() {
         await handleConfirmSave(confirm.id, confirm.edit);
         toast.success("Permissions updated");
       } else if (confirm.kind === "add") {
-        handleAddStaff(confirm.data);
+        await handleAddStaff(confirm.data);
         toast.success("Staff member added");
       } else {
         await deleteStaff(confirm.id);

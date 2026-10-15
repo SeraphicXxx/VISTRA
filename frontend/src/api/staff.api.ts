@@ -1,7 +1,19 @@
 import { API_ENDPOINTS } from "/@/config/ApiConfig";
 import { ApiResponse } from "/@/api/schema/ApiResponseSchema";
-import { StaffData, StaffPermissions, UpdateStaffPermissions } from "/@/api/schema/StaffSchema";
+import { StaffData, StaffPermissions, UpdateStaffPermissions, CreateStaffRequest } from "/@/api/schema/StaffSchema";
 import {getResource, sendResource} from "/@/api/resource";
+
+export const createStaff = (
+    payload: CreateStaffRequest,
+    signal?: AbortSignal
+) => {
+    return sendResource<ApiResponse<StaffData>>(
+        "POST",
+        API_ENDPOINTS.staff.create_staff,
+        payload,
+        signal,
+    );
+};
 
 export const getStaffById = (
     staffId: string,
