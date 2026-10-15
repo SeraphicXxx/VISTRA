@@ -1,6 +1,11 @@
 from app.repositories.base import insert_model
 from app.repositories.staff_repositories import StaffRepository
-from app.schemas.staff import StaffData, CreateStaffRequest
+from app.schemas.staff import (
+    StaffData,
+    CreateStaffRequest,
+    StaffPermissionsInput,
+    UpdateStaffPermissionsRequest,
+)
 from app.schemas.user import STAFF_ROLE
 from app.services.auth.user import (
     compensate_auth_user,
@@ -23,7 +28,7 @@ def create_staff(request: CreateStaffRequest, supabase: Client):
         id=user.id,
         staff_id=staff_id,
         **request.model_dump(
-            exclude={"staff_id", "password"}
+            exclude={"staff_id", "password", "permissions"}
         )
     )
 
@@ -34,6 +39,23 @@ def create_staff(request: CreateStaffRequest, supabase: Client):
             user.id,
             db_response["message"],
             "Failed to insert staff into database and failed to delete "
+            "user from auth",
+        )
+
+    # Permissions row: always present going forward (default-deny),
+    # so reads never see a null they must interpret.
+    staff_repo = StaffRepository(supabase)
+    created_perms = staff_repo.insert_permissions(
+        staff_id,
+        (request.permissions or StaffPermissionsInput()).model_dump(),
+    )
+
+    if created_perms is None:
+        staff_repo.delete(staff_id)
+        compensate_auth_user(
+            user.id,
+            "Failed to insert staff permissions",
+            "Failed to insert staff permissions and failed to delete "
             "user from auth",
         )
 
@@ -60,6 +82,33 @@ def delete_staff(staff_id: str, supabase: Client):
     delete_auth_or_500("Staff", existing["id"])
 
     return ok(message="Staff deleted successfully")
+
+
+@handle_service_errors
+def update_staff_permissions(
+    staff_id: str,
+    request: UpdateStaffPermissionsRequest,
+    supabase: Client,
+):
+    staff_repo = StaffRepository(supabase)
+    or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+
+    payload = request.to_permissions_update()
+
+    if not payload:
+        raise ValueError(
+            "No permission fields provided. Allowed: dental_module, "
+            "medical_module, appointment_module, patient_module, "
+            "staff_module."
+        )
+
+    updated = staff_repo.update_permissions(staff_id, payload)
+
+    if updated is None:
+        # Legacy row predating permissions: heal by inserting.
+        updated = staff_repo.insert_permissions(staff_id, payload)
+
+    return ok(or_404(updated, "Staff permissions not found"))
 
 
 @handle_service_errors

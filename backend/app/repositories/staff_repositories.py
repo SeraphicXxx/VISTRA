@@ -16,6 +16,27 @@ class StaffRepository(BaseRepository):
             filters={"staff_id": staff_id},
         )
 
+    def insert_permissions(self, staff_id: str, perms: dict):
+        response = (
+            self.supabase
+            .table("STAFF_PERMISSIONS")
+            .insert({"staff_id": staff_id, **perms})
+            .execute()
+        )
+
+        if not response.data:
+            return None
+
+        return response.data[0]
+
+    def update_permissions(self, staff_id: str, perms: dict):
+        return self.update_by_column(
+            "STAFF_PERMISSIONS",
+            "staff_id",
+            staff_id,
+            perms,
+        )
+
     def get_staff(self):
         return self.fetch_all("STAFF")
 

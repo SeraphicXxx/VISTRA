@@ -6,6 +6,8 @@ export interface StaffPermissions {
     staff_module: boolean;
 }
 
+export type UpdateStaffPermissions = Partial<StaffPermissions>;
+
 export interface StaffData {
     id: string;
     staff_id: string;
