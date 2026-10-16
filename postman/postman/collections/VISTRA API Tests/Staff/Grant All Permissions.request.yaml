@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/staff/{{user_id}}/permissions"
+url: "{{base_url}}/{{api_version}}/staff/{{user_id}}/access"
 method: PATCH
 auth:
   type: bearer
@@ -22,7 +22,7 @@ body:
     }"
 scripts:
   - type: afterResponse
-    code: |+
+    code: |
       pm.test("Grant all permissions returns 200", function () {
           pm.response.to.have.status(200);
       });
@@ -30,8 +30,8 @@ scripts:
       pm.test("All flags granted", function () {
           var jsonData = pm.response.json();
           pm.expect(jsonData.success).to.eql(true);
-          pm.expect(jsonData.data.medical_module).to.eql(true);
-          pm.expect(jsonData.data.staff_module).to.eql(true);
+          pm.expect(jsonData.data.permissions.medical_module).to.eql(true);
+          pm.expect(jsonData.data.permissions.staff_module).to.eql(true);
       });
 
       // NOTE: seeds the runner's staff identity ({{user_id}}) with full
