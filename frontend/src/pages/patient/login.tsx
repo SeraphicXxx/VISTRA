@@ -16,7 +16,7 @@ import { ROUTES } from "/@/config/RoutePaths.js";
 import { Logo } from "/@/components/Logo.jsx";
 import { PATIENT_ID_PATTERN, usePatientLogin, usePatientLoginForm } from "/@/hooks/UsePatientLogin";
 import { useNavigate } from "react-router-dom";
-import { AdminAnimStyles, HeartbeatLine, LiveDot } from "/@/components/adminanim.jsx";
+import { AdminAnimStyles, HeartbeatLine, LiveDot } from "/@/components/adminanim";
 
 const ID_PATTERN = PATIENT_ID_PATTERN;
 

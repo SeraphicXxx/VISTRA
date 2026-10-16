@@ -27,7 +27,7 @@ import {
   AdminAnimStyles,
   HeartbeatLine,
   LiveDot,
-} from "/@/components/adminanim.jsx";
+} from "/@/components/adminanim";
 
 const SLIDESHOW_IMAGES = [
   clinicImage2,

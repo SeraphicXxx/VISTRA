@@ -16,7 +16,7 @@ import {
   HeartbeatLine,
   AdminAnimStyles,
   usePrefersReducedMotion,
-} from "/@/components/adminanim.jsx";
+} from "/@/components/adminanim";
 
 const capabilityChips = [
   { icon: Calendar, label: "Appointments" },
