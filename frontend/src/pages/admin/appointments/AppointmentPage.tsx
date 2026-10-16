@@ -17,12 +17,8 @@ export function AppointmentPage() {
             <AppointmentsTab setFilters={setFilters}/>
         </AppointmentProvider>
     );
-
 }
 
 export function AppointmentDetailPage() {
-    return (
-        <AppointmentDetailView/>
-    )
-
+    return <AppointmentDetailView/>;
 }

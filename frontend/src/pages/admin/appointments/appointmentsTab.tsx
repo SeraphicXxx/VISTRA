@@ -8,8 +8,10 @@ import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
 import {removeNullFilters} from "/@/components/Filters";
 import {useAppointmentContext} from "/@/context/PaginatedContext";
 import {AppointmentModel} from "/@/repository/AppointmentModel";
+import {GenFooter} from "/@/components/GenFooter";
 
-interface  AppointmentTadProps {
+
+interface AppointmentTadProps {
     setFilters: (filters: AppointmentFilters) => void;
 }
 
@@ -32,30 +34,33 @@ export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
     );
 
     return (
-        <DefaultTablePreset<AppointmentTableFormat>
-            title="Appointment"
-            icon={Calendar}
-            data={appointments}
-            isLoading={isLoading}
-            columns={AppointmentsColumns}
-            totalPages={totalPages}
-            page={page}
-            renderAction={
-                (appointment) => (
-                    <HyperlinkText
-                        title={`View`}
-                        link={`${ROUTES.staff.appointments.view.build(appointment.studentId, appointment.id)}`}
-                        icon={ChevronRight}
-                    />
-                )}
-            onRun={(search, filters, page, pageSize) =>
-                setFilters({
-                    search,
-                    ...removeNullFilters(filters),
-                    page,
-                    page_size: pageSize,
-                })
-            }
-        />
+        <div className="flex flex-col gap-6">
+            <DefaultTablePreset<AppointmentTableFormat>
+                title="Appointment"
+                icon={Calendar}
+                data={appointments}
+                isLoading={isLoading}
+                columns={AppointmentsColumns}
+                totalPages={totalPages}
+                page={page}
+                renderAction={
+                    (appointment) => (
+                        <HyperlinkText
+                            title={`View`}
+                            link={`${ROUTES.staff.appointments.view.build(appointment.studentId, appointment.id)}`}
+                            icon={ChevronRight}
+                        />
+                    )}
+                onRun={(search, filters, page, pageSize) =>
+                    setFilters({
+                        search,
+                        ...removeNullFilters(filters),
+                        page,
+                        page_size: pageSize,
+                    })
+                }
+            />
+
+        </div>
     );
 }

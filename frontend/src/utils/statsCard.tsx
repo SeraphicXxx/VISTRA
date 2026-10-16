@@ -1,4 +1,9 @@
-import {TrendingUp,} from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import {
+  ViewCountUp,
+  revealStyle,
+  useReveal,
+} from "/@/components/adminanim";
 
 export interface StatData {
   id: string;
@@ -66,7 +71,6 @@ export const visitData = [
   },
 ];
 
-
 export function StatCard({
   config,
   value,
@@ -76,34 +80,63 @@ export function StatCard({
   value: number;
   delta?: string;
 }) {
+  const reveal = useReveal();
+  const { ref, visible, reduced, t } = reveal;
+
+  const deltaText = delta || "No change";
+  const isDown = deltaText.trim().startsWith("-");
+  const DeltaIcon = isDown ? TrendingDown : TrendingUp;
+  const deltaTone = isDown ? "text-red-600" : "text-success";
+  const barWidth = Math.min(Math.max(value * 3, 15), 90);
+
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-      <p className="text-sm font-medium text-textSecondary">
-        {config.label}
-      </p>
+    <div
+      ref={ref}
+      className="hover-lift group relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm"
+    >
+      <div style={revealStyle(visible, reduced, { distance: 16 })}>
+        <p className="text-sm font-medium text-textSecondary">
+          {config.label}
+        </p>
 
-      <p className="mt-2 font-heading text-3xl font-bold text-textPrimary">
-        {value}
-      </p>
+        <p className="mt-2 font-heading text-3xl font-bold tabular-nums text-textPrimary">
+          <ViewCountUp
+            to={value}
+            visible={visible}
+            delay={150}
+            duration={900}
+          />
+        </p>
 
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-success">
-          <TrendingUp className="h-3.5 w-3.5" />
-          <span>{delta || "No change"}</span>
+        <div className="mt-4 flex items-center justify-between">
+          <div
+            className={`flex items-center gap-1.5 text-xs font-medium ${deltaTone}`}
+            style={{
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateX(0)" : "translateX(-8px)",
+              transition: t(
+                "opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s"
+              ),
+            }}
+          >
+            <DeltaIcon className="h-3.5 w-3.5" />
+            <span>{deltaText}</span>
+          </div>
+
+          <span className="text-xs text-textMuted">vs yesterday</span>
         </div>
 
-        <span className="text-xs text-textMuted">
-          vs yesterday
-        </span>
-      </div>
-
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-background">
-        <div
-          className="h-full rounded-full bg-primary/30"
-          style={{
-            width: `${Math.min(Math.max(value * 3, 15), 90)}%`,
-          }}
-        />
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-background">
+          <div
+            className="h-full rounded-full bg-primary/30"
+            style={{
+              width: visible ? `${barWidth}%` : "0%",
+              transition: t(
+                "width 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.45s"
+              ),
+            }}
+          />
+        </div>
       </div>
     </div>
   );

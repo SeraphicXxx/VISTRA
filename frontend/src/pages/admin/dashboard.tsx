@@ -5,7 +5,7 @@ import AppointmentsTab from "./appointments/appointmentsTab";
 import OverviewTab from "./overview/Overview";
 import MedicalTab from "./medical/medicalTab";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
-import { AdminAnimStyles, CountUp } from "/@/components/adminanim.jsx";
+import { AdminAnimStyles, CountUp } from "/@/components/adminanim";
 
 interface QueueEntry {
   id: string;
