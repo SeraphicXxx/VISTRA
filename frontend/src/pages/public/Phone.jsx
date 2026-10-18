@@ -12,7 +12,7 @@ export default function Phone() {
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-20 md:grid-cols-2 md:py-24">
 
         {/* phone */}
-        <div className="order-2 flex justify-center md:order-1">
+        <div className="order-1 flex justify-center md:order-1">
           <Reveal variants={scaleIn}>
             <div className="relative">
               <div className="pointer-events-none absolute -inset-10 rounded-full bg-primary/10 blur-[80px]" />
@@ -30,8 +30,6 @@ export default function Phone() {
                   <p className="text-[11px] font-medium text-textPrimary">Download the Vistra App</p>
                 </a>
               </div>
-
-
 
               {/* phone frame */}
               <Floating>
@@ -65,7 +63,7 @@ export default function Phone() {
           </Reveal>
         </div>
 
-        <div className="order-1 md:order-2">
+        <div className="order-2 md:order-2">
           <Reveal variants={fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 font-mono text-[11px] tracking-wide text-textSecondary">
               <Smartphone className="h-3 w-3 text-primary" strokeWidth={2.5} />
