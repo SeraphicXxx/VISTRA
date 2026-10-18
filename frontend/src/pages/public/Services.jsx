@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Reveal, fadeUp, stagger } from "../../components/landinganim.jsx";
-import { services, vitalStyles } from "./data.jsx";
+import { services } from "./data.jsx";
 
 export default function Services() {
   return (
@@ -27,16 +27,13 @@ export default function Services() {
           whileInView="visible"
           viewport={{ once: false, amount: 0.15 }}
         >
-          {services.map(({ key, icon: Icon, title, body }) => (
+          {services.map(({ key, title, body }) => (
             <motion.div
               key={key}
               variants={fadeUp}
               className="rounded-2xl border border-border bg-surface p-6 transition-shadow hover:shadow-card"
             >
-              <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${vitalStyles[key].chip}`}>
-                <Icon className="h-5 w-5" strokeWidth={2} />
-              </div>
-              <h3 className="mt-4 font-heading text-base font-semibold text-textPrimary">
+              <h3 className="font-heading text-base font-semibold text-primaryDark">
                 {title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-textSecondary">{body}</p>
