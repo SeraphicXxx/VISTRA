@@ -25,14 +25,14 @@ import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTa
 import PatientBookAppointment from "/@/pages/patient/appointments/appointmentBook";
 import PatientAppointmentView from "/@/pages/patient/appointments/appointmentView";
 import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
+import PatientMedicalRecordView from "/@/pages/patient/medical/medicalViewRec";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
+import PatientDentalRecordView from "/@/pages/patient/dental/dentalViewRec";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
 import RequireModule from "/@/routes/RequireModule";
-
-
 
 function AppRoutes() {
     return (
@@ -101,7 +101,9 @@ function AppRoutes() {
                         <Route path={ROUTES.patient.appointment.bookAppointment} element={<PatientBookAppointment/>}/>
                         <Route path={ROUTES.patient.appointment.viewAppointment} element={<PatientAppointmentView/>}/>
                         <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab/>}/>
+                        <Route path={`${ROUTES.patient.dashboard.medical}/record`} element={<PatientMedicalRecordView/>}/>
                         <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab/>}/>
+                        <Route path={`${ROUTES.patient.dashboard.dental}/record`} element={<PatientDentalRecordView/>}/>
                         <Route path={ROUTES.patient.profile} element={<PatientProfilePage/>}/>
                     </Route>
                 </Route>

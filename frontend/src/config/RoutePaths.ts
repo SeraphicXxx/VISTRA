@@ -62,6 +62,12 @@ export const ROUTES = {
             bookAppointment: "/patient/appointments/book",
             viewAppointment: "/patient/appointments/view",
         },
+        medical: {
+            viewRecord: "/patient/dashboard/medical/record",
+        },
+        dental: {
+            viewRecord: "/patient/dashboard/dental/record",
+        },
         profile: "/patient/profile",
     },
 };
