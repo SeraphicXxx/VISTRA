@@ -19,7 +19,7 @@ export default function Steps() {
           variants={stagger}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: false, amount: 0.15 }}
         >
           {steps.map(({ number, title, body }, i) => (
             <motion.div

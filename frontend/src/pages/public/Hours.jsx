@@ -11,7 +11,7 @@ export default function Hours() {
         variants={stagger}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        viewport={{ once: false, amount: 0.15 }}
       >
         <motion.div variants={fadeUp} className="rounded-2xl border border-border bg-surface p-6">
           <Clock className="h-5 w-5 text-primary" strokeWidth={2} />

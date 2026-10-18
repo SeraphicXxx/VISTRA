@@ -92,7 +92,7 @@ export default function Phone() {
             variants={stagger}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: false, amount: 0.15 }}
           >
             {appFeatures.map(({ icon: Icon, title, body }) => (
               <motion.div key={title} variants={fadeUp} className="flex gap-4">

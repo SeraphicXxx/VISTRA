@@ -25,7 +25,7 @@ export default function Services() {
           variants={stagger}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: false, amount: 0.15 }}
         >
           {services.map(({ key, icon: Icon, title, body }) => (
             <motion.div
