@@ -27,7 +27,7 @@ export default function Start() {
           <Reveal variants={fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] tracking-wide text-textSecondary shadow-card">
               <LiveDot />
-              SYSTEM ONLINE &middot; WALK-INS WELCOME
+              UCC CLINIC &middot; WALK-INS ARE WELCOME
             </span>
           </Reveal>
 
@@ -42,7 +42,7 @@ export default function Start() {
               Provide students and healthcare professionals with a secure,
               centralized platform for managing medical records, dental records,
               appointments, and vital signs—enhancing efficiency, improving accessibility,
-              and supporting high-quality healthcare services across your institution.
+              and supporting high-quality healthcare services across all campus.
             </p>
           </Reveal>
 
