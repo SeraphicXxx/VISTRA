@@ -14,18 +14,30 @@ const SESSION_KEYS = {
 type SessionKey =
     (typeof SESSION_KEYS)[keyof typeof SESSION_KEYS];
 
+const AUTH_KEYS = new Set<string>(Object.values(SESSION_KEYS));
+
+function notifyAuthChanged(): void {
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("vistra:auth-changed"));
+    }
+}
+
 export const sessionManager = {
+    // Cross-tab shared storage. sessionStorage is per-tab, so it cannot
+    // synchronize login/logout across tabs; localStorage is shared and
+    // emits `storage` events to other tabs.
     set(key: SessionKey, value: unknown): void {
-        sessionStorage.setItem(
+        localStorage.setItem(
             key,
             typeof value === "string"
                 ? value
                 : JSON.stringify(value)
         );
+        notifyAuthChanged();
     },
 
-        get<T = unknown>(key: SessionKey): T | string | null {
-        const value = sessionStorage.getItem(key);
+    get<T = unknown>(key: SessionKey): T | string | null {
+        const value = localStorage.getItem(key);
 
         if (value === null) {
             return null;
@@ -39,11 +51,16 @@ export const sessionManager = {
     },
 
     remove(key: SessionKey): void {
-        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+        notifyAuthChanged();
     },
 
     clear(): void {
-        sessionStorage.clear();
+        // Only touch auth keys; never wipe unrelated app state.
+        for (const key of AUTH_KEYS) {
+            localStorage.removeItem(key);
+        }
+        notifyAuthChanged();
     },
     setTokens(
         accessToken: string,
@@ -62,14 +79,14 @@ export const sessionManager = {
         this.set(SESSION_KEYS.USER, user);
     },
 
-        getAccessToken(): string | null {
-        return sessionStorage.getItem(
+    getAccessToken(): string | null {
+        return localStorage.getItem(
             SESSION_KEYS.ACCESS_TOKEN
         );
     },
 
     getRefreshToken(): string | null {
-        return sessionStorage.getItem(
+        return localStorage.getItem(
             SESSION_KEYS.REFRESH_TOKEN
         );
     },

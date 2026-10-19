@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { sessionManager } from "/@/utils/SessionManager";
+import { useAuth } from "/@/context/AuthContext";
 import { ROUTES } from "/@/config/RoutePaths";
 
 /**
@@ -8,7 +9,9 @@ import { ROUTES } from "/@/config/RoutePaths";
  * session goes to the patient overview.
  */
 export default function GuestRoute(): React.JSX.Element {
-    if (sessionManager.isAuthenticated()) {
+    const { isAuthenticated } = useAuth();
+
+    if (isAuthenticated || sessionManager.isAuthenticated()) {
         const target = sessionManager.isStaff()
             ? ROUTES.staff.dashboard.overview
             : ROUTES.patient.dashboard.overview;
