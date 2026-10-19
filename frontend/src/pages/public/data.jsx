@@ -2,15 +2,12 @@ import {
   Heart,
   Thermometer,
   Wind,
-  Apple,
   Scale,
-  Stethoscope,
   Syringe,
-  Brain,
+  Ruler,
   Calendar,
   FileText,
   Bell,
-  Ruler,
   Fingerprint,
 } from "lucide-react";
 
@@ -33,37 +30,31 @@ export const vitals = [
 export const services = [
   {
     key: "temperature",
-    icon: Thermometer,
     title: "Fever & illness checks",
     body: "Walk-in checks for fever, colds, stomach aches, and anything that doesn't feel right.",
   },
   {
     key: "heartRate",
-    icon: Stethoscope,
     title: "First aid & injuries",
     body: "Cuts, sprains, falls on the court — cleaned, treated, and documented on the spot.",
   },
   {
     key: "spo2",
-    icon: Wind,
     title: "Asthma & allergy support",
     body: "Inhaler storage, allergy action plans, and a quiet room to catch your breath.",
   },
   {
     key: "weight",
-    icon: Scale,
     title: "Growth & wellness checks",
     body: "Routine height, weight, and vision screenings tracked year over year.",
   },
   {
     key: "height",
-    icon: Brain,
     title: "Counseling referrals",
     body: "A first, private conversation and a warm handoff to the school counselor.",
   },
   {
     key: "bmi",
-    icon: Apple,
     title: "BMI & nutrition guidance",
     body: "A confidential discussion of your BMI, diet, and healthy lifestyle choices.",
   },

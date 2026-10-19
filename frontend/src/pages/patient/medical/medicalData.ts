@@ -23,11 +23,14 @@ export interface Visit {
     complaint: string;
     treatmentType: string;
     treatment: string;
+    status: Status;
 }
 
 export type MedicalRecords = Record<string, MedicalRecord>;
 
 export type MyVisits = Record<string, Visit[]>;
+
+export const DEFAULT_STUDENT_ID = "20230847-S";
 
 export const myMedicalRecords: MedicalRecords = {
     "20230847-S": {
@@ -50,20 +53,40 @@ export const myMedicalRecords: MedicalRecords = {
 export const myVisits: MyVisits = {
     "20230847-S": [
         {
-            id: "v1",
+            id: "MED-0001",
             date: "2026-02-14",
             doctor: "Dr. Maria Santos",
             complaint: "Mild fever, headache",
             treatmentType: "Medicine",
             treatment: "Paracetamol 500mg, rest advised",
+            status: "cleared",
         },
         {
-            id: "v2",
+            id: "MED-0002",
             date: "2026-05-03",
             doctor: "Dr. Ramon Cruz",
             complaint: "Sprained ankle during PE",
             treatmentType: "Procedure",
             treatment: "Ice compress, elastic bandage applied",
+            status: "cleared",
+        },
+        {
+            id: "MED-0003",
+            date: "2026-08-21",
+            doctor: "Dr. Maria Santos",
+            complaint: "Annual physical exam",
+            treatmentType: "Checkup",
+            treatment: "Vitals normal, cleared for PE",
+            status: "cleared",
+        },
+        {
+            id: "MED-0004",
+            date: "2026-10-05",
+            doctor: "Dr. Ramon Cruz",
+            complaint: "Persistent cough",
+            treatmentType: "Medicine",
+            treatment: "Cough syrup, follow-up in 1 week",
+            status: "pending",
         },
     ],
 };

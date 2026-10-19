@@ -6,10 +6,19 @@ import { Reveal, fadeUp, fadeRight, stagger } from "../../components/landinganim
 import { LiveDot } from "./Shared.jsx";
 import { vitals, vitalStyles } from "./data.jsx";
 import { ROUTES } from "/@/config/RoutePaths";
+import campusImage from "/@/assets/images/campus-background.jpg";
 
 export default function Start() {
   return (
     <section id="top" className="relative overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 scale-105 bg-cover bg-[position:center] opacity-[0.3]"
+        style={{ backgroundImage: `url(${campusImage})` }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-background/85" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/80" />
+
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent)]" />
       <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[110px]" />
 
@@ -18,13 +27,13 @@ export default function Start() {
           <Reveal variants={fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] tracking-wide text-textSecondary shadow-card">
               <LiveDot />
-              SYSTEM ONLINE &middot; WALK-INS WELCOME
+              UCC CLINIC &middot; WALK-INS ARE WELCOME
             </span>
           </Reveal>
 
           <Reveal variants={fadeUp} delay={0.1}>
             <h1 className="mt-6 font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-textPrimary md:text-5xl">
-              Transforming Campus <br /> Health Services.
+             Clinic Services Across <br/> Every Platform.
             </h1>
           </Reveal>
 
@@ -33,13 +42,14 @@ export default function Start() {
               Provide students and healthcare professionals with a secure,
               centralized platform for managing medical records, dental records,
               appointments, and vital signs—enhancing efficiency, improving accessibility,
-              and supporting high-quality healthcare services across your institution.
+              and supporting high-quality healthcare services across all campus.
             </p>
           </Reveal>
 
           <Reveal variants={fadeUp} delay={0.3}>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a href="#app"
+              <a
+                href="#app"
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-card transition-transform hover:scale-[1.02] hover:bg-primaryDark"
               >
                 Download the App
@@ -61,6 +71,7 @@ export default function Start() {
               className="scan-line pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-transparent via-primary/10 to-transparent"
               aria-hidden="true"
             />
+
             <div className="flex items-center justify-between">
               <p className="font-heading text-sm font-medium text-textSecondary">Today's check-in snapshot</p>
             </div>
@@ -70,7 +81,7 @@ export default function Start() {
               variants={stagger}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: false, amount: 0.15 }}
             >
               {vitals.map(({ key, label, value, unit, icon: Icon }) => (
                 <motion.div

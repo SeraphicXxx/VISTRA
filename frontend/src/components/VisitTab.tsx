@@ -20,11 +20,11 @@ interface VisitTabProps<Row extends { id: string }, Item, F extends object> {
     totalPages?: number;
     page?: number;
     createAction?: VisitTabCreateAction;
-    buildViewLink: (row: Row) => string;
-    setFilters: (filters: F) => void;
+    buildViewLink?: (row: Row) => string;
+    setFilters?: (filters: F) => void;
 }
 
-export function VisitTab<Row extends { id: string }, Item, F extends object>({
+export function VisitTab<Row extends { id: string }, Item, F extends object = object>({
     title,
     icon,
     columns,
@@ -61,21 +61,26 @@ export function VisitTab<Row extends { id: string }, Item, F extends object>({
                 ) : undefined
             }
             renderAction={
-                (row) => (
-                    <HyperlinkText
-                        title="View"
-                        link={buildViewLink(row)}
-                        icon={ChevronRight}
-                    />
-                )
+                buildViewLink
+                    ? (row) => (
+                        <HyperlinkText
+                            title="View"
+                            link={buildViewLink(row)}
+                            icon={ChevronRight}
+                        />
+                    )
+                    : undefined
             }
-            onRun={(search, filters, page, pageSize) =>
-                setFilters({
-                    search,
-                    ...removeNullFilters(filters),
-                    page,
-                    page_size: pageSize,
-                } as F)
+            onRun={
+                setFilters
+                    ? (search, filters, page, pageSize) =>
+                        setFilters({
+                            search,
+                            ...removeNullFilters(filters),
+                            page,
+                            page_size: pageSize,
+                        } as F)
+                    : undefined
             }
         />
     );
