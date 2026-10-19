@@ -1,3 +1,5 @@
+import { broadcast } from "/@/utils/syncBus";
+
 export interface SessionUser {
     id: string;
     user_id: string;
@@ -16,12 +18,6 @@ type SessionKey =
 
 const AUTH_KEYS = new Set<string>(Object.values(SESSION_KEYS));
 
-function notifyAuthChanged(): void {
-    if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("vistra:auth-changed"));
-    }
-}
-
 export const sessionManager = {
     // Cross-tab shared storage. sessionStorage is per-tab, so it cannot
     // synchronize login/logout across tabs; localStorage is shared and
@@ -33,7 +29,7 @@ export const sessionManager = {
                 ? value
                 : JSON.stringify(value)
         );
-        notifyAuthChanged();
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
 
     get<T = unknown>(key: SessionKey): T | string | null {
@@ -52,7 +48,7 @@ export const sessionManager = {
 
     remove(key: SessionKey): void {
         localStorage.removeItem(key);
-        notifyAuthChanged();
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
 
     clear(): void {
@@ -60,7 +56,7 @@ export const sessionManager = {
         for (const key of AUTH_KEYS) {
             localStorage.removeItem(key);
         }
-        notifyAuthChanged();
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
     setTokens(
         accessToken: string,

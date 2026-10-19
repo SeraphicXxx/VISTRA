@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 import { sessionManager, type SessionUser } from "/@/utils/SessionManager";
 import { logoutSession } from "/@/hooks/UseLogout";
+import { subscribe, type SyncMessage } from "/@/utils/syncBus";
 
 interface AuthContextValue {
     user: SessionUser | null;
@@ -22,25 +23,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        const onAuthChanged = () => sync();
-        const onStorage = (event: StorageEvent) => {
-            if (
-                event.key === null ||
-                event.key === "access_token" ||
-                event.key === "refresh_token" ||
-                event.key === "user"
-            ) {
+        const unsubscribe = subscribe((message: SyncMessage) => {
+            if (message.type === "auth-changed") {
                 sync();
             }
-        };
-
-        window.addEventListener("vistra:auth-changed", onAuthChanged);
-        window.addEventListener("storage", onStorage);
-
-        return () => {
-            window.removeEventListener("vistra:auth-changed", onAuthChanged);
-            window.removeEventListener("storage", onStorage);
-        };
+        });
+        return unsubscribe;
     }, [sync]);
 
     const logout = useCallback(async () => {

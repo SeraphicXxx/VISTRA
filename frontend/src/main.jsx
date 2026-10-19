@@ -7,12 +7,14 @@ import {
     QueryClientProvider,
 } from "@tanstack/react-query";
 import { AuthProvider } from "/@/context/AuthContext";
+import CrossTabSync from "/@/components/CrossTabSync";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
       <QueryClientProvider client={queryClient}>
+          <CrossTabSync />
           <AuthProvider>
               <App />
           </AuthProvider>

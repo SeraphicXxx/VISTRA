@@ -20,6 +20,7 @@ export function useStaffInfo(staffId: string) {
             return new StaffModel(apiResponse.data);
         },
         enabled: !!staffId,
+        refetchOnWindowFocus: false,
     });
     return {
         staffData: staffData ?? null,
