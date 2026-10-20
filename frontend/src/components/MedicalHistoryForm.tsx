@@ -5,6 +5,7 @@ import { SelectField, FormInput } from "/@/components/InputCollection";
 
 const YES_NO_OPTIONS: string[] = ["Yes", "No"];
 const NORMAL_ABNORMAL_OPTIONS: string[] = ["Normal", "Abnormal"];
+const FREQUENCY_OPTIONS: string[] = ["Everyday", "Moderate", "Occasional", "None"];
 const FAMILY_HISTORY_OPTIONS: string[] = [
   "Hypertension",
   "Asthma",
@@ -18,28 +19,27 @@ const textareaClass =
 
 const SECTIONS = [
   { key: "medicalHistory", label: "Medical History" },
+  { key: "personalHistory", label: "Personal History" },
   { key: "familyHistory", label: "Family History" },
-  { key: "familyPlanning", label: "Family Planning" },
   { key: "vitalSigns", label: "Vital Signs" },
   { key: "results", label: "Results" },
   { key: "recommendation", label: "Recommendation" },
-  { key: "examinationDetails", label: "Examination" },
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]["key"];
 
 export interface MedicalHistoryFormProps {
   sections?: Partial<Record<SectionKey, boolean>>;
+  sex?: string;
 }
 
 const DEFAULT_SECTIONS: Record<SectionKey, boolean> = {
   medicalHistory: true,
+  personalHistory: true,
   familyHistory: true,
-  familyPlanning: true,
   vitalSigns: true,
   results: true,
   recommendation: true,
-  examinationDetails: true,
 };
 
 const toSnake = (value: string): string =>
@@ -49,9 +49,10 @@ const toSnake = (value: string): string =>
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
 
-export default function MedicalHistoryForm({ sections }: MedicalHistoryFormProps) {
+export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryFormProps) {
   const show = { ...DEFAULT_SECTIONS, ...sections };
   const visibleSections = SECTIONS.filter((s) => show[s.key]);
+  const isFemale = sex === "Female";
 
   const [active, setActive] = useState<SectionKey>(
     visibleSections[0]?.key ?? "medicalHistory"
@@ -231,48 +232,75 @@ export default function MedicalHistoryForm({ sections }: MedicalHistoryFormProps
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-4">
             <FormInput
               id="allergy_medicine"
               name="allergy_medicine"
               label="Allergy — medicine"
               placeholder="e.g. Penicillin, or None"
             />
-            <FormInput
-              id="allergy_food"
-              name="allergy_food"
-              label="Allergy — food"
-              placeholder="e.g. Shellfish, or None"
-            />
+          </div>
+        </div>
+      )}
+
+      {show.personalHistory && (
+        <div
+          ref={(el) => {
+            sectionRefs.current.personalHistory = el;
+          }}
+          className={active === "personalHistory" ? "" : "hidden"}
+        >
+          <div className="mb-4 flex items-center gap-2">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">
+              II. Personal History
+            </h2>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <SelectField
               id="smoking"
               name="smoking"
               label="Smoking"
-              options={YES_NO_OPTIONS}
+              options={FREQUENCY_OPTIONS}
               required
             />
             <SelectField
               id="vaping"
               name="vaping"
               label="Vaping"
-              options={YES_NO_OPTIONS}
+              options={FREQUENCY_OPTIONS}
               required
             />
             <SelectField
               id="alcohol_intake"
               name="alcohol_intake"
-              label="Alcohol intake"
-              options={YES_NO_OPTIONS}
+              label="Alcohol"
+              options={FREQUENCY_OPTIONS}
               required
             />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {isFemale && (
+              <FormInput
+                id="last_menstrual_period"
+                name="last_menstrual_period"
+                label="Last menstrual period"
+                type="date"
+              />
+            )}
             <FormInput
-              id="last_menstrual_period"
-              name="last_menstrual_period"
-              label="Last menstrual period"
-              type="date"
+              id="contraceptive_method"
+              name="contraceptive_method"
+              label="Contraceptive method"
+              placeholder="e.g. None, Pills, IUD, Condom"
+            />
+            <SelectField
+              id="often_sexual_activity"
+              name="often_sexual_activity"
+              label="Often sexual activity"
+              options={YES_NO_OPTIONS}
+              required
             />
           </div>
         </div>
@@ -320,26 +348,6 @@ export default function MedicalHistoryForm({ sections }: MedicalHistoryFormProps
               placeholder="e.g. None / Cancer / kidney disease"
             />
           </div>
-        </div>
-      )}
-
-      {show.familyPlanning && (
-        <div
-          ref={(el) => {
-            sectionRefs.current.familyPlanning = el;
-          }}
-          className={active === "familyPlanning" ? "" : "hidden"}
-        >
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-            II. Family Planning Method
-          </h2>
-          <FormInput
-            id="family_planning_method"
-            name="family_planning_method"
-            label="Method"
-            placeholder="e.g. None, Pills, IUD, Condom"
-            required
-          />
         </div>
       )}
 
@@ -458,36 +466,6 @@ export default function MedicalHistoryForm({ sections }: MedicalHistoryFormProps
             className={textareaClass}
             required
           />
-        </div>
-      )}
-
-      {show.examinationDetails && (
-        <div
-          ref={(el) => {
-            sectionRefs.current.examinationDetails = el;
-          }}
-          className={active === "examinationDetails" ? "" : "hidden"}
-        >
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-            Examination Details
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormInput
-              id="examination_date"
-              name="examination_date"
-              label="Date"
-              type="date"
-              required
-            />
-            <FormInput
-              id="examining_physician"
-              name="examining_physician"
-              label="Examining physician"
-              placeholder="e.g. Dr. Juan Dela Cruz"
-              required
-            />
-          </div>
         </div>
       )}
 

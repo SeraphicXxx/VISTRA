@@ -9,7 +9,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Kenji Chua",
     course: "BS Computer Science",
-    time: "9:00 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "cleared",
   },
@@ -18,7 +18,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Ivan Mejorada",
     course: "BS Psychology",
-    time: "9:30 AM",
+    time: "2026-10-20",
     type: "Follow-up",
     status: "secondOpinion",
   },
@@ -27,7 +27,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Cjay Gonzales",
     course: "BS Industrial Engineering",
-    time: "10:00 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "recovered",
   },
@@ -36,7 +36,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Joshua Lapitan",
     course: "BS Electronics Engineering",
-    time: "10:15 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "referred",
   },
@@ -45,7 +45,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Rosh Ingel",
     course: "BS Accountancy",
-    time: "10:45 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "ongoingTreatment",
   },
@@ -169,12 +169,10 @@ export const MedicalColumns: Column<medData>[] = [
 
   {
     key: "time",
-    label: "Time",
+    label: "Date",
     filterType: "date",
     filterKey: "date",
   },
-
-
 
   {
     key: "status",
@@ -184,6 +182,5 @@ export const MedicalColumns: Column<medData>[] = [
     render: (value) => (
         <StatusBadge status={value as Status}/>
     ),
-
   },
 ]

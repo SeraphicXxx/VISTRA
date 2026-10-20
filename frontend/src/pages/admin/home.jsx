@@ -74,7 +74,7 @@ export default function AdminLandingPage() {
     <div className="page-in flex min-h-screen w-full flex-col bg-background font-sans text-textPrimary selection:bg-primary/20 md:h-screen md:overflow-hidden">
       <AdminAnimStyles />
 
-      <header className="slide-down relative z-10 shrink-0 border-b border-border bg-surface/80 backdrop-blur-md">
+      <header className="slide-down relative z-10 shrink-0 border-b border-border bg-transparent backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3.5 md:px-10">
           <a href="/landingpage" className={`rounded-md ${focusRing}`}>
             <img
@@ -136,7 +136,7 @@ export default function AdminLandingPage() {
                   href="/login"
                   className={`btn-shine group inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-white shadow-card transition-all duration-200 hover:bg-primaryDark hover:shadow-lg active:translate-y-px ${focusRing}`}
                 >
-                  Log in to staff portal
+                   Medical Personnel Portal
                   <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </a>
                 <span className="flex items-center gap-1.5 text-sm text-textSecondary">

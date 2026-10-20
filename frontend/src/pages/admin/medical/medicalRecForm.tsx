@@ -1,5 +1,5 @@
-import {useState, type FormEvent} from "react";
-import {Save, ArrowLeft, User, ClipboardList, Info} from "lucide-react";
+import {useRef, useState, type ChangeEvent, type FormEvent} from "react";
+import {Save, ArrowLeft, User, ClipboardList, Info, FlaskConical, ImagePlus, X} from "lucide-react";
 import {type as visitTypeOptions} from "./medicalData";
 import {useForm} from "/@/hooks/Form";
 import {statusEditFields} from "/@/components/editModal.jsx";
@@ -45,11 +45,87 @@ const initialFormValues: MedicalRecFormValues = {
     treatment: "",
 };
 
+const inputClass =
+    "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
+
+interface AttachmentFieldProps {
+    id: string;
+    label: string;
+    hint: string;
+    accept: string;
+    files: File[];
+    onAdd: (files: File[]) => void;
+    onRemove: (index: number) => void;
+    icon: typeof FlaskConical;
+}
+
+function AttachmentField({id, label, hint, accept, files, onAdd, onRemove, icon: Icon}: AttachmentFieldProps) {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        const selected = Array.from(e.target.files ?? []);
+        if (selected.length) onAdd(selected);
+        e.target.value = "";
+    };
+
+    return (
+        <div>
+            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+
+            <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-6 text-center transition-colors duration-200 hover:border-primary/50 hover:bg-primary/5"
+            >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Icon className="h-4 w-4" strokeWidth={2}/>
+                </span>
+                <span className="text-sm font-medium text-textPrimary">Click to add files</span>
+                <span className="text-xs text-textMuted">{hint}</span>
+            </button>
+
+            <input
+                ref={inputRef}
+                id={id}
+                name={id}
+                type="file"
+                multiple
+                accept={accept}
+                onChange={handleChange}
+                hidden
+            />
+
+            {files.length > 0 && (
+                <ul className="mt-3 flex flex-col gap-2">
+                    {files.map((file, index) => (
+                        <li
+                            key={`${file.name}-${index}`}
+                            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
+                        >
+                            <span className="truncate text-xs text-textPrimary">{file.name}</span>
+                            <button
+                                type="button"
+                                onClick={() => onRemove(index)}
+                                aria-label={`Remove ${file.name}`}
+                                className="shrink-0 rounded-md p-1 text-textMuted transition-colors duration-200 hover:bg-background hover:text-textPrimary"
+                            >
+                                <X className="h-3.5 w-3.5" strokeWidth={2}/>
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
 export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
     const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [labFiles, setLabFiles] = useState<File[]>([]);
+    const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const details = selectedStudent
         ? {
             course: selectedStudent.course ?? selectedStudent.department ?? "N/A",
@@ -73,6 +149,8 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
     const handleClear = (): void => {
         reset();
+        setLabFiles([]);
+        setPhotoFiles([]);
     };
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
@@ -157,7 +235,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                         name="type"
                         value={visitType}
                         onChange={(e) => setField("visitType", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className={inputClass}
                     >
                         <option value="" disabled>Select Type</option>
                         {visitTypeOptions.map((option) => (
@@ -176,7 +254,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                         name="treatmentType"
                         value={treatmentType}
                         onChange={(e) => setField("treatmentType", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className={inputClass}
                     >
                         <option value="" disabled>
                             Select Treatment Type
@@ -197,7 +275,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                         name="status"
                         value={status}
                         onChange={(e) => setField("status", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className={inputClass}
                     >
                         <option value="" disabled>Select Status</option>
                         {statusOptions.map((option) => (
@@ -222,7 +300,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                             type="date"
                             value={visitDate}
                             onChange={(e) => setField("visitDate", e.target.value)}
-                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className={inputClass}
                         />
                     </div>
                 </div>
@@ -237,7 +315,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                             onChange={(e) => setField("complaint", e.target.value)}
                             placeholder="e.g. Fever, headache since morning"
                             rows={3}
-                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className={inputClass}
                         />
                     </div>
 
@@ -250,9 +328,39 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                             onChange={(e) => setField("treatment", e.target.value)}
                             placeholder="e.g. Paracetamol 500mg, rest advised"
                             rows={3}
-                            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className={inputClass}
                         />
                     </div>
+                </div>
+            </div>
+
+            <div className="mt-10">
+                <div className="mb-4 flex items-center gap-2 border-t border-border pt-6">
+                    <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">Attachments</h2>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <AttachmentField
+                        id="laboratoryResults"
+                        label="Laboratory Results"
+                        hint="Images or PDF, up to 10 MB each"
+                        accept="image/*,application/pdf"
+                        files={labFiles}
+                        onAdd={(files) => setLabFiles((prev) => [...prev, ...files])}
+                        onRemove={(index) => setLabFiles((prev) => prev.filter((_, i) => i !== index))}
+                        icon={FlaskConical}
+                    />
+
+                    <AttachmentField
+                        id="clinicalPhotos"
+                        label="Clinical Photos"
+                        hint="Images only, up to 10 MB each"
+                        accept="image/*"
+                        files={photoFiles}
+                        onAdd={(files) => setPhotoFiles((prev) => [...prev, ...files])}
+                        onRemove={(index) => setPhotoFiles((prev) => prev.filter((_, i) => i !== index))}
+                        icon={ImagePlus}
+                    />
                 </div>
             </div>
 

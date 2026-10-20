@@ -4,9 +4,40 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Reveal, fadeUp, fadeRight, stagger } from "../../components/landinganim.jsx";
 import { LiveDot } from "./Shared.jsx";
-import { vitals, vitalStyles } from "./data.jsx";
+import { vitalStyles } from "./data.jsx";
 import { ROUTES } from "/@/config/RoutePaths";
 import campusImage from "/@/assets/images/campus-background.jpg";
+
+const medicalFacts = [
+  {
+    key: "heartRate",
+    label: "Heart rate",
+    range: "60–100",
+    unit: "bpm",
+    fact: "Normal resting rate for adults. Trained athletes often sit lower.",
+  },
+  {
+    key: "spo2",
+    label: "Oxygen saturation",
+    range: "95–100",
+    unit: "%",
+    fact: "Readings below 90% usually need prompt medical attention.",
+  },
+  {
+    key: "temperature",
+    label: "Body temperature",
+    range: "36.1–37.2",
+    unit: "°C",
+    fact: "A fever is generally defined as 38 °C or higher.",
+  },
+  {
+    key: "bmi",
+    label: "Body mass index",
+    range: "18.5–24.9",
+    unit: "kg/m²",
+    fact: "A screening measure of weight for height, not a diagnosis.",
+  },
+];
 
 export default function Start() {
   return (
@@ -33,7 +64,7 @@ export default function Start() {
 
           <Reveal variants={fadeUp} delay={0.1}>
             <h1 className="mt-6 font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-textPrimary md:text-5xl">
-             Clinic Services Across <br/> Every Platform.
+              Clinic Services Across <br/> Every Platform.
             </h1>
           </Reveal>
 
@@ -66,45 +97,45 @@ export default function Start() {
         </div>
 
         <Reveal variants={fadeRight} delay={0.15}>
-          <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-card">
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/90 p-6 shadow-card backdrop-blur">
             <div
               className="scan-line pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-transparent via-primary/10 to-transparent"
               aria-hidden="true"
             />
 
-            <div className="flex items-center justify-between">
-              <p className="font-heading text-sm font-medium text-textSecondary">Today's check-in snapshot</p>
+            <div className="mb-5">
+              <p className="font-mono text-[11px] uppercase tracking-wide text-textMuted">Reference</p>
+              <h3 className="mt-1 font-heading text-lg font-semibold text-textPrimary">
+                Normal ranges for adults
+              </h3>
             </div>
 
             <motion.div
-              className="mt-5 grid grid-cols-2 gap-3"
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
               variants={stagger}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false, amount: 0.15 }}
             >
-              {vitals.map(({ key, label, value, unit, icon: Icon }) => (
+              {medicalFacts.map(({ key, label, range, unit, fact }) => (
                 <motion.div
                   key={key}
                   variants={fadeUp}
-                  className={`rounded-xl border border-border bg-background p-4 ring-1 ${vitalStyles[key].ring}`}
+                  className={`rounded-2xl border border-border bg-background p-4 ring-1 ${vitalStyles[key].ring}`}
                 >
-                  <div className={`flex items-center gap-2 ${vitalStyles[key].text}`}>
-                    <Icon className="h-4 w-4" strokeWidth={2} />
-                    <span className="text-xs font-medium text-textSecondary">{label}</span>
-                  </div>
-                  <p className="mt-2 font-mono text-2xl font-semibold text-textPrimary">
-                    {value}
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${vitalStyles[key].chip}`}
+                  >
+                    {label}
+                  </span>
+                  <p className="mt-3 font-mono text-2xl font-semibold text-textPrimary">
+                    {range}
                     <span className="ml-1 text-xs font-normal text-textMuted">{unit}</span>
                   </p>
+                  <p className="mt-2 text-xs leading-relaxed text-textMuted">{fact}</p>
                 </motion.div>
               ))}
             </motion.div>
-
-            <p className="mt-4 text-xs leading-relaxed text-textMuted">
-              Every visit logs a quick vitals check like this one to your student health record —
-              visible to your parent or guardian, and to you.
-            </p>
           </div>
         </Reveal>
       </div>
