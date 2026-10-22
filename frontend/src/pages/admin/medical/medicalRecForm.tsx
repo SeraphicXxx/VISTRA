@@ -12,7 +12,15 @@ import {useCreateMedicalVisit} from "/@/hooks/query/MedicalQuery";
 import {sessionManager} from "/@/utils/SessionManager";
 import {getFieldErrors} from "/@/utils/Formatters";
 import {treatmentTypeOptions} from "/@/types/types";
+import {medicalStatuses, medicalTypes} from "/@/types/Medical";
 import {ConfirmModal} from "/@/components/ConfirmModal";
+
+const statusToEnum = Object.fromEntries(
+    Object.entries(medicalStatuses).map(([key, label]) => [label, key])
+);
+const typeToEnum = Object.fromEntries(
+    Object.entries(medicalTypes).map(([key, label]) => [label, key])
+);
 
 const statusField = statusEditFields.find(
     (field: { key: string }) => field.key === "status"
@@ -50,6 +58,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const details = selectedStudent
         ? {
             course: selectedStudent.course ?? selectedStudent.department ?? "N/A",
@@ -77,12 +86,14 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
+        setFieldErrors({});
         if (!selectedStudent) return;
         setIsConfirmOpen(true);
     };
 
     const saveRecord = (): void => {
         setIsConfirmOpen(false);
+        setFieldErrors({});
         if (!selectedStudent) return;
 
         const staffId = sessionManager.getUser()?.user_id ?? "";
@@ -94,8 +105,8 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         const record: CreateMedicalVisit = {
             patient_id: selectedStudent.patient_id,
             staff_id: staffId,
-            status,
-            type: visitType,
+            status: statusToEnum[status] ?? status,
+            type: typeToEnum[visitType] ?? visitType,
             treatment_type: treatmentType,
             visit_date: visitDate ? new Date(visitDate).toISOString() : new Date().toISOString(),
             complaint,
@@ -111,6 +122,19 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             },
             onError: (error) => {
                 console.error("Failed to create medical visit:", getFieldErrors(error));
+                const nextErrors: Record<string, string> = {};
+                const detail = (error as any)?.detail;
+                if (Array.isArray(detail)) {
+                    detail.forEach((item: any) => {
+                        const field = item?.loc?.[item.loc.length - 1];
+                        if (field) nextErrors[field] = "Missing field";
+                    });
+                } else if (typeof detail === "string") {
+                    nextErrors.form = "Missing field";
+                } else {
+                    nextErrors.form = "Missing field";
+                }
+                setFieldErrors(nextErrors);
             },
         });
     };
