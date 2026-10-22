@@ -22,8 +22,17 @@ const USE_DUMMY_DATA =
 const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
   medical_visit_id: "1042",
   patient_name: "Kenji Chua",
+  patient_id: "20230518-S",
   status: "Cleared",
   course: "BS Computer Science",
+  year_section: "3 - A",
+  age: "21",
+  sex: "Male",
+  civil_status: "Single",
+  birthday: "2005-01-01",
+  address: "123 Main St",
+  barangay: "Barangay 1",
+  mobileNumber: "09171234567",
   staff_name: "Maria Santos",
   visit_date: "2026-10-11",
   complaint: "Fever, headache since morning",
@@ -364,12 +373,44 @@ export default function PatientRecordView() {
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <InfoField label="Patient ID" value={patientId} />
+              <InfoField label="Patient ID" value={patientId ?? visit.patient_id} />
               <InfoField label="Course" value={visit.course ?? undefined} />
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+              <InfoField
+                label="Year and Section"
+                value={visit.year_section ?? undefined}
+              />
+              <InfoField label="Age" value={visit.age ?? undefined} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+              <InfoField label="Sex" value={visit.sex ?? undefined} />
+              <InfoField
+                label="Civil status"
+                value={visit.civil_status ?? undefined}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+              <InfoField
+                label="Birthday"
+                value={visit.birthday ? formatDate(visit.birthday) : undefined}
+              />
+              <InfoField label="Mobile Number" value={visit.mobileNumber ?? undefined} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-x-4 gap-y-5">
+              <InfoField label="Address" value={visit.address ?? undefined} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
               <InfoField label="Status" value={visit.status} />
+              <InfoField
+                label="Visit date"
+                value={visit.visit_date ? formatDate(visit.visit_date) : undefined}
+              />
             </div>
           </div>
 

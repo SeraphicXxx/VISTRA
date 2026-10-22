@@ -124,13 +124,7 @@ export function resolveStudentId(user: any): string {
 }
 
 export function getViewPath(id: string): string {
-  const base = ROUTES.patient.appointment.viewAppointment as string;
-
-  if (base.includes(":id")) {
-    return base.replace(":id", id);
-  }
-
-  return `${base}?id=${encodeURIComponent(id)}`;
+  return ROUTES.patient.appointment.view.build(id);
 }
 
 export function getEffectiveSlot(

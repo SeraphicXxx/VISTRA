@@ -13,13 +13,25 @@ alter table "public"."MEDICAL_VISIT" alter column "visit_date" set default now()
 create or replace view "public"."medical_record_view" as  SELECT (mv.id)::text AS medical_visit_id,
     concat_ws(' '::text, pp.first_name, pp.middle_name, pp.last_name) AS patient_name,
     pp.patient_id,
+    pp.complete_address AS address,
+    pp.barangay,
+    (pp.age)::text AS age,
+    pp.contact_no AS "mobileNumber",
+    (pp.sex)::text AS sex,
+    (pp.birthday)::text AS birthday,
+    pp.civil_status,
+    concat_ws(' - '::text, (pp.school_year)::text, pp.section) AS year_section,
+    pp.course,
     mv.type,
     mv.status,
-    pp.course,
+    mv.visit_date,
+    mv.complaint,
+    mv.treatment,
+    mv.treatment_type,
     concat_ws(' '::text, s.first_name, s.middle_name, s.last_name) AS staff_name
    FROM ((public."MEDICAL_VISIT" mv
      JOIN public."PATIENT_PROFILE" pp ON ((pp.patient_id = mv.patient_id)))
-     JOIN public."STAFF" s ON ((s.staff_id = mv.staff_id)));
+     LEFT JOIN public."STAFF" s ON ((s.staff_id = mv.staff_id)));
 
 
 create or replace view "public"."medical_tab" as  SELECT mv.id,

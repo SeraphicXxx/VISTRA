@@ -12,8 +12,17 @@ export interface MedicalVisitSchema {
 export interface MedicalRecordDetailSchema {
     medical_visit_id: string;
     patient_name: string;
+    patient_id: string;
     status: string;
     course: string | null;
+    year_section: string | null;
+    age: string | null;
+    sex: string | null;
+    civil_status: string | null;
+    birthday: string | null;
+    address: string | null;
+    barangay: string | null;
+    mobileNumber: string | null;
     staff_name: string | null;
     visit_date: string | null;
     complaint: string | null;

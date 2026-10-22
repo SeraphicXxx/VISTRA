@@ -8,7 +8,7 @@ import { AdminAnimStyles, Reveal } from "/@/components/adminanim";
 
 const HIDDEN_HEADER_PATHS = [
     ROUTES.patient.appointment.bookAppointment,
-    ROUTES.patient.appointment.viewAppointment,
+    ROUTES.patient.appointment.view.route,
 ];
 
 export default function PatientLayout() {

@@ -99,11 +99,11 @@ function AppRoutes() {
                         <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab/>}/>
                         <Route path={ROUTES.patient.dashboard.appointments} element={<PatientAppointmentsTab/>}/>
                         <Route path={ROUTES.patient.appointment.bookAppointment} element={<PatientBookAppointment/>}/>
-                        <Route path={ROUTES.patient.appointment.viewAppointment} element={<PatientAppointmentView/>}/>
+                        <Route path={ROUTES.patient.appointment.view.route} element={<PatientAppointmentView/>}/>
                         <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab/>}/>
-                        <Route path={`${ROUTES.patient.dashboard.medical}/record`} element={<PatientMedicalRecordView/>}/>
+                        <Route path={ROUTES.patient.medical.view.route} element={<PatientMedicalRecordView/>}/>
                         <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab/>}/>
-                        <Route path={`${ROUTES.patient.dashboard.dental}/record`} element={<PatientDentalRecordView/>}/>
+                        <Route path={ROUTES.patient.dental.view.route} element={<PatientDentalRecordView/>}/>
                         <Route path={ROUTES.patient.profile} element={<PatientProfilePage/>}/>
                     </Route>
                 </Route>

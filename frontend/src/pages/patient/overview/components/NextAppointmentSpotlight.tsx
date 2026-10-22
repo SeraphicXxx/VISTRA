@@ -74,7 +74,7 @@ export default function NextAppointmentSpotlight({ appointment }: NextAppointmen
       </div>
 
       <Link
-        to={ROUTES.patient.appointment.viewAppointment}
+        to={ROUTES.patient.appointment.view.build(appointment.id)}
         className="relative mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:text-white/80"
       >
         View details

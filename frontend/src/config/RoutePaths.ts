@@ -60,13 +60,25 @@ export const ROUTES = {
         },
         appointment: {
             bookAppointment: "/patient/appointments/book",
-            viewAppointment: "/patient/appointments/view",
+            view: {
+                route: "/patient/appointments/view/:appointmentId",
+                build: (appointmentId: string) =>
+                    `/patient/appointments/view/${appointmentId}`,
+            },
         },
         medical: {
-            viewRecord: "/patient/dashboard/medical/record",
+            view: {
+                route: "/patient/dashboard/medical/view/:medicalId",
+                build: (medicalId: string) =>
+                    `/patient/dashboard/medical/view/${medicalId}`,
+            },
         },
         dental: {
-            viewRecord: "/patient/dashboard/dental/record",
+            view: {
+                route: "/patient/dashboard/dental/view/:dentalId",
+                build: (dentalId: string) =>
+                    `/patient/dashboard/dental/view/${dentalId}`,
+            },
         },
         profile: "/patient/profile",
     },
