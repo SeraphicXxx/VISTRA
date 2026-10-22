@@ -326,7 +326,12 @@ export default function AdminLoginPage() {
   const [isCheckingPresence, setIsCheckingPresence] = useState(false);
   const isBusy = isLoading || isCheckingPresence;
 
+  const clearDutyPromptPending = (): void => {
+    sessionStorage.removeItem("vistra_duty_prompt_pending");
+  };
+
   const skipToDashboard = (): void => {
+    clearDutyPromptPending();
     setIsDutyModalOpen(false);
     navigate(ROUTES.staff.dashboard.overview);
   };
@@ -336,6 +341,7 @@ export default function AdminLoginPage() {
     // session replaces the one from the initial login.
     try {
       await login({ ...credentials, on_duty: true });
+      clearDutyPromptPending();
       skipToDashboard();
     } catch {}
   };
@@ -345,12 +351,17 @@ export default function AdminLoginPage() {
 
     if (!validate()) return;
 
+    // Keep the login page mounted after authentication so the duty
+    // prompt can render (GuestRoute would otherwise redirect away).
+    sessionStorage.setItem("vistra_duty_prompt_pending", "true");
+
     // Authenticate first (presence lookup needs a session), then
     // decide on the duty prompt: staff already flagged active skip
     // it entirely — only the 5pm cronjob can flip the flag back.
     try {
       await login({ ...credentials, on_duty: false });
     } catch {
+      sessionStorage.removeItem("vistra_duty_prompt_pending");
       return;
     }
 
@@ -362,6 +373,7 @@ export default function AdminLoginPage() {
       const { data } = await getStaffById(staffId);
 
       if (data.data?.is_active) {
+        sessionStorage.removeItem("vistra_duty_prompt_pending");
         navigate(ROUTES.staff.dashboard.overview);
         return;
       }
@@ -389,7 +401,12 @@ export default function AdminLoginPage() {
       {isDutyModalOpen && (
         <Modal
           title="Are you on duty?"
-          onClose={() => !isLoading && setIsDutyModalOpen(false)}
+          onClose={() =>
+            !isLoading &&
+            (clearDutyPromptPending(),
+            setIsDutyModalOpen(false),
+            navigate(ROUTES.staff.dashboard.overview))
+          }
           maxWidth="max-w-sm"
           footer={
             <>

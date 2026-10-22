@@ -12,6 +12,12 @@ export default function GuestRoute(): React.JSX.Element {
     const { isAuthenticated } = useAuth();
 
     if (isAuthenticated || sessionManager.isAuthenticated()) {
+        // Allow the staff login page to stay mounted while the
+        // "are you on duty?" prompt is being answered.
+        if (sessionStorage.getItem("vistra_duty_prompt_pending") === "true") {
+            return <Outlet />;
+        }
+
         const target = sessionManager.isStaff()
             ? ROUTES.staff.dashboard.overview
             : ROUTES.patient.dashboard.overview;

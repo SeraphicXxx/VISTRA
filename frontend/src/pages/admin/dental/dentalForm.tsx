@@ -7,6 +7,8 @@ import {StudentInfoSection} from "/@/components/StudentInfoSection.jsx";
 import {ToothNoteModal} from "/@/components/dental/ToothForm";
 import {useDentalRecordForm} from "/@/hooks/DentalForms";
 import {getFieldErrors} from "/@/utils/Formatters";
+import {useNavigate} from "react-router-dom";
+import {ROUTES} from "/@/config/RoutePaths";
 import {useCreateDentalVisit} from "/@/hooks/query/DentalQuery";
 import {CreateDentalVisit} from "/@/api/schema/DentalSchema";
 import {statusEditFields} from "/@/components/editModal.jsx";
@@ -42,8 +44,8 @@ function DentalConditionSection() {
                 </div>
 
                 <FormInput
-                    id="current_medication"
-                    name="current_medication"
+                    id="current_medications"
+                    name="current_medications"
                     label="Medication"
                     placeholder="List current medications"
                 />
@@ -401,6 +403,7 @@ function DentalHabitsSection() {
 }
 
 export default function DentalRecordForm() {
+    const navigate = useNavigate();
     const {
         selectedStudent,
         setSelectedStudent,
@@ -437,13 +440,16 @@ export default function DentalRecordForm() {
             brushing_frequency: String(formData.brushing_frequency ?? ""),
             floss: formData.floss === "true",
             calculus_severity: String(formData.calculus_severity ?? ""),
-            current_medication: String(formData.current_medication ?? ""),
+            current_medications: String(formData.current_medications ?? ""),
             status: String(formData.status ?? ""),
             notes: String(formData.notes ?? ""),
             patient_id: selectedStudent.patient_id,
             tooth_records: Object.values(toothRecords),
         };
         createDentalVisitMutation.mutate(record, {
+            onSuccess: () => {
+                navigate(ROUTES.staff.dashboard.dental);
+            },
             onError: (error) => {
                 console.error("Failed to create dental visit:", getFieldErrors(error));
             },

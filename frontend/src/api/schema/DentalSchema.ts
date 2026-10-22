@@ -20,7 +20,7 @@ export interface CreateDentalVisit {
     brushing_frequency: string;
     floss: boolean
     calculus_severity: string;
-    current_medication: string
+    current_medications: string
     notes: string
     status: string;
 
