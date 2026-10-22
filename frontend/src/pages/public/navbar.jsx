@@ -118,7 +118,7 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={`mx-auto flex items-center justify-between transition-all duration-500 ${
           scrolled
-            ? "max-w-3xl rounded-2xl border border-border/60 bg-surface/85 px-4 py-2.5 shadow-lg shadow-black/[0.06] backdrop-blur-xl sm:mx-6 lg:mx-auto"
+            ? "max-w-3xl rounded-2xl border border-border/60 bg-transparent px-4 py-2.5 shadow-lg shadow-black/[0.06] backdrop-blur-xl sm:mx-6 lg:mx-auto"
             : "mt-0 max-w-6xl border border-transparent bg-transparent px-6 py-5"
         }`}
       >

@@ -8,7 +8,7 @@ export const dentalRecords: DentalData[] = [
         id: "DEN-1042",
         student: "James Bontogon",
         course: "BS Computer Science",
-        time: "9:00 AM",
+        time: "2026-10-20",
         type: "Dental Consultation",
         status: "completed",
     },
@@ -17,7 +17,7 @@ export const dentalRecords: DentalData[] = [
         id: "DEN-1043",
         student: "Heart Combinido",
         course: "BS Psychology",
-        time: "9:30 AM",
+        time: "2026-10-20",
         type: "Tooth Extraction",
         status: "followUp",
     },
@@ -26,7 +26,7 @@ export const dentalRecords: DentalData[] = [
         id: "DEN-1044",
         student: "Angelo Bejamino",
         course: "BS Industrial Engineering",
-        time: "10:00 AM",
+        time: "2026-10-20",
         type: "Oral Prophylaxis",
         status: "completed",
     },
@@ -35,7 +35,7 @@ export const dentalRecords: DentalData[] = [
         id: "DEN-1045",
         student: "Natasha Pinon",
         course: "BS Electronics Engineering",
-        time: "10:15 AM",
+        time: "2026-10-20",
         type: "Dental Filling",
         status: "referred",
     },
@@ -44,7 +44,7 @@ export const dentalRecords: DentalData[] = [
         id: "DEN-1046",
         student: "Rosh Ingel",
         course: "BS Accountancy",
-        time: "10:45 AM",
+        time: "2026-10-20",
         type: "Dental Consultation",
         status: "ongoingTreatment",
     },
@@ -93,7 +93,7 @@ export const DentalColumns: Column<DentalData>[] = [
 
     {
         key: "time",
-        label: "Time",
+        label: "Date",
         filterType: "date",
     },
 
@@ -101,17 +101,9 @@ export const DentalColumns: Column<DentalData>[] = [
         key: "status",
         label: "Status",
         filterType: "select",
-        options: [
-            "ongoingTreatment",
-            "followUp",
-            "declined",
-            "completed",
-            "referred",
-        ],
         render: (value) => (
             <StatusBadge status={value as Status}/>
         ),
     },
 
 ];
-

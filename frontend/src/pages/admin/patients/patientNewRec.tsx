@@ -2,7 +2,6 @@ import {useState, type FormEvent, type FocusEvent} from "react";
 import {ArrowLeft, Save, UserPlus, Info, Eye, EyeOff} from "lucide-react";
 import {FormInput, SelectField} from "/@/components/InputCollection.jsx";
 import {
-    ClassificationToggle,
     COURSE_OPTIONS,
     YEAR_OPTIONS,
     SECTION_OPTIONS,
@@ -13,17 +12,32 @@ import {
 } from "/@/utils/NewPatientUtils.jsx";
 import MedicalHistoryForm from "/@/components/MedicalHistoryForm";
 import {
-    STUDENT_ID_PATTERN,
     FACULTY_ID_PATTERN,
-    validateStudentId,
     validateFacultyId,
 } from "/@/utils/NewPatientValidation.jsx";
 import {useSavePatient} from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
-type Classification = "student" | "faculty" | "professor";
+type Classification = "student" | "faculty" | "staff";
 type PatientRecord = Record<string, FormDataEntryValue>;
+
+const CLASSIFICATION_OPTIONS: {value: Classification; label: string}[] = [
+    {value: "student", label: "Student"},
+    {value: "faculty", label: "Faculty/Professor"},
+    {value: "staff", label: "University Staff"},
+];
+
+const STAFF_POSITION_OPTIONS: string[] = [
+    "Maintenance",
+    "Security",
+    "Other University Facilities",
+];
+
+const STAFF_ID_PATTERN = "UF-[0-9]{4}-[0-9]{3}";
+
+const validateStaffId = (value: string): string =>
+    /^UF-[0-9]{4}-[0-9]{3}$/.test(value) ? "" : "Use the format UF-2023-045";
 
 const ID_FIELDS: Record<Classification, {
     label: string;
@@ -34,22 +48,48 @@ const ID_FIELDS: Record<Classification, {
     student: {
         label: "Student ID",
         placeholder: "20230786-S",
-        pattern: STUDENT_ID_PATTERN,
-        validate: validateStudentId,
+        pattern: "[0-9]{8}-S",
+        validate: (value: string) => (/^[0-9]{8}-S$/.test(value) ? "" : "Use the format 20230786-S"),
     },
     faculty: {
-        label: "Faculty ID",
+        label: "Faculty/Professor ID",
         placeholder: "F-2023-045",
         pattern: FACULTY_ID_PATTERN,
         validate: validateFacultyId,
     },
-    professor: {
-        label: "Professor ID",
-        placeholder: "F-2023-045",
-        pattern: FACULTY_ID_PATTERN,
-        validate: validateFacultyId,
+    staff: {
+        label: "Staff ID",
+        placeholder: "UF-2023-045",
+        pattern: STAFF_ID_PATTERN,
+        validate: validateStaffId,
     },
 };
+
+function PatientTypeToggle({value, onChange}: {value: Classification; onChange: (value: Classification) => void}) {
+    return (
+        <div role="radiogroup" className="inline-flex flex-wrap gap-2 rounded-xl border border-border bg-background p-1">
+            {CLASSIFICATION_OPTIONS.map((option) => {
+                const selected = value === option.value;
+                return (
+                    <button
+                        key={option.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => onChange(option.value)}
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                            selected
+                                ? "bg-primary text-white shadow-sm"
+                                : "text-textSecondary hover:text-textPrimary"
+                        }`}
+                    >
+                        {option.label}
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
 
 export default function NewPatientRecordForm() {
     const {
@@ -66,7 +106,7 @@ export default function NewPatientRecordForm() {
 
     const isStudent = classification === "student";
     const isFaculty = classification === "faculty";
-    const isProfessor = classification === "professor";
+    const isStaff = classification === "staff";
     const idField = ID_FIELDS[classification];
     const PasswordIcon = showPassword ? EyeOff : Eye;
 
@@ -125,6 +165,8 @@ export default function NewPatientRecordForm() {
             onSubmit={handleSubmit}
             className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface p-8 shadow-lg"
         >
+            <input type="hidden" name="patient_type" value={classification} />
+
             <div className="mb-8 flex items-center gap-3 border-b border-border pb-6">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                     <UserPlus className="h-5 w-5 text-primary" strokeWidth={2}/>
@@ -142,7 +184,7 @@ export default function NewPatientRecordForm() {
             </div>
 
             <div className="mb-6">
-                <ClassificationToggle
+                <PatientTypeToggle
                     value={classification}
                     onChange={handleClassificationChange}
                 />
@@ -284,7 +326,7 @@ export default function NewPatientRecordForm() {
                 </div>
             )}
 
-            {(isFaculty || isProfessor) && (
+            {isFaculty && (
                 <div className="mt-8 border-t border-border pt-6">
                     <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
                         Employment Details
@@ -304,6 +346,24 @@ export default function NewPatientRecordForm() {
                             name="position"
                             label="Position"
                             options={POSITION_OPTIONS}
+                            error={saveErrorMessage?.position}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {isStaff && (
+                <div className="mt-8 border-t border-border pt-6">
+                    <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
+                        Employment Details
+                    </h2>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <SelectField
+                            id="position"
+                            name="position"
+                            label="Position"
+                            options={STAFF_POSITION_OPTIONS}
                             error={saveErrorMessage?.position}
                         />
                     </div>

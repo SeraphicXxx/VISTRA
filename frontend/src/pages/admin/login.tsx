@@ -93,11 +93,11 @@ export function LoginForm({
         </a>
 
         <h1 className="mb-2 font-heading text-3xl font-semibold leading-tight tracking-tight text-textPrimary">
-          Sign in to the staff portal
+          Sign in to the Medical Personnel Portal
         </h1>
 
-        <p className="text-base leading-relaxed text-textSecondary">
-          Use your Staff ID and password.
+        <p className="text-xs leading-relaxed text-textSecondary">
+          Use your Medical Personnel ID and password.
         </p>
       </div>
 
@@ -113,7 +113,7 @@ export function LoginForm({
 
       <div className="mb-5 w-full text-left">
         <FormInput
-          label="Staff ID"
+          label="Medical Personnel ID"
           id="email"
           name="email"
           type="text"
