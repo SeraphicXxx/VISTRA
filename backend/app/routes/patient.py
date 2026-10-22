@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
 from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
-from app.schemas.query import FilterPatient
+from app.schemas.query import FilterPatient, FilterMedical, FilterDental
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
     get_patient_summary_record
+from app.services.medical import get_patient_medical_tab as get_patient_medical_tab_service
+from app.services.dental import get_patient_dental_tab as get_patient_dental_tab_service
 from app.services.patient import create_patient as create_patient_service
 from app.services.patient import delete_patient as delete_patient_service
 from app.services.patient import update_patient_profile as update_patient_profile_service
@@ -29,6 +31,33 @@ def create_patient(request: CreatePatientRequest, supabase: Client = Depends(get
 @protected_patient_router.get("/profiles/", dependencies=[Depends(require_staff)])
 def get_all_profiles(filters : FilterPatient = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_patient_profiles(supabase, filters)
+
+@protected_patient_router.get("/medical-tab/")def get_patient_medical_tab(
+    filters: FilterMedical = Depends(),
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    # The patient ID is derived solely from the JWT; no search param.
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    return get_patient_medical_tab_service(scope, filters, supabase)
+
+
+@protected_patient_router.get("/dental-tab/")def get_patient_dental_tab(
+    filters: FilterDental = Depends(),
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    return get_patient_dental_tab_service(scope, filters, supabase)
+
 
 @protected_patient_router.get("/{patient_id}/")
 def get_patient(patient_id: str, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
