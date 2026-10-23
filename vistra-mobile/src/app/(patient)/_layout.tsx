@@ -1,56 +1,48 @@
+import { AppHeader } from "@/components/navigation/AppHeader";
+import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import { brand } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { Tabs } from "expo-router";
+import { StyleSheet, View } from "react-native";
 
-export default function PatientLayout() {
+export default function PatientTabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: brand.primaryDark,
-        tabBarInactiveTintColor: brand.textMuted,
-        tabBarStyle: {
-          backgroundColor: brand.surface,
-          borderTopColor: brand.border,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Overview",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="grid-outline" size={size} color={color} />
-          ),
-        }}
+    <View style={styles.root}>
+                <LinearGradient
+        colors={[
+          "#ffffff",
+          "#ffffff",
+          "#ccfbf1",
+          "#5eead4",
+          brand.primary,
+          brand.primary,
+        ]}
+        locations={[0, 0.3, 0.45, 0.6, 0.8, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={StyleSheet.absoluteFill}
       />
-      <Tabs.Screen
-        name="medical"
-        options={{
-          title: "Medical",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="medkit-outline" size={size} color={color} />
-          ),
+
+      <Tabs
+        tabBar={(props) => <PatientTabBar {...props} />}
+        screenOptions={{
+          header: () => <AppHeader notificationCount={2} />,
+          sceneStyle: { backgroundColor: "transparent" },
         }}
-      />
-      <Tabs.Screen
-        name="dental"
-        options={{
-          title: "Dental",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="happy-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen name="overview" options={{ title: "Overview" }} />
+        <Tabs.Screen name="appointments" options={{ title: "Appointments" }} />
+        <Tabs.Screen name="medical" options={{ title: "Medical" }} />
+        <Tabs.Screen name="dental" options={{ title: "Dental" }} />
+        <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      </Tabs>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: brand.background,
+  },
+});

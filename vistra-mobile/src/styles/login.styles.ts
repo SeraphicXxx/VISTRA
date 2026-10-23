@@ -106,10 +106,10 @@ export const loginStyles = StyleSheet.create({
   inputError: {
     borderColor: brand.danger,
   },
-  eyeButton: {
+    eyeButton: {
     position: "absolute",
     right: 14,
-    top: 36,
+    top: 8,
     height: 40,
     justifyContent: "center",
   },

@@ -134,7 +134,7 @@ export default function LoginScreen() {
                   <TextInput
                     value={patientId}
                     onChangeText={setPatientId}
-                    placeholder="20230847-S"
+                    placeholder="2023XXXX-S"
                     placeholderTextColor={brand.textMuted}
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -149,33 +149,35 @@ export default function LoginScreen() {
               <Reveal delay={AFTER_CARD + 320} distance={16}>
                 <View style={styles.field}>
                   <Text style={styles.fieldLabel}>Password</Text>
-                  <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    placeholder="Enter your password"
-                    placeholderTextColor={brand.textMuted}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    style={[
-                      styles.input,
-                      styles.inputWithIcon,
-                      errors.password && styles.inputError,
-                    ]}
-                  />
-                  <Pressable
-                    onPress={() => setShowPassword((prev) => !prev)}
-                    style={styles.eyeButton}
-                    accessibilityLabel={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye-off-outline" : "eye-outline"}
-                      size={20}
-                      color={brand.textMuted}
+                  <View style={styles.inputWrap}>
+                    <TextInput
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Enter your password"
+                      placeholderTextColor={brand.textMuted}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      style={[
+                        styles.input,
+                        styles.inputWithIcon,
+                        errors.password && styles.inputError,
+                      ]}
                     />
-                  </Pressable>
+                    <Pressable
+                      onPress={() => setShowPassword((prev) => !prev)}
+                      style={styles.eyeButton}
+                      accessibilityLabel={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color={brand.textMuted}
+                      />
+                    </Pressable>
+                  </View>
                   {errors.password ? (
                     <Text style={styles.fieldError}>{errors.password}</Text>
                   ) : null}
