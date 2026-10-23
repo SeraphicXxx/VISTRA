@@ -15,17 +15,17 @@ import {
     FACULTY_ID_PATTERN,
     validateFacultyId,
 } from "/@/utils/NewPatientValidation.jsx";
-import {useSavePatient} from "/@/hooks/SavePatient.ts";
+import {useSavePatient} from "/@/hooks/SavePatient";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
-type Classification = "student" | "faculty" | "staff";
+type Classification = "student" | "faculty" | "university_staff";
 type PatientRecord = Record<string, FormDataEntryValue>;
 
 const CLASSIFICATION_OPTIONS: {value: Classification; label: string}[] = [
     {value: "student", label: "Student"},
     {value: "faculty", label: "Faculty/Professor"},
-    {value: "staff", label: "University Staff"},
+    {value: "university_staff", label: "University Staff"},
 ];
 
 const STAFF_POSITION_OPTIONS: string[] = [
@@ -57,8 +57,8 @@ const ID_FIELDS: Record<Classification, {
         pattern: FACULTY_ID_PATTERN,
         validate: validateFacultyId,
     },
-    staff: {
-        label: "Staff ID",
+    university_staff: {
+        label: "University Staff ID",
         placeholder: "UF-2023-045",
         pattern: STAFF_ID_PATTERN,
         validate: validateStaffId,
@@ -106,7 +106,7 @@ export default function NewPatientRecordForm() {
 
     const isStudent = classification === "student";
     const isFaculty = classification === "faculty";
-    const isStaff = classification === "staff";
+    const isUniversityStaff = classification === "university_staff";
     const idField = ID_FIELDS[classification];
     const PasswordIcon = showPassword ? EyeOff : Eye;
 
@@ -165,7 +165,7 @@ export default function NewPatientRecordForm() {
             onSubmit={handleSubmit}
             className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface p-8 shadow-lg"
         >
-            <input type="hidden" name="patient_type" value={classification} />
+            <input type="hidden" name="classification" value={classification} />
 
             <div className="mb-8 flex items-center gap-3 border-b border-border pb-6">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -352,7 +352,7 @@ export default function NewPatientRecordForm() {
                 </div>
             )}
 
-            {isStaff && (
+            {isUniversityStaff ? (
                 <div className="mt-8 border-t border-border pt-6">
                     <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
                         Employment Details
@@ -368,7 +368,7 @@ export default function NewPatientRecordForm() {
                         />
                     </div>
                 </div>
-            )}
+            ) : null}
 
             <div className="mt-8 border-t border-border pt-6">
                 <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">

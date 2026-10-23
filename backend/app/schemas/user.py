@@ -27,6 +27,7 @@ CLASSIFICATION_ROLE_MAP: dict[str, Role] = {
     "student": STUDENT_ROLE,
     "faculty": FACULTY_ROLE,
     "staff": STAFF_ROLE,
+    "university_staff": STAFF_ROLE,
 }
 
 # Accepted resolver inputs: form keys plus common variants

@@ -52,7 +52,7 @@ class CreatePatientRequest(BaseModel):
     # Patient endpoint creates system users only. Admin/staff
     # accounts are the staff-management page's responsibility
     # (POST /staff/); anything else 422s here.
-    classification: Literal["student", "faculty", "professor"]
+    classification: Literal["student", "faculty", "professor", "university_staff"]
 
     course: str | None = None
     school_year: str | None = None
