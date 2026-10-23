@@ -24,6 +24,14 @@ const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
   patient_name: "Kenji Chua",
   status: "Cleared",
   course: "BS Computer Science",
+  year_section: "4th Year, Section A",
+  age: "21",
+  sex: "Male",
+  civil_status: "Single",
+  birthday: "2005-03-14",
+  address: "12 Mahogany St.",
+  barangay: "Barangay Holy Spirit",
+  mobile_number: "0917 234 5566",
   staff_name: "Maria Santos",
   visit_date: "2026-10-11",
   complaint: "Fever, headache since morning",
@@ -47,11 +55,7 @@ const consultationEditFields = [
   },
 ];
 
-/*
- * Status modal options are display labels ("Not Cleared"); the
- * endpoint takes backend keys ("notCleared"). Labels map 1:1 by
- * lowercasing the first letter and stripping spaces.
- */
+
 function toBackendStatus(label: string): string {
   const trimmed = label.trim();
   return trimmed.charAt(0).toLowerCase() + trimmed.slice(1).replace(/\s+/g, "");
@@ -286,6 +290,10 @@ export default function PatientRecordView() {
     persistUpdate(payload, () => setIsConsultationModalOpen(false));
   };
 
+  const address = visit.address
+    ? `${visit.address}${visit.barangay ? `, ${visit.barangay}` : ""}`
+    : undefined;
+
   return (
     <>
       <SaveErrorBanner message={saveError} />
@@ -353,8 +361,8 @@ export default function PatientRecordView() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
-          <div className="flex flex-col gap-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-            <div className="border-b border-border pb-4">
+          <div className="rounded-2xl border border-border bg-surface shadow-sm">
+            <div className="border-b border-border px-5 py-4">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-primary" />
                 <h2 className="font-heading text-sm font-semibold text-primaryDark">
@@ -363,37 +371,74 @@ export default function PatientRecordView() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <InfoField label="Patient ID" value={patientId} />
-              <InfoField label="Course" value={visit.course ?? undefined} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <InfoField label="Status" value={visit.status} />
+            <div className="flex flex-col gap-y-4 p-6">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField label="Course" value={visit.course ?? undefined} />
+                <InfoField
+                  label="Year and Section"
+                  value={visit.year_section ?? undefined}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField label="Age" value={visit.age ?? undefined} />
+                <InfoField label="Sex" value={visit.sex ?? undefined} />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField
+                  label="Civil status"
+                  value={visit.civil_status ?? undefined}
+                />
+                <InfoField
+                  label="Birthday"
+                  value={visit.birthday ? formatDate(visit.birthday) : undefined}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-x-4 gap-y-5">
+                <InfoField label="Address" value={address} />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField
+                  label="Mobile Number"
+                  value={visit.mobile_number ?? undefined}
+                />
+                <InfoField
+                  label="Visit Date"
+                  value={visit.visit_date ? formatDate(visit.visit_date) : undefined}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
-            <div className="mb-5 flex items-center justify-between gap-2 border-b border-border pb-4">
-              <div className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4 text-primary" />
-                <h2 className="font-heading text-sm font-semibold text-primaryDark">
-                  Consultation
-                </h2>
-              </div>
+          <div className="rounded-2xl border border-border bg-surface shadow-sm lg:col-span-2">
+            <div className="border-b border-border px-5 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-primary" />
+                  <div>
+                    <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                      Consultation
+                    </h2>
+                    <p className="text-xs text-textMuted">
+                      {visit.staff_name
+                        ? `Attending staff: ${visit.staff_name}`
+                        : "Visit record details below."}
+                    </p>
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                onClick={openConsultationEdit}
-                aria-label="Edit consultation"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-textSecondary transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
+                <button
+                  type="button"
+                  onClick={openConsultationEdit}
+                  aria-label="Edit consultation"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-textSecondary transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
 
-            <div className="rounded-xl border border-border p-5">
-              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+            <div className="p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <InfoField
                   label="Visit date"
                   value={visit.visit_date ? formatDate(visit.visit_date) : undefined}

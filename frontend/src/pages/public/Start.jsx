@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Reveal, fadeUp, fadeRight, stagger } from "../../components/landinganim.jsx";
+import { Reveal, fadeUp, fadeRight } from "../../components/landinganim.jsx";
+import { Reveal as CardReveal } from "/@/components/adminanim";
 import { LiveDot } from "./Shared.jsx";
 import { vitalStyles } from "./data.jsx";
 import { ROUTES } from "/@/config/RoutePaths";
@@ -110,32 +110,32 @@ export default function Start() {
               </h3>
             </div>
 
-            <motion.div
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-              variants={stagger}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.15 }}
-            >
-              {medicalFacts.map(({ key, label, range, unit, fact }) => (
-                <motion.div
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {medicalFacts.map(({ key, label, range, unit, fact }, index) => (
+                <CardReveal
                   key={key}
-                  variants={fadeUp}
-                  className={`rounded-2xl border border-border bg-background p-4 ring-1 ${vitalStyles[key].ring}`}
+                  as="div"
+                  delay={index * 0.12}
+                  distance={18}
+                  className="h-full"
                 >
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${vitalStyles[key].chip}`}
+                  <div
+                    className={`group h-full cursor-default rounded-2xl border border-border bg-background p-4 ring-1 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:shadow-card ${vitalStyles[key].ring}`}
                   >
-                    {label}
-                  </span>
-                  <p className="mt-3 font-mono text-2xl font-semibold text-textPrimary">
-                    {range}
-                    <span className="ml-1 text-xs font-normal text-textMuted">{unit}</span>
-                  </p>
-                  <p className="mt-2 text-xs leading-relaxed text-textMuted">{fact}</p>
-                </motion.div>
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold transition-transform duration-300 group-hover:scale-105 ${vitalStyles[key].chip}`}
+                    >
+                      {label}
+                    </span>
+                    <p className="mt-3 font-mono text-2xl font-semibold text-textPrimary transition-colors duration-300 group-hover:text-primaryDark">
+                      {range}
+                      <span className="ml-1 text-xs font-normal text-textMuted">{unit}</span>
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-textMuted">{fact}</p>
+                  </div>
+                </CardReveal>
               ))}
-            </motion.div>
+            </div>
           </div>
         </Reveal>
       </div>
