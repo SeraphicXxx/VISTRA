@@ -2,51 +2,47 @@ import {ClipboardList} from "lucide-react";
 import {StatusBadge} from "/@/components/StatusBadge";
 import {VisitTab} from "/@/components/VisitTab";
 import {Column} from "/@/components/table/Table";
-import {sessionManager} from "/@/utils/SessionManager";
 import {ROUTES} from "/@/config/RoutePaths";
-
-import {myMedicalRecords, myVisits, DEFAULT_STUDENT_ID, Visit} from "./medicalData";
+import {usePatientMedicalTabContext} from "/@/context/PaginatedContext";
+import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
+import {toPatientMedicalTableRow} from "/@/repository/PatientMedicalModel";
+import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {Visit} from "./medicalData";
 
 const columns: Column<Visit>[] = [
     {key: "date", label: "Date", filterType: "date"},
     {key: "id", label: "Visit ID"},
-    {key: "complaint", label: "Complaint"},
+    {key: "complaint", label: "Remarks"},
     {key: "doctor", label: "Doctor"},
-    {key: "treatment", label: "Treatment"},
     {key: "status", label: "Status", render: (value) => <StatusBadge status={value}/>},
 ];
 
-const toRow = (visit: Visit) => visit;
-
 const buildViewLink = (visit: Visit) => ROUTES.patient.medical.view.build(visit.id);
 
-export default function PatientMedicalTab() {
-    const user = sessionManager.getUser();
-    const sessionId = user?.user_id ?? "";
-    const studentId = myMedicalRecords[sessionId] ? sessionId : DEFAULT_STUDENT_ID;
+interface PatientMedicalTabProps {
+    setFilters: (filters: MedicalVisitFilters) => void;
+}
 
-    const visits = myVisits[studentId] ?? [];
-
-    if (!myMedicalRecords[studentId]?.recordId) {
-        return (
-            <div className="mx-auto w-full rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-                <p className="text-sm text-textMuted">
-                    We couldn't find a medical record for your account yet. If you've recently
-                    had a clinic visit, check back soon or contact the clinic.
-                </p>
-            </div>
-        );
-    }
+export default function PatientMedicalTab({setFilters}: PatientMedicalTabProps) {
+    const {
+        items,
+        totalPages,
+        page,
+        isLoading,
+    } = usePatientMedicalTabContext();
 
     return (
-        <VisitTab<Visit, Visit>
+        <VisitTab<Visit, PatientMedicalTabVisit>
             title="My Medical Records"
             icon={ClipboardList}
             columns={columns}
-            items={visits}
-            toRow={toRow}
-            isLoading={false}
+            items={items}
+            toRow={toPatientMedicalTableRow}
+            isLoading={isLoading}
+            page={page}
+            totalPages={totalPages}
             buildViewLink={buildViewLink}
+            setFilters={setFilters}
         />
     );
 }

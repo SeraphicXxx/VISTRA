@@ -1,7 +1,9 @@
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile, PatientInfo, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
-import {PatientFilters} from "/@/api/schema/FilterSchemaCollection";
+import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
+import {PatientDentalTabVisit} from "/@/api/schema/PatientDentalTabSchema";
 import {getResource, listResource, sendResource} from "/@/api/resource";
 
 export async function createPatientAccount(
@@ -48,6 +50,28 @@ export function updatePatientProfile(
         "PATCH",
         API_ENDPOINTS.patient.update_patient_profile(patientId),
         payload,
+        signal,
+    );
+}
+
+export function getPatientMedicalTab(
+    filters?: MedicalVisitFilters,
+    signal?: AbortSignal
+) {
+    return listResource<ApiResponse<PaginatedData<PatientMedicalTabVisit>>>(
+        API_ENDPOINTS.patient.get_patient_medical_tab,
+        filters,
+        signal,
+    );
+}
+
+export function getPatientDentalTab(
+    filters?: DentalVisitFilters,
+    signal?: AbortSignal
+) {
+    return listResource<ApiResponse<PaginatedData<PatientDentalTabVisit>>>(
+        API_ENDPOINTS.patient.get_patient_dental_tab,
+        filters,
         signal,
     );
 }

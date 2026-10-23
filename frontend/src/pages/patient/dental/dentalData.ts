@@ -27,11 +27,8 @@ export interface DentalVisit {
     date: string;
     doctor: string;
     complaint: string;
-    treatmentType: string;
     treatment: string;
     status: Status;
-    floss: string;
-    brushFrequency: string;
     calculus: string;
     medication: string;
     notes: string;
