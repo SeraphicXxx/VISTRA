@@ -31,6 +31,14 @@ def get_all_medical_visits(filters: FilterMedical, supabase: Client):
 
 
 @handle_service_errors
+def get_patient_medical_tab(patient_id: str, filters: FilterMedical, supabase: Client):
+    medical_repository = MedicalRepository(supabase)
+    response = medical_repository.get_patient_medical_tab(patient_id, filters)
+
+    return ok(response)
+
+
+@handle_service_errors
 def get_medical_record_by_id(patient_id: str, medical_visit_id: int, supabase: Client):
     medical_repository = MedicalRepository(supabase)
     response = medical_repository.get_medical_record(patient_id, medical_visit_id)

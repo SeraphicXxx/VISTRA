@@ -1,20 +1,17 @@
 import {ClipboardList} from "lucide-react";
 import {StatusBadge} from "/@/components/StatusBadge";
 import {VisitTab} from "/@/components/VisitTab";
-import {Column, optionsFromValues} from "/@/components/table/Table";
+import {Column} from "/@/components/table/Table";
 import {sessionManager} from "/@/utils/SessionManager";
 import {ROUTES} from "/@/config/RoutePaths";
 
 import {myMedicalRecords, myVisits, DEFAULT_STUDENT_ID, Visit} from "./medicalData";
-
-const treatmentOptions = optionsFromValues(["Medicine", "Procedure", "Checkup"]);
 
 const columns: Column<Visit>[] = [
     {key: "date", label: "Date", filterType: "date"},
     {key: "id", label: "Visit ID"},
     {key: "complaint", label: "Complaint"},
     {key: "doctor", label: "Doctor"},
-    {key: "treatmentType", label: "Type", filterType: "select", options: treatmentOptions},
     {key: "treatment", label: "Treatment"},
     {key: "status", label: "Status", render: (value) => <StatusBadge status={value}/>},
 ];

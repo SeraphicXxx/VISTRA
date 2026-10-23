@@ -41,7 +41,7 @@ def require_module(module: str):
         if current_user.role != STAFF_ROLE:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions for this resource",
+                detail=f"Insufficient permissions for this resource",
             )
 
         staff_id = staff_id_format(require_user_email(current_user))
@@ -94,5 +94,5 @@ def enforce_patient_scope(scope: str | None, patient_id: str) -> None:
     if scope is not None and patient_id != scope:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions for this resource",
+            detail=f"Insufficient permissions for this resource {patient_id}",
         )

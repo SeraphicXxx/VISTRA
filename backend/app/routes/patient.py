@@ -32,7 +32,8 @@ def create_patient(request: CreatePatientRequest, supabase: Client = Depends(get
 def get_all_profiles(filters : FilterPatient = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_patient_profiles(supabase, filters)
 
-@protected_patient_router.get("/medical-tab/")def get_patient_medical_tab(
+@protected_patient_router.get("/record/medical-tab/")
+def get_patient_medical_tab(
     filters: FilterMedical = Depends(),
     scope: str | None = Depends(get_patient_scope),
     supabase: Client = Depends(get_supabase_for_user),
@@ -46,7 +47,8 @@ def get_all_profiles(filters : FilterPatient = Depends(), supabase: Client = Dep
     return get_patient_medical_tab_service(scope, filters, supabase)
 
 
-@protected_patient_router.get("/dental-tab/")def get_patient_dental_tab(
+@protected_patient_router.get("/record/dental-tab/")
+def get_patient_dental_tab(
     filters: FilterDental = Depends(),
     scope: str | None = Depends(get_patient_scope),
     supabase: Client = Depends(get_supabase_for_user),

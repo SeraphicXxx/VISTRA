@@ -44,6 +44,14 @@ def get_all_dental_visits(filters: FilterDental, supabase: Client):
 
 
 @handle_service_errors
+def get_patient_dental_tab(patient_id: str, filters: FilterDental, supabase: Client):
+    dental_repository = DentalRepository(supabase)
+    response = dental_repository.get_patient_dental_tab(patient_id, filters)
+
+    return ok(response)
+
+
+@handle_service_errors
 def delete_dental_visit(dental_visit_id: int, supabase: Client):
     dental_repository = DentalRepository(supabase)
     or_404(

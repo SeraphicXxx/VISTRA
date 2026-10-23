@@ -9,10 +9,10 @@ SELECT mv.id,
     mv.staff_id,
     concat_ws(' '::text, s.first_name, s.middle_name, s.last_name) AS doctor,
     mv.status,
-    mv.type,
-    mv.treatment_type,
+    mv.type AS treatment_type,
     mv.complaint,
-    mv.treatmentFROM ((public."MEDICAL_VISIT" mv
+    mv.treatment
+FROM ((public."MEDICAL_VISIT" mv
   JOIN public."PATIENT_PROFILE" pp ON ((pp.patient_id = mv.patient_id)))
   LEFT JOIN public."STAFF" s ON ((s.staff_id = mv.staff_id)));
 

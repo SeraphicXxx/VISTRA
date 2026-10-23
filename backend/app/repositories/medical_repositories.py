@@ -1,6 +1,7 @@
 from typing import Any
 
 from app.repositories.base import BaseRepository, fetch_visit_tab
+from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.schemas.medical import EDITABLE_MEDICAL_VISIT_COLUMNS
 from app.schemas.query import FilterMedical
 
@@ -13,11 +14,29 @@ class MedicalRepository(BaseRepository):
             "medical_tab",
             columns=(
                 "id, patient_id, patient_name, course, "
-                "visit_date, staff_id, status, type"
+                "visit_date, staff_id, status"
             ),
             filters=filters,
             include_type=True,
         )
+
+    def get_patient_medical_tab(self, patient_id: str, filters: FilterMedical):
+        builder = SupabaseQueryBuilder(
+            self.supabase,
+            "patient_medical_tab",
+            count="exact",
+        )
+        builder.eq("patient_id", patient_id)
+        builder.eq("status", filters.status)
+        builder.eq("course", filters.course)
+        builder.date_day("visit_date", filters.date)
+        if filters.search:
+            like = f"%{filters.search}%"
+            builder.or_(
+                f"patient_name.ilike.{like},complaint.ilike.{like},treatment.ilike.{like}"
+            )
+        builder.order("visit_date", desc=True)
+        return self.fetch_page(builder, filters.page, filters.page_size)
 
     def delete_visit(self, medical_visit_id: int):
         return self.delete_by_column("MEDICAL_VISIT", "id", medical_visit_id)
