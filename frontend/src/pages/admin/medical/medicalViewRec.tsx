@@ -8,7 +8,7 @@ import { EditRecordModal, statusEditFields } from "/@/components/editModal";
 import { useMedicalVisitDetail, useUpdateMedicalVisit } from "/@/hooks/query/MedicalQuery";
 import type { MedicalRecordDetailSchema, UpdateMedicalVisit } from "/@/api/schema/MedicalSchema";
 import { formatDate } from "/@/utils/FormatDate";
-import { getFieldErrors } from "/@/utils/Formatters";
+import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 
 /*
@@ -251,7 +251,7 @@ export default function PatientRecordView() {
           void refetch();
         },
         onError: (error) => {
-          setSaveError(getFieldErrors(error));
+          setSaveError(getFieldErrorString(error));
         },
       }
     );

@@ -24,7 +24,7 @@ import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts, todayISO, to12Hour } from "/@/utils/DateUtils";
 import { useCreateAppointment } from "/@/hooks/query/AppointmentQuery";
-import { getFieldErrors } from "/@/utils/Formatters";
+import { getFieldErrorString } from "/@/utils/Formatters";
 import axios from "axios";
 
 const INPUT_CLASS =
@@ -135,7 +135,7 @@ export default function PatientBookAppointment() {
     } catch (err) {
       const payload = axios.isAxiosError(err) ? err.response?.data : err;
       setError(
-        getFieldErrors(payload) ||
+        getFieldErrorString(payload) ||
           "Couldn't submit your request. Please try again."
       );
     } finally {

@@ -5,7 +5,7 @@ import { usePatientRecordSummaryQuery, useUpdatePatientProfile } from "/@/hooks/
 import { PatientRecordTab } from "/@/types/types";
 import { formatDate } from "/@/utils/FormatDate";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal";
-import { getFieldErrors } from "/@/utils/Formatters";
+import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 import { getInitials } from "/@/utils/RecordInfo";
 import type { PatientInfo, UpdatePatientProfile } from "/@/api/schema/PatientSchema";
@@ -237,7 +237,7 @@ export default function ViewStudentRecord() {
           void refetch();
         },
         onError: (error) => {
-          setSaveError(getFieldErrors(error));
+          setSaveError(getFieldErrorString(error));
         },
       }
     );

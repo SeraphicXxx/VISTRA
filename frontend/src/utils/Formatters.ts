@@ -43,34 +43,46 @@ export function getClinicOperationState(date = new Date()) {
         : "closed";
 }
 
-export function getFieldErrors(error: unknown): string {
+export interface FieldErrors {
+    [key: string]: string;
+}
+
+export function getFieldErrors(error: unknown): FieldErrors {
+    const errors: FieldErrors = {};
+
     if (!error) {
-        return "";
+        return errors;
     }
 
     if (Array.isArray((error as any).detail)) {
-        return (error as any).detail
-            .map((item: any) => {
-                const field = item.loc?.[item.loc.length - 1];
+        (error as any).detail.forEach((item: any) => {
+            const field = item.loc?.[item.loc.length - 1];
 
-                if (field) {
-                    return `${field}: ${item.msg}`;
-                }
+            if (field) {
+                errors[field] = item.msg;
+            } else {
+                errors.general = item.msg;
+            }
+        });
 
-                return item.msg;
-            })
-            .join(", ");
+        return errors;
     }
 
     if (typeof (error as any).detail === "string") {
-        return (error as any).detail;
+        errors.general = (error as any).detail;
+        return errors;
     }
 
     if (error instanceof Error) {
-        return error.message;
+        errors.general = error.message;
+        return errors;
     }
 
-    return "";
+    return errors;
+}
+
+export function getFieldErrorString(error: unknown): string {
+    return Object.values(getFieldErrors(error)).join(", ");
 }
 
 export function removeEmptyValues<T extends Record<string, unknown>>(

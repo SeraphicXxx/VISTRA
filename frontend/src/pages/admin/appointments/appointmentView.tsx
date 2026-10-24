@@ -15,7 +15,7 @@ import {useState} from "react";
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
-import {getFieldErrors} from "/@/utils/Formatters";
+import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
 import {getInitials} from "/@/utils/RecordInfo";
 import {Modal} from "/@/components/editModal";
@@ -348,7 +348,7 @@ export default function AppointmentDetailView() {
                 },
                 onError: (error) => {
                     setOptimisticStatus(null);
-                    setSaveError(getFieldErrors(error));
+                    setSaveError(getFieldErrorString(error));
                 },
             }
         );

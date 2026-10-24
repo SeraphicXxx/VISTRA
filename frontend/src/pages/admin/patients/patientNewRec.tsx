@@ -16,7 +16,7 @@ import {
     validateFacultyId,
 } from "/@/utils/NewPatientValidation.jsx";
 import {useSavePatient} from "/@/hooks/SavePatient";
-import {getFieldErrors} from "/@/utils/Formatters.js";
+import {getFieldErrors, FieldErrors, getFieldErrorString} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 
 type Classification = "student" | "faculty" | "university_staff";
@@ -98,7 +98,7 @@ export default function NewPatientRecordForm() {
         error: saveError,
     } = useSavePatient();
 
-    const saveErrorMessage = getFieldErrors(saveError);
+    const saveErrorMessage: FieldErrors = getFieldErrors(saveError);
     const [classification, setClassification] = useState<Classification>("student");
     const [idError, setIdError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -190,9 +190,9 @@ export default function NewPatientRecordForm() {
                 />
             </div>
 
-            {saveErrorMessage && (
+            {Object.keys(saveErrorMessage).length > 0 && (
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                    <p>{saveErrorMessage}</p>
+                    <p>{getFieldErrorString(saveError)}</p>
                 </div>
             )}
 

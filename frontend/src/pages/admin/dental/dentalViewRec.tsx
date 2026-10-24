@@ -16,7 +16,7 @@ import {
 import { ToothEditModal } from "/@/components/ToothEditModal.jsx";
 import { useDentalVisitDetail, useUpdateDentalVisit } from "/@/hooks/query/DentalQuery";
 import { formatDate } from "/@/utils/FormatDate";
-import { getFieldErrors } from "/@/utils/Formatters";
+import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 import type { UpdateDentalVisit, UpdateToothRecord } from "/@/api/schema/DentalSchema";
 
@@ -203,7 +203,7 @@ export default function DentalRecordView() {
           void refetch();
         },
         onError: (error) => {
-          setSaveError(getFieldErrors(error));
+          setSaveError(getFieldErrorString(error));
         },
       }
     );
