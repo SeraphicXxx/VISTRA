@@ -1,70 +1,43 @@
-import { LiveDot } from "@/components/ui/LiveDot";
-import { brand } from "@/constants/theme";
 import { overviewStyles as styles } from "@/styles/overview.styles";
-import { todayLabel } from "@/utils/dates";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 interface WelcomeHeroProps {
   name: string;
   studentId: string;
-  onBookPress?: () => void;
 }
 
-export function WelcomeHero({ name, studentId, onBookPress }: WelcomeHeroProps) {
-  const firstName = name.split(" ")[0];
+const initialsOf = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
 
+const displayName = (name: string) => {
+  const parts = name.split(" ").filter(Boolean);
+  const first = parts[0] ?? "";
+  const last = parts.length > 1 ? `${parts[parts.length - 1][0]}.` : "";
+  return [first, last].filter(Boolean).join(" ");
+};
+
+export function WelcomeHero({ name, studentId }: WelcomeHeroProps) {
   return (
-    <View style={styles.hero}>
-      <View style={styles.heroGlow} />
-
-      <View style={styles.chipRow}>
+    <View>
+      <View style={styles.greetingRow}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{initialsOf(name)}</Text>
+        </View>
+        <View style={styles.greetingBody}>
+          <Text style={styles.greetingSmall}>Welcome back</Text>
+          <Text style={styles.greetingName}>{displayName(name)}</Text>
+        </View>
         <View style={styles.idChip}>
           <Text style={styles.idChipText}>{studentId}</Text>
         </View>
-        <View style={styles.dateChip}>
-          <LiveDot />
-          <Text style={styles.dateChipText}>{todayLabel()}</Text>
-        </View>
       </View>
 
-      <Text style={styles.heroTitle}>Welcome back, {firstName}.</Text>
-      <Text style={styles.heroSubtitle}>
-        Here's what's happening with your health records and upcoming visits.
-      </Text>
-
-      <Pressable
-        onPress={onBookPress}
-        style={({ pressed }) => [
-          heroStyles.bookLink,
-          pressed && heroStyles.pressed,
-        ]}
-      >
-        <Text style={heroStyles.bookLinkText}>Book an Appointment →</Text>
-      </Pressable>
+      <Text style={styles.heroTitle}>How are you feeling today?</Text>
     </View>
   );
 }
-
-const heroStyles = StyleSheet.create({
-  bookLink: {
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 18,
-  },
-  bookLinkText: {
-    marginTop: 16,
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 14,
-    color: brand.primaryDark,
-  },
-  bookArrow: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 14,
-    color: brand.primaryDark,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-});

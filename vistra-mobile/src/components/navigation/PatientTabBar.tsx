@@ -1,66 +1,120 @@
+import { PATIENT_TABS, TAB_SLIDE_MS, type TabConfig } from "@/constants/patientTabs";
 import { brand } from "@/constants/theme";
-import { navigationStyles as styles } from "@/styles/navigation.styles";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { tabBarStyles as styles } from "@/styles/tabBar.styles";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import type { Tabs } from "expo-router";
 import type { ComponentProps } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  Text,
+  View,
+  type LayoutChangeEvent,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type TabIcon = ComponentProps<typeof MaterialCommunityIcons>["name"];
+type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
+type IoniconName = ComponentProps<typeof Ionicons>["name"];
+type MaterialIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 
-const TAB_ICONS: Record<string, TabIcon> = {
-  overview: "view-grid-outline",
-  appointments: "calendar-month-outline",
-  medical: "heart-pulse",
-  dental: "tooth-outline",
-  profile: "account-outline",
-};
+const BAR_PADDING = 6;
+const INDICATOR_INSET = 2;
 
-export function PatientTabBar({
-  state,
-  descriptors,
-  navigation,
-}: BottomTabBarProps) {
+function TabIcon({ tab, focused, color }: { tab: TabConfig; focused: boolean; color: string }) {
+  const name = focused ? tab.activeIcon : tab.icon;
+
+  if (tab.family === "material") {
+    return <MaterialCommunityIcons name={name as MaterialIconName} size={18} color={color} />;
+  }
+
+  return <Ionicons name={name as IoniconName} size={18} color={color} />;
+}
+
+export function PatientTabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
+  const [barWidth, setBarWidth] = useState(0);
+
+  const activeRouteName = state.routes[state.index]?.name;
+  const activeIndex = Math.max(
+    0,
+    PATIENT_TABS.findIndex((tab) => tab.routeName === activeRouteName),
+  );
+
+  const itemWidth = (barWidth - BAR_PADDING * 2) / PATIENT_TABS.length;
+  const slide = useRef(new Animated.Value(activeIndex)).current;
+
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: activeIndex,
+      duration: TAB_SLIDE_MS,
+      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      useNativeDriver: true,
+    }).start();
+  }, [activeIndex, slide]);
+
+  const indicatorX = slide.interpolate({
+    inputRange: PATIENT_TABS.map((_, index) => index),
+    outputRange: PATIENT_TABS.map(
+      (_, index) => BAR_PADDING + index * itemWidth + INDICATOR_INSET,
+    ),
+  });
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    setBarWidth(event.nativeEvent.layout.width);
+  };
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      {state.routes.map((route, index) => {
-        const focused = state.index === index;
-        const { options } = descriptors[route.key];
-        const label = options.title ?? route.name;
-        const icon = TAB_ICONS[route.name] ?? "circle-outline";
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={styles.bar} onLayout={handleLayout}>
+        {barWidth > 0 && (
+          <Animated.View
+            style={[
+              styles.indicator,
+              {
+                width: Math.max(itemWidth - INDICATOR_INSET * 2, 0),
+                transform: [{ translateX: indicatorX }],
+              },
+            ]}
+          />
+        )}
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
+        {PATIENT_TABS.map((tab, index) => {
+          const route = state.routes.find((r) => r.name === tab.routeName);
+          if (!route) return null;
 
-          if (!focused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
-          }
-        };
+          const focused = index === activeIndex;
+          const color = focused ? brand.primaryDark : brand.surface;
 
-        return (
-          <Pressable key={route.key} onPress={onPress} style={styles.item}>
-            <View style={[styles.pill, focused && styles.pillActive]}>
-              <MaterialCommunityIcons
-                name={icon}
-                size={22}
-                color={focused ? brand.primaryDark : brand.textMuted}
-              />
-            </View>
-            <Text
-              numberOfLines={1}
-              style={[styles.label, focused && styles.labelActive]}
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!focused && !event.defaultPrevented) {
+              navigation.navigate(route.name, route.params);
+            }
+          };
+
+          return (
+            <Pressable
+              key={tab.routeName}
+              onPress={onPress}
+              style={styles.item}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: focused }}
             >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
+              <View style={styles.content}>
+                <TabIcon tab={tab} focused={focused} color={color} />
+                <Text style={[styles.label, { color }]}>{tab.label}</Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }

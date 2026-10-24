@@ -1,48 +1,58 @@
 import { AppHeader } from "@/components/navigation/AppHeader";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { brand } from "@/constants/theme";
-import { LinearGradient } from "expo-linear-gradient";
-import { Tabs } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Tabs, useSegments } from "expo-router";
+import { useEffect, useRef } from "react";
+import { Animated, Easing, StyleSheet } from "react-native";
+
+const TAB_FADE_MS = 320;
+const TAB_SHIFT = 12;
 
 export default function PatientTabsLayout() {
-  return (
-    <View style={styles.root}>
-                <LinearGradient
-        colors={[
-          "#ffffff",
-          "#ffffff",
-          "#ccfbf1",
-          "#5eead4",
-          brand.primary,
-          brand.primary,
-        ]}
-        locations={[0, 0.3, 0.45, 0.6, 0.8, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
+  const segments = useSegments();
+  const activeTab = segments.join("/");
+  const progress = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    progress.setValue(0);
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: TAB_FADE_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab, progress]);
+
+  const translateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [TAB_SHIFT, 0],
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.root,
+        { backgroundColor: "#ffffff", opacity: progress, transform: [{ translateY }] },
+      ]}
+    >
       <Tabs
+        detachInactiveScreens
         tabBar={(props) => <PatientTabBar {...props} />}
         screenOptions={{
           header: () => <AppHeader notificationCount={2} />,
-          sceneStyle: { backgroundColor: "transparent" },
+          sceneStyle: { backgroundColor: "#ffffff" },
         }}
       >
         <Tabs.Screen name="overview" options={{ title: "Overview" }} />
         <Tabs.Screen name="appointments" options={{ title: "Appointments" }} />
-        <Tabs.Screen name="medical" options={{ title: "Medical" }} />
-        <Tabs.Screen name="dental" options={{ title: "Dental" }} />
+        <Tabs.Screen name="records" options={{ title: "Records" }} />
         <Tabs.Screen name="profile" options={{ title: "Profile" }} />
       </Tabs>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: brand.background,
   },
 });

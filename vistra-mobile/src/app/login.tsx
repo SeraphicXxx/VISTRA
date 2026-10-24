@@ -134,7 +134,7 @@ export default function LoginScreen() {
                   <TextInput
                     value={patientId}
                     onChangeText={setPatientId}
-                    placeholder="2023XXXX-S"
+                    placeholder="202XXXXX-S"
                     placeholderTextColor={brand.textMuted}
                     autoCapitalize="none"
                     autoCorrect={false}

@@ -1,4 +1,5 @@
 import { brand } from "@/constants/theme";
+import { ITEM_TOP, PILL_HEIGHT, PILL_WIDTH } from "@/constants/navigation";
 import { StyleSheet } from "react-native";
 
 export const navigationStyles = StyleSheet.create({
@@ -6,14 +7,15 @@ export const navigationStyles = StyleSheet.create({
     opacity: 0.85,
   },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 10,
-    backgroundColor: "#ffff",
-  },
+ header: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  paddingLeft: 2,
+  paddingRight: 16,
+  paddingBottom: 10,
+  backgroundColor: "#ffff",
+},
   headerLogo: {
     width: 120,
     height: 36,
@@ -68,7 +70,7 @@ export const navigationStyles = StyleSheet.create({
   },
   pill: {
     paddingTop: 6,
-    width: 56,
+    width: 76,
     height: 30,
     borderRadius: 15,
     alignItems: "center",
@@ -82,11 +84,51 @@ export const navigationStyles = StyleSheet.create({
   },
   label: {
     fontFamily: "Inter_400Regular",
-    fontSize: 10,
+    fontSize: 9,
+    letterSpacing: -0.2,
     color: brand.textMuted,
   },
   labelActive: {
     fontFamily: "Inter_600SemiBold",
+    fontSize: 9,
+    letterSpacing: -0.2,
     color: brand.primaryDark,
+  },
+});
+
+export const motionStyles = StyleSheet.create({
+  indicator: {
+    position: "absolute",
+    top: ITEM_TOP,
+    left: 0,
+    width: PILL_WIDTH,
+    height: PILL_HEIGHT,
+    borderRadius: PILL_HEIGHT / 2,
+    backgroundColor: "rgba(20,184,166,0.14)",
+  },
+  iconBox: {
+    width: PILL_WIDTH,
+    height: PILL_HEIGHT,
+    marginTop: ITEM_TOP,
+  },
+  layer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  labelBox: {
+    height: 14,
+    alignSelf: "stretch",
+  },
+  labelLayer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    textAlign: "center",
   },
 });

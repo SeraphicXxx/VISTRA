@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useRef } from "react";
 import { Animated, Easing, StyleProp, ViewStyle } from "react-native";
 
 type RevealProps = {
@@ -18,7 +19,8 @@ export function Reveal({
 }: RevealProps) {
   const progress = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
+  const play = useCallback(() => {
+    progress.setValue(0);
     Animated.timing(progress, {
       toValue: 1,
       duration,
@@ -27,6 +29,8 @@ export function Reveal({
       useNativeDriver: true,
     }).start();
   }, [progress, delay, duration]);
+
+  useFocusEffect(play);
 
   const opacity = progress;
   const translateY = progress.interpolate({
