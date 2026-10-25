@@ -8,6 +8,6 @@ screening_router = APIRouter(
     tags=["screening"]
 )
 
-@screening_router.post("/predict", dependencies=[Depends(get_current_user)])
+@screening_router.post("/predict")
 def predict_screening(request: ScreeningPredictRequest):
     return get_kiosk_screening_prediction(request)
