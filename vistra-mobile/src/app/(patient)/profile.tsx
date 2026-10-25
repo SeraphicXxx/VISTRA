@@ -3,12 +3,14 @@ import { AppHeader } from "@/components/navigation/AppHeader";
 import { VitalsRow } from "@/components/overview/VitalsRow";
 import { ExaminationResultsTab } from "@/components/profile/ExaminationResultsTab";
 import { FamilyHistoryTab } from "@/components/profile/FamilyHistoryTab";
+import { HealthRiskTab } from "@/components/profile/HealthRiskTab";
 import { MedicalHistoryTab } from "@/components/profile/MedicalHistoryTab";
 import { PersonalTab } from "@/components/profile/PersonalTab";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { PROFILE_TABS } from "@/constants/profile";
 import { brand } from "@/constants/theme";
+import { PATIENT_HEALTH_RISKS } from "@/mock/healthRisk";
 import { PATIENT_PROFILE, type ProfileTabId } from "@/mock/profile";
 import { PATIENT_VITALS } from "@/mock/vitals";
 import { profileStyles as styles } from "@/styles/profile.styles";
@@ -35,6 +37,8 @@ export default function ProfileScreen() {
         return <VitalsRow vitals={PATIENT_VITALS} />;
       case "results":
         return <ExaminationResultsTab {...results} />;
+      case "risk":
+        return <HealthRiskTab predictions={PATIENT_HEALTH_RISKS} />;
       default:
         return null;
     }

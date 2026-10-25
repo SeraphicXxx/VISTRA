@@ -10,6 +10,7 @@ export const PROFILE_TABS: { id: ProfileTabId; label: string; icon: IconName }[]
   { id: "family", label: "Family & Planning", icon: "people-outline" },
   { id: "vitals", label: "Vital Signs", icon: "pulse-outline" },
   { id: "results", label: "Examination Results", icon: "document-text-outline" },
+  { id: "risk", label: "Health Risk Prediction", icon: "shield-checkmark-outline" },
 ];
 
 export const ID_LABELS: Record<PatientClassification, string> = {

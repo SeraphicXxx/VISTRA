@@ -1,6 +1,12 @@
 export type PatientClassification = "student" | "faculty" | "staff";
 
-export type ProfileTabId = "personal" | "medical" | "family" | "vitals" | "results";
+export type ProfileTabId =
+  | "personal"
+  | "medical"
+  | "family"
+  | "vitals"
+  | "results"
+  | "risk";
 
 export interface PersonalInfo {
   name: string;
@@ -59,8 +65,8 @@ export const PATIENT_PROFILE: PatientProfile = {
     classification: "student",
     patient_id: "20230519-S",
     birthday: "2003-05-17",
-    age: 21,
-    sex: "Female",
+    age: 22,
+    sex: "Male",
     civil_status: "Single",
     mobile_number: "09171234567",
     address: "123 Mabini Street",
