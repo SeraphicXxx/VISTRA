@@ -4,6 +4,7 @@ from app.config.settings import Config
 
 class MLServiceClient:
     def __init__(self):
+        url = Config.ml_service_url() or "http://127.0.0.1:8001"
         self.base_url = Config.ml_service_url().rstrip("/")
         self.api_key = Config.ml_service_api_key()
 
