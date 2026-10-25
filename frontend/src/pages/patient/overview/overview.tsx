@@ -3,8 +3,9 @@ import { useOutletContext } from "react-router-dom";
 
 import PatientStatsGrid from "./stats";
 import WelcomeHero from "./components/WelcomeHero";
-import NextAppointmentSpotlight from "./components/NextAppointmentSpotlight";
 import RecentVisitsPanel from "./components/RecentVisitsPanel";
+import HealthRiskPanel from "./components/HealthRiskPanel";
+import VitalSignsPanel from "./components/VitalSignsPanel";
 import {
   mapBackendAppointmentToAppointment,
   resolveStudentId,
@@ -12,6 +13,8 @@ import {
 } from "../appointments/appointmentsData";
 import { myMedicalRecords, myVisits } from "../medical/medicalData";
 import { myDentalRecords } from "../dental/dentalData";
+import { PATIENT_HEALTH_RISKS } from "./healthRisk";
+import { PATIENT_VITALS } from "./vitalsData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
@@ -86,17 +89,19 @@ export default function PatientOverviewTab() {
         />
       </Reveal>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Reveal as="div" delay={2 * STAGGER} distance={24} className="xl:col-span-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Reveal as="div" delay={2 * STAGGER} distance={24} className="h-full">
           <RecentVisitsPanel visits={filteredVisits} />
         </Reveal>
 
-        <div className="flex flex-col gap-6">
-          <Reveal as="div" delay={3 * STAGGER} distance={24}>
-            <NextAppointmentSpotlight appointment={nextAppointment} />
-          </Reveal>
-        </div>
+        <Reveal as="div" delay={3 * STAGGER} distance={24} className="h-full">
+          <VitalSignsPanel vitals={PATIENT_VITALS} />
+        </Reveal>
       </div>
+
+      <Reveal as="div" delay={4 * STAGGER} distance={24}>
+        <HealthRiskPanel predictions={PATIENT_HEALTH_RISKS} />
+      </Reveal>
     </div>
   );
 }
