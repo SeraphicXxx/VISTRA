@@ -36,34 +36,40 @@ export default function LoginScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    const idError = validatePatientId(patientId);
-    const passwordError = validatePassword(password);
 
-    setErrors({ id: idError, password: passwordError });
-    setFormError(null);
+const handleLogin = () => {
+  const id = patientId.trim();
 
-    if (idError || passwordError) {
-      return;
-    }
+  setErrors({});
+  setFormError(null);
 
-    setLoading(true);
+  if (!id || !password) {
+    setErrors({
+      id: !id ? "Patient ID is required" : undefined,
+      password: !password ? "Password is required" : undefined,
+    });
+    return;
+  }
 
-    setTimeout(() => {
-      const user = DUMMY_USERS.find(
-        (u) => u.id === patientId.trim() && u.password === password,
-      );
+  const user = DUMMY_USERS.find(
+    (account) =>
+      account.id === id &&
+      account.password === password
+  );
 
-      setLoading(false);
+  if (!user) {
+    setFormError("Invalid Patient ID or password");
+    return;
+  }
 
-      if (!user) {
-        setFormError("Invalid Patient ID or password");
-        return;
-      }
+  setLoading(true);
 
-      router.replace("/(patient)/overview");
-    }, 600);
-  };
+  setTimeout(() => {
+    setLoading(false);
+    router.replace("/(patient)/overview");
+  }, 600);
+};
+
 
   return (
     <SafeAreaView style={styles.safe}>

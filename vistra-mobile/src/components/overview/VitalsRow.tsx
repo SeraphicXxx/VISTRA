@@ -22,21 +22,16 @@ interface VitalsRowProps {
   vitals: VitalSigns | null;
 }
 
+const buildBmi = (weight: number, height: number) => {
+  const meters = height / 100;
+
+  return (weight / (meters * meters)).toFixed(1);
+};
+
 const buildItems = (vitals: VitalSigns | null): VitalItem[] => {
   if (!vitals) return [];
 
   const items: (VitalItem | null)[] = [
-    vitals.bloodPressure
-      ? {
-          key: "bp",
-          label: "Blood Pressure",
-          value: `${vitals.bloodPressure.systolic}/${vitals.bloodPressure.diastolic}`,
-          unit: "mmHg",
-          icon: "gauge",
-          color: "#dc2626",
-          background: "#fee2e2",
-        }
-      : null,
     vitals.heartRate != null
       ? {
           key: "hr",
@@ -79,6 +74,28 @@ const buildItems = (vitals: VitalSigns | null): VitalItem[] => {
           icon: "scale-bathroom",
           color: "#4f46e5",
           background: "#e0e7ff",
+        }
+      : null,
+    vitals.height != null
+      ? {
+          key: "height",
+          label: "Height",
+          value: `${vitals.height}`,
+          unit: "cm",
+          icon: "human-male-height",
+          color: "#0d9488",
+          background: "#ccfbf1",
+        }
+      : null,
+    vitals.weight != null && vitals.height != null
+      ? {
+          key: "bmi",
+          label: "BMI",
+          value: buildBmi(vitals.weight, vitals.height),
+          unit: "kg/m²",
+          icon: "calculator-variant-outline",
+          color: "#7c3aed",
+          background: "#ede9fe",
         }
       : null,
   ];

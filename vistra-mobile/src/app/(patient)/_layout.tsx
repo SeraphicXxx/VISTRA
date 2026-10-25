@@ -45,7 +45,10 @@ export default function PatientTabsLayout() {
         <Tabs.Screen name="overview" options={{ title: "Overview" }} />
         <Tabs.Screen name="appointments" options={{ title: "Appointments" }} />
         <Tabs.Screen name="records" options={{ title: "Records" }} />
-        <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+        <Tabs.Screen
+          name="profile"
+          options={{ title: "Profile", headerShown: false }}
+        />
       </Tabs>
     </Animated.View>
   );
