@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -68,3 +68,19 @@ export const usePatientDentalTabQuery = createListQueryHook<
     DentalVisitFilters,
     PaginatedData<PatientDentalTabVisit>
 >("patient-dental-tab", getPatientDentalTab, "Patient dental tab data is missing");
+
+export function usePatientMedicalDentalSummaryQuery() {
+    return useQuery({
+        queryKey: ["patient", "medical-dental-summary"],
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientMedicalDentalSummary(signal);
+
+            if (!data.data) {
+                throw new Error("Medical-dental summary data is missing");
+            }
+
+            return data.data;
+        },
+        refetchOnWindowFocus: false,
+    });
+}

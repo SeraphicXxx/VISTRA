@@ -1,6 +1,6 @@
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
-import {CreatePatientSchema, PatientProfile, PatientInfo, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
+import {CreatePatientSchema, PatientProfile, PatientInfo, PatientRecord, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
 import {PatientDentalTabVisit} from "/@/api/schema/PatientDentalTabSchema";
@@ -72,6 +72,18 @@ export function getPatientDentalTab(
     return listResource<ApiResponse<PaginatedData<PatientDentalTabVisit>>>(
         API_ENDPOINTS.patient.get_patient_dental_tab,
         filters,
+        signal,
+    );
+}
+
+export function getPatientMedicalDentalSummary(
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<{
+        medical: PatientRecord[];
+        dental: PatientRecord[];
+    }>>(
+        API_ENDPOINTS.patient.get_patient_medical_dental_summary,
         signal,
     );
 }

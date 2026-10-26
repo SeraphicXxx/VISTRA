@@ -11,7 +11,7 @@ import {
   resolveStudentId,
   Appointment,
 } from "../appointments/appointmentsData";
-import { myMedicalRecords, myVisits } from "../medical/medicalData";
+import { myMedicalRecords } from "../medical/medicalData";
 import { myDentalRecords } from "../dental/dentalData";
 import { PATIENT_HEALTH_RISKS } from "./healthRisk";
 import { PATIENT_VITALS } from "./vitalsData";
@@ -19,6 +19,8 @@ import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
 import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
+import { usePatientMedicalDentalSummaryQuery } from "/@/hooks/query/PatientQuery";
+import { toPatientMedicalDentalVisits } from "/@/repository/PatientMedicalDentalModel";
 import { Visit } from "/@/types/types";
 import { AdminAnimStyles, Reveal } from "/@/components/adminanim";
 
@@ -43,7 +45,12 @@ export default function PatientOverviewTab() {
 
   const patientName = medicalRecord?.name ?? dentalRecord?.name ?? "there";
 
-  const visits = useMemo(() => myVisits[studentId] ?? [], [studentId]);
+  const { data: summaryData } = usePatientMedicalDentalSummaryQuery();
+
+  const visits = useMemo(
+    () => toPatientMedicalDentalVisits(summaryData ?? { medical: [], dental: [] }),
+    [summaryData]
+  );
 
   const appointments: Appointment[] = useMemo(
     () => (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment),
