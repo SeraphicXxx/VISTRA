@@ -53,6 +53,18 @@ class PatientRepository(BaseRepository):
             .execute()
         )
 
+    def get_medical_dental_summary(self, patient_id):
+        """Combined medical + dental visit history from the
+        patient_medical_dental_summary view (security_invoker)."""
+        return (
+            self.supabase
+            .table("patient_medical_dental_summary")
+            .select("*")
+            .eq("patient_id", patient_id)
+            .single()
+            .execute()
+        )
+
     def delete_patient_cascade(self, patient_id: str):
         # Atomic: profile + patient deleted in one transaction.
         # Requires migration 20261010120000_cascade_deletes.

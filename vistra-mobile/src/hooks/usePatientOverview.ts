@@ -19,6 +19,7 @@ function mapBackendAppointment(a: {
   const start = new Date(a.scheduled_start);
   const statusMap: Record<string, MobileAppointment["status"]> = {
     pending: "pending",
+    confirmed: "upcoming",
     upcoming: "upcoming",
     completed: "completed",
     declined: "declined",
@@ -68,11 +69,67 @@ export function usePatientAppointments() {
   return useQuery({
     queryKey: ["patient", "appointments"],
     queryFn: async () => {
-      const result = await patientService.getAppointments();
+      const result = await patientService.getMyAppointments();
       const data = assertSuccess<
         { id: number; scheduled_start: string; status: string; reason?: string | null }[]
       >(result as any);
       return data.map(mapBackendAppointment);
+    },
+  });
+}
+
+export type RecentVisit = {
+  id: string;
+  complaint: string;
+  doctor: string;
+  date: string;
+  treatmentType: string;
+};
+
+export function usePatientMedicalDentalSummary() {
+  return useQuery({
+    queryKey: ["patient", "medical-dental-summary"],
+    queryFn: async () => {
+      const result = await patientService.getMedicalDentalSummary();
+      const data = assertSuccess<{
+        medical: Array<{
+          id: number | string;
+          date: string;
+          title: string;
+          notes?: string | null;
+          provider?: string | null;
+        }>;
+        dental: Array<{
+          id: number | string;
+          date: string;
+          title: string;
+          notes?: string | null;
+          provider?: string | null;
+        }>;
+      }>(result as any);
+
+      const medical: RecentVisit[] = (data.medical ?? []).map((m) => ({
+        id: String(m.id),
+        complaint: m.title,
+        doctor: m.provider ?? "Clinic",
+        date: m.date,
+        treatmentType: "Medical",
+      }));
+
+      const dental: RecentVisit[] = (data.dental ?? []).map((d) => ({
+        id: String(d.id),
+        complaint: d.title,
+        doctor: d.provider ?? "Clinic",
+        date: d.date,
+        treatmentType: "Dental",
+      }));
+
+      return [...medical, ...dental]
+        .sort(
+          (a, b) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        )
+        .slice(0, 6);
     },
   });
 }

@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
         get_summary_record: (patientId: string) =>
             `${API_V1}/patients/profiles/${patientId}/`,
         get_my_profile: `${API_V1}/patients/profiles/me/`,
+        get_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
         get_patient_by_id: (patientId: string) =>
             `${API_V1}/patients/${patientId}/`,
         update_patient_profile: (patientId: string) =>
@@ -51,6 +52,7 @@ export const API_ENDPOINTS = {
     appointment: {
         create_appointment: `${API_V1}/appointments/`,
         get_appointment: `${API_V1}/appointments/`,
+        get_appointment_me: `${API_V1}/appointments/me/`,
         get_appointment_by_id: (
             patient_id: string,
             appointment_id: string

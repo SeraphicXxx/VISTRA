@@ -148,3 +148,12 @@ def get_patient_summary_record(supabase: Client, patient_id: str):
     response = patient_repo.get_summary_records(patient_id)
 
     return ok(response.data)
+
+
+@handle_service_errors
+def get_patient_medical_dental_summary(supabase: Client, patient_id: str):
+    patient_repo = PatientRepository(supabase)
+
+    response = patient_repo.get_medical_dental_summary(patient_id)
+
+    return ok(or_404(response.data, "Patient summary not found"))

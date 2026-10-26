@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
 from app.config.security import get_current_user, require_staff
@@ -28,6 +28,26 @@ def create_appointment(request: CreateAppointmentRequest, scope: str | None = De
 def get_appointments(filters: FilterAppointment = Depends(), scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     if scope is not None:
         filters.patient_id = scope
+    return get_all_appointments(filters, supabase)
+
+
+@protected_appointment_router.get("/me/")
+def get_my_appointments(
+    filters: FilterAppointment = Depends(),
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    """Current patient's appointments, patient_id derived from JWT.
+
+    Staff get None scope → 403. Patient roles resolve their own
+    patient_id via PATIENT.id == auth.uid().
+    """
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    filters.patient_id = scope
     return get_all_appointments(filters, supabase)
 
 @protected_appointment_router.get("/{patient_id}/{appointment_id}")

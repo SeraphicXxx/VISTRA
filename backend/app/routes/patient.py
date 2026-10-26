@@ -7,7 +7,7 @@ from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileReques
 from app.schemas.query import FilterPatient, FilterMedical, FilterDental
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
-    get_patient_summary_record
+    get_patient_summary_record, get_patient_medical_dental_summary
 from app.services.medical import get_patient_medical_tab as get_patient_medical_tab_service
 from app.services.dental import get_patient_dental_tab as get_patient_dental_tab_service
 from app.services.patient import create_patient as create_patient_service
@@ -82,6 +82,20 @@ def get_my_profile(
             detail="Patient account required",
         )
     return get_patient_summary_record(supabase, scope)
+
+@protected_patient_router.get("/summary/medical-dental/")
+def get_patient_medical_dental_summary_endpoint(
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    """Current patient's combined medical + dental visit history,
+    patient_id derived from JWT."""
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    return get_patient_medical_dental_summary(supabase, scope)
 
 @protected_patient_router.get("/profiles/{patient_id}/")
 def profile_summary(patient_id: str, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):

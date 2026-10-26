@@ -8,7 +8,11 @@ import { brand } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, Text, View } from "react-native";
 import { overviewStyles as styles } from "@/styles/overview.styles";
-import { usePatientAppointments, usePatientProfile } from "@/hooks/usePatientOverview";
+import {
+  usePatientAppointments,
+  usePatientMedicalDentalSummary,
+  usePatientProfile,
+} from "@/hooks/usePatientOverview";
 import { useMemo } from "react";
 
 const FULL_WIDTH = { alignSelf: "stretch" as const };
@@ -16,6 +20,7 @@ const FULL_WIDTH = { alignSelf: "stretch" as const };
 export default function OverviewScreen() {
   const profile = usePatientProfile();
   const appointments = usePatientAppointments();
+  const medicalDental = usePatientMedicalDentalSummary();
 
   const data = useMemo(() => {
     const upcoming = appointments.data
@@ -27,34 +32,18 @@ export default function OverviewScreen() {
           )[0] ?? null
       : null;
 
-    const recent = appointments.data
-      ? appointments.data
-          .filter((a) => a.status === "completed")
-          .sort(
-            (a, b) =>
-              new Date(b.date).getTime() - new Date(a.date).getTime()
-          )
-          .slice(0, 6)
-      : [];
-    console.log(profile);
     return {
       name: profile.data?.name ?? "Patient",
       studentId: profile.data?.id ?? "--",
       age: profile.data?.age,
       medicalStatus: profile.data?.medicalStatus,
       upcomingAppointment: upcoming,
-      recentVisits: recent.map((a) => ({
-        id: a.id,
-        complaint: a.type,
-        doctor: a.doctor,
-        date: a.date,
-        treatmentType: a.status,
-      })),
+      recentVisits: medicalDental.data ?? [],
       visitCount: appointments.data ? appointments.data.length : 0,
     };
-  }, [profile.data, appointments.data]);
-
-  const isLoading = profile.isLoading || appointments.isLoading;
+  }, [profile.data, appointments.data, medicalDental.data]);
+  const isLoading =
+    profile.isLoading || appointments.isLoading || medicalDental.isLoading;
 
   return (
     <View style={styles.safe}>

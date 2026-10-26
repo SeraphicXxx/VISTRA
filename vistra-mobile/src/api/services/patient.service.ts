@@ -20,6 +20,30 @@ export type PatientProfileSummary = {
 };
 
 /**
+ * Shape returned by the patient_medical_dental_summary view.
+ */
+export type MedicalDentalSummary = {
+  patient_id: string;
+  medical: Array<{
+    id: number;
+    date: string;
+    title: string;
+    notes?: string | null;
+    staff_id?: string | null;
+    provider?: string | null;
+  }>;
+  dental: Array<{
+    id: number;
+    date: string;
+    title: string;
+    notes?: string | null;
+    staff_id?: string | null;
+    provider?: string | null;
+  }>;
+  [key: string]: unknown;
+};
+
+/**
  * Backend paginated appointment response (GET /appointments/).
  */
 export type BackendAppointmentResponse = {
@@ -76,6 +100,26 @@ export const patientService = {
         data: BackendAppointmentResponse;
       }>(API_ENDPOINTS.appointment.get_appointment);
       return data.data.items;
+    }
+  ),
+
+  getMyAppointments: handleServiceErrors<[], BackendAppointment[]>(
+    async () => {
+      const { data } = await apiClient<{
+        success: boolean;
+        data: BackendAppointmentResponse;
+      }>(API_ENDPOINTS.appointment.get_appointment_me);
+      return data.data.items;
+    }
+  ),
+
+  getMedicalDentalSummary: handleServiceErrors<[], MedicalDentalSummary>(
+    async () => {
+      const { data } = await apiClient<{
+        success: boolean;
+        data: MedicalDentalSummary;
+      }>(API_ENDPOINTS.patient.get_medical_dental_summary);
+      return data.data;
     }
   ),
 };
