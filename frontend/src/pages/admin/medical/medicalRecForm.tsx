@@ -1,6 +1,7 @@
 import {useRef, useState, type ChangeEvent, type FormEvent} from "react";
 import {Save, ArrowLeft, User, ClipboardList, Info, FlaskConical, ImagePlus, X} from "lucide-react";
 import {type as visitTypeOptions} from "./medicalData";
+import {NOTIFY_PROFESSIONALS, type Professional} from "./notifyProfessor";
 import {useForm} from "/@/hooks/Form";
 import {statusEditFields} from "/@/components/editModal.jsx";
 import {ReadOnlyField} from "/@/utils/ReadOnlyField";
@@ -13,6 +14,7 @@ import {sessionManager} from "/@/utils/SessionManager";
 import {getFieldErrors} from "/@/utils/Formatters";
 import {treatmentTypeOptions} from "/@/types/types";
 import {ConfirmModal} from "/@/components/ConfirmModal";
+import {NotifyProfessionalModal} from "../../../components/NotifyProfessorModal";
 
 const statusField = statusEditFields.find(
     (field: { key: string }) => field.key === "status"
@@ -20,7 +22,7 @@ const statusField = statusEditFields.find(
 const statusOptions: string[] = statusField?.options ?? [];
 
 interface PatientRecordFormProps {
-    onSave?: (record: CreateMedicalVisit) => void;
+    onSave?: (record: CreateMedicalVisit, notify: Professional | null) => void;
 }
 
 interface MedicalRecFormValues {
@@ -124,6 +126,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [labFiles, setLabFiles] = useState<File[]>([]);
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const details = selectedStudent
@@ -159,17 +162,21 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         setIsConfirmOpen(true);
     };
 
-    const saveRecord = (): void => {
+    const handleConfirmSave = (): void => {
         setIsConfirmOpen(false);
-        if (!selectedStudent) return;
+        setIsNotifyOpen(true);
+    };
+
+    const buildRecord = (): CreateMedicalVisit | null => {
+        if (!selectedStudent) return null;
 
         const staffId = sessionManager.getUser()?.user_id ?? "";
         if (!staffId) {
             console.error("Failed to create medical visit: no staff session found.");
-            return;
+            return null;
         }
 
-        const record: CreateMedicalVisit = {
+        return {
             patient_id: selectedStudent.patient_id,
             staff_id: staffId,
             status,
@@ -179,8 +186,13 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             complaint,
             treatment,
         };
+    };
 
-        if (onSave) onSave(record);
+    const persistRecord = (notify: Professional | null): void => {
+        const record = buildRecord();
+        if (!record) return;
+
+        if (onSave) onSave(record, notify);
 
         createMedicalVisitMutation.mutate(record, {
             onSuccess: () => {
@@ -191,6 +203,16 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                 console.error("Failed to create medical visit:", getFieldErrors(error));
             },
         });
+    };
+
+    const handleNotify = (professional: Professional): void => {
+        setIsNotifyOpen(false);
+        persistRecord(professional);
+    };
+
+    const handleSkipNotify = (): void => {
+        setIsNotifyOpen(false);
+        persistRecord(null);
     };
 
     return (
@@ -395,8 +417,17 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                     title="Save medical record?"
                     message="Make sure all information is accurate. This record will be stored in the system for future reference."
                     confirmLabel="Save record"
-                    onConfirm={saveRecord}
+                    onConfirm={handleConfirmSave}
                     onCancel={() => setIsConfirmOpen(false)}
+                />
+            )}
+
+            {isNotifyOpen && (
+                <NotifyProfessionalModal
+                    professionals={NOTIFY_PROFESSIONALS}
+                    onNotify={handleNotify}
+                    onSkip={handleSkipNotify}
+                    onCancel={() => setIsNotifyOpen(false)}
                 />
             )}
         </form>

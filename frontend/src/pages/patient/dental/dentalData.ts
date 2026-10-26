@@ -16,6 +16,8 @@ export interface DentalRecord {
     yearSection: string;
     course: string;
     status: Status;
+    examDate: string;
+    lastVisit: string;
     lastCleaning: string;
     allergies: string;
     medicalHistory: string[];
@@ -64,10 +66,33 @@ export const myDentalRecords: DentalRecords = {
         yearSection: "4th Year - Section A",
         course: "BS Computer Science",
         status: "cleared",
+        examDate: "2026-08-02",
+        lastVisit: "2026-04-11",
         lastCleaning: "2026-08-02",
         allergies: "Penicillin",
         medicalHistory: ["Asthma", "Hypertension"],
         teeth: {16: "filled", 26: "caries", 36: "crown", 46: "missing", 14: "filled", 37: "caries"},
+    },
+    "20230518-S": {
+        recordId: "DEN-2042",
+        studentId: "20230518-S",
+        name: "Angel Emie Jane Bien",
+        address: "123 Mabini Street",
+        barangay: "Brgy. 176",
+        age: "22",
+        mobileNumber: "09171234567",
+        sex: "Male",
+        birthday: "2003-05-17",
+        civilStatus: "Single",
+        yearSection: "3rd Year - Section A",
+        course: "BS Computer Science",
+        status: "pending",
+        examDate: "2026-10-12",
+        lastVisit: "2026-06-22",
+        lastCleaning: "2026-06-22",
+        allergies: "Penicillin",
+        medicalHistory: ["Appendicitis (appendectomy)"],
+        teeth: {16: "filled", 46: "caries"},
     },
 };
 
@@ -116,6 +141,50 @@ export const myDentalVisits: DentalVisits = {
             notes: "Schedule restoration for tooth 37.",
         },
     ],
+    "20230518-S": [
+        {
+            id: "DEN-0004",
+            date: "2026-02-10",
+            doctor: "Dr. Ana Reyes",
+            complaint: "Routine dental checkup",
+            treatmentType: "Checkup",
+            treatment: "Oral exam, no caries detected",
+            status: "cleared",
+            floss: "Yes",
+            brushFrequency: "Twice a day",
+            calculus: "Light",
+            medication: "None",
+            notes: "Continue daily flossing.",
+        },
+        {
+            id: "DEN-0005",
+            date: "2026-06-22",
+            doctor: "Dr. Luis Gomez",
+            complaint: "Gums bleed when brushing",
+            treatmentType: "Cleaning",
+            treatment: "Scaling and polishing, fluoride applied",
+            status: "cleared",
+            floss: "No",
+            brushFrequency: "Twice a day",
+            calculus: "Moderate",
+            medication: "None",
+            notes: "Recommended daily flossing and a follow-up cleaning in 3 months.",
+        },
+        {
+            id: "DEN-0006",
+            date: "2026-10-12",
+            doctor: "Dr. Ana Reyes",
+            complaint: "Sensitivity to cold, lower right",
+            treatmentType: "Treatment",
+            treatment: "Sensitivity noted on tooth 46, desensitizing treatment scheduled",
+            status: "pending",
+            floss: "Yes",
+            brushFrequency: "Twice a day",
+            calculus: "Light",
+            medication: "Potassium nitrate toothpaste",
+            notes: "Schedule desensitizing treatment for tooth 46.",
+        },
+    ],
 };
 
 export const emptyDentalRecord: DentalRecord = {
@@ -132,6 +201,8 @@ export const emptyDentalRecord: DentalRecord = {
     yearSection: "",
     course: "",
     status: "pending",
+    examDate: "",
+    lastVisit: "",
     lastCleaning: "",
     allergies: "",
     medicalHistory: [],

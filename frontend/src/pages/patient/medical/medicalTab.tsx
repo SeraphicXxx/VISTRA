@@ -21,7 +21,7 @@ const columns: Column<Visit>[] = [
 
 const toRow = (visit: Visit) => visit;
 
-const buildViewLink = (visit: Visit) => `${ROUTES.patient.dashboard.medical}/${visit.id}`;
+const buildViewLink = () => ROUTES.patient.medical.viewRecord;
 
 export default function PatientMedicalTab() {
     const user = sessionManager.getUser();

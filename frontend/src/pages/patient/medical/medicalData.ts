@@ -48,6 +48,21 @@ export const myMedicalRecords: MedicalRecords = {
         course: "BS Computer Science",
         status: "cleared",
     },
+    "20230518-S": {
+        recordId: "MED-1043",
+        studentId: "20230518-S",
+        name: "Angel Emie Jane Bien",
+        address: "123 Mabini Street",
+        barangay: "Brgy. 176",
+        age: "22",
+        mobileNumber: "09171234567",
+        sex: "Male",
+        birthday: "2003-05-17",
+        civilStatus: "Single",
+        yearSection: "3rd Year - Section A",
+        course: "BS Computer Science",
+        status: "cleared",
+    },
 };
 
 export const myVisits: MyVisits = {
@@ -87,6 +102,26 @@ export const myVisits: MyVisits = {
             treatmentType: "Medicine",
             treatment: "Cough syrup, follow-up in 1 week",
             status: "pending",
+        },
+    ],
+    "20230518-S": [
+        {
+            id: "MED-0005",
+            date: "2026-03-10",
+            doctor: "Dr. Maria Santos",
+            complaint: "Routine check-up",
+            treatmentType: "Checkup",
+            treatment: "Vitals normal, cleared for classes",
+            status: "cleared",
+        },
+        {
+            id: "MED-0006",
+            date: "2026-09-15",
+            doctor: "Dr. Ramon Cruz",
+            complaint: "Headache",
+            treatmentType: "Medicine",
+            treatment: "Ibuprofen 400mg as needed, hydration advised",
+            status: "cleared",
         },
     ],
 };
