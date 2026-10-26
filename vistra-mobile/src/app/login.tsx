@@ -1,6 +1,5 @@
 import { Reveal } from "@/components/animation/Reveal";
 import { brand } from "@/constants/theme";
-import { DUMMY_USERS } from "@/mock/auth";
 import { loginStyles as styles } from "@/styles/login.styles";
 import { validatePassword, validatePatientId } from "@/utils/validators";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +20,8 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLogin } from "@/hooks/useLogin";
+import { ServiceError } from "@/api/service_helpers";
 
 const CAMPUS_BACKGROUND = require("../../assets/images/campus-background.jpg");
 const VISTRA_LOGO = require("../../assets/images/vistra-logo.png");
@@ -34,42 +35,47 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ id?: string; password?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
+  const login = useLogin();
 
-const handleLogin = () => {
-  const id = patientId.trim();
+  const handleLogin = async () => {
+    const id = patientId.trim();
 
-  setErrors({});
-  setFormError(null);
+    setErrors({});
+    setFormError(null);
 
-  if (!id || !password) {
-    setErrors({
-      id: !id ? "Patient ID is required" : undefined,
-      password: !password ? "Password is required" : undefined,
-    });
-    return;
-  }
+    if (!id || !password) {
+      setErrors({
+        id: !id ? "Patient ID is required" : undefined,
+        password: !password ? "Password is required" : undefined,
+      });
+      return;
+    }
 
-  const user = DUMMY_USERS.find(
-    (account) =>
-      account.id === id &&
-      account.password === password
-  );
+    try {
+      await login.mutateAsync({ identifier: id, password });
 
-  if (!user) {
-    setFormError("Invalid Patient ID or password");
-    return;
-  }
+      router.replace("/(patient)/overview");
+    } catch (error: unknown) {
+      console.error("[LOGIN ERROR]", error);
 
-  setLoading(true);
+      if (error instanceof ServiceError) {
+        if (error.code === 422 && error.fieldErrors) {
+          setErrors(error.fieldErrors);
+          return;
+        }
+        setFormError(error.message || "Login failed");
+        return;
+      }
 
-  setTimeout(() => {
-    setLoading(false);
-    router.replace("/(patient)/overview");
-  }, 600);
-};
+      if (error instanceof Error) {
+        setFormError(error.message || "Unable to sign in. Please try again.");
+        return;
+      }
 
+      setFormError("Unable to sign in. Please try again.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -197,16 +203,16 @@ const handleLogin = () => {
               <Reveal delay={AFTER_CARD + 400} distance={16}>
                 <Pressable
                   onPress={handleLogin}
-                  disabled={loading}
+                  disabled={login.isPending}
                   style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}
                 >
                   <LinearGradient
                     colors={[brand.primaryDark, brand.primary]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={[styles.button, loading && { opacity: 0.7 }]}
+                    style={[styles.button, login.isPending && { opacity: 0.7 }]}
                   >
-                    {loading ? (
+                    {login.isPending ? (
                       <ActivityIndicator color="#ffffff" />
                     ) : (
                       <Text style={styles.buttonText}>Sign in</Text>

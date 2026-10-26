@@ -1,46 +1,60 @@
 import { Reveal } from "@/components/animation/Reveal";
-import { HealthRiskCard } from "@/components/overview/HealthRiskCard";
 import { HealthSummaryRow } from "@/components/overview/HealthSummaryRow";
 import { RecentVisitsPanel } from "@/components/overview/RecentVisitsPanel";
 import { UpcomingAppointmentCard } from "@/components/overview/UpcomingAppointmentCard";
-import { VitalsRow } from "@/components/overview/VitalsRow";
 import { WelcomeHero } from "@/components/overview/WelcomeHero";
-import {
-  PATIENT_APPOINTMENTS,
-  type PatientAppointment,
-} from "@/mock/appointments";
-import { PATIENT_HEALTH_RISKS } from "@/mock/healthRisk";
-import {
-  OVERVIEW_PATIENT,
-  OVERVIEW_VISITS,
-  type Visit,
-} from "@/mock/overview";
-import { PATIENT_VITALS } from "@/mock/vitals";
+import { ComingSoonCard } from "@/components/overview/ComingSoonCard";
+import { brand } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { ScrollView, Text, View } from "react-native";
 import { overviewStyles as styles } from "@/styles/overview.styles";
+import { usePatientAppointments, usePatientProfile } from "@/hooks/usePatientOverview";
 import { useMemo } from "react";
-import { ScrollView, View } from "react-native";
 
 const FULL_WIDTH = { alignSelf: "stretch" as const };
 
-const byDateAsc = (a: PatientAppointment, b: PatientAppointment) =>
-  new Date(a.date).getTime() - new Date(b.date).getTime();
-
-const byDateDesc = (a: Visit, b: Visit) =>
-  new Date(b.date).getTime() - new Date(a.date).getTime();
-
 export default function OverviewScreen() {
-  const nextAppointment = useMemo<PatientAppointment | null>(
-    () =>
-      [...PATIENT_APPOINTMENTS]
-        .filter((a) => a.status !== "completed")
-        .sort(byDateAsc)[0] ?? null,
-    [],
-  );
+  const profile = usePatientProfile();
+  const appointments = usePatientAppointments();
 
-  const recentVisits = useMemo<Visit[]>(
-    () => [...OVERVIEW_VISITS].sort(byDateDesc).slice(0, 6),
-    [],
-  );
+  const data = useMemo(() => {
+    const upcoming = appointments.data
+      ? appointments.data
+          .filter((a) => a.status !== "completed")
+          .sort(
+            (a, b) =>
+              new Date(a.date).getTime() - new Date(b.date).getTime()
+          )[0] ?? null
+      : null;
+
+    const recent = appointments.data
+      ? appointments.data
+          .filter((a) => a.status === "completed")
+          .sort(
+            (a, b) =>
+              new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          .slice(0, 6)
+      : [];
+    console.log(profile);
+    return {
+      name: profile.data?.name ?? "Patient",
+      studentId: profile.data?.id ?? "--",
+      age: profile.data?.age,
+      medicalStatus: profile.data?.medicalStatus,
+      upcomingAppointment: upcoming,
+      recentVisits: recent.map((a) => ({
+        id: a.id,
+        complaint: a.type,
+        doctor: a.doctor,
+        date: a.date,
+        treatmentType: a.status,
+      })),
+      visitCount: appointments.data ? appointments.data.length : 0,
+    };
+  }, [profile.data, appointments.data]);
+
+  const isLoading = profile.isLoading || appointments.isLoading;
 
   return (
     <View style={styles.safe}>
@@ -48,35 +62,66 @@ export default function OverviewScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Reveal delay={0} distance={16} style={FULL_WIDTH}>
-          <WelcomeHero
-            name={OVERVIEW_PATIENT.name}
-            studentId={OVERVIEW_PATIENT.id}
-          />
-        </Reveal>
+        {isLoading ? (
+          <Reveal delay={0} distance={16} style={FULL_WIDTH}>
+            <View style={styles.comingSoonContainer}>
+              <Ionicons name="reload-circle" size={32} color={brand.primaryDark} />
+              <Text style={styles.comingSoonTitle}>Loading your overview…</Text>
+            </View>
+          </Reveal>
+        ) : (
+          <>
+            <Reveal delay={0} distance={16} style={FULL_WIDTH}>
+              <WelcomeHero name={data.name} studentId={data.studentId} />
+            </Reveal>
 
-        <Reveal delay={120} distance={20} style={FULL_WIDTH}>
-          <UpcomingAppointmentCard appointment={nextAppointment} />
-        </Reveal>
+            <Reveal delay={120} distance={20} style={FULL_WIDTH}>
+              <UpcomingAppointmentCard
+                appointment={{
+                  id: data.upcomingAppointment?.id ?? "0",
+                  type: data.upcomingAppointment?.type ?? "Medical check-up",
+                  doctor: data.upcomingAppointment?.doctor ?? "Clinic",
+                  date: data.upcomingAppointment?.date ?? new Date().toISOString(),
+                  time: data.upcomingAppointment?.time ?? "--:--",
+                  status: (data.upcomingAppointment?.status ??
+                    "pending") as
+                    | "pending"
+                    | "upcoming"
+                    | "completed"
+                    | "declined",
+                  reason: data.upcomingAppointment?.reason,
+                }}
+              />
+            </Reveal>
 
-        <Reveal delay={240} distance={20} style={FULL_WIDTH}>
-          <HealthSummaryRow
-            visitCount={OVERVIEW_VISITS.length}
-            medicalStatus={OVERVIEW_PATIENT.medicalStatus}
-          />
-        </Reveal>
+            <Reveal delay={240} distance={20} style={FULL_WIDTH}>
+              <HealthSummaryRow
+                visitCount={data.visitCount}
+                medicalStatus={data.medicalStatus ?? "No record yet"}
+              />
+            </Reveal>
 
-        <Reveal delay={360} distance={20} style={FULL_WIDTH}>
-          <VitalsRow vitals={PATIENT_VITALS} />
-        </Reveal>
+            <Reveal delay={360} distance={20} style={FULL_WIDTH}>
+              <ComingSoonCard
+                title="Vital Signs"
+                subtitle="Your latest measurements will appear here after your next check-up."
+                iconName="heart-pulse"
+              />
+            </Reveal>
 
-        <Reveal delay={480} distance={20} style={FULL_WIDTH}>
-          <HealthRiskCard predictions={PATIENT_HEALTH_RISKS} />
-        </Reveal>
+            <Reveal delay={480} distance={20} style={FULL_WIDTH}>
+              <ComingSoonCard
+                title="Health Risk Prediction"
+                subtitle="Estimated risk percentages based on your records will appear here."
+                iconName="alert-circle-outline"
+              />
+            </Reveal>
 
-        <Reveal delay={600} distance={24} style={FULL_WIDTH}>
-          <RecentVisitsPanel visits={recentVisits} />
-        </Reveal>
+            <Reveal delay={600} distance={24} style={FULL_WIDTH}>
+              <RecentVisitsPanel visits={data.recentVisits} />
+            </Reveal>
+          </>
+        )}
       </ScrollView>
     </View>
   );

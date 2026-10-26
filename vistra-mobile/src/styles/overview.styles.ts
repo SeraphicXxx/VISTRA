@@ -597,4 +597,32 @@ export const overviewStyles = StyleSheet.create({
     color: brand.textMuted,
     textAlign: "center",
   },
+
+  comingSoonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+    gap: 12,
+  },
+  comingSoonIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(20,184,166,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: brand.border,
+  },
+  comingSoonTitle: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 16,
+    color: brand.textPrimary,
+  },
+  comingSoonSubtitle: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: brand.textMuted,
+    textAlign: "center",
+  },
 });

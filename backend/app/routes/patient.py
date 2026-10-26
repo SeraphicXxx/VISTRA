@@ -66,6 +66,23 @@ def get_patient(patient_id: str, scope: str | None = Depends(get_patient_scope),
     enforce_patient_scope(scope, patient_id)
     return get_patient_by_id(patient_id, supabase)
 
+@protected_patient_router.get("/profiles/me/")
+def get_my_profile(
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    """Current patient's profile summary, patient_id derived from JWT.
+
+    Staff get None scope → 403. Patient roles resolve their own
+    patient_id via PATIENT.id == auth.uid().
+    """
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    return get_patient_summary_record(supabase, scope)
+
 @protected_patient_router.get("/profiles/{patient_id}/")
 def profile_summary(patient_id: str, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, patient_id)
