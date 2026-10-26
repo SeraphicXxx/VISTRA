@@ -24,7 +24,7 @@ export default function AdminLayout() {
     const location = useLocation();
     const mainRef = useRef<HTMLElement>(null);
 
-    const hideHeader = HIDDEN_HEADER_PATHS.some((path) =>
+    const hideChrome = HIDDEN_HEADER_PATHS.some((path) =>
         location.pathname.startsWith(path)
     );
 
@@ -38,7 +38,7 @@ export default function AdminLayout() {
             <Sidebar />
 
             <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col pt-14 lg:pt-0">
-                {!hideHeader && (
+                {!hideChrome && (
                     <div className="slide-down shrink-0">
                         <StaffPageHeader
                             staffId={sessionManager.getUser()?.user_id || ""}
@@ -57,9 +57,11 @@ export default function AdminLayout() {
                             <Outlet context={{ searchQuery }} />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <GenFooter />
-                    </div>
+                    {!hideChrome && (
+                        <div className="mt-10">
+                            <GenFooter />
+                        </div>
+                    )}
                 </main>
             </div>
 

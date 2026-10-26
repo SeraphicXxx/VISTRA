@@ -39,7 +39,7 @@ interface RecentVisitsPanelProps {
 
 export default function RecentVisitsPanel({ visits }: RecentVisitsPanelProps) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-7">
+    <div className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-7">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-heading text-sm font-semibold text-primaryDark">Recent Visits</h2>
@@ -51,13 +51,13 @@ export default function RecentVisitsPanel({ visits }: RecentVisitsPanelProps) {
         </span>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-1">
         {visits.length > 0 ? (
           visits.map((visit, i) => (
             <VisitTimelineRow key={visit.id} entry={visit} isLast={i === visits.length - 1} />
           ))
         ) : (
-          <div className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-textMuted">
+          <div className="flex h-full min-h-40 items-center justify-center rounded-xl border border-dashed border-border py-10 text-center text-sm text-textMuted">
             No visits yet — your check-ins will appear here.
           </div>
         )}
