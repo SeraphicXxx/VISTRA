@@ -1,435 +1,542 @@
-import {useRef, useState, type ChangeEvent, type FormEvent} from "react";
-import {Save, ArrowLeft, User, ClipboardList, Info, FlaskConical, ImagePlus, X} from "lucide-react";
-import {type as visitTypeOptions} from "./medicalData";
-import {NOTIFY_PROFESSIONALS, type Professional} from "./notifyProfessor";
-import {useForm} from "/@/hooks/Form";
-import {statusEditFields} from "/@/components/editModal.jsx";
-import {ReadOnlyField} from "/@/utils/ReadOnlyField";
-import {StudentCombobox} from "/@/utils/StudentComboBox";
-import {FieldLabel} from "/@/utils/FieldLabel";
-import type {PatientProfile} from "/@/api/schema/PatientSchema";
-import type {CreateMedicalVisit} from "/@/api/schema/MedicalSchema";
-import {useCreateMedicalVisit} from "/@/hooks/query/MedicalQuery";
-import {sessionManager} from "/@/utils/SessionManager";
-import {getFieldErrors} from "/@/utils/Formatters";
-import {treatmentTypeOptions} from "/@/types/types";
-import {ConfirmModal} from "/@/components/ConfirmModal";
-import {NotifyProfessionalModal} from "../../../components/NotifyProfessorModal";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 
-const statusField = statusEditFields.find(
-    (field: { key: string }) => field.key === "status"
-);
-const statusOptions: string[] = statusField?.options ?? [];
+import { InfoField, getInitials } from "/@/utils/RecordInfo";
+import { StatusBadge } from "/@/components/StatusBadge";
+import { EditRecordModal, statusEditFields } from "/@/components/editModal";
+import { useMedicalVisitDetail, useUpdateMedicalVisit } from "/@/hooks/query/MedicalQuery";
+import type { MedicalRecordDetailSchema, UpdateMedicalVisit } from "/@/api/schema/MedicalSchema";
+import { formatDate } from "/@/utils/FormatDate";
+import { getFieldErrors } from "/@/utils/Formatters";
+import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 
-interface PatientRecordFormProps {
-    onSave?: (record: CreateMedicalVisit, notify: Professional | null) => void;
+const USE_DUMMY_DATA =
+  import.meta.env.VITE_USE_DUMMY_MEDICAL === "true";
+
+interface NotifiedProfessor {
+  name: string;
+  role: string;
+  course: string;
+  email: string;
+  sent_at: string;
 }
 
-interface MedicalRecFormValues {
-    selectedStudent: PatientProfile | null;
-    visitType: string;
-    treatmentType: string;
-    status: string;
-    visitDate: string;
-    complaint: string;
-    treatment: string;
-}
-
-const todayInputValue = () => new Date().toISOString().slice(0, 10);
-
-const initialFormValues: MedicalRecFormValues = {
-    selectedStudent: null,
-    visitType: "",
-    treatmentType: "",
-    status: "",
-    visitDate: todayInputValue(),
-    complaint: "",
-    treatment: "",
+type MedicalVisitView = MedicalRecordDetailSchema & {
+  notified_professor?: NotifiedProfessor | null;
 };
 
-const inputClass =
-    "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
+const DUMMY_MEDICAL_VISIT: MedicalVisitView = {
+  medical_visit_id: "1042",
+  patient_name: "Kenji Chua",
+  status: "Cleared",
+  course: "BS Computer Science",
+  year_section: "4th Year, Section A",
+  age: "21",
+  sex: "Male",
+  civil_status: "Single",
+  birthday: "2005-03-14",
+  address: "12 Mahogany St.",
+  barangay: "Barangay Holy Spirit",
+  mobile_number: "0917 234 5566",
+  staff_name: "Maria Santos",
+  visit_date: "2026-10-11",
+  complaint: "Fever, headache since morning",
+  treatment: "Paracetamol 500mg, rest advised",
+  treatment_type: "Medicine",
+  notified_professor: {
+    name: "Dr. Maria Santos",
+    role: "Professor",
+    course: "BS Computer Science",
+    email: "maria.santos@vistra-university.test",
+    sent_at: "2026-10-11",
+  },
+};
 
-interface AttachmentFieldProps {
-    id: string;
-    label: string;
-    hint: string;
-    accept: string;
-    files: File[];
-    onAdd: (files: File[]) => void;
-    onRemove: (index: number) => void;
-    icon: typeof FlaskConical;
+const consultationEditFields = [
+  { key: "visitDate", label: "Visit date", type: "date" },
+  {
+    key: "complaint",
+    label: "Complaint / findings",
+    type: "textarea",
+    span: true,
+  },
+  {
+    key: "treatment",
+    label: "Treatment",
+    type: "textarea",
+    span: true,
+  },
+];
+
+
+function toBackendStatus(label: string): string {
+  const trimmed = label.trim();
+  return trimmed.charAt(0).toLowerCase() + trimmed.slice(1).replace(/\s+/g, "");
 }
 
-function AttachmentField({id, label, hint, accept, files, onAdd, onRemove, icon: Icon}: AttachmentFieldProps) {
-    const inputRef = useRef<HTMLInputElement>(null);
+interface MedicalNotFoundProps {
+  patientId?: string | null;
+  medicalId?: string | null;
+}
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        const selected = Array.from(e.target.files ?? []);
-        if (selected.length) onAdd(selected);
-        e.target.value = "";
-    };
+export function MedicalNotFound({ patientId, medicalId }: MedicalNotFoundProps) {
+  return (
+    <div className="mx-auto w-full">
+      <div className="rounded-2xl border border-border bg-surface p-8 text-center shadow-sm">
+        <h2 className="font-heading text-lg font-semibold text-primaryDark">
+          {medicalId
+            ? `Medical record No. ${medicalId} not found`
+            : "Medical record not found"}
+        </h2>
 
-    return (
-        <div>
-            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+        <p className="mt-2 text-sm text-textMuted">
+          There is no medical visit at No. {medicalId ?? "unknown"} for patient{" "}
+          <span className="font-medium text-textPrimary">
+            {patientId ?? "unknown"}
+          </span>
+          .
+        </p>
 
-            <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-6 text-center transition-colors duration-200 hover:border-primary/50 hover:bg-primary/5"
-            >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-4 w-4" strokeWidth={2}/>
-                </span>
-                <span className="text-sm font-medium text-textPrimary">Click to add files</span>
-                <span className="text-xs text-textMuted">{hint}</span>
-            </button>
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to records
+        </button>
+      </div>
+    </div>
+  );
+}
 
-            <input
-                ref={inputRef}
-                id={id}
-                name={id}
-                type="file"
-                multiple
-                accept={accept}
-                onChange={handleChange}
-                hidden
-            />
+function ReadOnlyBlock({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | null;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-xs font-medium text-textMuted">{label}</p>
+      <div className="min-h-[72px] whitespace-pre-wrap rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary">
+        {value || "—"}
+      </div>
+    </div>
+  );
+}
 
-            {files.length > 0 && (
-                <ul className="mt-3 flex flex-col gap-2">
-                    {files.map((file, index) => (
-                        <li
-                            key={`${file.name}-${index}`}
-                            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
-                        >
-                            <span className="truncate text-xs text-textPrimary">{file.name}</span>
-                            <button
-                                type="button"
-                                onClick={() => onRemove(index)}
-                                aria-label={`Remove ${file.name}`}
-                                className="shrink-0 rounded-md p-1 text-textMuted transition-colors duration-200 hover:bg-background hover:text-textPrimary"
-                            >
-                                <X className="h-3.5 w-3.5" strokeWidth={2}/>
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+export function MedicalRecordSkeleton() {
+  return (
+    <div
+      className="mx-auto w-full animate-pulse"
+      aria-busy="true"
+      aria-label="Loading medical record"
+    >
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="relative p-6 sm:p-8">
+          <div className="mb-6 flex items-start justify-between">
+            <div className="h-4 w-28 rounded bg-border" />
+            <div className="flex gap-2">
+              <div className="h-8 w-28 rounded-lg bg-surface" />
+              <div className="h-8 w-28 rounded-lg bg-surface" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-5">
+            <div className="h-16 w-16 shrink-0 rounded-full bg-surface" />
+            <div>
+              <div className="h-7 w-52 rounded bg-surface" />
+              <div className="mt-2 h-3 w-36 rounded bg-surface" />
+            </div>
+          </div>
         </div>
-    );
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2">
+              <div className="h-2.5 w-20 rounded bg-border" />
+              <div className="h-4 w-28 rounded bg-surface" />
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
+          <div className="mb-4 h-4 w-40 rounded bg-surface" />
+          <div className="rounded-xl border border-border p-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-2">
+                  <div className="h-2.5 w-20 rounded bg-border" />
+                  <div className="h-4 w-28 rounded bg-surface" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
-    const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
-    const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
-    const createMedicalVisitMutation = useCreateMedicalVisit();
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-    const [isNotifyOpen, setIsNotifyOpen] = useState(false);
-    const [labFiles, setLabFiles] = useState<File[]>([]);
-    const [photoFiles, setPhotoFiles] = useState<File[]>([]);
-    const details = selectedStudent
-        ? {
-            course: selectedStudent.course ?? selectedStudent.department ?? "N/A",
-            address: selectedStudent.complete_address ?? "N/A",
-            barangay: selectedStudent.barangay ?? "N/A",
-            age: selectedStudent.age != null ? String(selectedStudent.age) : "N/A",
-            mobile_number: selectedStudent.contact_no ?? "N/A",
-            sex: selectedStudent.sex ?? "N/A",
-            birthday: selectedStudent.birthday ?? "N/A",
-            civil_status: selectedStudent.civil_status ?? "N/A",
-            year_section:
-                [selectedStudent.school_year, selectedStudent.section]
-                    .filter(Boolean)
-                    .join(" - ") || "N/A",
-        }
-        : null;
+export default function PatientRecordView() {
+  const { patientId, medicalId } = useParams<{
+    patientId: string;
+    medicalId: string;
+  }>();
 
-    const handleBack = (): void => {
-        if (typeof window !== "undefined") window.history.back();
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [consultationForm, setConsultationForm] = useState<
+    Record<string, any>
+  >({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const updateVisitMutation = useUpdateMedicalVisit();
+
+  const {
+    data: fetchedVisit,
+    isLoading,
+    isError,
+    refetch,
+  } = useMedicalVisitDetail(
+    USE_DUMMY_DATA ? undefined : patientId,
+    USE_DUMMY_DATA ? undefined : medicalId
+  );
+
+  const visit: MedicalVisitView | undefined = USE_DUMMY_DATA
+    ? DUMMY_MEDICAL_VISIT
+    : fetchedVisit;
+
+  if (!USE_DUMMY_DATA && (!patientId || !medicalId)) {
+    return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;
+  }
+
+  if (!USE_DUMMY_DATA && isLoading) {
+    return <MedicalRecordSkeleton />;
+  }
+
+  if (!visit || (!USE_DUMMY_DATA && isError)) {
+    return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;
+  }
+
+  const handleBack = (): void => {
+    window.history.back();
+  };
+
+  const openConsultationEdit = () => {
+    setConsultationForm({
+      visitDate: visit.visit_date
+        ? visit.visit_date.slice(0, 10)
+        : new Date().toISOString().slice(0, 10),
+      complaint: visit.complaint ?? "",
+      treatment: visit.treatment ?? "",
+    });
+    setSaveError(null);
+    setIsConsultationModalOpen(true);
+  };
+
+  const persistUpdate = (
+    payload: UpdateMedicalVisit,
+    onDone: () => void
+  ): void => {
+    if (USE_DUMMY_DATA || !patientId || !medicalId) {
+      onDone();
+      return;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      onDone();
+      return;
+    }
+
+    setSaveError(null);
+    updateVisitMutation.mutate(
+      { patientId, medicalId, payload },
+      {
+        onSuccess: () => {
+          onDone();
+          void refetch();
+        },
+        onError: (error) => {
+          setSaveError(getFieldErrors(error));
+        },
+      }
+    );
+  };
+
+  const handleSaveStatus = (form: Record<string, any>): void => {
+    const status = toBackendStatus(String(form.status ?? ""));
+
+    if (!status || status === visit.status) {
+      setIsStatusModalOpen(false);
+      return;
+    }
+
+    persistUpdate({ status }, () => setIsStatusModalOpen(false));
+  };
+
+  const handleSaveConsultation = (form: Record<string, any>): void => {
+    const text = (value: unknown): string | undefined => {
+      const trimmed = String(value ?? "").trim();
+      return trimmed || undefined;
     };
 
-    const handleClear = (): void => {
-        reset();
-        setLabFiles([]);
-        setPhotoFiles([]);
-    };
+    const payload: UpdateMedicalVisit = {};
+    const visitDate = text(form.visitDate);
+    const complaint = text(form.complaint);
+    const treatment = text(form.treatment);
+    const currentDate = visit.visit_date?.slice(0, 10) ?? "";
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
-        e.preventDefault();
-        if (!selectedStudent) return;
-        setIsConfirmOpen(true);
-    };
+    if (visitDate && visitDate !== currentDate) {
+      payload.visit_date = visitDate;
+    }
 
-    const handleConfirmSave = (): void => {
-        setIsConfirmOpen(false);
-        setIsNotifyOpen(true);
-    };
+    if (complaint && complaint !== (visit.complaint ?? "")) {
+      payload.complaint = complaint;
+    }
 
-    const buildRecord = (): CreateMedicalVisit | null => {
-        if (!selectedStudent) return null;
+    if (treatment && treatment !== (visit.treatment ?? "")) {
+      payload.treatment = treatment;
+    }
 
-        const staffId = sessionManager.getUser()?.user_id ?? "";
-        if (!staffId) {
-            console.error("Failed to create medical visit: no staff session found.");
-            return null;
-        }
+    persistUpdate(payload, () => setIsConsultationModalOpen(false));
+  };
 
-        return {
-            patient_id: selectedStudent.patient_id,
-            staff_id: staffId,
-            status,
-            type: visitType,
-            treatment_type: treatmentType,
-            visit_date: visitDate ? new Date(visitDate).toISOString() : new Date().toISOString(),
-            complaint,
-            treatment,
-        };
-    };
+  const address = visit.address
+    ? `${visit.address}${visit.barangay ? `, ${visit.barangay}` : ""}`
+    : undefined;
 
-    const persistRecord = (notify: Professional | null): void => {
-        const record = buildRecord();
-        if (!record) return;
+  return (
+    <>
+      <SaveErrorBanner message={saveError} />
 
-        if (onSave) onSave(record, notify);
+      <div className="mx-auto w-full">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
 
-        createMedicalVisitMutation.mutate(record, {
-            onSuccess: () => {
-                handleClear();
-                handleBack();
-            },
-            onError: (error) => {
-                console.error("Failed to create medical visit:", getFieldErrors(error));
-            },
-        });
-    };
+          <div className="relative p-6 sm:p-8">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to records
+              </button>
 
-    const handleNotify = (professional: Professional): void => {
-        setIsNotifyOpen(false);
-        persistRecord(professional);
-    };
-
-    const handleSkipNotify = (): void => {
-        setIsNotifyOpen(false);
-        persistRecord(null);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}
-              className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface p-8 shadow-lg">
-            <div className="mb-5 flex items-center gap-3 border-b border-border pb-6">
-                <div>
-                    <h1 className="font-heading text-xl font-semibold text-primaryDark">Patient Medical Record</h1>
-                    <p className="mt-0.5 text-xs text-textMuted">To be completed by the attending doctor or nurse.</p>
-                </div>
-            </div>
-
-            {!selectedStudent && (
-                <div
-                    className="mb-6 flex items-start gap-1.5 rounded-xl border border-info/30 bg-info/5 px-3.5 py-2.5 text-xs text-info">
-                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2}/>
-                    <span>Search and select an existing student to auto-fill their personal information. If the student is not found, please add them first.</span>
-                </div>
-            )}
-
-            <div className="mb-4 flex items-center gap-2">
-                <User className="h-4 w-4 text-primary" strokeWidth={2}/>
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">Personal Information</h2>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <StudentCombobox selectedStudent={selectedStudent} onSelect={(student) => setField("selectedStudent", student)}/>
-                <ReadOnlyField id="course" label="Course" value={details?.course} placeholder="Select a student first"/>
-                <ReadOnlyField id="address" label="Address" value={details?.address} placeholder="Select a student first"/>
-                <ReadOnlyField id="barangay" label="Barangay" value={details?.barangay} placeholder="Select a student first"/>
-                <ReadOnlyField id="age" label="Age" value={details?.age} placeholder="Select a student first"/>
-                <ReadOnlyField id="mobile_number" label="Mobile Number" value={details?.mobile_number} placeholder="Select a student first"/>
-                <ReadOnlyField id="sex" label="Sex" value={details?.sex} placeholder="Select a student first"/>
-                <ReadOnlyField id="birthday" label="Birthday" value={details?.birthday} placeholder="Select a student first"/>
-                <ReadOnlyField id="civil_status" label="Civil Status" value={details?.civil_status} placeholder="Select a student first"/>
-                <ReadOnlyField id="year_section" label="Year and Section" value={details?.year_section} placeholder="Select a student first"/>
-
-                <div>
-                    <FieldLabel htmlFor="type">Type</FieldLabel>
-                    <select
-                        id="type"
-                        name="type"
-                        value={visitType}
-                        onChange={(e) => setField("visitType", e.target.value)}
-                        className={inputClass}
-                    >
-                        <option value="" disabled>Select Type</option>
-                        {visitTypeOptions.map((option) => (
-                            <option key={option} value={option}>{option}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <FieldLabel htmlFor="treatmentType">
-                        Treatment Type
-                    </FieldLabel>
-
-                    <select
-                        id="treatmentType"
-                        name="treatmentType"
-                        value={treatmentType}
-                        onChange={(e) => setField("treatmentType", e.target.value)}
-                        className={inputClass}
-                    >
-                        <option value="" disabled>
-                            Select Treatment Type
-                        </option>
-
-                        {treatmentTypeOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <FieldLabel htmlFor="status">Status</FieldLabel>
-                    <select
-                        id="status"
-                        name="status"
-                        value={status}
-                        onChange={(e) => setField("status", e.target.value)}
-                        className={inputClass}
-                    >
-                        <option value="" disabled>Select Status</option>
-                        {statusOptions.map((option) => (
-                            <option key={option} value={option}>{option}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-
-            <div className="mt-10">
-                <div className="mb-4 flex items-center gap-2 border-t border-border pt-6">
-                    <ClipboardList className="h-4 w-4 text-primaryDark" strokeWidth={2}/>
-                    <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">Visit Log</h2>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <FieldLabel htmlFor="visitDate">Visit Date</FieldLabel>
-                        <input
-                            id="visitDate"
-                            name="visitDate"
-                            type="date"
-                            value={visitDate}
-                            onChange={(e) => setField("visitDate", e.target.value)}
-                            className={inputClass}
-                        />
-                    </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-1 gap-4">
-                    <div>
-                        <FieldLabel htmlFor="complaint">Complaint / Findings</FieldLabel>
-                        <textarea
-                            id="complaint"
-                            name="complaint"
-                            value={complaint}
-                            onChange={(e) => setField("complaint", e.target.value)}
-                            placeholder="e.g. Fever, headache since morning"
-                            rows={3}
-                            className={inputClass}
-                        />
-                    </div>
-
-                    <div>
-                        <FieldLabel htmlFor="treatment">Treatment</FieldLabel>
-                        <textarea
-                            id="treatment"
-                            name="treatment"
-                            value={treatment}
-                            onChange={(e) => setField("treatment", e.target.value)}
-                            placeholder="e.g. Paracetamol 500mg, rest advised"
-                            rows={3}
-                            className={inputClass}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-10">
-                <div className="mb-4 flex items-center gap-2 border-t border-border pt-6">
-                    <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">Attachments</h2>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <AttachmentField
-                        id="laboratoryResults"
-                        label="Laboratory Results"
-                        hint="Images or PDF, up to 10 MB each"
-                        accept="image/*,application/pdf"
-                        files={labFiles}
-                        onAdd={(files) => setLabFiles((prev) => [...prev, ...files])}
-                        onRemove={(index) => setLabFiles((prev) => prev.filter((_, i) => i !== index))}
-                        icon={FlaskConical}
-                    />
-
-                    <AttachmentField
-                        id="clinicalPhotos"
-                        label="Clinical Photos"
-                        hint="Images only, up to 10 MB each"
-                        accept="image/*"
-                        files={photoFiles}
-                        onAdd={(files) => setPhotoFiles((prev) => [...prev, ...files])}
-                        onRemove={(index) => setPhotoFiles((prev) => prev.filter((_, i) => i !== index))}
-                        icon={ImagePlus}
-                    />
-                </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
-                <button type="button" onClick={handleBack}
-                        className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary">
-                    <ArrowLeft className="h-4 w-4" strokeWidth={2}/>
-                    Back
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsStatusModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primaryDark"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Update status
                 </button>
 
-                <div className="flex items-center gap-3">
-                    <button type="button" onClick={handleClear}
-                            className="rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary">
-                        Clear
-                    </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  Print record
+                </button>
+              </div>
+            </div>
 
-                    <button type="submit" disabled={!selectedStudent || createMedicalVisitMutation.isPending}
-                            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-primary">
-                        <Save className="h-4 w-4" strokeWidth={2}/>
-                        {createMedicalVisitMutation.isPending ? "Saving..." : "Save Record"}
-                    </button>
+            <div className="flex items-center gap-5">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
+                {getInitials(visit.patient_name)}
+              </span>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="font-heading text-2xl font-semibold text-primaryDark">
+                    {visit.patient_name}
+                  </h1>
+                  <span className="rounded-md bg-surfaceMuted px-2 py-0.5 text-xs text-textMuted">
+                    MED-{visit.medical_visit_id}
+                  </span>
+                  <StatusBadge status={visit.status} />
                 </div>
+
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textMuted">
+                  {patientId && <span>{patientId}</span>}
+                  <span>•</span>
+                  <span>Medical Record</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-surface shadow-sm">
+            <div className="border-b border-border px-5 py-4">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-primary" />
+                <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                  Patient Information
+                </h2>
+              </div>
             </div>
 
-            <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
-                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2}/>
-                <span>Please ensure all information is accurate before saving. This record will be stored in the system for future reference.</span>
+            <div className="flex flex-col gap-y-4 p-6">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField label="Course" value={visit.course ?? undefined} />
+                <InfoField
+                  label="Year and Section"
+                  value={visit.year_section ?? undefined}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField label="Age" value={visit.age ?? undefined} />
+                <InfoField label="Sex" value={visit.sex ?? undefined} />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField
+                  label="Civil status"
+                  value={visit.civil_status ?? undefined}
+                />
+                <InfoField
+                  label="Birthday"
+                  value={visit.birthday ? formatDate(visit.birthday) : undefined}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-x-4 gap-y-5">
+                <InfoField label="Address" value={address} />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                <InfoField
+                  label="Mobile Number"
+                  value={visit.mobile_number ?? undefined}
+                />
+                <InfoField
+                  label="Visit Date"
+                  value={visit.visit_date ? formatDate(visit.visit_date) : undefined}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface shadow-sm lg:col-span-2">
+            <div className="border-b border-border px-5 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-primary" />
+                  <div>
+                    <h2 className="font-heading text-sm font-semibold text-primaryDark">
+                      Consultation
+                    </h2>
+                    <p className="text-xs text-textMuted">
+                      {visit.staff_name
+                        ? `Attending staff: ${visit.staff_name}`
+                        : "Visit record details below."}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={openConsultationEdit}
+                  aria-label="Edit consultation"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-textSecondary transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
 
-            {isConfirmOpen && (
-                <ConfirmModal
-                    title="Save medical record?"
-                    message="Make sure all information is accurate. This record will be stored in the system for future reference."
-                    confirmLabel="Save record"
-                    onConfirm={handleConfirmSave}
-                    onCancel={() => setIsConfirmOpen(false)}
+            <div className="p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <InfoField
+                  label="Visit date"
+                  value={visit.visit_date ? formatDate(visit.visit_date) : undefined}
                 />
-            )}
+                <InfoField
+                  label="Attending Staff"
+                  value={visit.staff_name ?? undefined}
+                />
+              </div>
 
-            {isNotifyOpen && (
-                <NotifyProfessionalModal
-                    professionals={NOTIFY_PROFESSIONALS}
-                    onNotify={handleNotify}
-                    onSkip={handleSkipNotify}
-                    onCancel={() => setIsNotifyOpen(false)}
+              <div className="mt-6 flex flex-col gap-5">
+                <ReadOnlyBlock
+                  label="Complaint / findings"
+                  value={visit.complaint}
                 />
-            )}
-        </form>
-    );
+                <ReadOnlyBlock label="Treatment" value={visit.treatment} />
+              </div>
+
+              <div className="mt-6 border-t border-border pt-5">
+                <p className="mb-3 text-xs font-medium text-textMuted">
+                  Notified professor
+                </p>
+
+                {visit.notified_professor ? (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-background p-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+                      {getInitials(visit.notified_professor.name)}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-textPrimary">
+                        {visit.notified_professor.name}
+                      </p>
+                      <p className="truncate text-xs text-textMuted">
+                        {visit.notified_professor.role} · {visit.notified_professor.course}
+                      </p>
+                      <p className="truncate text-xs text-textSecondary">
+                        {visit.notified_professor.email}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0 text-right">
+                      <span className="inline-flex rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Emailed
+                      </span>
+                      <p className="mt-1 text-xs text-textMuted">
+                        {formatDate(visit.notified_professor.sent_at)}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="rounded-lg border border-dashed border-border px-3 py-3 text-sm text-textMuted">
+                    No professor was notified for this record.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isStatusModalOpen && (
+        <EditRecordModal
+          title="Update status"
+          fields={statusEditFields}
+          data={{ status: visit.status }}
+          onClose={() => setIsStatusModalOpen(false)}
+          onSave={handleSaveStatus}
+          isSaving={updateVisitMutation.isPending}
+        />
+      )}
+
+      {isConsultationModalOpen && (
+        <EditRecordModal
+          title="Edit consultation"
+          fields={consultationEditFields}
+          data={consultationForm}
+          onClose={() => setIsConsultationModalOpen(false)}
+          onSave={handleSaveConsultation}
+          isSaving={updateVisitMutation.isPending}
+        />
+      )}
+    </>
+  );
 }

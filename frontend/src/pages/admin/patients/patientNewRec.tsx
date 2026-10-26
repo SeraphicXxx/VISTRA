@@ -18,6 +18,7 @@ import {
 import {useSavePatient} from "/@/hooks/SavePatient.ts";
 import {getFieldErrors} from "/@/utils/Formatters.js";
 import {ConfirmModal} from "/@/components/ConfirmModal";
+import {useNotify} from "/@/components/notifications/NotificationProvider";
 
 type Classification = "student" | "faculty" | "staff";
 type PatientRecord = Record<string, FormDataEntryValue>;
@@ -97,6 +98,7 @@ export default function NewPatientRecordForm() {
         isPending: isSaving,
         error: saveError,
     } = useSavePatient();
+    const notify = useNotify();
 
     const saveErrorMessage = getFieldErrors(saveError);
     const [classification, setClassification] = useState<Classification>("student");
@@ -154,9 +156,15 @@ export default function NewPatientRecordForm() {
 
         try {
             await savePatient(record);
+            notify.success("The patient record was saved successfully.", {
+                title: "Patient saved",
+            });
             window.history.back();
         } catch (error) {
             console.error("Failed to create patient:", error);
+            notify.error("The patient record could not be saved. Please check the highlighted fields and try again.", {
+                title: "Save failed",
+            });
         }
     };
 

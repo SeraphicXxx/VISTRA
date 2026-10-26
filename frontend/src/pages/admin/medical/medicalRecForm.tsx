@@ -15,6 +15,7 @@ import {getFieldErrors} from "/@/utils/Formatters";
 import {treatmentTypeOptions} from "/@/types/types";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 import {NotifyProfessionalModal} from "../../../components/NotifyProfessorModal";
+import {useNotify} from "/@/components/notifications/NotificationProvider";
 
 const statusField = statusEditFields.find(
     (field: { key: string }) => field.key === "status"
@@ -125,6 +126,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
     const {form, setField, reset} = useForm<MedicalRecFormValues>(initialFormValues);
     const {selectedStudent, visitType, treatmentType, status, visitDate, complaint, treatment} = form;
     const createMedicalVisitMutation = useCreateMedicalVisit();
+    const notify = useNotify();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [labFiles, setLabFiles] = useState<File[]>([]);
@@ -158,7 +160,14 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
-        if (!selectedStudent) return;
+
+        if (!selectedStudent) {
+            notify.warning("Please select a student before saving the record.", {
+                title: "No student selected",
+            });
+            return;
+        }
+
         setIsConfirmOpen(true);
     };
 
@@ -173,6 +182,9 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         const staffId = sessionManager.getUser()?.user_id ?? "";
         if (!staffId) {
             console.error("Failed to create medical visit: no staff session found.");
+            notify.error("Your staff session was not found. Please log in again.", {
+                title: "Session not found",
+            });
             return null;
         }
 
@@ -188,19 +200,25 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         };
     };
 
-    const persistRecord = (notify: Professional | null): void => {
+    const persistRecord = (notifyProfessor: Professional | null): void => {
         const record = buildRecord();
         if (!record) return;
 
-        if (onSave) onSave(record, notify);
+        if (onSave) onSave(record, notifyProfessor);
 
         createMedicalVisitMutation.mutate(record, {
             onSuccess: () => {
+                notify.success("The medical record was saved successfully.", {
+                    title: "Record saved",
+                });
                 handleClear();
                 handleBack();
             },
             onError: (error) => {
                 console.error("Failed to create medical visit:", getFieldErrors(error));
+                notify.error("The medical record could not be saved. Please try again.", {
+                    title: "Save failed",
+                });
             },
         });
     };
