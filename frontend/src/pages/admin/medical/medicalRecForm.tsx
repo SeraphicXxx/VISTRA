@@ -15,7 +15,7 @@ import {getFieldErrors} from "/@/utils/Formatters";
 import {treatmentTypeOptions} from "/@/types/types";
 import {medicalStatuses, medicalTypes} from "/@/types/Medical";
 import {ConfirmModal} from "/@/components/ConfirmModal";
-import {NotifyProfessionalModal} from "../../../components/NotifyProfessorModal";
+import {NotifyProfessionalModal} from "/@/components/NotifyProfessorModal";
 import {useNotify} from "/@/components/notifications/NotificationProvider";
 
 const statusToEnum = Object.fromEntries(
