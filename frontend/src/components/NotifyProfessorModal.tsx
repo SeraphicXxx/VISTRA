@@ -34,12 +34,13 @@ const inputClass =
 const labelClass = "mb-1.5 block text-xs font-medium text-textMuted";
 
 export function NotifyProfessionalModal({
-    professionals,
-    defaultMessage,
-    onSend,
-    onSkip,
-    onCancel,
-}: NotifyProfessionalModalProps) {
+                                            professionals,
+                                            defaultMessage,
+                                            onNotify,
+                                            onSend,
+                                            onSkip,
+                                            onCancel,
+                                        }: NotifyProfessionalModalProps) {
     const [extraProfessors, setExtraProfessors] = useState<Professional[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [message, setMessage] = useState(defaultMessage);
@@ -107,7 +108,7 @@ export function NotifyProfessionalModal({
 
     return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40" onClick={onCancel} aria-hidden="true" />
+            <div className="absolute inset-0 bg-slate-900/40" onClick={onCancel} aria-hidden="true"/>
 
             <div
                 role="dialog"
@@ -117,11 +118,13 @@ export function NotifyProfessionalModal({
             >
                 <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                            <Bell className="h-4 w-4" strokeWidth={2} />
+                        <span
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                            <Bell className="h-4 w-4" strokeWidth={2}/>
                         </span>
                         <div>
-                            <h2 id="notify-professor-title" className="font-heading text-sm font-semibold text-primaryDark">
+                            <h2 id="notify-professor-title"
+                                className="font-heading text-sm font-semibold text-primaryDark">
                                 Notify a professor by email
                             </h2>
                             <p className="text-xs text-textMuted">
@@ -136,7 +139,7 @@ export function NotifyProfessionalModal({
                         aria-label="Close"
                         className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border text-textSecondary hover:bg-surfaceMuted"
                     >
-                        <X className="h-3.5 w-3.5" />
+                        <X className="h-3.5 w-3.5"/>
                     </button>
                 </div>
 
@@ -156,7 +159,8 @@ export function NotifyProfessionalModal({
                                                 isSelected ? "bg-primary/10" : "hover:bg-background"
                                             }`}
                                         >
-                                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+                                            <span
+                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
                                                 {getInitials(professor.name)}
                                             </span>
 
@@ -179,7 +183,7 @@ export function NotifyProfessionalModal({
                                                         : "border-border text-transparent"
                                                 }`}
                                             >
-                                                <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                                                <Check className="h-3.5 w-3.5" strokeWidth={2.5}/>
                                             </span>
                                         </button>
                                     </li>
@@ -282,7 +286,7 @@ export function NotifyProfessionalModal({
                             onClick={() => setIsAdding(true)}
                             className="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-primary hover:text-primaryDark"
                         >
-                            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+                            <Plus className="h-3.5 w-3.5" strokeWidth={2}/>
                             Add a professor not on the list
                         </button>
                     )}
@@ -291,8 +295,9 @@ export function NotifyProfessionalModal({
                         <div className="flex flex-col gap-4 border-t border-border pt-5">
                             <div>
                                 <p className="text-xs font-medium text-textMuted">To</p>
-                                <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-textPrimary">
-                                    <Mail className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2} />
+                                <div
+                                    className="mt-1.5 flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-textPrimary">
+                                    <Mail className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2}/>
                                     <span className="truncate">{selected.email}</span>
                                 </div>
                             </div>
@@ -313,7 +318,8 @@ export function NotifyProfessionalModal({
                     )}
                 </div>
 
-                <div className="flex flex-col-reverse gap-2 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    className="flex flex-col-reverse gap-2 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <button
                         type="button"
                         onClick={onSkip}

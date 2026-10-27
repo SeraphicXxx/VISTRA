@@ -14,7 +14,7 @@ class MedicalRepository(BaseRepository):
             "medical_tab",
             columns=(
                 "id, patient_id, patient_name, course, "
-                "visit_date, staff_id, status"
+                "visit_date, staff_id, status, type"
             ),
             filters=filters,
             include_type=True,

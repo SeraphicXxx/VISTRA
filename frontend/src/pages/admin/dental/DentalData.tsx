@@ -61,6 +61,7 @@ export const dentalTypes = [
 export interface DentalData {
 
     id: string;
+    studentId: string;
     student: string;
     course: string;
     time: string;
@@ -84,12 +85,12 @@ export const DentalColumns: Column<DentalData>[] = [
         options: courseFilterOptions,
     },
 
-    {
-        key: "type",
-        label: "Type",
-        filterType: "select",
-        options: dentalTypes,
-    },
+    // {
+    //     key: "type",
+    //     label: "Type",
+    //     filterType: "select",
+    //     options: dentalTypes,
+    // },
 
     {
         key: "time",
