@@ -1,24 +1,23 @@
+
 import { Reveal } from "@/components/animation/Reveal";
 import { brand } from "@/constants/theme";
 import { DUMMY_USERS } from "@/mock/auth";
 import { loginStyles as styles } from "@/styles/login.styles";
-import { validatePassword, validatePatientId } from "@/utils/validators";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Image,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -32,44 +31,37 @@ export default function LoginScreen() {
   const [patientId, setPatientId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ id?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{
+    id?: string;
+    password?: string;
+  }>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
+  const handleLogin = () => {
+    const id = patientId.trim();
 
-const handleLogin = () => {
-  const id = patientId.trim();
+    setErrors({});
+    setFormError(null);
 
-  setErrors({});
-  setFormError(null);
+    if (!id || !password) {
+      setErrors({
+        id: !id ? "Patient ID is required" : undefined,
+        password: !password ? "Password is required" : undefined,
+      });
+      return;
+    }
 
-  if (!id || !password) {
-    setErrors({
-      id: !id ? "Patient ID is required" : undefined,
-      password: !password ? "Password is required" : undefined,
-    });
-    return;
-  }
+    const user = DUMMY_USERS.find(
+      (account) => account.id === id && account.password === password
+    );
 
-  const user = DUMMY_USERS.find(
-    (account) =>
-      account.id === id &&
-      account.password === password
-  );
+    if (!user) {
+      setFormError("Invalid Patient ID or password");
+      return;
+    }
 
-  if (!user) {
-    setFormError("Invalid Patient ID or password");
-    return;
-  }
-
-  setLoading(true);
-
-  setTimeout(() => {
-    setLoading(false);
     router.replace("/(patient)/overview");
-  }, 600);
-};
-
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -178,7 +170,9 @@ const handleLogin = () => {
                       }
                     >
                       <Ionicons
-                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        name={
+                          showPassword ? "eye-off-outline" : "eye-outline"
+                        }
                         size={20}
                         color={brand.textMuted}
                       />
@@ -197,20 +191,17 @@ const handleLogin = () => {
               <Reveal delay={AFTER_CARD + 400} distance={16}>
                 <Pressable
                   onPress={handleLogin}
-                  disabled={loading}
-                  style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.9 : 1,
+                  })}
                 >
                   <LinearGradient
                     colors={[brand.primaryDark, brand.primary]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={[styles.button, loading && { opacity: 0.7 }]}
+                    style={styles.button}
                   >
-                    {loading ? (
-                      <ActivityIndicator color="#ffffff" />
-                    ) : (
-                      <Text style={styles.buttonText}>Sign in</Text>
-                    )}
+                    <Text style={styles.buttonText}>Sign in</Text>
                   </LinearGradient>
                 </Pressable>
               </Reveal>
