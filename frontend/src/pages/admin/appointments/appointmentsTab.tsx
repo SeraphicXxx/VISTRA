@@ -1,61 +1,37 @@
-import React, {useMemo} from "react";
-import {Calendar, ChevronRight} from "lucide-react";
+import {Calendar} from "lucide-react";
 import {AppointmentsColumns, AppointmentTableFormat} from "./appointmentsData";
-import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {ROUTES} from "/@/config/RoutePaths.js";
-import {HyperlinkText} from "/@/components/Button";
-import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
-import {removeNullFilters} from "/@/components/Filters";
 import {useAppointmentContext} from "/@/context/PaginatedContext";
-import {AppointmentModel} from "/@/repository/AppointmentModel";
+import {toAppointmentTableRow} from "/@/repository/AppointmentModel";
+import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
+import {VisitTab} from "/@/components/VisitTab";
 
-interface  AppointmentTadProps {
+interface AppointmentsTabProps {
     setFilters: (filters: AppointmentFilters) => void;
 }
 
-export default function AppointmentsTab({setFilters}: AppointmentTadProps) {
+export default function AppointmentsTab({setFilters}: AppointmentsTabProps) {
     const {
-        items: Appointment,
+        items,
         totalPages,
         page,
         isLoading,
     } = useAppointmentContext();
 
-    const appointments = useMemo(
-        () =>
-            Appointment.map((appointment) => {
-                const appointmentModel = new AppointmentModel(appointment);
-
-                return appointmentModel.UiTableFormat();
-            }),
-        [Appointment]
-    );
-
     return (
-        <DefaultTablePreset<AppointmentTableFormat>
+        <VisitTab
             title="Appointment"
             icon={Calendar}
-            data={appointments}
-            isLoading={isLoading}
             columns={AppointmentsColumns}
+            items={items}
+            toRow={toAppointmentTableRow}
+            isLoading={isLoading}
             totalPages={totalPages}
             page={page}
-            renderAction={
-                (appointment) => (
-                    <HyperlinkText
-                        title={`View`}
-                        link={`${ROUTES.staff.appointments.view.build(appointment.studentId, appointment.id)}`}
-                        icon={ChevronRight}
-                    />
-                )}
-            onRun={(search, filters, page, pageSize) =>
-                setFilters({
-                    search,
-                    ...removeNullFilters(filters),
-                    page,
-                    page_size: pageSize,
-                })
+            buildViewLink={(row: AppointmentTableFormat) =>
+                ROUTES.staff.appointments.view.build(row.studentId, row.id)
             }
+            setFilters={setFilters}
         />
     );
 }

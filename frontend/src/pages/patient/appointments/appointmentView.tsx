@@ -120,14 +120,15 @@ export default function PatientAppointmentView() {
   const [searchParams] = useSearchParams();
 
   const studentId = resolveStudentId(sessionManager.getUser());
-  const requestedId = params.id ?? searchParams.get("id") ?? undefined;
+  const requestedId =
+    params.appointmentId ?? params.id ?? searchParams.get("id") ?? undefined;
 
   const {
     data: appointmentsData,
     isLoading,
     isError,
     refetch,
-  } = useAppointmentQuery({ patient_id: studentId, page_size: 100 });
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100, orderBy: "scheduled_start desc" });
 
   const appointment: Appointment | undefined = requestedId
     ? (appointmentsData?.items ?? [])

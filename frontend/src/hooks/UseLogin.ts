@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { sessionManager } from "/@/utils/SessionManager";
 import { login } from "/@/api/auth.api";
-import { PasswordAndId } from "/@/api/schema/AuthSchema"
+import { LoginRequest } from "/@/api/schema/AuthSchema"
 import axios from "axios";
 /* -------------------------------------------------------------------------- */
 /* Types                                                                      */
@@ -20,8 +20,15 @@ interface LoginValidationErrors {
 
 export function useLogin() {
     const mutation = useMutation({
-        mutationFn: async (credentials: PasswordAndId) =>
-            login({ identifier: credentials.email, password: credentials.password }),
+        mutationFn: async (credentials: LoginRequest) => {
+            const {data} = await login({
+                identifier: credentials.identifier ?? credentials.email,
+                password: credentials.password,
+                on_duty: credentials.on_duty ?? false,
+            });
+
+            return data;
+        },
 
         onSuccess: (data) => {
             sessionManager.setLogin(
@@ -51,7 +58,7 @@ export function useLogin() {
 
 export function useLoginForm() {
     const [credentials, setCredentials] =
-        useState<PasswordAndId>({
+        useState<LoginRequest>({
             email: "",
             password: "",
         });
@@ -80,7 +87,7 @@ export function useLoginForm() {
     const validate = (): boolean => {
         const newErrors: LoginValidationErrors = {};
 
-        if (!credentials.email.trim()) {
+        if (!credentials.email?.trim()) {
             newErrors.email = "Staff ID is required.";
         }
 

@@ -30,18 +30,10 @@ class StaffData(BaseModel):
 
 
 # -----------------------------
-# Helpers
+# Helpers (shared production implementations)
 # -----------------------------
 
-def remove_ucc_domain(staff_id: str):
-    return staff_id.replace("@ucc.edu.ph", "")
-
-
-def add_ucc_domain(staff_id: str):
-    if "@ucc.edu.ph" not in staff_id:
-        return f"{staff_id}@ucc.edu.ph"
-
-    return staff_id
+from app.utils.email_utils import add_ucc_domain, remove_ucc_domain
 
 
 # -----------------------------

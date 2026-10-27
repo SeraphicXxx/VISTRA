@@ -1,52 +1,39 @@
 import {AppointmentSchema} from "/@/api/schema/AppointmentSchema";
 import {AppointmentPageFormat, AppointmentTableFormat} from "/@/pages/admin/appointments/appointmentsData";
 import {formatDate, formatTime} from "/@/utils/FormatDate";
+import {joinName} from "/@/utils/joinName";
 
+export function toAppointmentTableRow(appointment: AppointmentSchema): AppointmentTableFormat {
+    return {
+        id: appointment.id,
+        studentId: appointment.patient_id,
+        student: joinName([
+            appointment.first_name,
+            appointment.middle_name,
+            appointment.last_name,
+        ]),
+        course: appointment.course,
+        time: formatDate(appointment.scheduled_start),
+        type: appointment.reason,
+        status: appointment.status
+    };
+}
 
-export class AppointmentModel {
-    private AppointmentSchema: AppointmentSchema
-
-    constructor(appointmentSchema: AppointmentSchema) {
-        this.AppointmentSchema = appointmentSchema;
-    }
-
-    UiTableFormat(): AppointmentTableFormat {
-        return {
-            id: this.AppointmentSchema.id,
-            studentId: this.AppointmentSchema.patient_id,
-            student: [
-                this.AppointmentSchema.first_name,
-                this.AppointmentSchema.middle_name,
-                this.AppointmentSchema.last_name,
-            ]
-                .filter(Boolean)
-                .join(" "),
-            course: this.AppointmentSchema.course,
-            time: formatDate(this.AppointmentSchema.scheduled_start),
-            type: this.AppointmentSchema.reason,
-            status: this.AppointmentSchema.status
-        };
-    }
-
-    UiPageFormat(): AppointmentPageFormat {
-        return {
-            id: this.AppointmentSchema.id,
-            studentId: this.AppointmentSchema.patient_id,
-
-            student: [
-                this.AppointmentSchema.first_name,
-                this.AppointmentSchema.middle_name,
-                this.AppointmentSchema.last_name,
-            ]
-                .filter(Boolean)
-                .join(" "),
-            course: this.AppointmentSchema.course,
-            time: formatTime(this.AppointmentSchema.scheduled_start),
-            date: formatDate(this.AppointmentSchema.scheduled_start),
-            type: this.AppointmentSchema.reason,
-            notes: this.AppointmentSchema.notes,
-            declineReason: this.AppointmentSchema.decline_reason,
-            status: this.AppointmentSchema.status
-        }
-    }
+export function toAppointmentPageFormat(appointment: AppointmentSchema): AppointmentPageFormat {
+    return {
+        id: appointment.id,
+        studentId: appointment.patient_id,
+        student: joinName([
+            appointment.first_name,
+            appointment.middle_name,
+            appointment.last_name,
+        ]),
+        course: appointment.course,
+        time: formatTime(appointment.scheduled_start),
+        date: formatDate(appointment.scheduled_start),
+        type: appointment.reason,
+        notes: appointment.notes,
+        declineReason: appointment.decline_reason,
+        status: appointment.status
+    };
 }

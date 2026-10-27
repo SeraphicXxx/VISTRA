@@ -2,6 +2,8 @@ name: VISTRA local
 values:
   - key: base_url
     value: 'http:\\localhost:8000'
+  - key: api_version
+    value: api/v1
   - key: user_id
     value: STF001
   - key: access_token
@@ -9,6 +11,12 @@ values:
   - key: refresh_token
     value: ''
   - key: patient_id
+    value: ''
+  - key: patientB_id
+    value: ''
+  - key: patientA_access_token
+    value: ''
+  - key: patientB_access_token
     value: ''
   - key: patient_birthday
     value: ''

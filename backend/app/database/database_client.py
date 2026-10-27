@@ -2,6 +2,9 @@ from app.config.settings import Config
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from supabase import create_client, Client
+import logging
+
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
@@ -33,3 +36,9 @@ supabase_admin: Client | None = None
 
 if Config.supabase_privilege_key():
     supabase_admin = _base_client(Config.supabase_privilege_key())
+else:
+    logger.warning(
+        "SUPABASE_PRIVILEGE_KEY (or SELFHOSTED_PRIVILEGE_KEY) is not set: "
+        "auth admin operations (create/delete auth users) will fail gracefully. "
+        "Set the privilege key to enable them."
+    )

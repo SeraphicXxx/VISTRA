@@ -1,0 +1,58 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"patient_id\": \"{{patientB_id}}\",\r
+
+    \    \"password\": \"TestPass123!\",\r
+
+    \    \"created_by\": \"{{user_id}}\",\r
+
+    \    \"name\": \"Test, Patient B\",\r
+
+    \    \"address\": \"456 Test Avenue\",\r
+
+    \    \"age\": 22,\r
+
+    \    \"barangay\": \"Commonwealth\",\r
+
+    \    \"birthday\": \"2004-05-05\",\r
+
+    \    \"mobile_number\": \"09177654321\",\r
+
+    \    \"sex\": \"Female\",\r
+
+    \    \"civil_status\": \"Single\",\r
+
+    \    \"classification\": \"Faculty\",\r
+
+    \    \"course\": \"BS Nursing\",\r
+
+    \    \"school_year\": \"2nd Year\",\r
+
+    \    \"section\": \"A\"\r
+
+    }"
+scripts:
+  - type: beforeRequest
+    code: |+
+      pm.environment.set("patientB_id", "TESTB-" + Date.now());
+    language: text/javascript
+  - type: afterResponse
+    code: |+
+      pm.test("Create patient B returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Patient B creation succeeds", function () {
+          pm.expect(pm.response.json().success).to.eql(true);
+      });
+    language: text/javascript
+order: 7950

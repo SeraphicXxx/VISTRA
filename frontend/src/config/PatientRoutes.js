@@ -39,3 +39,5 @@ export const PatientRoutes = [
         component: "profile",
     },
 ];
+
+export const PatientNavRoutes = PatientRoutes.filter((route) => !route.hidden);

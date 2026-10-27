@@ -10,13 +10,12 @@ import OverviewTab from "/@/pages/admin/overview/Overview";
 import {MedicalPage} from "/@/pages/admin/medical/MedicalPage";
 import PatientRecordForm from "/@/pages/admin/medical/medicalRecForm";
 import PatientRecordView from "/@/pages/admin/medical/medicalViewRec";
-import DentalTab from "/@/pages/admin/dental/dentalTab";
 import DentalRecordForm from "/@/pages/admin/dental/dentalForm";
 import DentalRecordView from "/@/pages/admin/dental/dentalViewRec";
 import PageNotFound from "/@/pages/public/PageNotFound";
 import ProtectedRoute from "/@/routes/ProtectedRoute";
 import GuestRoute from "/@/routes/GuestRoute";
-import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec.jsx";
+import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
 import ProtectedPatientRoute from "/@/routes/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
@@ -25,12 +24,15 @@ import PatientOverviewTab from "/@/pages/patient/overview/overview";
 import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTab";
 import PatientBookAppointment from "/@/pages/patient/appointments/appointmentBook";
 import PatientAppointmentView from "/@/pages/patient/appointments/appointmentView";
-import PatientMedicalTab from "/@/pages/patient/medical/medicalTab";
-import PatientDentalTab from "/@/pages/patient/dental/dentalTab";
+import PatientMedicalTab from "/@/pages/patient/medical/medicalTabPage";
+import PatientMedicalRecordView from "/@/pages/patient/medical/medicalViewRec";
+import PatientDentalTab from "/@/pages/patient/dental/dentalTabPage";
+import PatientDentalRecordView from "/@/pages/patient/dental/dentalViewRec";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
-
+import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
+import RequireModule from "/@/routes/RequireModule";
 
 function AppRoutes() {
     return (
@@ -40,7 +42,6 @@ function AppRoutes() {
                 <Route element={<PublicLayout/>}>
                     <Route path="/" element={<LandingPage/>}/>
                     <Route path="*" element={<PageNotFound/>}/>
-                    {/*<Route path="/DEMO/" element={<DemoPage />} />*/}
                 </Route>
 
                 {/* Admin Showcase / Login */}
@@ -57,34 +58,38 @@ function AppRoutes() {
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<AdminLayout/>}>
                         <Route path={ROUTES.staff.dashboard.overview} element={<OverviewTab/>}/>
-                        <Route path={ROUTES.staff.dashboard.medical} element={<MedicalPage/>}/>
-                        <Route path={ROUTES.staff.medical.createNewRecord} element={<PatientRecordForm/>}/>
-                        <Route path={ROUTES.staff.medical.view.route} element={<PatientRecordView/>}/>
+                        <Route path={ROUTES.staff.dashboard.medical} element={<RequireModule module="medical_module"><MedicalPage/></RequireModule>}/>
+                        <Route path={ROUTES.staff.medical.createNewRecord} element={<RequireModule module="medical_module"><PatientRecordForm/></RequireModule>}/>
+                        <Route path={ROUTES.staff.medical.view.route} element={<RequireModule module="medical_module"><PatientRecordView/></RequireModule>}/>
 
-                        <Route path={ROUTES.staff.dashboard.dental} element={<DentalPage/>}/>
-                        <Route path={ROUTES.staff.dental.createNewRecord} element={<DentalRecordForm/>}/>
-                        <Route path={ROUTES.staff.dental.view.route} element={<DentalRecordView/>}/>
+                        <Route path={ROUTES.staff.dashboard.dental} element={<RequireModule module="dental_module"><DentalPage/></RequireModule>}/>
+                        <Route path={ROUTES.staff.dental.createNewRecord} element={<RequireModule module="dental_module"><DentalRecordForm/></RequireModule>}/>
+                        <Route path={ROUTES.staff.dental.view.route} element={<RequireModule module="dental_module"><DentalRecordView/></RequireModule>}/>
 
                         <Route
                             path={ROUTES.staff.dashboard.appointments}
-                            element={<AppointmentPage/>}
+                            element={<RequireModule module="appointment_module"><AppointmentPage/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.appointments.view.route}
-                            element={<AppointmentDetailPage/>}
+                            element={<RequireModule module="appointment_module"><AppointmentDetailPage/></RequireModule>}
                         />
 
                         <Route
                             path={ROUTES.staff.dashboard.patients}
-                            element={<PatientsPage/>}
+                            element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
+                        />
+                        <Route
+                            path={ROUTES.staff.dashboard.accessControl}
+                            element={<RequireModule module="staff_module"><RoleManagementPage/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.patient.createNewRecord}
-                            element={<NewPatientRecordForm/>}
+                            element={<RequireModule module="patient_module"><NewPatientRecordForm/></RequireModule>}
                         />
                         <Route
                             path={`${ROUTES.staff.patient.patientRecordTab}/:id`}
-                            element={<ViewPatientRecord/>}
+                            element={<RequireModule module="patient_module"><ViewPatientRecord/></RequireModule>}
                         />
                     </Route>
                 </Route>
@@ -94,9 +99,11 @@ function AppRoutes() {
                         <Route path={ROUTES.patient.dashboard.overview} element={<PatientOverviewTab/>}/>
                         <Route path={ROUTES.patient.dashboard.appointments} element={<PatientAppointmentsTab/>}/>
                         <Route path={ROUTES.patient.appointment.bookAppointment} element={<PatientBookAppointment/>}/>
-                        <Route path={ROUTES.patient.appointment.viewAppointment} element={<PatientAppointmentView/>}/>
+                        <Route path={ROUTES.patient.appointment.view.route} element={<PatientAppointmentView/>}/>
                         <Route path={ROUTES.patient.dashboard.medical} element={<PatientMedicalTab/>}/>
+                        <Route path={ROUTES.patient.medical.view.route} element={<PatientMedicalRecordView/>}/>
                         <Route path={ROUTES.patient.dashboard.dental} element={<PatientDentalTab/>}/>
+                        <Route path={ROUTES.patient.dental.view.route} element={<PatientDentalRecordView/>}/>
                         <Route path={ROUTES.patient.profile} element={<PatientProfilePage/>}/>
                     </Route>
                 </Route>

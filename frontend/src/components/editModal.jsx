@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { ReadOnlyField } from "/@/utils/ReadOnlyField";
 
 export const patientEditFields = [
-  { key: "name", label: "Full name", required: true },
-  { key: "studentId", label: "Student ID" },
+  { key: "name", label: "Full name", required: true, readOnly: true },
+  { key: "studentId", label: "Student ID", readOnly: true },
   { key: "yearSection", label: "Year & section" },
   { key: "age", label: "Age" },
   { key: "sex", label: "Sex", type: "select", options: ["Male", "Female", "Other"] },
@@ -50,14 +51,46 @@ export function Modal({
   footer,
   maxWidth = "max-w-2xl",
 }) {
+  const overlayRef = useRef(null);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    overlayRef.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 180,
+      easing: "ease-out",
+      fill: "both",
+    });
+
+    dialogRef.current?.animate(
+      [
+        { opacity: 0, transform: "translateY(12px) scale(0.97)" },
+        { opacity: 1, transform: "translateY(0) scale(1)" },
+      ],
+      {
+        duration: 220,
+        easing: "cubic-bezier(0.2, 0.7, 0.2, 1)",
+        fill: "both",
+      }
+    );
+  }, []);
+
   return (
     <div
+      ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
+        ref={dialogRef}
         className={`max-h-[90vh] w-full ${maxWidth} overflow-y-auto rounded-2xl border border-border bg-surface shadow-lg`}
       >
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
@@ -90,7 +123,7 @@ export function Modal({
 const inputClass =
   "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary/40";
 
-export function FormField({ field, value, onChange }) {
+export function FormField({ field, value, onChange, disabled = false }) {
   const {
     key,
     label,
@@ -98,7 +131,14 @@ export function FormField({ field, value, onChange }) {
     options,
     required,
     span,
+    readOnly,
   } = field;
+
+  if (readOnly) {
+    return <ReadOnlyField id={key} label={label} value={value} />;
+  }
+
+  const disabledClass = disabled ? "cursor-not-allowed opacity-60" : "";
 
   return (
     <label className={`flex flex-col gap-1.5 ${span ? "sm:col-span-2" : ""}`}>
@@ -109,6 +149,7 @@ export function FormField({ field, value, onChange }) {
           className={inputClass}
           value={value ?? ""}
           onChange={(e) => onChange(key, e.target.value)}
+          disabled={disabled}
         >
           {options.map((option) => (
             <option key={option} value={option}>
@@ -118,19 +159,21 @@ export function FormField({ field, value, onChange }) {
         </select>
       ) : type === "textarea" ? (
         <textarea
-          className={`${inputClass} resize-none`}
+          className={`${inputClass} resize-none ${disabledClass}`}
           rows={4}
           value={value ?? ""}
           onChange={(e) => onChange(key, e.target.value)}
           required={required}
+          disabled={disabled}
         />
       ) : (
         <input
           type={type}
-          className={inputClass}
+          className={`${inputClass} ${disabledClass}`}
           value={value ?? ""}
           onChange={(e) => onChange(key, e.target.value)}
           required={required}
+          disabled={disabled}
         />
       )}
     </label>
@@ -143,28 +186,37 @@ export function EditRecordModal({
   data,
   onClose,
   onSave,
+  isSaving = false,
 }) {
   const [form, setForm] = useState(data);
 
   const update = (key, value) => {
+    if (isSaving) return;
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isSaving) return;
     onSave(form);
+  };
+
+  const handleClose = () => {
+    if (isSaving) return;
+    onClose();
   };
 
   return (
     <Modal
       title={title}
-      onClose={onClose}
+      onClose={handleClose}
       footer={
         <>
           <button
             type="button"
-            onClick={onClose}
-            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+            onClick={handleClose}
+            disabled={isSaving}
+            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
@@ -172,9 +224,16 @@ export function EditRecordModal({
           <button
             type="submit"
             form="edit-record-form"
-            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primaryDark"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Save changes
+            {isSaving && (
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
+            )}
+            {isSaving ? "Saving..." : "Save changes"}
           </button>
         </>
       }
@@ -190,6 +249,7 @@ export function EditRecordModal({
             field={field}
             value={form[field.key]}
             onChange={update}
+            disabled={isSaving}
           />
         ))}
       </form>

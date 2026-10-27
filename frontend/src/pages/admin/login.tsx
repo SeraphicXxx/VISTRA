@@ -10,14 +10,24 @@ import { Calendar, FileText, ShieldCheck, User } from "lucide-react";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { Logo } from "/@/components/Logo.jsx";
 import { useLogin, useLoginForm } from "/@/hooks/UseLogin.js";
+import type { LoginRequest } from "/@/api/schema/AuthSchema";
 import { useNavigate } from "react-router-dom";
 import { FormInput, PasswordInput } from "/@/components/InputCollection";
 import { LoginButton } from "/@/components/Button";
+import { Modal } from "/@/components/editModal";
+import { getStaffById } from "/@/api/staff.api";
+
+function toStaffId(identifier: string): string {
+  return identifier
+    .trim()
+    .replace(/@ucc\.com$/i, "")
+    .toUpperCase();
+}
 import {
   AdminAnimStyles,
   HeartbeatLine,
   LiveDot,
-} from "/@/components/adminanim.jsx";
+} from "/@/components/adminanim";
 
 const SLIDESHOW_IMAGES = [
   clinicImage2,
@@ -48,10 +58,7 @@ function greeting() {
 }
 
 interface LoginFormProps {
-  credentials: {
-    email: string;
-    password: string;
-  };
+  credentials: LoginRequest;
   validationErrors: {
     email?: string;
     password?: string;
@@ -86,11 +93,11 @@ export function LoginForm({
         </a>
 
         <h1 className="mb-2 font-heading text-3xl font-semibold leading-tight tracking-tight text-textPrimary">
-          Sign in to the staff portal
+          Sign in to the Medical Personnel Portal
         </h1>
 
-        <p className="text-base leading-relaxed text-textSecondary">
-          Use your Staff ID and password.
+        <p className="text-xs leading-relaxed text-textSecondary">
+          Use your Medical Personnel ID and password.
         </p>
       </div>
 
@@ -106,12 +113,12 @@ export function LoginForm({
 
       <div className="mb-5 w-full text-left">
         <FormInput
-          label="Staff ID"
+          label="Medical Personnel ID"
           id="email"
           name="email"
           type="text"
           autoComplete="username"
-          value={credentials.email}
+          value={credentials.email ?? ""}
           onChange={onChange}
           placeholder="e.g. UCC-2481"
           error={validationErrors.email}
@@ -315,16 +322,68 @@ export default function AdminLoginPage() {
     useLoginForm();
 
   const { login, isLoading, isError, error } = useLogin();
+  const [isDutyModalOpen, setIsDutyModalOpen] = useState(false);
+  const [isCheckingPresence, setIsCheckingPresence] = useState(false);
+  const isBusy = isLoading || isCheckingPresence;
+
+  const clearDutyPromptPending = (): void => {
+    sessionStorage.removeItem("vistra_duty_prompt_pending");
+  };
+
+  const skipToDashboard = (): void => {
+    clearDutyPromptPending();
+    setIsDutyModalOpen(false);
+    navigate(ROUTES.staff.dashboard.overview);
+  };
+
+  const confirmOnDuty = async (): Promise<void> => {
+    // Second sign-in with on_duty flips is_active; the fresh
+    // session replaces the one from the initial login.
+    try {
+      await login({ ...credentials, on_duty: true });
+      clearDutyPromptPending();
+      skipToDashboard();
+    } catch {}
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validate()) return;
 
+    // Keep the login page mounted after authentication so the duty
+    // prompt can render (GuestRoute would otherwise redirect away).
+    sessionStorage.setItem("vistra_duty_prompt_pending", "true");
+
+    // Authenticate first (presence lookup needs a session), then
+    // decide on the duty prompt: staff already flagged active skip
+    // it entirely — only the 5pm cronjob can flip the flag back.
     try {
-      await login(credentials);
-      navigate(ROUTES.staff.dashboard.overview);
-    } catch {}
+      await login({ ...credentials, on_duty: false });
+    } catch {
+      sessionStorage.removeItem("vistra_duty_prompt_pending");
+      return;
+    }
+
+    try {
+      const staffId = toStaffId(
+        credentials.identifier ?? credentials.email ?? ""
+      );
+      setIsCheckingPresence(true);
+      const { data } = await getStaffById(staffId);
+
+      if (data.data?.is_active) {
+        sessionStorage.removeItem("vistra_duty_prompt_pending");
+        navigate(ROUTES.staff.dashboard.overview);
+        return;
+      }
+    } catch {
+      // Unknown staff or lookup failure: fall through to the modal.
+    } finally {
+      setIsCheckingPresence(false);
+    }
+
+    setIsDutyModalOpen(true);
   };
 
   return (
@@ -332,12 +391,51 @@ export default function AdminLoginPage() {
       <LoginForm
         credentials={credentials}
         validationErrors={validationErrors}
-        isLoading={isLoading}
+        isLoading={isBusy}
         isError={isError}
         error={error}
         onChange={handleChange}
         onSubmit={handleSubmit}
       />
+
+      {isDutyModalOpen && (
+        <Modal
+          title="Are you on duty?"
+          onClose={() =>
+            !isLoading &&
+            (clearDutyPromptPending(),
+            setIsDutyModalOpen(false),
+            navigate(ROUTES.staff.dashboard.overview))
+          }
+          maxWidth="max-w-sm"
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={skipToDashboard}
+                disabled={isLoading}
+                className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Not on duty
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void confirmOnDuty()}
+                disabled={isLoading}
+                className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoading ? "Signing in..." : "Yes, on duty"}
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-textSecondary">
+            Your active status will be shown to the clinic while you are
+            signed in, and it will remain until 5pm.
+          </p>
+        </Modal>
+      )}
     </AdminLoginLayout>
   );
 }

@@ -23,7 +23,7 @@ export default function Card({
             className={`
                 rounded-xl
                 border border-gray-200
-                bg-surface
+                bg-primaryDark/90
                 shadow-card
                 overflow-hidden
                 ${className}

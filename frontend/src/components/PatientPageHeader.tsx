@@ -69,7 +69,7 @@ export default function PatientPageHeader({
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-primary/10 bg-background/75 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 border-b border-primary/10 bg-surface">
       <div className="flex items-center gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
         <div
           className={`min-w-0 flex-1 ${

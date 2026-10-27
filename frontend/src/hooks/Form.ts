@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function useForm<T extends Record<string, unknown>>(
+export function useForm<T extends object>(
     initialValues: T
 ) {
     const [form, setForm] = useState<T>(initialValues);
@@ -12,7 +12,7 @@ export function useForm<T extends Record<string, unknown>>(
         setForm((prev) => ({
             ...prev,
             [field]: value,
-        }));
+        } as T));
     };
 
     const reset = () => {

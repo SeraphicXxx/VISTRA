@@ -1,0 +1,36 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/overview/stats/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Get overview stats returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Stats row is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    pm.expect(json.data).to.have.property(\"appointments_today\");\r
+
+      \    pm.expect(json.data).to.have.property(\"active_staff\");\r
+
+      \    pm.expect(json.data).to.have.property(\"weekly_appointments\");\r
+
+      \    pm.expect(json.data).to.have.property(\"visit_mix\");\r
+
+      \    });"
+    language: text/javascript
+order: 500

@@ -1,6 +1,10 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.database.database_client import supabase
+from app.utils.service_helpers import ok
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def auth_refresh_token(request):
@@ -13,22 +17,22 @@ def auth_refresh_token(request):
 
         if not session:
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or expired refresh token"
             )
 
-        return {
-            "access_token": session.access_token,
-            "refresh_token": session.refresh_token
-        }
+        return ok(
+            access_token=session.access_token,
+            refresh_token=session.refresh_token,
+        )
 
     except HTTPException:
         raise
 
     except Exception as e:
-        print(f"Token refresh error: {e}")
+        logger.exception("Token refresh failed: %s", e)
 
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token"
         )

@@ -1,0 +1,43 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/20230847-S/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"barangay\": \"Commonwealth\",\r
+
+    \    \"mobile_number\": \"09171234567\",\r
+
+    \    \"complete_address\": \"123 Test Street\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Update patient returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Profile fields are updated\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    pm.expect(json.data.barangay).to.eql(\"Commonwealth\");\r
+
+      \    pm.expect(json.data.contact_no).to.eql(\"09171234567\");\r
+
+      \    });"
+    language: text/javascript
+order: 7900

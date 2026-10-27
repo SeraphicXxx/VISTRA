@@ -1,41 +1,40 @@
-from fastapi import HTTPException, status
-
+from app.repositories.base import insert_model
 from app.repositories.staff_repositories import StaffRepository
-from app.schemas.staff import StaffData, CreateStaffRequest
-from app.services.auth.user import create_auth_user, delete_auth_user, compensate_auth_user
+from app.schemas.staff import (
+    StaffData,
+    CreateStaffRequest,
+    StaffPermissionsInput,
+    UpdateStaffAccessRequest,
+)
+from app.schemas.user import STAFF_ROLE
+from app.services.auth.user import (
+    compensate_auth_user,
+    delete_auth_or_500,
+    get_supabase_admin,
+    provision_auth_or_raise,
+)
 from app.utils.email_utils import remove_ucc_domain
-from app.utils.service_helpers import handle_service_errors, handle_service_returns, or_404
+from app.utils.service_helpers import handle_service_errors, ok, or_404
+from fastapi import status, HTTPException
+from postgrest.exceptions import APIError
+from supabase import Client
 
 
-def create_staff(request: CreateStaffRequest, supabase):
+@handle_service_errors
+def create_staff(request: CreateStaffRequest, supabase: Client):
     staff_id = remove_ucc_domain(request.staff_id)
 
-    auth_response = create_auth_user(
-        user_id=staff_id,
-        password=request.password,
-        role="staff"
-    )
-
-    if not auth_response["success"]:
-        raise HTTPException(
-            status_code=auth_response.get(
-                "status_code",
-                status.HTTP_400_BAD_REQUEST,
-            ),
-            detail=auth_response["message"],
-        )
-
-    user = auth_response["user"]
+    user = provision_auth_or_raise(staff_id, request.password, STAFF_ROLE)
 
     staff_data = StaffData(
         id=user.id,
         staff_id=staff_id,
         **request.model_dump(
-            exclude={"staff_id", "password"}
+            exclude={"staff_id", "password", "permissions"}
         )
     )
 
-    db_response = insert_staff_into_db(staff_data, supabase)
+    db_response = insert_model(supabase, "STAFF", staff_data)
 
     if not db_response["success"]:
         compensate_auth_user(
@@ -45,53 +44,128 @@ def create_staff(request: CreateStaffRequest, supabase):
             "user from auth",
         )
 
-    return {
-        "success": True,
-        "message": "Staff inserted into database"
-    }
-
-@handle_service_returns
-def insert_staff_into_db(staff_data : StaffData, supabase) -> dict:
+    # Permissions row: always present going forward (default-deny),
+    # so reads never see a null they must interpret.
     staff_repo = StaffRepository(supabase)
-    response = staff_repo.create(staff_data)
+    created_perms = staff_repo.insert_permissions(
+        staff_id,
+        (request.permissions or StaffPermissionsInput()).model_dump(),
+    )
 
-    return {
-        "success": True,
-        "data": response.data
-    }
+    if created_perms is None:
+        staff_repo.delete(staff_id)
+        compensate_auth_user(
+            user.id,
+            "Failed to insert staff permissions",
+            "Failed to insert staff permissions and failed to delete "
+            "user from auth",
+        )
 
-@handle_service_errors
-def get_staff_by_id(staff_id: str, supabase):
-    staff_repo = StaffRepository(supabase)
-    response = staff_repo.get_by_id(staff_id)
-
-    return {
-        "success": True,
-        "data": or_404(response, f"Staff not found for {staff_id}"),
-    }
+    return ok(message="Staff inserted into database")
 
 
 @handle_service_errors
-def delete_staff(staff_id: str, supabase):
+def get_all_staff(supabase: Client):
+    staff_repo = StaffRepository(supabase)
+
+    return ok(staff_repo.get_all_with_permissions())
+
+
+@handle_service_errors
+def get_staff_by_id(staff_id: str, supabase: Client):
+    staff_repo = StaffRepository(supabase)
+    record = or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+
+    return ok({**record, "permissions": staff_repo.get_permissions(staff_id)})
+
+
+@handle_service_errors
+def delete_staff(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
     existing = staff_repo.get_by_id(staff_id)
     or_404(existing, "Staff not found")
 
-    deleted = staff_repo.delete(staff_id)
+    # Permissions row first: its FK is NO ACTION, so deleting STAFF
+    # while it exists would 409 on our own permissions record.
+    # Absent for legacy rows — None is fine.
+    staff_repo.delete_permissions(staff_id)
+
+    try:
+        deleted = staff_repo.delete(staff_id)
+    except APIError as e:
+        # Remaining NO ACTION children (e.g. appointments) block the
+        # delete to conserve history: conflict, not a 500.
+        if getattr(e, "code", None) == "23503":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Staff has linked records that block deletion",
+            )
+
+        raise
+
     or_404(deleted, "Staff not found")
 
-    delete_response = delete_auth_user(existing[0]["id"])
+    delete_auth_or_500("Staff", existing["id"])
 
-    if not delete_response["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Staff deleted from database but failed "
-                f"to delete user from auth: {delete_response['message']}"
-            )
+    return ok(message="Staff deleted successfully")
+
+
+@handle_service_errors
+def update_staff_access(
+    staff_id: str,
+    request: UpdateStaffAccessRequest,
+    supabase: Client,
+):
+    staff_repo = StaffRepository(supabase)
+    or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+
+    data: dict = {}
+    flags = request.to_permissions_update()
+
+    if request.role is None and not flags:
+        raise ValueError(
+            "No update fields provided. Allowed: role, dental_module, "
+            "medical_module, appointment_module, patient_module, "
+            "staff_module."
         )
 
-    return {
-        "success": True,
-        "message": "Staff deleted successfully"
-    }
+    if request.role is not None:
+        or_404(
+            staff_repo.update_role(staff_id, request.role),
+            "Staff not found",
+        )
+        data["role"] = request.role
+
+    if flags:
+        updated = staff_repo.update_permissions(staff_id, flags)
+
+        if updated is None:
+            # Legacy row predating permissions: heal by inserting.
+            updated = staff_repo.insert_permissions(staff_id, flags)
+
+        data["permissions"] = or_404(updated, "Staff permissions not found")
+
+    return ok(data)
+
+
+@handle_service_errors
+def clock_out_all_staff():
+    """Clear STAFF.is_active for everyone currently on duty.
+
+    Called by the Postgres 5pm cron (direct DB update) and by the
+    manual emergency endpoint (POST /api/v1/internal/emergency/
+    clock-out-all). Uses the service-role client on purpose:
+    presence is operational state. Returns how many rows flipped.
+    """
+    admin = get_supabase_admin()
+
+    response = (
+        admin.table("STAFF")
+        .update({"is_active": False})
+        .eq("is_active", True)
+        .execute()
+    )
+
+    clocked_out = len(response.data or [])
+
+    return ok(message=f"Clocked out {clocked_out} staff", count=clocked_out)

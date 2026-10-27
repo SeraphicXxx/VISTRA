@@ -1,0 +1,51 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/dental/20230847-S/{{dental_visit_id}}/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"notes\": \"Postman edit\",\r
+
+    \    \"status\": \"ComingSoon\",\r
+
+    \    \"tooth_records\": [{\r
+
+    \        \"tooth_number\": 16,\r
+
+    \        \"condition\": \"filled\",\r
+
+    \        \"notes\": \"Postman edit\"\r
+
+    \    }]\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Update dental visit returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Visit and tooth are updated\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    pm.expect(json.data.visit.notes).to.eql(\"Postman edit\");\r
+
+      \    pm.expect(json.data.tooth_records).to.have.lengthOf(1);\r
+
+      \    });"
+    language: text/javascript
+order: 9310

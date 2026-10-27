@@ -24,10 +24,6 @@ class Config:
     ML_SERVICE_API_KEY = os.getenv("ML_SERVICE_API_KEY")
 
     @classmethod
-    def supabase_source(cls) -> str:
-        return "selfhosted" if cls.USE_SELFHOSTED_SUPABASE else "cloud"
-
-    @classmethod
     def _pick(cls, cloud_value, selfhosted_value):
         if cls.USE_SELFHOSTED_SUPABASE:
             return selfhosted_value

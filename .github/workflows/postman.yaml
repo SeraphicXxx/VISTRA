@@ -3,6 +3,29 @@ name: Automated API tests using Postman CLI
 on: push
 
 jobs:
+  guard-service-role:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Guard service-role usage
+        run: |
+          violators=$(grep -rn --include='*.py' -E '\bsupabase_admin\b' backend/app \
+            | grep -v 'backend/app/database/database_client.py' \
+            | grep -v 'backend/app/services/auth/user.py' \
+            | grep -v 'get_supabase_admin' \
+            || true)
+
+          if [ -n "$violators" ]; then
+            echo "Direct supabase_admin use outside the allowlist:"
+            echo "$violators"
+            exit 1
+          fi
+
+          echo "Service-role usage confined to the allowlist."
+
   automated-api-tests:
     runs-on: ubuntu-latest
 

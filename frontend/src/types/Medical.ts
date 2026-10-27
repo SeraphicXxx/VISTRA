@@ -12,3 +12,12 @@ export const medicalStatuses = {
 } as const;
 
 export type MedicalStatus = keyof typeof medicalStatuses;
+
+// Mirrors backend app/enums/medical_terms.py::MedicalVisitTypes.
+// Keys are the stored values (MEDICAL_VISIT.type), values the display labels.
+export const medicalTypes = {
+    medicalConsultation: "Medical Consultation",
+    followUp: "Follow-up",
+} as const;
+
+export type MedicalType = keyof typeof medicalTypes;

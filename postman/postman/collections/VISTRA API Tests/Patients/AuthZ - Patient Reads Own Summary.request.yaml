@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/profiles/{{patient_id}}/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{patientA_access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Patient reads own summary: 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Own summary data is returned", function () {
+          pm.expect(pm.response.json().success).to.eql(true);
+      });
+    language: text/javascript
+order: 8070

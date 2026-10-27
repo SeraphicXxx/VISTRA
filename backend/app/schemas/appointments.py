@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class Appointments(BaseModel):
@@ -23,14 +23,28 @@ class CreateAppointmentRequest(BaseModel):
     location: str | None = None
     notes: str | None = None
 
+    @model_validator(mode="after")
+    def check_range(self):
+        if self.scheduled_end <= self.scheduled_start:
+            raise ValueError("scheduled_end must be after scheduled_start")
+
+        return self
+
+
+EDITABLE_APPOINTMENT_COLUMNS = frozenset({
+    "status",
+    "decline_reason",
+    "staff_id",
+})
+
+
 class UpdateAppointmentRequest(BaseModel):
     status: str | None = None
-    reason: str | None = None
-    location: str | None = None
+    decline_reason: str | None = None
 
-class AppointmentSummary(BaseModel):
-    id: int
-    title: str
-    date: datetime
-    details: str
-    provider: str
+    def to_appointment_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(exclude_unset=True).items()
+            if key in EDITABLE_APPOINTMENT_COLUMNS and value is not None
+        }

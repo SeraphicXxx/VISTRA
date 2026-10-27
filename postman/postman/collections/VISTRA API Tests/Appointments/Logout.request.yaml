@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/auth/logout/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Logout returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Logout reports success", function () {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.success).to.be.true;
+      });
+
+      // NOTE: logout revokes the session server-side (global sign-out).
+      // It lives here, last in the Appointments folder (the final
+      // folder in the run), so no later request ever runs on a
+      // revoked session. Do not move it earlier.
+    language: text/javascript
+order: 8800

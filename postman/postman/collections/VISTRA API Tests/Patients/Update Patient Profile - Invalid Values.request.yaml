@@ -1,0 +1,37 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/20230847-S/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"sex\": \"Unknown\",\r
+
+    \    \"mobile_number\": \"abc\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Invalid values return 422\", function () {\r
+
+      \    pm.response.to.have.status(422);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Validation detail is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json).to.have.property(\"detail\");\r
+
+      \    });"
+    language: text/javascript
+order: 7920

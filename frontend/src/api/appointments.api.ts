@@ -1,51 +1,53 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
-import {apiClient} from "/@/api/axios_client";
 import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {AppointmentSchema, CreateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
+import {AppointmentSchema, CreateAppointmentRequest, UpdateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
+import {getResource, listResource, sendResource} from "/@/api/resource";
 
-export async function getAllAppointments(
+export function getAllAppointments(
     filters?: AppointmentFilters,
     signal?: AbortSignal
 ){
-    return apiClient<ApiResponse<PaginatedData<AppointmentSchema>>>(
+    return listResource<ApiResponse<PaginatedData<AppointmentSchema>>>(
         API_ENDPOINTS.appointment.get_appointment,
-        {
-            method: "GET",
-            params: filters,
-            signal,
-        }
+        filters,
+        signal
     );
 }
 
-
-
-
-export async function createAppointment(
+export function createAppointment(
     request: CreateAppointmentRequest,
     signal?: AbortSignal
 ){
-    return apiClient<ApiResponse<AppointmentSchema>>(
+    return sendResource<ApiResponse<AppointmentSchema>>(
+        "POST",
         API_ENDPOINTS.appointment.create_appointment,
-        {
-            method: "POST",
-            data: request,
-            signal,
-        }
+        request,
+        signal
     );
 }
 
-
-export async function getAppointmentById(
+export function getAppointmentById(
     patientId: string,
     appointmentId: string,
     signal?: AbortSignal
 ){
-    return apiClient<ApiResponse<AppointmentSchema>>(
-        `${API_ENDPOINTS.appointment.get_appointment_by_id(patientId, appointmentId)}`,
-        {
-            method: "GET",
-            signal,
-        }
+    return getResource<ApiResponse<AppointmentSchema>>(
+        API_ENDPOINTS.appointment.get_appointment_by_id(patientId, appointmentId),
+        signal
+    );
+}
+
+export function updateAppointment(
+    patientId: string,
+    appointmentId: string,
+    payload: UpdateAppointmentRequest,
+    signal?: AbortSignal
+){
+    return sendResource<ApiResponse<AppointmentSchema>>(
+        "PATCH",
+        API_ENDPOINTS.appointment.update_appointment(patientId, appointmentId),
+        payload,
+        signal
     );
 }

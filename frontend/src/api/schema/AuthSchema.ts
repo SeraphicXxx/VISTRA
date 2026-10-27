@@ -6,17 +6,12 @@ export interface LoginRequest {
     patient_id?: string;
     staff_id?: string;
     password: string;
-}
-
-export interface PasswordAndId {
-    email: string;
-    password: string;
+    on_duty?: boolean;
 }
 
 export interface LoginStaffResponse {
+    success: boolean;
+    user: SessionUser;
     access_token: string;
     refresh_token: string;
-    token_type: string;
-    detail: string
-    user: SessionUser;
 }

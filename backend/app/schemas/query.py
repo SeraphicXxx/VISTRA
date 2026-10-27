@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PaginationParams(BaseModel):
-    page: int = 1
-    page_size: int = 10
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=10, ge=1, le=100)
 
 
 class FilterPatient(PaginationParams):
@@ -27,11 +27,13 @@ class VisitFilter(PaginationParams):
 
 class FilterAppointment(VisitFilter):
     patient_id: str | None = None
+    order_by: str | None = None
 
 
 class FilterDental(VisitFilter):
     pass
 
 
-class FilterMedical(VisitFilter):
-    pass
+# Intentionally identical to FilterDental today; split into a real
+# subclass if medical ever gains its own filter fields.
+FilterMedical = FilterDental

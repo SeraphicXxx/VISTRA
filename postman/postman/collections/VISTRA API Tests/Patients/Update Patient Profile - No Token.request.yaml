@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/20230847-S/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: ""
+body:
+  type: json
+  content: "{\r
+
+    \    \"barangay\": \"Commonwealth\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Unauthenticated request returns 401\", function () {\r
+
+      \    pm.response.to.have.status(401);\r
+
+      \    });"
+    language: text/javascript
+order: 7930

@@ -10,8 +10,17 @@ export function useStaffInfo(staffId: string) {
         error,
     } = useQuery<StaffModel, Error> ({
         queryKey: ["staff", staffId],
-        queryFn: ({signal}) =>getStaffById(staffId, signal),
+        queryFn: async ({signal}) => {
+            const {data: apiResponse} = await getStaffById(staffId, signal);
+
+            if (!apiResponse?.data) {
+                throw new Error(`Staff not found for ${staffId}`);
+            }
+
+            return new StaffModel(apiResponse.data);
+        },
         enabled: !!staffId,
+        refetchOnWindowFocus: false,
     });
     return {
         staffData: staffData ?? null,

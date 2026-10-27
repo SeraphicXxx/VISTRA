@@ -56,12 +56,29 @@ export interface PatientRecord {
     provider: string;
 }
 
+export interface UpdatePatientProfile {
+    birthday?: string;
+    age?: number;
+    sex?: string;
+    civil_status?: string;
+    mobile_number?: string;
+    barangay?: string;
+    complete_address?: string;
+}
+
 export interface PatientInfo {
     patient_id: string;
     patient_name: string;
     course?: string;
     department?: string;
     school_year?: string;
+    birthday?: string;
+    age?: number;
+    sex?: string;
+    civil_status?: string;
+    mobile_number?: string;
+    barangay?: string;
+    address?: string;
     appointment: PatientRecord[];
     medical: PatientRecord[];
     dental: PatientRecord[];

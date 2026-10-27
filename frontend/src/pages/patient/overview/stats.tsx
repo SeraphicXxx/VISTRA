@@ -3,11 +3,13 @@ import { CalendarClock, Stethoscope, ShieldCheck, ClipboardList } from "lucide-r
 import { LucideIcon } from "lucide-react";
 import { formatDate } from "/@/utils/FormatDate";
 import { Appointment } from "../appointments/appointmentsData";
+import { CountUp, Reveal } from "/@/components/adminanim";
 
 interface Stat {
   id: string;
   label: string;
   value: string;
+  numericValue?: number;
   delta: string;
   icon: LucideIcon;
   accent: {
@@ -22,7 +24,10 @@ interface PatientStatsGridProps {
   visitCount: number;
   medicalStatus?: string;
   dentalStatus?: string;
+  startDelay?: number;
 }
+
+const CARD_STAGGER = 0.15;
 
 const ACCENTS = {
   sky: { ring: "ring-sky-500/15", iconBg: "bg-sky-500/10", iconText: "text-sky-600" },
@@ -50,6 +55,7 @@ function buildStatCards({
       id: "visits",
       label: "Total Visits",
       value: String(visitCount),
+      numericValue: visitCount,
       delta: "Logged to your record",
       icon: Stethoscope,
       accent: ACCENTS.violet,
@@ -88,7 +94,11 @@ function StatCard({ stat }: { stat: Stat }) {
         </span>
       </div>
       <p className="mt-4 truncate font-heading text-2xl font-semibold text-textPrimary capitalize">
-        {stat.value}
+        {stat.numericValue !== undefined ? (
+          <CountUp to={stat.numericValue} duration={0.9} />
+        ) : (
+          stat.value
+        )}
       </p>
       <p className="mt-1 truncate text-xs text-textMuted">{stat.delta}</p>
     </div>
@@ -100,13 +110,21 @@ export default function PatientStatsGrid({
   visitCount,
   medicalStatus,
   dentalStatus,
+  startDelay = 0,
 }: PatientStatsGridProps) {
   const statCards = buildStatCards({ nextAppointment, visitCount, medicalStatus, dentalStatus });
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {statCards.map((stat) => (
-        <StatCard key={stat.id} stat={stat} />
+      {statCards.map((stat, index) => (
+        <Reveal
+          key={stat.id}
+          as="div"
+          delay={startDelay + index * CARD_STAGGER}
+          distance={18}
+        >
+          <StatCard stat={stat} />
+        </Reveal>
       ))}
     </div>
   );

@@ -1,3 +1,5 @@
+import { broadcast } from "/@/utils/syncBus";
+
 export interface SessionUser {
     id: string;
     user_id: string;
@@ -14,18 +16,24 @@ const SESSION_KEYS = {
 type SessionKey =
     (typeof SESSION_KEYS)[keyof typeof SESSION_KEYS];
 
+const AUTH_KEYS = new Set<string>(Object.values(SESSION_KEYS));
+
 export const sessionManager = {
+    // Cross-tab shared storage. sessionStorage is per-tab, so it cannot
+    // synchronize login/logout across tabs; localStorage is shared and
+    // emits `storage` events to other tabs.
     set(key: SessionKey, value: unknown): void {
-        sessionStorage.setItem(
+        localStorage.setItem(
             key,
             typeof value === "string"
                 ? value
                 : JSON.stringify(value)
         );
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
 
-        get<T = unknown>(key: SessionKey): T | string | null {
-        const value = sessionStorage.getItem(key);
+    get<T = unknown>(key: SessionKey): T | string | null {
+        const value = localStorage.getItem(key);
 
         if (value === null) {
             return null;
@@ -39,11 +47,16 @@ export const sessionManager = {
     },
 
     remove(key: SessionKey): void {
-        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
 
     clear(): void {
-        sessionStorage.clear();
+        // Only touch auth keys; never wipe unrelated app state.
+        for (const key of AUTH_KEYS) {
+            localStorage.removeItem(key);
+        }
+        broadcast({ type: "auth-changed", at: Date.now() });
     },
     setTokens(
         accessToken: string,
@@ -62,14 +75,14 @@ export const sessionManager = {
         this.set(SESSION_KEYS.USER, user);
     },
 
-        getAccessToken(): string | null {
-        return sessionStorage.getItem(
+    getAccessToken(): string | null {
+        return localStorage.getItem(
             SESSION_KEYS.ACCESS_TOKEN
         );
     },
 
     getRefreshToken(): string | null {
-        return sessionStorage.getItem(
+        return localStorage.getItem(
             SESSION_KEYS.REFRESH_TOKEN
         );
     },
@@ -112,6 +125,7 @@ export const sessionManager = {
 
     logout(): void {
         this.remove(SESSION_KEYS.ACCESS_TOKEN);
+        this.remove(SESSION_KEYS.REFRESH_TOKEN);
         this.remove(SESSION_KEYS.USER);
     },
 };

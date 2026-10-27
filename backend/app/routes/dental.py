@@ -1,31 +1,33 @@
 from fastapi import APIRouter, Depends
 from supabase import Client
 
-from app.config.security import get_current_user
+from app.config.security import get_current_user, require_staff
+from app.services.access import require_module
 from app.database.database_client import get_supabase_for_user
 from app.services.dental import (
-    create_dental_record,
     get_all_dental_visits,
     get_dental_record_by_id,
-    delete_dental_visit,
 )
-from app.schemas.dental import DentalVisitCreateRequest
+from app.services.dental import create_dental_record as create_dental_record_service
+from app.services.dental import delete_dental_visit as delete_dental_visit_service
+from app.services.dental import update_dental_visit as update_dental_visit_service
+from app.schemas.dental import DentalVisitCreateRequest, DentalVisitUpdateRequest
 from app.schemas.query import FilterDental
 
 protected_dental_router = APIRouter(
     prefix="/dental",
-    tags=["dental"],
-    dependencies=[Depends(get_current_user)]
+    tags=["Dental"],
+    dependencies=[Depends(require_staff), Depends(require_module("dental"))]
 )
 
 
 @protected_dental_router.post("/")
-def create(
+def create_dental_record(
         request: DentalVisitCreateRequest,
         supabase: Client = Depends(get_supabase_for_user),
         current_user=Depends(get_current_user)
 ):
-    return create_dental_record(request, supabase, current_user)
+    return create_dental_record_service(request, supabase, current_user)
 
 
 @protected_dental_router.get("/")
@@ -46,8 +48,20 @@ def get_dental_record(
 
 
 @protected_dental_router.delete("/{dental_visit_id}/")
-def delete(
+def delete_dental_visit(
         dental_visit_id: int,
         supabase: Client = Depends(get_supabase_for_user)
 ):
-    return delete_dental_visit(dental_visit_id, supabase)
+    return delete_dental_visit_service(dental_visit_id, supabase)
+
+
+@protected_dental_router.patch("/{patient_id}/{dental_visit_id}/")
+def update_dental_visit(
+        patient_id: str,
+        dental_visit_id: int,
+        request: DentalVisitUpdateRequest,
+        supabase: Client = Depends(get_supabase_for_user)
+):
+    return update_dental_visit_service(
+        patient_id, dental_visit_id, request, supabase,
+    )

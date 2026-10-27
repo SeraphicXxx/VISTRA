@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/auth/refresh/"
+url: "{{base_url}}/{{api_version}}/auth/refresh/"
 method: POST
 body:
   type: json

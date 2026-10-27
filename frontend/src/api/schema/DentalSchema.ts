@@ -2,7 +2,6 @@ import {DentalStatus, Dentition, ToothCondition} from "/@/types/Dental"
 
 export interface ToothSchema {
     id: number;
-    appointment_id: number;
     patient_id: string;
     tooth_number: number;
     dentition: Dentition | null;
@@ -12,7 +11,7 @@ export interface ToothSchema {
 
 export type CreateToothRequest = Omit<
     ToothSchema,
-    "id" | "appointment_id" | "patient_id"
+    "id" | "patient_id"
 >;
 
 export interface CreateDentalVisit {
@@ -21,7 +20,7 @@ export interface CreateDentalVisit {
     brushing_frequency: string;
     floss: boolean
     calculus_severity: string;
-    current_medication: string
+    current_medications: string
     notes: string
     status: string;
 
@@ -61,6 +60,26 @@ export interface DentalRecordDetailSchema {
     notes: string | null;
     medical_history: string[];
     tooth_records: ToothSchema[];
+}
+
+export interface UpdateToothRecord {
+    id?: number;
+    tooth_number?: number;
+    is_permanent?: boolean;
+    condition?: string;
+    notes?: string | null;
+}
+
+export interface UpdateDentalVisit {
+    visit_date?: string;
+    last_dental_visit?: string;
+    floss?: boolean;
+    brushing_frequency?: string;
+    calculus_severity?: string;
+    current_medications?: string;
+    status?: string;
+    notes?: string;
+    tooth_records?: UpdateToothRecord[];
 }
 
 

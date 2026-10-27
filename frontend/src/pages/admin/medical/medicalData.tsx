@@ -1,8 +1,7 @@
 import {Status, StatusBadge} from "/@/components/StatusBadge";
-import {Column, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
-import {avatarColor, getInitials, getTypeIcon} from "/@/components/avatar";
+import {Column, StudentCell, courseFilterOptions, optionsFromMap, optionsFromValues} from "/@/components/table/Table";
 import React from "react";
-import {medicalStatuses} from "/@/types/Medical";
+import {medicalStatuses, medicalTypes} from "/@/types/Medical";
 
 export const medRecords: medData[] = [
   {
@@ -10,7 +9,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Kenji Chua",
     course: "BS Computer Science",
-    time: "9:00 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "cleared",
   },
@@ -19,7 +18,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Ivan Mejorada",
     course: "BS Psychology",
-    time: "9:30 AM",
+    time: "2026-10-20",
     type: "Follow-up",
     status: "secondOpinion",
   },
@@ -28,7 +27,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Cjay Gonzales",
     course: "BS Industrial Engineering",
-    time: "10:00 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "recovered",
   },
@@ -37,7 +36,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Joshua Lapitan",
     course: "BS Electronics Engineering",
-    time: "10:15 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "referred",
   },
@@ -46,7 +45,7 @@ export const medRecords: medData[] = [
     patient_id: "",
     student: "Rosh Ingel",
     course: "BS Accountancy",
-    time: "10:45 AM",
+    time: "2026-10-20",
     type: "Medical Consultation",
     status: "ongoingTreatment",
   },
@@ -152,59 +151,28 @@ export const MedicalColumns: Column<medData>[] = [
   {
     key: "student",
     label: "Student",
-    render: (value) => {
-      const student = value as string;
-
-      return (
-
-        <div className="flex items-center gap-2.5">
-
-          <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(student)}`}
-          >
-            {getInitials(student)}
-          </span>
-
-          <span className="text-sm font-medium text-textPrimary">
-            {student}
-          </span>
-
-        </div>
-
-      );
-    },
+    render: (value) => <StudentCell name={value as string} />,
   },
   {
     key: "course",
     label: "Course",
     filterType: "select",
-    options: optionsFromValues([
-      "BS Computer Science",
-      "BS Business Administration",
-      "BS Psychology",
-      "BS Nursing",
-      "BS Information Technology",
-      "BS Education",
-      "BS Accountancy",
-
-    ]),
+    options: courseFilterOptions,
   },
 
   {
     key: "type",
     label: "Type",
     filterType: "select",
-    options: type,
+    options: optionsFromMap(medicalTypes),
   },
 
   {
     key: "time",
-    label: "Time",
+    label: "Date",
     filterType: "date",
     filterKey: "date",
   },
-
-
 
   {
     key: "status",
@@ -214,6 +182,5 @@ export const MedicalColumns: Column<medData>[] = [
     render: (value) => (
         <StatusBadge status={value as Status}/>
     ),
-
   },
 ]

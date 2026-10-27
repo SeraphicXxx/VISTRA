@@ -1,4 +1,4 @@
-import {Status} from "/@/components/StatusBadge";
+import {AppointmentStatus} from "/@/types/Appointment";
 
 export interface AppointmentSchema {
     id: string;
@@ -7,7 +7,7 @@ export interface AppointmentSchema {
     scheduled_start: string;
     scheduled_end: string;
 
-    status: Status;
+    status: AppointmentStatus;
     reason: string;
     notes: string | null;
     decline_reason: string | null;
@@ -30,4 +30,9 @@ export interface CreateAppointmentRequest {
     reason?: string | null;
     location?: string | null;
     notes?: string | null;
+}
+
+export interface UpdateAppointmentRequest {
+    status?: string;
+    decline_reason?: string | null;
 }

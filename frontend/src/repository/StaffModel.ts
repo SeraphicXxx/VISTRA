@@ -1,15 +1,6 @@
-export interface StaffData {
-    id: string;
-    staff_id: string;
-    first_name: string;
-    middle_name: string | null;
-    last_name: string;
-    position: string;
-    specialty: string | null;
-    phone: string | null;
-    email: string;
-    created_at: string;
-}
+import type {StaffData, StaffPermissions} from "/@/api/schema/StaffSchema";
+
+export type {StaffPermissions};
 
 export class StaffModel {
     id: string;
@@ -22,6 +13,9 @@ export class StaffModel {
     phone: string | null;
     email: string;
     created_at: string;
+    is_active: boolean;
+    role: string | null;
+    permissions: StaffPermissions | null;
 
     constructor(data: StaffData) {
         this.id = data.id;
@@ -34,6 +28,9 @@ export class StaffModel {
         this.phone = data.phone;
         this.email = data.email;
         this.created_at = data.created_at;
+        this.is_active = data.is_active;
+        this.role = data.role ?? null;
+        this.permissions = data.permissions ?? null;
     }
 
     getDisplayName(): string {

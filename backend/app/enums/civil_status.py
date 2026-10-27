@@ -6,3 +6,4 @@ class CivilStatus(str, Enum):
     MARRIED = "Married"
     WIDOWED = "Widowed"
     SEPARATED = "Separated"
+    DIVORCED = "Divorced"

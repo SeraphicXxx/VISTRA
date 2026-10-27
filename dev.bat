@@ -2,8 +2,7 @@
 title Development Servers
 
 echo Starting Backend...
-start "Backend" cmd /k "cd /d "%~dp0backend" && call .venv\Scripts\activate && uvicorn app.main:app --reload --port 8000"
-
+start "Backend" cmd /k "cd /d "%~dp0backend" && call .venv\Scripts\activate && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 echo Starting Frontend...
 start "Frontend" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 

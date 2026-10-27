@@ -1,0 +1,50 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{patientA_access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"patient_id\": \"AUTHZ-PROBE-1\",\r
+
+    \    \"password\": \"TestPass123!\",\r
+
+    \    \"created_by\": \"{{user_id}}\",\r
+
+    \    \"name\": \"Probe, AuthZ\",\r
+
+    \    \"address\": \"1 Probe Street\",\r
+
+    \    \"age\": 20,\r
+
+    \    \"barangay\": \"Commonwealth\",\r
+
+    \    \"birthday\": \"2006-07-07\",\r
+
+    \    \"mobile_number\": \"09170000001\",\r
+
+    \    \"sex\": \"Male\",\r
+
+    \    \"civil_status\": \"Single\",\r
+
+    \    \"classification\": \"student\",\r
+
+    \    \"course\": \"BS Computer Science\",\r
+
+    \    \"school_year\": \"3rd Year\",\r
+
+    \    \"section\": \"B\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Patient blocked from patient create: 403", function () {
+          pm.response.to.have.status(403);
+      });
+    language: text/javascript
+order: 8130

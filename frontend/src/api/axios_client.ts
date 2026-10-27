@@ -123,13 +123,13 @@ axiosClient.interceptors.response.use(
     }
 );
 
-export const apiClient = async <T = unknown>(
+export async function apiClient<T = unknown>(
     endpoint: string,
     options: AxiosRequestConfig = {}
 ): Promise<{
     response: Awaited<ReturnType<typeof axiosClient>>;
     data: T;
-}> => {
+}> {
 
     const response = await axiosClient({
         url: endpoint,
@@ -140,4 +140,4 @@ export const apiClient = async <T = unknown>(
         response,
         data: response.data as T,
     };
-};
+}

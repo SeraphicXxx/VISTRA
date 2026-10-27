@@ -12,6 +12,7 @@ export const ROUTES = {
             dental: "/staff/dashboard/dental",
             appointments: "/staff/dashboard/appointments",
             patients: "/staff/dashboard/patients",
+            accessControl: "/staff/dashboard/Access-Control-Management",
         },
         medical: {
             createNewRecord: "/staff/medical/new",
@@ -44,6 +45,9 @@ export const ROUTES = {
             createNewRecord: "/staff/patients/new",
             patientRecordTab: "/staff/patients/record",
         },
+        accessControl: {
+            manageStaff: "/staff/Access-Control-Management/new-staff",
+        },
     },
 
     patient: {
@@ -56,7 +60,25 @@ export const ROUTES = {
         },
         appointment: {
             bookAppointment: "/patient/appointments/book",
-            viewAppointment: "/patient/appointments/view",
+            view: {
+                route: "/patient/appointments/view/:appointmentId",
+                build: (appointmentId: string) =>
+                    `/patient/appointments/view/${appointmentId}`,
+            },
+        },
+        medical: {
+            view: {
+                route: "/patient/dashboard/medical/view/:medicalId",
+                build: (medicalId: string) =>
+                    `/patient/dashboard/medical/view/${medicalId}`,
+            },
+        },
+        dental: {
+            view: {
+                route: "/patient/dashboard/dental/view/:dentalId",
+                build: (dentalId: string) =>
+                    `/patient/dashboard/dental/view/${dentalId}`,
+            },
         },
         profile: "/patient/profile",
     },

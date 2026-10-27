@@ -1,47 +1,53 @@
 import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
-import {apiClient} from "/@/api/axios_client";
 import {API_ENDPOINTS} from "/@/config/ApiConfig";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
-import {CreateMedicalVisit, CreateMedicalVisitResponse, MedicalRecordDetailSchema, MedicalVisitSchema} from "/@/api/schema/MedicalSchema";
+import {CreateMedicalVisit, CreateMedicalVisitResponse, MedicalRecordDetailSchema, MedicalVisitSchema, UpdateMedicalVisit} from "/@/api/schema/MedicalSchema";
+import {getResource, listResource, sendResource} from "/@/api/resource";
 
-export async function createMedicalVisit(
+export function createMedicalVisit(
     record: CreateMedicalVisit,
     signal?: AbortSignal
 ) {
-    return apiClient<CreateMedicalVisitResponse>(
+    return sendResource<CreateMedicalVisitResponse>(
+        "POST",
         API_ENDPOINTS.medical.create_medical_visit,
-        {
-            method: "POST",
-            data: record,
-            signal
-        }
+        record,
+        signal
     );
 }
 
-export async function getMedicalVisit(
+export function getMedicalVisit(
     filter?: MedicalVisitFilters,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiResponse<PaginatedData<MedicalVisitSchema>>>(
+    return listResource<ApiResponse<PaginatedData<MedicalVisitSchema>>>(
         API_ENDPOINTS.medical.get_medical_visit,
-        {
-            method: "GET",
-            params: filter,
-            signal
-        }
+        filter,
+        signal
     );
 }
 
-export async function getMedicalRecordById(
+export function getMedicalRecordById(
     patientId: string,
     medicalId: string,
     signal?: AbortSignal
 ) {
-    return apiClient<ApiResponse<MedicalRecordDetailSchema>>(
+    return getResource<ApiResponse<MedicalRecordDetailSchema>>(
         API_ENDPOINTS.medical.get_medical_record(patientId, medicalId),
-        {
-            method: "GET",
-            signal
-        }
+        signal
+    );
+}
+
+export function updateMedicalVisit(
+    patientId: string,
+    medicalId: string,
+    payload: UpdateMedicalVisit,
+    signal?: AbortSignal
+) {
+    return sendResource<ApiResponse<unknown>>(
+        "PATCH",
+        API_ENDPOINTS.medical.update_medical_visit(patientId, medicalId),
+        payload,
+        signal
     );
 }

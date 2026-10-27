@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "VISTRA",
+    "slug": "mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "vistra",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.vistra_mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundImage": "./assets/images/icon.png",
+        "monochromeImage": "./assets/images/icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.vistra_mobile"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/images/logonotext.png",
+          "imageWidth": 160,
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8b6b8d7a-fd04-4e23-957b-08a07d8a0ada"
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import {useState} from "react";
 import {ArrowLeft, Save, Stethoscope, Info} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
 import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
@@ -7,9 +8,14 @@ import {StudentInfoSection} from "/@/components/StudentInfoSection.jsx";
 import {ToothNoteModal} from "/@/components/dental/ToothForm";
 import {useDentalRecordForm} from "/@/hooks/DentalForms";
 import {getFieldErrors} from "/@/utils/Formatters";
+import {useNavigate} from "react-router-dom";
+import {ROUTES} from "/@/config/RoutePaths";
 import {useCreateDentalVisit} from "/@/hooks/query/DentalQuery";
 import {CreateDentalVisit} from "/@/api/schema/DentalSchema";
 import {statusEditFields} from "/@/components/editModal.jsx";
+import {useNotify} from "/@/components/notifications/NotificationProvider";
+import {NotifyProfessionalModal} from "/@/components/NotifyProfessorModal";
+import {NOTIFY_PROFESSIONALS, type MedicalNotification} from "/@/pages/admin/medical/notifyProfessor";
 
 const statusOptions = statusEditFields.find((f) => f.key === "status")?.options ?? [];
 
@@ -17,12 +23,15 @@ const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilep
 
 const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis / Periodontal Disease", "Debris", "Calculus", "Cleft Lip / Palate", "Others (Supernumerary/Mesiodens)", "No. of Permanent Teeth Present", "No. of Permanent Sound Present", "No. of Decayed Teeth (D)", "No. of Missing Teeth (M)", "No. of Filled Teeth (F)", "No. of Teeth for Extraction (X)", "No. of DMFX Teeth", "No. of Temporary Teeth Present"];
 
-const  dentalStudentFields = [
+const dentalStudentFields = [
     {id: "age", label: "Age"},
     {id: "sex", label: "Gender"},
     {id: "year_section", label: "Year and section / course / department", span: "sm:col-span-3"},
 ];
 
+interface DentalRecordFormProps {
+    onSave?: (record: CreateDentalVisit, notification: MedicalNotification | null) => void;
+}
 
 function DentalConditionSection() {
     return (
@@ -42,8 +51,8 @@ function DentalConditionSection() {
                 </div>
 
                 <FormInput
-                    id="current_medication"
-                    name="current_medication"
+                    id="current_medications"
+                    name="current_medications"
                     label="Medication"
                     placeholder="List current medications"
                 />
@@ -400,7 +409,8 @@ function DentalHabitsSection() {
     );
 }
 
-export default function DentalRecordForm() {
+export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
+    const navigate = useNavigate();
     const {
         selectedStudent,
         setSelectedStudent,
@@ -414,17 +424,38 @@ export default function DentalRecordForm() {
         clearTooth,
     } = useDentalRecordForm();
 
+    const [pendingRecord, setPendingRecord] = useState<CreateDentalVisit | null>(null);
+    const [notifyMessage, setNotifyMessage] = useState("");
+    const notify = useNotify();
+
     const handleBack = () => {
         window.history.back();
     };
 
     const createDentalVisitMutation = useCreateDentalVisit();
 
+    const persistRecord = (
+        record: CreateDentalVisit,
+        notification: MedicalNotification | null
+    ) => {
+        onSave?.(record, notification);
+
+        createDentalVisitMutation.mutate(record, {
+            onError: (error) => {
+                console.error("Failed to create dental visit:", getFieldErrors(error));
+            },
+        });
+
+        setPendingRecord(null);
+    };
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (selectedStudent === null) {
-            alert("Please select a student.");
+            notify.warning("Please select a student before saving the record.", {
+                title: "No student selected",
+            });
             return;
         }
 
@@ -437,21 +468,38 @@ export default function DentalRecordForm() {
             brushing_frequency: String(formData.brushing_frequency ?? ""),
             floss: formData.floss === "true",
             calculus_severity: String(formData.calculus_severity ?? ""),
-            current_medication: String(formData.current_medication ?? ""),
+            current_medications: String(formData.current_medications ?? ""),
             status: String(formData.status ?? ""),
             notes: String(formData.notes ?? ""),
             patient_id: selectedStudent.patient_id,
             tooth_records: Object.values(toothRecords),
         };
-        console.log(record);
-        createDentalVisitMutation.mutate(record, {
-            onSuccess: (data) => {
-                console.log("Dental visit created:", data);
-            },
-            onError: (error) => {
-                console.error("Failed to create dental visit:", getFieldErrors(error));
-            },
+
+        const visitDate = String(formData.date ?? "") || new Date().toISOString().slice(0, 10);
+
+        setNotifyMessage(
+            `A dental record was saved for ${selectedStudent.patient_id} on ${visitDate}. Please review it at your earliest convenience.`
+        );
+        setPendingRecord(record);
+    };
+
+    const handleSendNotification = (
+        professional: MedicalNotification["professional"],
+        message: string
+    ) => {
+        if (!pendingRecord) return;
+
+        persistRecord(pendingRecord, {
+            professional,
+            subject: `Dental record saved: ${pendingRecord.patient_id}`,
+            message,
         });
+    };
+
+    const handleSkipNotify = () => {
+        if (!pendingRecord) return;
+
+        persistRecord(pendingRecord, null);
     };
 
     return (
@@ -498,6 +546,16 @@ export default function DentalRecordForm() {
                     onSubmit={saveTooth}
                     onClear={clearTooth}
                     onClose={closeTooth}
+                />
+            )}
+
+            {pendingRecord && (
+                <NotifyProfessionalModal
+                    professionals={NOTIFY_PROFESSIONALS}
+                    defaultMessage={notifyMessage}
+                    onSend={handleSendNotification}
+                    onSkip={handleSkipNotify}
+                    onCancel={() => setPendingRecord(null)}
                 />
             )}
         </form>

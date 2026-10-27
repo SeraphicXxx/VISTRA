@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/dental/{{dental_visit_id}}/"
+url: "{{base_url}}/{{api_version}}/dental/{{dental_visit_id}}/"
 method: DELETE
 auth:
   type: bearer

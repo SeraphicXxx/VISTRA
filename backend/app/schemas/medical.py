@@ -2,35 +2,35 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.enums.medical_terms import MedicalVisitTypes, MedicalVisitStatus
+from app.enums.medical_terms import MedicalVisitType, MedicalVisitStatus, MedicalTreatmentType
 
 
-class MedicalVisitLog(BaseModel):
-    complaint: str
-    treatment: str
+EDITABLE_MEDICAL_VISIT_COLUMNS = frozenset({
+    "visit_date",
+    "status",
+    "complaint",
+    "treatment",
+})
+
 
 class MedicalVisitCreateRequest(BaseModel):
     patient_id: str
-    staff_id: str
     status: MedicalVisitStatus
-    type: MedicalVisitTypes
+    type: MedicalVisitType
+    treatment_type: MedicalTreatmentType
     visit_date: datetime
-    visit_log: list[MedicalVisitLog]
+    complaint: str
+    treatment: str
 
-    def to_db_dict(self) -> dict:
-        first_log = self.visit_log[0] if self.visit_log else None
-        visit_date_iso = self.visit_date.isoformat()
-
+    def to_db_dict(self, staff_id: str) -> dict:
         return {
             "patient_id": self.patient_id,
-            "staff_id": self.staff_id,
+            "staff_id": staff_id,
             "type": self.type.value,
-            "visit_date": visit_date_iso,
-            "visit_log": {
-                "date": visit_date_iso,
-                "complaint": first_log.complaint if first_log else "",
-                "treatment": first_log.treatment if first_log else "",
-            },
+            "visit_date": self.visit_date.isoformat(),
+            "treatment_type": self.treatment_type.value,
+            "complaint": self.complaint,
+            "treatment": self.treatment,
             "status": self.status.value,
         }
 
@@ -42,4 +42,20 @@ class MedicalVisitTab(BaseModel):
     visit_date: datetime
     staff_id: str
     status: MedicalVisitStatus
-    type: MedicalVisitTypes
+    type: MedicalVisitType
+
+
+class MedicalVisitUpdateRequest(BaseModel):
+    visit_date: datetime | None = None
+    status: MedicalVisitStatus | None = None
+    complaint: str | None = None
+    treatment: str | None = None
+
+    def to_visit_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(
+                mode="json", exclude_unset=True
+            ).items()
+            if key in EDITABLE_MEDICAL_VISIT_COLUMNS and value is not None
+        }

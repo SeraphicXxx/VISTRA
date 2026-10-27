@@ -1,49 +1,31 @@
-import {CreateDentalVisit, DentalRecordDetailSchema} from "/@/api/schema/DentalSchema";
-import {createDentalVisit, getDentalRecordById, getDentalVisit} from "/@/api/dental.api";
+import {CreateDentalVisit, DentalRecordDetailSchema, DentalVisitSchema, UpdateDentalVisit} from "/@/api/schema/DentalSchema";
+import {createDentalVisit, getDentalRecordById, getDentalVisit, updateDentalVisit} from "/@/api/dental.api";
 
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {AppointmentFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {ApiMessageResponse} from "/@/api/schema/ApiResponseSchema";
+import {createDetailQueryHook, createListQueryHook, createMutationHook, createUpdateMutationHook} from "/@/hooks/query/visitQuery";
 
-export function useCreateDentalVisit() {
-    return useMutation({
-        mutationFn: async (record: CreateDentalVisit) => {
-            const { data } = await createDentalVisit(record);
-            return data;
-        },
-    });
+export const useCreateDentalVisit = createMutationHook<CreateDentalVisit, ApiMessageResponse>(createDentalVisit);
+
+export const useDentalQuery = createListQueryHook<DentalVisitFilters, PaginatedData<DentalVisitSchema>>(
+    "dental",
+    getDentalVisit,
+    "Dental data is missing",
+);
+
+export const useDentalVisitDetail = createDetailQueryHook<DentalRecordDetailSchema>(
+    "dental",
+    getDentalRecordById,
+    "Dental record is missing",
+);
+
+interface UpdateDentalVisitArgs {
+    patientId: string;
+    dentalId: string;
+    payload: UpdateDentalVisit;
 }
 
-export function useDentalQuery(filters?: DentalVisitFilters ) {
-    return useQuery({
-        queryKey: ["dental", filters],
-        queryFn: async ({signal}) => {
-            const {data} = await getDentalVisit(
-                filters,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Dental data is missing");
-            }
-
-            return data.data;
-        }
-    })
-}
-
-export function useDentalVisitDetail(patientId?: string, dentalId?: string) {
-    return useQuery({
-        queryKey: ["dental", patientId, dentalId],
-        queryFn: async ({signal}): Promise<DentalRecordDetailSchema | null> => {
-            const {data} = await getDentalRecordById(
-                patientId as string,
-                dentalId as string,
-                signal
-            );
-
-            return data.data ?? null;
-        },
-        enabled: Boolean(patientId && dentalId),
-        refetchOnWindowFocus: false,
-    });
-}
+export const useUpdateDentalVisit = createUpdateMutationHook<UpdateDentalVisitArgs, unknown>(
+    (args) => updateDentalVisit(args.patientId, args.dentalId, args.payload)
+);

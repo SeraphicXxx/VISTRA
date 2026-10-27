@@ -4,7 +4,7 @@ import { AppointmentSchema } from "/@/api/schema/AppointmentSchema";
 import { DentalVisitSchema } from "/@/api/schema/DentalSchema";
 import { MedicalVisitSchema } from "/@/api/schema/MedicalSchema";
 import { AppointmentTableFormat } from "/@/pages/admin/appointments/appointmentsData";
-import { AppointmentModel } from "/@/repository/AppointmentModel";
+import { toAppointmentTableRow } from "/@/repository/AppointmentModel";
 
 export interface OverviewConsultationEntry {
     id: string;
@@ -48,5 +48,5 @@ export function mapDentalToOverview(record: DentalVisitSchema): OverviewConsulta
 }
 
 export function mapAppointmentToTable(record: AppointmentSchema): AppointmentTableFormat {
-    return new AppointmentModel(record).UiTableFormat();
+    return toAppointmentTableRow(record);
 }

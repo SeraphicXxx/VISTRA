@@ -1,17 +1,27 @@
-import { apiClient } from "/@/api/axios_client";
 import { API_ENDPOINTS } from "/@/config/ApiConfig";
 import { LoginRequest, LoginStaffResponse } from "/@/api/schema/AuthSchema";
+import { ApiMessageResponse } from "/@/api/schema/ApiResponseSchema";
+import {sendResource} from "/@/api/resource";
 
-export const login = async (
-    request: LoginRequest
-): Promise<LoginStaffResponse> => {
-    const result = await apiClient<LoginStaffResponse>(
+export async function login(
+    request: LoginRequest,
+    signal?: AbortSignal
+) {
+    return sendResource<LoginStaffResponse>(
+        "POST",
         API_ENDPOINTS.auth.login,
-        {
-            method: "POST",
-            data: request,
-        }
+        request,
+        signal,
     );
+}
 
-    return result.data;
-};
+export async function logout(
+    signal?: AbortSignal
+) {
+    return sendResource<ApiMessageResponse>(
+        "POST",
+        API_ENDPOINTS.auth.logout,
+        undefined,
+        signal,
+    );
+}

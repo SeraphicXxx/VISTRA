@@ -1,8 +1,9 @@
-from app.schemas.response_dto.reponses import PaginatedResponse
+from app.repositories.base import BaseRepository
+from app.schemas.appointments import EDITABLE_APPOINTMENT_COLUMNS
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
-class AppointmentRepository:
+class AppointmentRepository(BaseRepository):
     def __init__(self, supabase):
         self.supabase = supabase
 
@@ -20,11 +21,18 @@ class AppointmentRepository:
         return None
 
     def get_appointments(self, filters):
-        query = (
-            SupabaseQueryBuilder(
-                self.supabase,
-                "APPOINTMENT",
-                columns="""
+        use_course_filter = bool(getattr(filters, "course", None))
+        columns = """
+                    *,
+                    PATIENT!inner(
+                        PATIENT_PROFILE!inner(
+                            first_name,
+                            middle_name,
+                            last_name,
+                            course
+                        )
+                    )
+                """ if use_course_filter else """
                     *,
                     PATIENT(
                         PATIENT_PROFILE(
@@ -34,48 +42,40 @@ class AppointmentRepository:
                             course
                         )
                     )
-                """,
+                """
+        query = (
+            SupabaseQueryBuilder(
+                self.supabase,
+                "APPOINTMENT",
+                columns=columns,
                 count="exact"
             )
-            .order("scheduled_start")
             .eq("patient_id", filters.patient_id)
             .eq("status", filters.status)
             .eq("type", filters.type)
-            .eq("course", filters.course)
+            .order("scheduled_start", filters.order_by)
         )
+
+        if use_course_filter:
+            query = query.eq(
+                "PATIENT.PATIENT_PROFILE.course", filters.course
+            )
 
         if filters.date:
             query = query.date_day("scheduled_start", filters.date)
 
-        response = (
-            query
-            .paginate(
-                filters.page,
-                filters.page_size,
-            )
-            .build()
-            .execute()
-        )
-
-        total = response.count or 0
-
-        items = [
+        result = self.fetch_page(query, filters.page, filters.page_size)
+        result.items = [
             self._map_appointment(appointment)
-            for appointment in response.data
+            for appointment in result.items
         ]
 
-        return PaginatedResponse(
-            items=items,
-            total=total,
-            page=filters.page,
-            page_size=filters.page_size,
-        )
+        return result
 
     def get_appointment_by_id(self, appointment_id: int, patient_id: str):
-        response = (
-            self.supabase
-            .table("APPOINTMENT")
-            .select("""
+        row = self.fetch_one(
+            "APPOINTMENT",
+            select="""
                 *,
                 PATIENT(
                     PATIENT_PROFILE(
@@ -85,23 +85,35 @@ class AppointmentRepository:
                         course
                     )
                 )
-            """)
-            .eq("id", appointment_id)
-            .eq("patient_id", patient_id)
-            .limit(1)
-            .execute()
+            """,
+            filters={
+                "id": appointment_id,
+                "patient_id": patient_id,
+            },
         )
 
-        if not response.data:
+        if row is None:
             return None
 
-        return self._map_appointment(response.data[0])
+        return self._map_appointment(row)
 
     def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
+        updatable = {
+            key: value
+            for key, value in (updated_appointment_data or {}).items()
+            if key in EDITABLE_APPOINTMENT_COLUMNS
+        }
+
+        if not updatable:
+            raise ValueError(
+                "No updatable fields provided. Allowed: "
+                + ", ".join(sorted(EDITABLE_APPOINTMENT_COLUMNS))
+            )
+
         response = (
             self.supabase
             .table("APPOINTMENT")
-            .update(updated_appointment_data)
+            .update(updatable)
             .eq("id", appointment_id)
             .execute()
         )
@@ -112,18 +124,29 @@ class AppointmentRepository:
         return None
 
     def delete_appointment(self, appointment_id: int):
-        response = (
-            self.supabase.table("APPOINTMENT")
-            .delete()
-            .eq("id", appointment_id)
-            .execute()
-        )
-        return bool(response.data)
+        return self.delete_by_column("APPOINTMENT", "id", appointment_id)
 
     @staticmethod
     def _map_appointment(appointment):
-        patient = appointment.pop("PATIENT", {})
-        profile = patient.get("PATIENT_PROFILE", {})
+        if not isinstance(appointment, dict):
+            return appointment
+
+        appointment = dict(appointment)
+        patient = appointment.pop("PATIENT", {}) or {}
+
+        if isinstance(patient, list):
+            patient = patient[0] if patient else {}
+
+        if not isinstance(patient, dict):
+            patient = {}
+
+        profile = patient.get("PATIENT_PROFILE", {}) or {}
+
+        if isinstance(profile, list):
+            profile = profile[0] if profile else {}
+
+        if not isinstance(profile, dict):
+            profile = {}
 
         return {
             **appointment,

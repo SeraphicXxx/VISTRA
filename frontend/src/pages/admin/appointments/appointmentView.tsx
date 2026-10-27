@@ -3,7 +3,6 @@ import {
     CheckCircle2,
     XCircle,
     Hourglass,
-    RotateCcw,
     CalendarDays,
     Clock,
     ClipboardList,
@@ -11,13 +10,17 @@ import {
 } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
+import {useState} from "react";
 
-import {AppointmentModel} from "/@/repository/AppointmentModel";
-import LoadingPage from "/@/components/LoadingPage";
-import {useAppointmentByIdQuery} from "/@/hooks/query/AppointmentQuery";
+import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
+import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
+import {getFieldErrorString} from "/@/utils/Formatters";
+import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
+import {getInitials} from "/@/utils/RecordInfo";
+import {Modal} from "/@/components/editModal";
 
-type AppointmentStatus = "pending" | "confirmed" | "declined";
+type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
 interface AppointmentUiModel {
     id: string | number;
@@ -27,7 +30,7 @@ interface AppointmentUiModel {
     notes?: string
     time: string;
     type: string;
-    status: AppointmentStatus;
+    status: AdminAppointmentStatus;
 }
 
 interface InfoFieldProps {
@@ -44,7 +47,7 @@ interface StatusMeta {
     dot: string;
 }
 
-const STATUS_META: Record<AppointmentStatus, StatusMeta> = {
+const STATUS_META: Record<AdminAppointmentStatus, StatusMeta> = {
     pending: {
         label: "Pending",
         icon: Hourglass,
@@ -69,16 +72,6 @@ const STATUS_META: Record<AppointmentStatus, StatusMeta> = {
         dot: "bg-danger",
     },
 };
-
-function getInitials(name: string = ""): string {
-    return name
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase();
-}
 
 function InfoField({
                        icon: Icon,
@@ -145,18 +138,145 @@ export function AppointmentNotFound({
 }
 
 type interviewForm = {
-    status: AppointmentStatus
     declined: boolean
     reason: string
+}
+
+function StatusConfirmModal({
+  action,
+  isSaving,
+  onClose,
+  onConfirm,
+}: {
+  action: { status: AdminAppointmentStatus; decline_reason?: string };
+  isSaving: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const isDecline = action.status === "declined";
+
+  return (
+    <Modal
+      title={isDecline ? "Decline appointment?" : "Confirm appointment?"}
+      onClose={onClose}
+      maxWidth="max-w-sm"
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSaving}
+            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isSaving}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 ${
+              isDecline ? "bg-danger hover:opacity-90" : "bg-primary hover:opacity-90"
+            }`}
+          >
+            {isSaving && (
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
+            )}
+            {isSaving
+              ? "Saving..."
+              : isDecline
+                ? "Confirm decline"
+                : "Confirm appointment"}
+          </button>
+        </>
+      }
+    >
+      <p className="text-sm text-textSecondary">
+        {isDecline
+          ? "The student will be notified that this appointment was declined."
+          : "The student will be notified that this appointment is confirmed."}
+      </p>
+
+      {action.decline_reason && (
+        <div className="mt-3 rounded-lg border border-border bg-surfaceMuted/40 p-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-textMuted">
+            Reason
+          </p>
+          <p className="text-sm text-textPrimary">{action.decline_reason}</p>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
+export function AppointmentDetailSkeleton() {
+    return (
+        <div
+            className="mx-auto w-full animate-pulse"
+            aria-busy="true"
+            aria-label="Loading appointment"
+        >
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+                <div className="relative p-6 sm:p-8">
+                    <div className="mb-6 flex items-start justify-between gap-4">
+                        <div className="h-4 w-32 rounded bg-border" />
+                    </div>
+
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-5">
+                            <div className="h-16 w-16 shrink-0 rounded-full bg-surface" />
+                            <div>
+                                <div className="h-7 w-52 rounded bg-surface" />
+                                <div className="mt-2 h-3 w-36 rounded bg-surface" />
+                            </div>
+                        </div>
+
+                        <div className="h-7 w-28 rounded-full bg-surface" />
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+                <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+                    <div className="mb-2 h-4 w-40 rounded bg-surface" />
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border bg-surfaceMuted/30 px-4 py-3">
+                            <div className="h-2.5 w-24 rounded bg-border" />
+                            <div className="mt-2 h-4 w-32 rounded bg-surface" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
+                    <div className="mb-4 h-4 w-44 rounded bg-surface" />
+                    <div className="h-20 rounded-xl border border-dashed border-border bg-surfaceMuted/20" />
+                    <div className="mt-6 flex flex-wrap gap-2">
+                        <div className="h-9 w-44 rounded-lg bg-surface" />
+                        <div className="h-9 w-28 rounded-lg bg-surface" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default function AppointmentDetailView() {
     const {patientId, appointmentId} = useParams<{ patientId: string, appointmentId: string }>();
     const { form, setField } = useForm<interviewForm>({
-        status: "pending",
         declined: false,
         reason: "",
     });
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [confirmAction, setConfirmAction] = useState<{
+        status: AdminAppointmentStatus;
+        decline_reason?: string;
+    } | null>(null);
+    const [optimisticStatus, setOptimisticStatus] =
+        useState<AdminAppointmentStatus | null>(null);
+    const updateAppointmentMutation = useUpdateAppointment();
     if (!appointmentId || !patientId) {
         return (
             <AppointmentNotFound
@@ -170,13 +290,14 @@ export default function AppointmentDetailView() {
         data: appointmentDetails,
         isLoading,
         isError,
+        refetch,
     } = useAppointmentByIdQuery(
         patientId,
         appointmentId
     );
 
     if (isLoading) {
-        return <LoadingPage/>
+        return <AppointmentDetailSkeleton/>
     }
 
     if (!appointmentDetails) {
@@ -187,32 +308,76 @@ export default function AppointmentDetailView() {
             />
         );
     }
-    const appointmentModel = new AppointmentModel(appointmentDetails);
+    const appointment = toAppointmentPageFormat(appointmentDetails) as AppointmentUiModel;
 
-    const appointment = appointmentModel.UiPageFormat() as AppointmentUiModel;
+    const serverStatus: AdminAppointmentStatus =
+        appointment.status === "confirmed" || appointment.status === "declined"
+            ? appointment.status
+            : "pending";
 
+    const effectiveStatus = optimisticStatus ?? serverStatus;
+    const isDecided = effectiveStatus !== "pending";
 
-
-    const meta = STATUS_META[form.status];
+    const meta = STATUS_META[effectiveStatus];
 
     const handleBack = (): void => {
         window.history.back();
     };
 
-    const applyStatus = (
-        next: AppointmentStatus
+    const persistStatus = (
+        status: AdminAppointmentStatus,
+        decline_reason?: string,
+        onDone: () => void = () => {}
     ): void => {
-        setField("status", next);
-        setField("declined", next === "declined");
+        if (!patientId || !appointmentId) return;
+
+        setSaveError(null);
+        setOptimisticStatus(status);
+        updateAppointmentMutation.mutate(
+            {
+                patientId,
+                appointmentId,
+                payload: decline_reason ? { status, decline_reason } : { status },
+            },
+            {
+                onSuccess: () => {
+                    setField("declined", false);
+                    setField("reason", "");
+                    onDone();
+                    void refetch();
+                },
+                onError: (error) => {
+                    setOptimisticStatus(null);
+                    setSaveError(getFieldErrorString(error));
+                },
+            }
+        );
     };
 
-
     const confirmDecline = (): void => {
-        applyStatus("declined");
-        console.log(form.declined, form.reason)
+        const reason = form.reason.trim();
+        setConfirmAction({ status: "declined", decline_reason: reason || undefined });
     };
 
     return (
+        <>
+            <SaveErrorBanner message={saveError} />
+
+            {confirmAction && (
+                <StatusConfirmModal
+                    action={confirmAction}
+                    isSaving={updateAppointmentMutation.isPending}
+                    onClose={() => setConfirmAction(null)}
+                    onConfirm={() =>
+                        persistStatus(
+                            confirmAction.status,
+                            confirmAction.decline_reason,
+                            () => setConfirmAction(null)
+                        )
+                    }
+                />
+            )}
+
         <div className="mx-auto w-full">
 
             <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
@@ -385,7 +550,14 @@ export default function AppointmentDetailView() {
 
                         {/* Decline reason */}
 
-                        {form.declined ? (
+                        {isDecided ? (
+
+                            <div className="rounded-xl border border-border bg-surfaceMuted/40 px-4 py-3 text-xs text-textMuted">
+                                This appointment has been {effectiveStatus}. Status
+                                can no longer be changed.
+                            </div>
+
+                        ) : form.declined ? (
 
                             <div className="rounded-xl border border-danger/25 bg-danger/5 p-4">
 
@@ -416,10 +588,11 @@ export default function AppointmentDetailView() {
                                     <button
                                         type="button"
                                         onClick={confirmDecline}
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         <XCircle className="h-3.5 w-3.5"/>
-                                        Confirm decline
+                                        {updateAppointmentMutation.isPending ? "Saving..." : "Confirm decline"}
                                     </button>
 
 
@@ -429,7 +602,8 @@ export default function AppointmentDetailView() {
                                             setField("declined", false);
                                             setField("reason", "");
                                         }}
-                                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
+                                        disabled={updateAppointmentMutation.isPending}
+                                        className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         Cancel
                                     </button>
@@ -442,58 +616,29 @@ export default function AppointmentDetailView() {
 
                             <div className="flex flex-wrap gap-2">
 
-                                {/* Confirm */}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setConfirmAction({ status: "confirmed" })
+                                    }
+                                    disabled={updateAppointmentMutation.isPending}
+                                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <CheckCircle2 className="h-3.5 w-3.5"/>
+                                    {updateAppointmentMutation.isPending ? "Saving..." : "Confirm appointment"}
+                                </button>
 
-                                {form.status !== "confirmed" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            applyStatus("confirmed")
-                                        }
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
-                                    >
-                                        <CheckCircle2 className="h-3.5 w-3.5"/>
-                                        Confirm appointment
-                                    </button>
-
-                                )}
-
-
-                                {/* Decline */}
-
-                                {form.status !== "declined" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setField("declined", true)
-                                        }
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15"
-                                    >
-                                        <XCircle className="h-3.5 w-3.5"/>
-                                        Decline
-                                    </button>
-
-                                )}
-
-
-                                {/* Reset */}
-
-                                {form.status !== "pending" && (
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            applyStatus("pending")
-                                        }
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
-                                    >
-                                        <RotateCcw className="h-3.5 w-3.5"/>
-                                        Reset to pending
-                                    </button>
-
-                                )}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setField("declined", true)
+                                    }
+                                    disabled={updateAppointmentMutation.isPending}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-danger/25 bg-danger/10 px-4 py-2 text-xs font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <XCircle className="h-3.5 w-3.5"/>
+                                    Decline
+                                </button>
 
                             </div>
 
@@ -506,5 +651,6 @@ export default function AppointmentDetailView() {
             </div>
 
         </div>
+        </>
     );
 }

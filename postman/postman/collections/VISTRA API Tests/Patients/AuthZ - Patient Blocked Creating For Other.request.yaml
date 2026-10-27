@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/appointments/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{patientA_access_token}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"patient_id\": \"{{patientB_id}}\",\r
+
+    \    \"scheduled_start\": \"2026-12-02T09:00:00\",\r
+
+    \    \"scheduled_end\": \"2026-12-02T10:00:00\",\r
+
+    \    \"reason\": \"AuthZ probe visit\",\r
+
+    \    \"location\": \"Clinic A\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Patient blocked creating for other: 403", function () {
+          pm.response.to.have.status(403);
+      });
+    language: text/javascript
+order: 8100

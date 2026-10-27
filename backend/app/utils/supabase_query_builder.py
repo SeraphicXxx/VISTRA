@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Literal
 
 
 class SupabaseQueryBuilder:
@@ -16,7 +17,9 @@ class SupabaseQueryBuilder:
             .select(columns, count=count)
         )
 
-    def _apply(self, op: str, column: str, value):
+    FilterOp = Literal["eq", "gte", "lt"]
+
+    def _apply(self, op: FilterOp, column: str, value):
         if value is not None:
             self.query = getattr(self.query, op)(column, value)
 
@@ -25,20 +28,11 @@ class SupabaseQueryBuilder:
     def eq(self, column: str, value):
         return self._apply("eq", column, value)
 
-    def neq(self, column: str, value):
-        return self._apply("neq", column, value)
-
-    def gt(self, column: str, value):
-        return self._apply("gt", column, value)
-
     def gte(self, column: str, value):
         return self._apply("gte", column, value)
 
     def lt(self, column: str, value):
         return self._apply("lt", column, value)
-
-    def lte(self, column: str, value):
-        return self._apply("lte", column, value)
 
     def date_day(self, column: str, value):
         """
@@ -57,15 +51,16 @@ class SupabaseQueryBuilder:
             .lt(column, str(day + timedelta(days=1)))
         )
 
-    def ilike(self, column: str, value: str):
-        if value:
-            self.query = self.query.ilike(column, value)
+    def or_(self, *filters: str):
+        parts = []
+        for f in filters:
+            if f:
+                cleaned = f.strip().strip(",")
+                if cleaned:
+                    parts.append(cleaned)
 
-        return self
-
-    def or_(self, filters: str):
-        if filters:
-            self.query = self.query.or_(filters)
+        if parts:
+            self.query = self.query.or_(",".join(parts))
 
         return self
 

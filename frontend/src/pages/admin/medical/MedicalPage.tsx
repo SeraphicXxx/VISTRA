@@ -1,19 +1,16 @@
-import {useState} from "react";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
+import {MedicalVisitSchema} from "/@/api/schema/MedicalSchema";
 import {useMedicalQuery} from "/@/hooks/query/MedicalQuery";
 import {MedicalProvider} from "/@/context/PaginatedContext";
 import MedicalTab from "/@/pages/admin/medical/medicalTab";
+import {createVisitPage} from "/@/components/VisitPage";
 
-export function MedicalPage() {
-    const [filters, setFilters] = useState<MedicalVisitFilters>({
+export const MedicalPage = createVisitPage<MedicalVisitFilters, MedicalVisitSchema>({
+    initialFilters: {
         page: 1,
         page_size: 10,
-    });
-    const medicalQuery = useMedicalQuery(filters);
-
-    return (
-        <MedicalProvider query={medicalQuery}>
-            <MedicalTab setFilters={setFilters}/>
-        </MedicalProvider>
-    );
-}
+    },
+    useListQuery: useMedicalQuery,
+    Provider: MedicalProvider,
+    Tab: MedicalTab,
+});

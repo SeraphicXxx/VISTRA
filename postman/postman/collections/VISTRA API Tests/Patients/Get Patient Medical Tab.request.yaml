@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/medical-tab/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Get patient medical tab returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      \    });\r
+
+      \r
+
+      pm.test(\"Patient medical tab data is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    });"
+    language: text/javascript
+order: 7700

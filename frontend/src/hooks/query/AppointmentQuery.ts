@@ -1,55 +1,29 @@
 import {AppointmentFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {createAppointment, getAllAppointments, getAppointmentById} from "/@/api/appointments.api";
-import type {CreateAppointmentRequest} from "/@/api/appointments.api";
+import {createAppointment, getAllAppointments, getAppointmentById, updateAppointment} from "/@/api/appointments.api";
+import type {AppointmentSchema, CreateAppointmentRequest, UpdateAppointmentRequest} from "/@/api/schema/AppointmentSchema";
+import {ApiResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema";
+import {createDetailQueryHook, createListQueryHook, createMutationHook, createUpdateMutationHook} from "/@/hooks/query/visitQuery";
 
-export function useCreateAppointment() {
-    return useMutation({
-        mutationFn: async (request: CreateAppointmentRequest) => {
-            const {data} = await createAppointment(request);
-            return data;
-        },
-    });
+export const useCreateAppointment = createMutationHook<CreateAppointmentRequest, ApiResponse<AppointmentSchema>>(createAppointment);
+
+export const useAppointmentQuery = createListQueryHook<AppointmentFilters, PaginatedData<AppointmentSchema>>(
+    "appointments",
+    getAllAppointments,
+    "Appointment data is missing",
+);
+
+export const useAppointmentByIdQuery = createDetailQueryHook<AppointmentSchema>(
+    "appointment",
+    getAppointmentById,
+    "Appointment data is missing",
+);
+
+interface UpdateAppointmentArgs {
+    patientId: string;
+    appointmentId: string;
+    payload: UpdateAppointmentRequest;
 }
 
-export function useAppointmentQuery(filters?: AppointmentFilters) {
-    return useQuery({
-        queryKey: ["appointments", filters],
-        queryFn: async ({signal}) => {
-            const {data} = await getAllAppointments(
-                filters,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Appointment data is missing");
-            }
-
-            return data.data;
-        },
-        refetchOnWindowFocus: false,
-    })
-}
-
-export function useAppointmentByIdQuery(
-    appointmentId: string,
-    patientId: string
-) {
-    return useQuery({
-        queryKey: ["appointment", appointmentId, patientId],
-        queryFn: async ({signal}) => {
-            const {data} = await getAppointmentById(
-                appointmentId,
-                patientId,
-                signal
-            );
-
-            if (!data.data) {
-                throw new Error("Appointment data is missing");
-            }
-
-            return data.data;
-        },
-        refetchOnWindowFocus: false,
-    })
-}
+export const useUpdateAppointment = createUpdateMutationHook<UpdateAppointmentArgs, ApiResponse<AppointmentSchema>>(
+    (args) => updateAppointment(args.patientId, args.appointmentId, args.payload)
+);

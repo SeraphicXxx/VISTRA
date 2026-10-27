@@ -98,8 +98,8 @@ export function ClassificationToggle({
 }) {
   const options = [
     { key: "student", label: "Student" },
-    { key: "faculty", label: "Faculty / Professor" },
-    { key: "staff", label: "Admin" },
+    { key: "faculty", label: "Faculty" },
+    { key: "professor", label: "Professor" },
   ];
 
   return (

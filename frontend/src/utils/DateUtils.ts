@@ -96,6 +96,22 @@ export function to12Hour(time: string): string {
   return `${displayHours}:${String(minutes).padStart(2, "0")} ${suffix}`;
 }
 
+export function daysUntil(dateStr: string): number {
+  const target = new Date(dateStr);
+  const today = new Date();
+  target.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function todayLabel(): string {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
+}
+
 export function daysUntilLabel(date: string): string {
   const target = new Date(`${date}T00:00:00`);
 

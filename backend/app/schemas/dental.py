@@ -1,26 +1,26 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
-class DentalRecord(BaseModel):
-    id: int
-    patient_id: str
-    staff_id: str
-    last_dental_visit: str
-    floss: bool
-    brushing_frequency: str
-    calculus_severity: str
-    current_medication: str
-    notes: str
+DENTITION_PERMANENT = "permanent"
 
+EDITABLE_VISIT_COLUMNS = frozenset({
+    "visit_date",
+    "last_dental_visit",
+    "floss",
+    "brushing_frequency",
+    "calculus_severity",
+    "current_medications",
+    "status",
+    "notes",
+})
 
-class Odontogram(BaseModel):
-    id: int
-    patient_id: str
-    tooth_number: int
-    is_permanent: bool
-    condition: str
-    notes: str
-    dental_record_id: int
+EDITABLE_ODONTOGRAM_COLUMNS = frozenset({
+    "is_permanent",
+    "condition",
+    "notes",
+})
 
 
 class OdontogramCreateRequest(BaseModel):
@@ -33,7 +33,7 @@ class OdontogramCreateRequest(BaseModel):
         return {
             "patient_id": patient_id,
             "tooth_number": self.tooth_number,
-            "is_permanent": self.dentition == "permanent",
+            "is_permanent": self.dentition == DENTITION_PERMANENT,
             "condition": self.condition,
             "notes": self.notes,
             "dental_record_id": dental_record_id,
@@ -63,6 +63,44 @@ class DentalVisitCreateRequest(BaseModel):
             "notes": self.notes,
             "status": self.status,
             "staff_id": staff_id,
+        }
+
+
+class OdontogramUpdateRequest(BaseModel):
+    id: int | None = None
+    tooth_number: int | None = None
+    is_permanent: bool | None = None
+    condition: str | None = None
+    notes: str | None = None
+
+    def to_tooth_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(exclude_unset=True).items()
+            if key in EDITABLE_ODONTOGRAM_COLUMNS
+            and value is not None
+        }
+
+
+class DentalVisitUpdateRequest(BaseModel):
+    visit_date: datetime | None = None
+    last_dental_visit: str | None = None
+    floss: bool | None = None
+    brushing_frequency: str | None = None
+    calculus_severity: str | None = None
+    current_medications: str | None = None
+    status: str | None = None
+    notes: str | None = None
+
+    tooth_records: list[OdontogramUpdateRequest] | None = None
+
+    def to_visit_update(self) -> dict:
+        return {
+            key: value
+            for key, value in self.model_dump(
+                mode="json", exclude_unset=True
+            ).items()
+            if key in EDITABLE_VISIT_COLUMNS and value is not None
         }
 
 

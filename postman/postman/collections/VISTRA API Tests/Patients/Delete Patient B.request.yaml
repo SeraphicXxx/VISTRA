@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/{{patientB_id}}/"
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |+
+      pm.test("Delete patient B returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Patient B cleanup is confirmed", function () {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.success).to.eql(true);
+          pm.expect(jsonData).to.have.property("message");
+      });
+
+      // Cleanup for the AuthZ fixtures (Create Patient B). Runs with
+      // the deletes so no TESTB-* rows or auth users accumulate.
+    language: text/javascript
+order: 9810

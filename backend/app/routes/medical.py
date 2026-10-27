@@ -1,30 +1,33 @@
 from fastapi import APIRouter, Depends
 from supabase import Client
 
-from app.config.security import get_current_user
+from app.config.security import get_current_user, require_staff
+from app.services.access import require_module
 from app.database.database_client import get_supabase_for_user
-from app.schemas.medical import MedicalVisitCreateRequest
+from app.schemas.medical import MedicalVisitCreateRequest, MedicalVisitUpdateRequest
 from app.schemas.query import FilterMedical
 from app.services.medical import (
-    create_medical_record,
     get_all_medical_visits,
     get_medical_record_by_id,
-    delete_medical_visit,
 )
+from app.services.medical import create_medical_record as create_medical_record_service
+from app.services.medical import delete_medical_visit as delete_medical_visit_service
+from app.services.medical import update_medical_visit as update_medical_visit_service
 
 protected_medical_router = APIRouter(
     prefix="/medical",
-    tags=["medical"],
-    dependencies=[Depends(get_current_user)]
+    tags=["Medical"],
+    dependencies=[Depends(require_staff), Depends(require_module("medical"))]
 )
 
 
 @protected_medical_router.post("/")
-def create(
+def create_medical_record(
         request: MedicalVisitCreateRequest,
-        supabase: Client = Depends(get_supabase_for_user)
+        supabase: Client = Depends(get_supabase_for_user),
+        current_user=Depends(get_current_user)
 ):
-    return create_medical_record(request, supabase)
+    return create_medical_record_service(request, supabase, current_user)
 
 
 @protected_medical_router.get("/")
@@ -45,8 +48,20 @@ def get_medical_record(
 
 
 @protected_medical_router.delete("/{medical_visit_id}/")
-def delete(
+def delete_medical_visit(
         medical_visit_id: int,
         supabase: Client = Depends(get_supabase_for_user)
 ):
-    return delete_medical_visit(medical_visit_id, supabase)
+    return delete_medical_visit_service(medical_visit_id, supabase)
+
+
+@protected_medical_router.patch("/{patient_id}/{medical_visit_id}/")
+def update_medical_visit(
+        patient_id: str,
+        medical_visit_id: int,
+        request: MedicalVisitUpdateRequest,
+        supabase: Client = Depends(get_supabase_for_user)
+):
+    return update_medical_visit_service(
+        patient_id, medical_visit_id, request, supabase,
+    )
