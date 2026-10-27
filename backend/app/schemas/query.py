@@ -27,6 +27,7 @@ class VisitFilter(PaginationParams):
 
 class FilterAppointment(VisitFilter):
     patient_id: str | None = None
+    order_by: str | None = None
 
 
 class FilterDental(VisitFilter):

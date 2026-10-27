@@ -38,6 +38,7 @@ export default function PatientOverviewTab() {
   const { data: appointmentsData } = useAppointmentQuery({
     patient_id: studentId,
     page_size: 100,
+    order_by: "scheduled_start desc",
   });
 
   const medicalRecord = myMedicalRecords[studentId];
@@ -62,11 +63,7 @@ export default function PatientOverviewTab() {
     ? statusLabels[dentalRecord.status] ?? dentalRecord.status
     : "No record yet";
 
-  const sortedAppointments = useMemo(
-    () => [...appointments].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-    [appointments]
-  );
-  const nextAppointment: Appointment | null = sortedAppointments[0] ?? null;
+  const nextAppointment: Appointment | null = appointments[0] ?? null;
 
   const recentVisits = useMemo(() => {
     return [...visits]

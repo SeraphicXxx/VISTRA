@@ -26,7 +26,7 @@ export default function PatientAppointmentsTab() {
     isLoading,
     isError,
     refetch,
-  } = useAppointmentQuery({ patient_id: studentId, page_size: 100 });
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100, orderBy: "scheduled_start desc" });
 
   const { upcoming, history, counts } = useMemo(() => {
     const all = (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment);

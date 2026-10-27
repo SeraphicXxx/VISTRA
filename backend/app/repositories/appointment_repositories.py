@@ -50,10 +50,10 @@ class AppointmentRepository(BaseRepository):
                 columns=columns,
                 count="exact"
             )
-            .order("scheduled_start")
             .eq("patient_id", filters.patient_id)
             .eq("status", filters.status)
             .eq("type", filters.type)
+            .order("scheduled_start", filters.order_by)
         )
 
         if use_course_filter:

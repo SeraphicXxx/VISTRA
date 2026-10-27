@@ -128,7 +128,7 @@ export default function PatientAppointmentView() {
     isLoading,
     isError,
     refetch,
-  } = useAppointmentQuery({ patient_id: studentId, page_size: 100 });
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100, orderBy: "scheduled_start desc" });
 
   const appointment: Appointment | undefined = requestedId
     ? (appointmentsData?.items ?? [])

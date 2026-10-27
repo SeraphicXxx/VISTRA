@@ -18,6 +18,7 @@ export interface AppointmentFilters extends PageParams {
     course?: string;
     date?: string;
     patient_id?: string;
+    order_by?: string;
 }
 
 export interface DentalVisitFilters extends PageParams {
