@@ -184,7 +184,9 @@ export default function LoginScreen() {
                       }
                     >
                       <Ionicons
-                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        name={
+                          showPassword ? "eye-off-outline" : "eye-outline"
+                        }
                         size={20}
                         color={brand.textMuted}
                       />
