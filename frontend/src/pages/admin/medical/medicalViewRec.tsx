@@ -11,15 +11,22 @@ import { formatDate } from "/@/utils/FormatDate";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 
-/*
- * Dummy-data toggle: set VITE_USE_DUMMY_MEDICAL=true in
- * frontend/.env (and restart vite) to render the mock below
- * instead of calling the backend. Unset/false = live API.
- */
 const USE_DUMMY_DATA =
   import.meta.env.VITE_USE_DUMMY_MEDICAL === "true";
 
-const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
+interface NotifiedProfessor {
+  name: string;
+  role: string;
+  course: string;
+  email: string;
+  sent_at: string;
+}
+
+type MedicalVisitView = MedicalRecordDetailSchema & {
+  notified_professor?: NotifiedProfessor | null;
+};
+
+const DUMMY_MEDICAL_VISIT: MedicalVisitView = {
   medical_visit_id: "1042",
   patient_name: "Kenji Chua",
   patient_id: "20230518-S",
@@ -38,6 +45,13 @@ const DUMMY_MEDICAL_VISIT: MedicalRecordDetailSchema = {
   complaint: "Fever, headache since morning",
   treatment: "Paracetamol 500mg, rest advised",
   treatment_type: "Medicine",
+  notified_professor: {
+    name: "Dr. Maria Santos",
+    role: "Professor",
+    course: "BS Computer Science",
+    email: "maria.santos@vistra-university.test",
+    sent_at: "2026-10-11",
+  },
 };
 
 const consultationEditFields = [
@@ -198,7 +212,9 @@ export default function PatientRecordView() {
     USE_DUMMY_DATA ? undefined : medicalId
   );
 
-  const visit = USE_DUMMY_DATA ? DUMMY_MEDICAL_VISIT : fetchedVisit;
+  const visit: MedicalVisitView | undefined = USE_DUMMY_DATA
+    ? DUMMY_MEDICAL_VISIT
+    : fetchedVisit;
 
   if (!USE_DUMMY_DATA && (!patientId || !medicalId)) {
     return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;
@@ -451,6 +467,45 @@ export default function PatientRecordView() {
                   value={visit.complaint}
                 />
                 <ReadOnlyBlock label="Treatment" value={visit.treatment} />
+              </div>
+
+              <div className="mt-6 border-t border-border pt-5">
+                <p className="mb-3 text-xs font-medium text-textMuted">
+                  Notified professor
+                </p>
+
+                {visit.notified_professor ? (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-background p-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+                      {getInitials(visit.notified_professor.name)}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-textPrimary">
+                        {visit.notified_professor.name}
+                      </p>
+                      <p className="truncate text-xs text-textMuted">
+                        {visit.notified_professor.role} · {visit.notified_professor.course}
+                      </p>
+                      <p className="truncate text-xs text-textSecondary">
+                        {visit.notified_professor.email}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0 text-right">
+                      <span className="inline-flex rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Emailed
+                      </span>
+                      <p className="mt-1 text-xs text-textMuted">
+                        {formatDate(visit.notified_professor.sent_at)}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="rounded-lg border border-dashed border-border px-3 py-3 text-sm text-textMuted">
+                    No professor was notified for this record.
+                  </p>
+                )}
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import {ClipboardList} from "lucide-react";
 import {StatusBadge} from "/@/components/StatusBadge";
 import {VisitTab} from "/@/components/VisitTab";
-import {Column} from "/@/components/table/Table";
+import {Column, optionsFromValues} from "/@/components/table/Table";
 import {ROUTES} from "/@/config/RoutePaths";
 import {usePatientMedicalTabContext} from "/@/context/PaginatedContext";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -9,15 +9,19 @@ import {toPatientMedicalTableRow} from "/@/repository/PatientMedicalModel";
 import {MedicalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {Visit} from "./medicalData";
 
+const treatmentOptions = optionsFromValues(["Medicine", "Procedure", "Checkup"]);
 const columns: Column<Visit>[] = [
     {key: "date", label: "Date", filterType: "date"},
     {key: "id", label: "Visit ID"},
     {key: "complaint", label: "Remarks"},
     {key: "doctor", label: "Doctor"},
+    {key: "treatmentType", label: "Type", filterType: "select", options: treatmentOptions},
+    {key: "treatment", label: "Treatment"},
     {key: "status", label: "Status", render: (value) => <StatusBadge status={value}/>},
 ];
 
-const buildViewLink = (visit: Visit) => ROUTES.patient.medical.view.build(visit.id);
+
+const buildViewLink = (visit: Visit) => `${ROUTES.patient.dashboard.medical}/${visit.id}`;
 
 interface PatientMedicalTabProps {
     setFilters: (filters: MedicalVisitFilters) => void;
