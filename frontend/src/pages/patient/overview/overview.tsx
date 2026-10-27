@@ -23,6 +23,7 @@ import { usePatientMedicalDentalSummaryQuery } from "/@/hooks/query/PatientQuery
 import { toPatientMedicalDentalVisits } from "/@/repository/PatientMedicalDentalModel";
 import { Visit } from "/@/types/types";
 import { AdminAnimStyles, Reveal } from "/@/components/adminanim";
+import { useScreeningPredictionQuery } from "/@/hooks/query/ScreeningQuery";
 
 interface OutletContextShape {
   searchQuery: string;
@@ -76,6 +77,27 @@ export default function PatientOverviewTab() {
     [searchQuery, recentVisits]
   );
 
+  const currentBmi = useMemo(() => {
+    if (PATIENT_VITALS?.weight && PATIENT_VITALS?.height) {
+      const heightInMeters = PATIENT_VITALS.height / 100;
+      return Number((PATIENT_VITALS.weight / (heightInMeters * heightInMeters)).toFixed(1));
+    }
+    return 22.8; //fallback for normal BMI
+  }, []);
+
+  const patientAge = Number(medicalRecord?.age) || 20;
+  const patientSex = medicalRecord?.sex || "Male";
+
+  const {
+    data: predictedRisks,
+    isLoading: isPredictionLoading,
+    isError: isPredictionError,
+  } = useScreeningPredictionQuery({
+    bmi: currentBmi,
+    age: patientAge,
+    sex: patientSex
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <AdminAnimStyles />
@@ -104,7 +126,10 @@ export default function PatientOverviewTab() {
       </div>
 
       <Reveal as="div" delay={4 * STAGGER} distance={24}>
-        <HealthRiskPanel predictions={PATIENT_HEALTH_RISKS} />
+        <HealthRiskPanel
+          predictions={predictedRisks ?? []}
+          loading={isPredictionLoading}
+        />
       </Reveal>
     </div>
   );
