@@ -26,15 +26,15 @@ PATIENT_ROLES: frozenset[Role] = frozenset(
 CLASSIFICATION_ROLE_MAP: dict[str, Role] = {
     "student": STUDENT_ROLE,
     "faculty": FACULTY_ROLE,
+    "professor": PROFESSOR_ROLE,
     "staff": STAFF_ROLE,
-    "university_staff": STAFF_ROLE,
+    "university_staff": FACULTY_ROLE,
 }
 
 # Accepted resolver inputs: form keys plus common variants
 # ("Student" from API clients, "admin" label, explicit professor).
 _CLASSIFICATION_ALIASES: dict[str, Role] = {
     **CLASSIFICATION_ROLE_MAP,
-    "professor": PROFESSOR_ROLE,
     "admin": STAFF_ROLE,
 }
 
