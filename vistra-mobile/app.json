@@ -35,6 +35,7 @@
           "resizeMode": "contain"
         }
       ],
+      ["expo-camera", { "cameraPermission": "Allow VISTRA to use the camera to scan vital records from the kiosk." }],
       "expo-font"
     ],
     "experiments": {

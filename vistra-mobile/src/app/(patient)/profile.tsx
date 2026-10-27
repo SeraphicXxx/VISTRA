@@ -1,6 +1,5 @@
 import { Reveal } from "@/components/animation/Reveal";
 import { AppHeader } from "@/components/navigation/AppHeader";
-import { VitalsRow } from "@/components/overview/VitalsRow";
 import { ExaminationResultsTab } from "@/components/profile/ExaminationResultsTab";
 import { FamilyHistoryTab } from "@/components/profile/FamilyHistoryTab";
 import { HealthRiskTab } from "@/components/profile/HealthRiskTab";
@@ -8,6 +7,7 @@ import { MedicalHistoryTab } from "@/components/profile/MedicalHistoryTab";
 import { PersonalTab } from "@/components/profile/PersonalTab";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
+import { VitalsTab } from "@/components/profile/VitalsTab";
 import { PROFILE_TABS } from "@/constants/profile";
 import { brand } from "@/constants/theme";
 import { PATIENT_HEALTH_RISKS } from "@/mock/healthRisk";
@@ -15,12 +15,25 @@ import { PATIENT_PROFILE, type ProfileTabId } from "@/mock/profile";
 import { PATIENT_VITALS } from "@/mock/vitals";
 import { profileStyles as styles } from "@/styles/profile.styles";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const isProfileTabId = (value?: string): value is ProfileTabId =>
+  PROFILE_TABS.some((tab) => tab.id === value);
+
 export default function ProfileScreen() {
-  const [activeTab, setActiveTab] = useState<ProfileTabId | null>(null);
+  const params = useLocalSearchParams<{ tab?: string; t?: string }>();
+
+  const [activeTab, setActiveTab] = useState<ProfileTabId | null>(
+    isProfileTabId(params.tab) ? params.tab : null
+  );
+
+  useEffect(() => {
+    if (isProfileTabId(params.tab)) setActiveTab(params.tab);
+  }, [params.tab, params.t]);
+
   const { personal, medical, family, results } = PATIENT_PROFILE;
 
   const activeLabel = PROFILE_TABS.find((tab) => tab.id === activeTab)?.label ?? "";
@@ -34,7 +47,7 @@ export default function ProfileScreen() {
       case "family":
         return <FamilyHistoryTab {...family} />;
       case "vitals":
-        return <VitalsRow vitals={PATIENT_VITALS} />;
+        return <VitalsTab vitals={PATIENT_VITALS} />;
       case "results":
         return <ExaminationResultsTab {...results} />;
       case "risk":

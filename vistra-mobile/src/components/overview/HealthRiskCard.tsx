@@ -138,13 +138,29 @@ export function HealthRiskCard({ predictions }: HealthRiskCardProps) {
           </View>
 
           <Pressable
-            onPress={() => router.push("/health-insights")}
-            style={({ pressed }) => [
-              styles.riskButton,
-              pressed && { opacity: 0.85 },
-            ]}
+            onPress={() =>
+              router.navigate({
+                pathname: "/profile",
+                params: { tab: "risk", t: String(Date.now()) },
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="View health insights"
+            android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+            style={{
+              marginTop: 16,
+              height: 48,
+              borderRadius: 14,
+              backgroundColor: "#14b8a6",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+            }}
           >
-            <Text style={styles.riskButtonText}>View Health Insights</Text>
+            <Text style={{ color: "#ffffff", fontSize: 14, fontWeight: "600" }}>
+              View Health Insights
+            </Text>
             <Ionicons name="arrow-forward" size={16} color="#ffffff" />
           </Pressable>
         </View>
