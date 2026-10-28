@@ -53,7 +53,7 @@ class AppointmentRepository(BaseRepository):
             .eq("patient_id", filters.patient_id)
             .eq("status", filters.status)
             .eq("type", filters.type)
-            .order("scheduled_start", filters.order_by)
+            .order("scheduled_start", "desc")
         )
 
         if use_course_filter:

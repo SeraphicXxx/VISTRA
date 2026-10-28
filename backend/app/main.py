@@ -41,3 +41,4 @@ app.include_router(overview.protected_overview_router, prefix=API_V1_PREFIX)
 # New machine-trigger endpoints are v1-only: the legacy mount is
 # deprecated from birth and gains no new surface.
 app.include_router(internal.internal_router, prefix=API_V1_PREFIX)
+app.include_router(screening.screening_router, prefix=API_V1_PREFIX)
