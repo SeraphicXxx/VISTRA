@@ -20,6 +20,9 @@ class Config:
     LOCAL_FRONTEND_URL = os.getenv("LOCAL_FRONTEND_URL")
     PROD_FRONTEND_URL = os.getenv("PROD_FRONTEND_URL")
 
+    ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://127.0.0.1:8001")
+    ML_SERVICE_API_KEY = os.getenv("ML_SERVICE_API_KEY")
+
     @classmethod
     def _pick(cls, cloud_value, selfhosted_value):
         if cls.USE_SELFHOSTED_SUPABASE:
@@ -80,6 +83,14 @@ class Config:
             )
 
         cls.frontend_url()
+
+    @classmethod
+    def ml_service_url(cls) -> str:
+        return cls.ML_SERVICE_URL
+    
+    @classmethod
+    def ml_service_api_key(cls) -> str | None:
+        return cls.ML_SERVICE_API_KEY
 
 
 Config.validate()

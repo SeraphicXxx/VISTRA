@@ -57,5 +57,8 @@ export const API_ENDPOINTS = {
     },
     overview: {
         get_stats: `${API_V1}/overview/stats/`,
+    },
+    screening: {
+        predict: `${API_V1}/screening/predict`,
     }
 };

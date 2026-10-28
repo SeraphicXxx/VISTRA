@@ -6,6 +6,7 @@ import {
 
 interface HealthRiskPanelProps {
   predictions: HealthRiskPrediction[];
+  loading?: boolean;
 }
 
 const getRiskLevel = (percent: number): RiskLevel => {
@@ -121,7 +122,17 @@ function RiskCard({ prediction }: { prediction: HealthRiskPrediction }) {
   );
 }
 
-export default function HealthRiskPanel({ predictions }: HealthRiskPanelProps) {
+export default function HealthRiskPanel({ predictions, loading }: HealthRiskPanelProps) {
+  
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-card animate-pulse">
+        <div className="h-4 w-40 bg-border rounded mb-4" />
+        <div className="h-28 bg-border/40 rounded-xl" />
+      </div>
+    );
+  }
+  
   const sorted = [...predictions].sort((a, b) => b.percent - a.percent);
   const [top, ...others] = sorted;
 
