@@ -2,6 +2,7 @@ import { Reveal } from "@/components/animation/Reveal";
 import { HealthSummaryRow } from "@/components/overview/HealthSummaryRow";
 import { RecentVisitsPanel } from "@/components/overview/RecentVisitsPanel";
 import { UpcomingAppointmentCard } from "@/components/overview/UpcomingAppointmentCard";
+import { VitalsRow } from "@/components/overview/VitalsRow";
 import { WelcomeHero } from "@/components/overview/WelcomeHero";
 import { ComingSoonCard } from "@/components/overview/ComingSoonCard";
 import { brand } from "@/constants/theme";
@@ -10,6 +11,7 @@ import { ScrollView, Text, View } from "react-native";
 import { overviewStyles as styles } from "@/styles/overview.styles";
 import {
   usePatientAppointments,
+  usePatientLatestVitalSigns,
   usePatientMedicalDentalSummary,
   usePatientProfile,
 } from "@/hooks/usePatientOverview";
@@ -21,6 +23,7 @@ export default function OverviewScreen() {
   const profile = usePatientProfile();
   const appointments = usePatientAppointments();
   const medicalDental = usePatientMedicalDentalSummary();
+  const latestVitals = usePatientLatestVitalSigns();
 
   const data = useMemo(() => {
     const upcoming = appointments.data
@@ -43,7 +46,7 @@ export default function OverviewScreen() {
     };
   }, [profile.data, appointments.data, medicalDental.data]);
   const isLoading =
-    profile.isLoading || appointments.isLoading || medicalDental.isLoading;
+    profile.isLoading || appointments.isLoading || medicalDental.isLoading || latestVitals.isLoading;
 
   return (
     <View style={styles.safe}>
@@ -91,11 +94,7 @@ export default function OverviewScreen() {
             </Reveal>
 
             <Reveal delay={360} distance={20} style={FULL_WIDTH}>
-              <ComingSoonCard
-                title="Vital Signs"
-                subtitle="Your latest measurements will appear here after your next check-up."
-                iconName="heart-pulse"
-              />
+              <VitalsRow vitals={latestVitals.data ?? null} />
             </Reveal>
 
             <Reveal delay={480} distance={20} style={FULL_WIDTH}>

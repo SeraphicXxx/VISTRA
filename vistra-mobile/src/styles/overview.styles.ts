@@ -242,6 +242,13 @@ export const overviewStyles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 12,
   },
+  vitalSignsContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
   vitalCard: {
     width: "48%",
     padding: 14,

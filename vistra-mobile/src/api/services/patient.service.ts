@@ -1,7 +1,21 @@
-import { apiClient } from "@/api/axios_client";
+import { apiClient, getStoredUserId } from "@/api/axios_client";
 import { API_ENDPOINTS } from "@/config/ApiConfig";
 import { handleServiceErrors, ok } from "@/api/service_helpers";
 
+export interface CreateVitalSignsRequest {
+  patient_id: string;
+  height?: number;
+  weight?: number;
+  temperature?: number;
+  heart_rate?: number;
+  spo2?: number;
+  recorded_at?: string;
+}
+
+export interface BackendVitalSigns extends CreateVitalSignsRequest {
+  id: number;
+  recorded_at: string;
+}
 /**
  * Shape returned by the patient_summary view (GET /patients/profiles/{id}/).
  * Columns depend on the DB view; fields are optional with safe fallbacks.
@@ -119,6 +133,33 @@ export const patientService = {
         success: boolean;
         data: MedicalDentalSummary;
       }>(API_ENDPOINTS.patient.get_medical_dental_summary);
+      return data.data;
+    }
+  ),
+
+  createVitalSigns: handleServiceErrors<
+      [CreateVitalSignsRequest],
+      BackendVitalSigns
+  >(async (payload) => {
+    const { data } = await apiClient<{
+      success: boolean;
+      data: BackendVitalSigns;
+    }>(API_ENDPOINTS.vitalSigns.create, {
+      method: "POST",
+      data: payload,
+    });
+
+    return data.data;
+  }),
+
+  getLatestVitalSigns: handleServiceErrors<[], BackendVitalSigns | null>(
+    async () => {
+      const patientId = await getStoredUserId();
+      if (!patientId) throw new Error("No patient ID stored");
+      const { data } = await apiClient<{
+        success: boolean;
+        data: BackendVitalSigns;
+      }>(API_ENDPOINTS.vitalSigns.get_latest(patientId));
       return data.data;
     }
   ),
