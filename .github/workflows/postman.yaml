@@ -67,7 +67,7 @@ jobs:
           done
 
           echo "Backend failed to start"
-          cat "${{ github.workspace }}/backend/backend.log"
+          cat "${{ github.workspace }}/backend/backend.log" 2>/dev/null || echo "(no backend log file)"
           exit 1
 
       - name: Install Postman CLI
@@ -107,4 +107,4 @@ jobs:
         if: always()
         run: |
           echo "=== BACKEND LOGS ==="
-          cat "${{ github.workspace }}/backend/backend.log"
+          cat "${{ github.workspace }}/backend/backend.log" 2>/dev/null || echo "(no backend log file)"
