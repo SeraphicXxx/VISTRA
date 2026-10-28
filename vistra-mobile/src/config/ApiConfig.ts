@@ -49,6 +49,11 @@ export const API_ENDPOINTS = {
         get_patient_medical_tab: `${API_V1}/patients/record/medical-tab/`,
         get_patient_dental_tab: `${API_V1}/patients/record/dental-tab/`,
     },
+    vitalSigns: {
+        create: "/api/v1/vital-signs/",
+        get_latest: (patientId: string) =>
+            `${API_V1}/vital-signs/patient/${patientId}/latest`,
+    },
     appointment: {
         create_appointment: `${API_V1}/appointments/`,
         get_appointment: `${API_V1}/appointments/`,

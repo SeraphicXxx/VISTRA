@@ -12,7 +12,7 @@ import { PROFILE_TABS } from "@/constants/profile";
 import { brand } from "@/constants/theme";
 import { PATIENT_HEALTH_RISKS } from "@/mock/healthRisk";
 import { PATIENT_PROFILE, type ProfileTabId } from "@/mock/profile";
-import { PATIENT_VITALS } from "@/mock/vitals";
+// vitals now fetched from API via usePatientLatestVitalSigns in VitalsTab
 import { profileStyles as styles } from "@/styles/profile.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -24,7 +24,7 @@ const isProfileTabId = (value?: string): value is ProfileTabId =>
   PROFILE_TABS.some((tab) => tab.id === value);
 
 export default function ProfileScreen() {
-  const params = useLocalSearchParams<{ tab?: string; t?: string }>();
+  const params = useLocalSearchParams<{ tab?: string; t?: string; scan?: string }>();
 
   const [activeTab, setActiveTab] = useState<ProfileTabId | null>(
     isProfileTabId(params.tab) ? params.tab : null
@@ -47,7 +47,7 @@ export default function ProfileScreen() {
       case "family":
         return <FamilyHistoryTab {...family} />;
       case "vitals":
-        return <VitalsTab vitals={PATIENT_VITALS} />;
+        return <VitalsTab autoScan={params.scan === "true"} />;
       case "results":
         return <ExaminationResultsTab {...results} />;
       case "risk":

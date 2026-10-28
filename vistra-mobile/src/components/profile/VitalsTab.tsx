@@ -1,24 +1,56 @@
-import { ComponentProps, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ComponentProps, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { VitalsRow } from "@/components/overview/VitalsRow";
 import { VitalsQrScanner } from "@/components/scanner/VitalsQrScanner";
+import {mapVistraVitalsToVitalSigns, VistraVitalsQR } from "@/utils/mapper";
+import { VitalSigns } from "@/mock/vitals";
+import { router } from "expo-router";
+import { usePatientLatestVitalSigns } from "@/hooks/usePatientOverview";
 
 interface VitalsTabProps {
-  vitals: ComponentProps<typeof VitalsRow>["vitals"];
+  vitals?: ComponentProps<typeof VitalsRow>["vitals"];
+  autoScan?: boolean;
 }
 
-export function VitalsTab({ vitals }: VitalsTabProps) {
+export function VitalsTab({ vitals: propVitals, autoScan }: VitalsTabProps) {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const { data: latestVitals, isLoading } = usePatientLatestVitalSigns();
+
+  const vitals = latestVitals ?? propVitals ?? null;
+
+  useEffect(() => {
+    if (autoScan) {
+      setIsScannerOpen(true);
+    }
+  }, [autoScan]);
 
   const handleScanned = (value: string) => {
-    console.log("Kiosk vitals QR:", value);
-    // TODO: parse the kiosk payload and save the new vital signs
+    try {
+      const payload: VistraVitalsQR = JSON.parse(value);
+      const vitalSigns = mapVistraVitalsToVitalSigns(payload);
+
+      router.push({
+        pathname: "/record/VitalsPreviewScreen",
+        params: {
+          vitals: JSON.stringify(vitalSigns),
+        },
+      });
+    } catch (error) {
+      console.error("Failed to parse kiosk vitals QR:", error);
+    }
   };
 
   return (
     <View>
-      <VitalsRow vitals={vitals} />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#0f766e" />
+          <Text style={styles.loadingText}>Loading vital signs…</Text>
+        </View>
+      ) : (
+        <VitalsRow vitals={vitals} />
+      )}
 
       <View style={styles.card}>
         <View style={styles.qrFrame}>
@@ -57,6 +89,15 @@ export function VitalsTab({ vitals }: VitalsTabProps) {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    paddingVertical: 24,
+    alignItems: "center",
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 13,
+    color: "#64748b",
+  },
   card: {
     marginTop: 16,
     padding: 20,

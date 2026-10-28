@@ -1,8 +1,9 @@
 import { AppHeader } from "@/components/navigation/AppHeader";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { Tabs, useSegments } from "expo-router";
+import { Tabs, useSegments, router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet } from "react-native";
+import { mapVistraVitalsToVitalSigns } from "@/utils/mapper";
 
 const TAB_FADE_MS = 320;
 const TAB_SHIFT = 12;
@@ -22,6 +23,19 @@ export default function PatientTabsLayout() {
     }).start();
   }, [activeTab, progress]);
 
+  const handleKioskScan = (value: string) => {
+    try {
+      const payload = JSON.parse(value);
+      const vitalSigns = mapVistraVitalsToVitalSigns(payload);
+      void router.push({
+        pathname: "/record/VitalsPreviewScreen",
+        params: { vitals: JSON.stringify(vitalSigns) },
+      });
+    } catch (error) {
+      console.error("Failed to parse kiosk vitals QR:", error);
+    }
+  };
+
   const translateY = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [TAB_SHIFT, 0],
@@ -38,7 +52,7 @@ export default function PatientTabsLayout() {
         detachInactiveScreens
         tabBar={(props) => <PatientTabBar {...props} />}
         screenOptions={{
-          header: () => <AppHeader notificationCount={2} />,
+          header: () => <AppHeader notificationCount={2} onKioskScan={handleKioskScan} />,
           sceneStyle: { backgroundColor: "#ffffff" },
         }}
       >

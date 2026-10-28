@@ -13,6 +13,9 @@ type VitalsQrScannerProps = {
 
 export function VitalsQrScanner({ visible, onClose, onScanned }: VitalsQrScannerProps) {
   const insets = useSafeAreaInsets();
+  const [scanning, setScanning] = useState(false);
+  const [qrValue, setQrValue] = useState<string | null>(null);
+  const [qrType, setQrType] = useState<string | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [hasScanned, setHasScanned] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
@@ -35,6 +38,15 @@ export function VitalsQrScanner({ visible, onClose, onScanned }: VitalsQrScanner
     (result: BarcodeScanningResult) => {
       if (hasScanned) return;
       setHasScanned(true);
+      setQrValue(result.data);
+      setQrType(result.type);
+      setScanning(false);
+
+      console.log("=== QR CODE SCANNED ===");
+      console.log("Type:", result.type);
+      console.log("Decoded data:", result.data);
+      console.log("=======================");
+
       onScanned?.(result.data);
       onClose();
     },

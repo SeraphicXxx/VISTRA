@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { patientService, type MobileAppointment } from "@/api/services/patient.service";
+import { patientService, type MobileAppointment, type BackendVitalSigns } from "@/api/services/patient.service";
+import { mapBackendVitalSignsToVitalSigns } from "@/utils/mapper";
 import { ServiceError } from "@/api/service_helpers";
 
 function formatTime(dateStr: string): string {
@@ -75,6 +76,21 @@ export function usePatientAppointments() {
       >(result as any);
       return data.map(mapBackendAppointment);
     },
+  });
+}
+
+export function usePatientLatestVitalSigns() {
+  return useQuery({
+    queryKey: ["patient", "latest-vital-signs"],
+    queryFn: async () => {
+      const result = await patientService.getLatestVitalSigns();
+      if (!result.success) {
+        return null;
+      }
+      const data = (result as { success: true; data: BackendVitalSigns }).data;
+      return mapBackendVitalSignsToVitalSigns(data);
+    },
+    refetchOnWindowFocus: false,
   });
 }
 
