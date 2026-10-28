@@ -52,7 +52,7 @@ jobs:
           SUPABASE_PRIVILEGE_KEY: ${{ secrets.SUPABASE_PRIVILEGE_KEY }}
           LOCAL_FRONTEND_URL: ${{ secrets.LOCAL_FRONTEND_URL }}
         run: |
-          uvicorn app.main:app --host 127.0.0.1 --port 8000 > backend.log 2>&1 &
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 > ${{ github.workspace }}/backend/backend.log 2>&1 &
 
       - name: Wait for backend
         run: |
@@ -67,7 +67,7 @@ jobs:
           done
 
           echo "Backend failed to start"
-          cat backend/backend.log
+          cat "${{ github.workspace }}/backend/backend.log"
           exit 1
 
       - name: Install Postman CLI
@@ -107,4 +107,4 @@ jobs:
         if: always()
         run: |
           echo "=== BACKEND LOGS ==="
-          cat backend/backend.log
+          cat "${{ github.workspace }}/backend/backend.log"
