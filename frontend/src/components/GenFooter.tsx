@@ -52,7 +52,7 @@ export function GenFooter() {
                 Privacy Policy
               </a>
               <a
-                href="/Appoinment"
+                href="/patient/login"
                 className="text-xs text-primary transition-colors hover:text-primaryDark"
               >
                 Book an Appointment

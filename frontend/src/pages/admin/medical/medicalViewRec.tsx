@@ -5,14 +5,12 @@ import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 import { InfoField, getInitials } from "/@/utils/RecordInfo";
 import { StatusBadge } from "/@/components/StatusBadge";
 import { EditRecordModal, statusEditFields } from "/@/components/editModal";
+import MedicalReportPdfButton from "/@/components/medical/medicalreportpdf";
 import { useMedicalVisitDetail, useUpdateMedicalVisit } from "/@/hooks/query/MedicalQuery";
 import type { MedicalRecordDetailSchema, UpdateMedicalVisit } from "/@/api/schema/MedicalSchema";
 import { formatDate } from "/@/utils/FormatDate";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
-
-const USE_DUMMY_DATA =
-  import.meta.env.VITE_USE_DUMMY_MEDICAL === "true";
 
 interface NotifiedProfessor {
   name: string;
@@ -26,55 +24,12 @@ type MedicalVisitView = MedicalRecordDetailSchema & {
   notified_professor?: NotifiedProfessor | null;
 };
 
-const DUMMY_MEDICAL_VISIT: MedicalVisitView = {
-  medical_visit_id: "1042",
-  patient_name: "Kenji Chua",
-  patient_id: "20230518-S",
-  status: "Cleared",
-  course: "BS Computer Science",
-  year_section: "3 - A",
-  age: "21",
-  sex: "Male",
-  civil_status: "Single",
-  birthday: "2005-01-01",
-  address: "123 Main St",
-  barangay: "Barangay 1",
-  mobileNumber: "09171234567",
-  staff_name: "Maria Santos",
-  visit_date: "2026-10-11",
-  complaint: "Fever, headache since morning",
-  treatment: "Paracetamol 500mg, rest advised",
-  treatment_type: "Medicine",
-  notified_professor: {
-    name: "Dr. Maria Santos",
-    role: "Professor",
-    course: "BS Computer Science",
-    email: "maria.santos@vistra-university.test",
-    sent_at: "2026-10-11",
-  },
-};
-
 const consultationEditFields = [
   { key: "visitDate", label: "Visit date", type: "date" },
-  {
-    key: "complaint",
-    label: "Complaint / findings",
-    type: "textarea",
-    span: true,
-  },
-  {
-    key: "treatment",
-    label: "Treatment",
-    type: "textarea",
-    span: true,
-  },
+  { key: "complaint", label: "Complaint / findings", type: "textarea", span: true },
+  { key: "treatment", label: "Treatment", type: "textarea", span: true },
 ];
 
-/*
- * Status modal options are display labels ("Not Cleared"); the
- * endpoint takes backend keys ("notCleared"). Labels map 1:1 by
- * lowercasing the first letter and stripping spaces.
- */
 function toBackendStatus(label: string): string {
   const trimmed = label.trim();
   return trimmed.charAt(0).toLowerCase() + trimmed.slice(1).replace(/\s+/g, "");
@@ -124,9 +79,16 @@ function ReadOnlyBlock({
   value?: string | null;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-w-0 w-full flex-col gap-2">
       <p className="text-xs font-medium text-textMuted">{label}</p>
-      <div className="min-h-[72px] whitespace-pre-wrap rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary">
+      <div
+        className="min-h-[72px] w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary"
+        style={{
+          whiteSpace: "pre-wrap",
+          overflowWrap: "anywhere",
+          wordBreak: "break-word",
+        }}
+      >
         {value || "—"}
       </div>
     </div>
@@ -196,9 +158,9 @@ export default function PatientRecordView() {
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [consultationForm, setConsultationForm] = useState<
-    Record<string, any>
-  >({});
+  const [consultationForm, setConsultationForm] = useState<Record<string, any>>(
+    {}
+  );
   const [saveError, setSaveError] = useState<string | null>(null);
   const updateVisitMutation = useUpdateMedicalVisit();
 
@@ -207,30 +169,21 @@ export default function PatientRecordView() {
     isLoading,
     isError,
     refetch,
-  } = useMedicalVisitDetail(
-    USE_DUMMY_DATA ? undefined : patientId,
-    USE_DUMMY_DATA ? undefined : medicalId
-  );
+  } = useMedicalVisitDetail(patientId, medicalId);
 
-  const visit: MedicalVisitView | undefined = USE_DUMMY_DATA
-    ? DUMMY_MEDICAL_VISIT
-    : fetchedVisit;
+  const visit: MedicalVisitView | undefined = fetchedVisit;
 
-  if (!USE_DUMMY_DATA && (!patientId || !medicalId)) {
+  if (!patientId || !medicalId) {
     return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;
   }
 
-  if (!USE_DUMMY_DATA && isLoading) {
+  if (isLoading) {
     return <MedicalRecordSkeleton />;
   }
 
-  if (!visit || (!USE_DUMMY_DATA && isError)) {
+  if (!visit || isError) {
     return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;
   }
-
-  const handleBack = (): void => {
-    window.history.back();
-  };
 
   const openConsultationEdit = () => {
     setConsultationForm({
@@ -244,15 +197,7 @@ export default function PatientRecordView() {
     setIsConsultationModalOpen(true);
   };
 
-  const persistUpdate = (
-    payload: UpdateMedicalVisit,
-    onDone: () => void
-  ): void => {
-    if (USE_DUMMY_DATA || !patientId || !medicalId) {
-      onDone();
-      return;
-    }
-
+  const persistUpdate = (payload: UpdateMedicalVisit, onDone: () => void) => {
     if (Object.keys(payload).length === 0) {
       onDone();
       return;
@@ -273,7 +218,7 @@ export default function PatientRecordView() {
     );
   };
 
-  const handleSaveStatus = (form: Record<string, any>): void => {
+  const handleSaveStatus = (form: Record<string, any>) => {
     const status = toBackendStatus(String(form.status ?? ""));
 
     if (!status || status === visit.status) {
@@ -284,26 +229,23 @@ export default function PatientRecordView() {
     persistUpdate({ status }, () => setIsStatusModalOpen(false));
   };
 
-  const handleSaveConsultation = (form: Record<string, any>): void => {
-    const text = (value: unknown): string | undefined => {
+  const handleSaveConsultation = (form: Record<string, any>) => {
+    const clean = (value: unknown): string | undefined => {
       const trimmed = String(value ?? "").trim();
       return trimmed || undefined;
     };
 
     const payload: UpdateMedicalVisit = {};
-    const visitDate = text(form.visitDate);
-    const complaint = text(form.complaint);
-    const treatment = text(form.treatment);
-    const currentDate = visit.visit_date?.slice(0, 10) ?? "";
+    const visitDate = clean(form.visitDate);
+    const complaint = clean(form.complaint);
+    const treatment = clean(form.treatment);
 
-    if (visitDate && visitDate !== currentDate) {
+    if (visitDate && visitDate !== (visit.visit_date?.slice(0, 10) ?? "")) {
       payload.visit_date = visitDate;
     }
-
     if (complaint && complaint !== (visit.complaint ?? "")) {
       payload.complaint = complaint;
     }
-
     if (treatment && treatment !== (visit.treatment ?? "")) {
       payload.treatment = treatment;
     }
@@ -323,7 +265,7 @@ export default function PatientRecordView() {
             <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
               <button
                 type="button"
-                onClick={handleBack}
+                onClick={() => window.history.back()}
                 className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -340,14 +282,7 @@ export default function PatientRecordView() {
                   Update status
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
-                >
-                  <Printer className="h-3.5 w-3.5" />
-                  Print record
-                </button>
+                <MedicalReportPdfButton visit={visit} patientId={patientId} />
               </div>
             </div>
 
@@ -368,7 +303,7 @@ export default function PatientRecordView() {
                 </div>
 
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textMuted">
-                  {patientId && <span>{patientId}</span>}
+                  <span>{patientId}</span>
                   <span>•</span>
                   <span>Medical Record</span>
                 </div>
@@ -389,24 +324,18 @@ export default function PatientRecordView() {
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <InfoField label="Patient ID" value={patientId ?? visit.patient_id} />
+              <InfoField label="Patient ID" value={patientId} />
               <InfoField label="Course" value={visit.course ?? undefined} />
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <InfoField
-                label="Year and Section"
-                value={visit.year_section ?? undefined}
-              />
+              <InfoField label="Year and Section" value={visit.year_section ?? undefined} />
               <InfoField label="Age" value={visit.age ?? undefined} />
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
               <InfoField label="Sex" value={visit.sex ?? undefined} />
-              <InfoField
-                label="Civil status"
-                value={visit.civil_status ?? undefined}
-              />
+              <InfoField label="Civil status" value={visit.civil_status ?? undefined} />
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
@@ -430,7 +359,7 @@ export default function PatientRecordView() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
+          <div className="min-w-0 rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8 lg:col-span-2">
             <div className="mb-5 flex items-center justify-between gap-2 border-b border-border pb-4">
               <div className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4 text-primary" />
@@ -449,23 +378,17 @@ export default function PatientRecordView() {
               </button>
             </div>
 
-            <div className="rounded-xl border border-border p-5">
+            <div className="min-w-0 rounded-xl border border-border p-5">
               <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                 <InfoField
                   label="Visit date"
                   value={visit.visit_date ? formatDate(visit.visit_date) : undefined}
                 />
-                <InfoField
-                  label="Attending Staff"
-                  value={visit.staff_name ?? undefined}
-                />
+                <InfoField label="Attending Staff" value={visit.staff_name ?? undefined} />
               </div>
 
               <div className="mt-6 flex flex-col gap-5">
-                <ReadOnlyBlock
-                  label="Complaint / findings"
-                  value={visit.complaint}
-                />
+                <ReadOnlyBlock label="Complaint / findings" value={visit.complaint} />
                 <ReadOnlyBlock label="Treatment" value={visit.treatment} />
               </div>
 

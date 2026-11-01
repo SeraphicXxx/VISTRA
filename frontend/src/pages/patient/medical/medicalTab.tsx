@@ -21,7 +21,7 @@ const columns: Column<Visit>[] = [
 ];
 
 
-const buildViewLink = (visit: Visit) => `${ROUTES.patient.dashboard.medical}/${visit.id}`;
+const buildViewLink = (visit: Visit) => `${ROUTES.patient.dashboard.medical}/view/${visit.id}`;
 
 interface PatientMedicalTabProps {
     setFilters: (filters: MedicalVisitFilters) => void;

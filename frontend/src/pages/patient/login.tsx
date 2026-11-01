@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   AlertCircle,
   ArrowRight,
@@ -11,12 +6,13 @@ import {
   Eye,
   EyeOff,
   FileText,
+  IdCard,
   Lock,
   LoaderCircle,
   ShieldCheck,
-  IdCard,
   Users,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { Logo } from "/@/components/Logo.jsx";
 import {
@@ -24,12 +20,12 @@ import {
   usePatientLogin,
   usePatientLoginForm,
 } from "/@/hooks/UsePatientLogin";
-import { useNavigate } from "react-router-dom";
 import {
   AdminAnimStyles,
   HeartbeatLine,
   LiveDot,
 } from "/@/components/adminanim";
+import { TermsAgreementModal } from "/@/components/legal/TermsAgreementModal";
 import campusImage from "/@/assets/images/campus-background.jpg";
 
 const ID_PATTERN = PATIENT_ID_PATTERN;
@@ -37,7 +33,7 @@ const ID_PATTERN = PATIENT_ID_PATTERN;
 const ROLE_LABELS: Record<string, string> = {
   S: "Student",
   F: "Faculty",
-  A: "Admin",
+  U: "University Staff",
 };
 
 const panelPoints = [
@@ -60,6 +56,15 @@ function getRoleFromId(id: string): string | null {
   if (!match) return null;
   const suffix = id.trim().slice(-1).toUpperCase();
   return ROLE_LABELS[suffix] ?? null;
+}
+
+function getIdError(id: string): string | null {
+  const value = id.trim();
+  if (!value) return "Enter your ID number.";
+  if (!ID_PATTERN.test(value)) {
+    return "Enter an 8-digit ID followed by -S (Student), -F (Faculty), or -U (University Staff).";
+  }
+  return null;
 }
 
 function greeting() {
@@ -133,27 +138,47 @@ export default function PatientLoginPage() {
 
   const homeHref = ROUTES.patient?.dashboard?.overview ?? "/";
 
+  const idInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
   const [showPassword, setShowPassword] = useState(false);
   const [idTouched, setIdTouched] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isAgreementOpen, setIsAgreementOpen] = useState(false);
 
   const idNumber: string = credentials.idNumber ?? "";
-  const isIdValid = idNumber.length === 0 || ID_PATTERN.test(idNumber.trim());
+  const idMessage = getIdError(idNumber);
+  const passwordMessage = credentials.password ? null : "Enter your password.";
+  const showIdError = Boolean(idMessage) && (idTouched || submitAttempted);
+  const showPasswordError = Boolean(passwordMessage) && submitAttempted;
   const detectedRole = useMemo(() => getRoleFromId(idNumber), [idNumber]);
-
-  const handleIdChange = (e: ChangeEvent<HTMLInputElement>) => {
-    handleChange(e);
-  };
 
   const handleIdBlur = () => setIdTouched(true);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitAttempted(true);
     setIdTouched(true);
-    if (!ID_PATTERN.test(idNumber.trim())) return;
-    if (!credentials.password) return;
+
+    if (idMessage) {
+      idInputRef.current?.focus();
+      return;
+    }
+    if (passwordMessage) {
+      passwordInputRef.current?.focus();
+      return;
+    }
+    setIsAgreementOpen(true);
+  };
+
+  const handleAgreementAccepted = async () => {
+    setIsAgreementOpen(false);
     try {
-      // Auth: POST /auth/login/ with { identifier, password }.
-      await login(toRequest());
+      await login({
+        ...toRequest(),
+        accepted_terms: true,
+        accepted_at: new Date().toISOString(),
+      });
       navigate(homeHref);
     } catch {}
   };
@@ -186,7 +211,7 @@ export default function PatientLoginPage() {
                 </h1>
 
                 <p className="mt-3 text-base leading-relaxed text-textSecondary">
-                  Use your Student, Faculty, or Admin number.
+                  Use your Student, Faculty, or University Staff number.
                 </p>
               </div>
 
@@ -231,19 +256,20 @@ export default function PatientLoginPage() {
                   <div className="group/field relative">
                     <IdCard className={iconClass} strokeWidth={2} />
                     <input
+                      ref={idInputRef}
                       id="idNumber"
                       name="idNumber"
                       type="text"
                       inputMode="text"
                       autoComplete="username"
                       value={idNumber}
-                      onChange={handleIdChange}
+                      onChange={handleChange}
                       onBlur={handleIdBlur}
                       placeholder="e.g. 20230518-S"
-                      aria-invalid={idTouched && !isIdValid}
+                      aria-invalid={showIdError}
                       aria-describedby="idNumber-hint"
                       className={`${fieldClass} pl-12 pr-4 ${
-                        idTouched && !isIdValid
+                        showIdError
                           ? "border-danger/50 focus:border-danger/50 focus:ring-danger/20"
                           : "border-border focus:border-primary/50 focus:ring-primary/20"
                       }`}
@@ -252,13 +278,14 @@ export default function PatientLoginPage() {
 
                   <p
                     id="idNumber-hint"
+                    role={showIdError ? "alert" : undefined}
                     className={`mt-2 text-sm leading-relaxed transition-colors duration-200 ${
-                      idTouched && !isIdValid ? "text-danger" : "text-textMuted"
+                      showIdError ? "text-danger" : "text-textMuted"
                     }`}
                   >
-                    {idTouched && !isIdValid
-                      ? "Enter an 8-digit ID followed by -S (Student), -F (Faculty), or -A (Admin)."
-                      : "Format: 8-digit number + suffix -S, -F, or -A."}
+                    {showIdError
+                      ? idMessage
+                      : "Format: 8-digit number + suffix -S, -F, or -U."}
                   </p>
                 </div>
 
@@ -282,6 +309,7 @@ export default function PatientLoginPage() {
                   <div className="group/field relative">
                     <Lock className={iconClass} strokeWidth={2} />
                     <input
+                      ref={passwordInputRef}
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
@@ -289,7 +317,13 @@ export default function PatientLoginPage() {
                       value={credentials.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`${fieldClass} border-border pl-12 pr-12 focus:border-primary/50 focus:ring-primary/20`}
+                      aria-invalid={showPasswordError}
+                      aria-describedby="password-error"
+                      className={`${fieldClass} pl-12 pr-12 ${
+                        showPasswordError
+                          ? "border-danger/50 focus:border-danger/50 focus:ring-danger/20"
+                          : "border-border focus:border-primary/50 focus:ring-primary/20"
+                      }`}
                     />
                     <button
                       type="button"
@@ -306,6 +340,16 @@ export default function PatientLoginPage() {
                       )}
                     </button>
                   </div>
+
+                  {showPasswordError ? (
+                    <p
+                      id="password-error"
+                      role="alert"
+                      className="mt-2 text-left text-sm text-danger"
+                    >
+                      {passwordMessage}
+                    </p>
+                  ) : null}
                 </div>
 
                 <label className="group mt-5 flex w-fit cursor-pointer items-center gap-2.5 text-base text-textSecondary transition-colors duration-200 hover:text-textPrimary">
@@ -338,14 +382,21 @@ export default function PatientLoginPage() {
                   Records are encrypted and scoped to your role.
                 </p>
               </form>
-              <p className="fade-in-up -mx-12 mt-10 text-xs text-textMuted [animation-delay:1.1s] sm:-mx-14">
-                Access is limited to registered students, faculty, and admins.
+              <p className="fade-in-up -mx-12 mt-10 text-xs leading-relaxed text-textMuted [animation-delay:1.1s] sm:-mx-14">
+                Access is limited to registered students, faculty, and university staff.
                 Contact your administrator if you need an account.
               </p>
             </div>
           </div>
         </div>
       </main>
+
+      {isAgreementOpen && (
+        <TermsAgreementModal
+          onAccept={handleAgreementAccepted}
+          onCancel={() => setIsAgreementOpen(false)}
+        />
+      )}
     </div>
   );
 }

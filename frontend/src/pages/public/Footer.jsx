@@ -1,12 +1,17 @@
 import React from "react";
 import { Reveal, fadeUp } from "../../components/landinganim.jsx";
 import { UserLogoClickable } from "/@/components/Button.jsx";
+import { generateTermsPdf } from "/@/components/legal/termsandconditionpdf";
 
 const navLinks = [
   { label: "Mobile App", href: "#app" },
   { label: "Services", href: "#services" },
   { label: "How It Works", href: "#visit" },
 ];
+
+const openTermsPdf = () => {
+  generateTermsPdf().catch((err) => console.error(err));
+};
 
 export default function Footer() {
   return (
@@ -56,25 +61,27 @@ export default function Footer() {
                 ))}
               </div>
               <div className="flex gap-5 text-xs text-primary">
-                <a
-                  href="/terms"
-                  className="transition-colors hover:text-primaryDark"
+                <button
+                  type="button"
+                  onClick={openTermsPdf}
+                  className="cursor-pointer bg-transparent p-0 transition-colors hover:text-primaryDark"
                 >
                   Terms &amp; Conditions
-                </a>
+                </button>
               </div>
               <div className="flex gap-5 text-xs text-primary">
-                <a
-                  href="/privacy"
-                  className="transition-colors hover:text-primaryDark"
+                <button
+                  type="button"
+                  onClick={openTermsPdf}
+                  className="cursor-pointer bg-transparent p-0 transition-colors hover:text-primaryDark"
                 >
                   Privacy Policy
-                </a>
+                </button>
               </div>
 
               <div className="flex gap-5 text-xs text-primary">
                 <a
-                  href="/Appoinment"
+                  href="/patient/login"
                   className="transition-colors hover:text-primaryDark"
                 >
                   Book an Appointment

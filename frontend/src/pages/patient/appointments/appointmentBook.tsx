@@ -22,7 +22,7 @@ import {
 } from "./appointmentsData";
 import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
-import { getDateParts, todayISO, to12Hour } from "/@/utils/DateUtils";
+import { getDateParts, to12Hour } from "/@/utils/DateUtils";
 import { useCreateAppointment } from "/@/hooks/query/AppointmentQuery";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import axios from "axios";
@@ -30,11 +30,43 @@ import axios from "axios";
 const INPUT_CLASS =
   "h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
 
+const SELECT_CLASS =
+  "h-11 w-full appearance-none rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
+
+const TIME_SELECT_CLASS =
+  "h-11 min-w-0 flex-1 appearance-none rounded-xl border border-border bg-background px-3 text-center text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
+
+const HOUR_OPTIONS = Array.from({ length: 12 }, (_, i) => String(i + 1));
+const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, i) =>
+  String(i * 5).padStart(2, "0")
+);
+
 const NEXT_STEPS = [
   "You submit a request with your preferred date and time.",
   "The clinic reviews it and checks availability.",
   "You get a decision: approved, rejected, or a new time.",
 ];
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+const toISODate = (d: Date) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+function getBookingWindow() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const year = today.getFullYear();
+  const month = today.getMonth() + 6;
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const sixMonthsAhead = new Date(year, month, Math.min(today.getDate(), lastDay));
+  const yearEnd = new Date(year, 11, 31);
+
+  return {
+    min: toISODate(today),
+    max: toISODate(sixMonthsAhead < yearEnd ? sixMonthsAhead : yearEnd),
+  };
+}
 
 function getTypeIcon(type: string) {
   const value = type.toLowerCase();
@@ -83,12 +115,19 @@ export default function PatientBookAppointment() {
 
   const [type, setType] = useState(APPOINTMENT_TYPES[0]);
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [hour, setHour] = useState("");
+  const [minute, setMinute] = useState("");
+  const [period, setPeriod] = useState<"AM" | "PM">("AM");
   const [location, setLocation] = useState<string>(APPOINTMENT_LOCATIONS[0]);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createAppointmentMutation = useCreateAppointment();
+
+  const bookingWindow = getBookingWindow();
+  const time = hour && minute
+    ? `${pad((Number(hour) % 12) + (period === "PM" ? 12 : 0))}:${minute}`
+    : "";
 
   const handleBack = () => navigate(ROUTES.patient.dashboard.appointments);
 
@@ -100,8 +139,19 @@ export default function PatientBookAppointment() {
       return;
     }
 
-    if (date < todayISO()) {
+    if (date < bookingWindow.min) {
       setError("Please choose a date that isn't in the past.");
+      return;
+    }
+
+    if (date > bookingWindow.max) {
+      setError("You can book up to 6 months ahead, within this year.");
+      return;
+    }
+
+    const now = new Date();
+    if (date === bookingWindow.min && time <= `${pad(now.getHours())}:${pad(now.getMinutes())}`) {
+      setError("Please choose a time later than now.");
       return;
     }
 
@@ -115,10 +165,8 @@ export default function PatientBookAppointment() {
 
     const start = new Date(`${date}T${time}:00`);
     const end = new Date(start.getTime() + 30 * 60 * 1000);
-    const toLocalISO = (d: Date) => {
-      const pad = (n: number) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
-    };
+    const toLocalISO = (d: Date) =>
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
     const trimmedNotes = notes.trim();
 
     try {
@@ -144,6 +192,7 @@ export default function PatientBookAppointment() {
   };
 
   const dateParts = date ? getDateParts(date) : null;
+  const maxDateParts = getDateParts(bookingWindow.max);
   const TypeIcon = getTypeIcon(type);
 
   return (
@@ -303,29 +352,61 @@ export default function PatientBookAppointment() {
                   id="date"
                   type="date"
                   value={date}
-                  min={todayISO()}
+                  min={bookingWindow.min}
+                  max={bookingWindow.max}
                   onChange={(e) => setDate(e.target.value)}
                   className={INPUT_CLASS}
                 />
               </div>
+              <p className="mt-1.5 text-xs text-textMuted">
+                Up to {maxDateParts.short}
+              </p>
             </div>
 
             <div>
-              <label htmlFor="time" className="mb-1.5 block text-sm font-semibold text-textPrimary">
+              <span className="mb-1.5 block text-sm font-semibold text-textPrimary">
                 Preferred time
-              </label>
-              <div className="relative">
-                <Clock
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-textMuted"
-                  strokeWidth={2}
-                />
-                <input
-                  id="time"
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className={INPUT_CLASS}
-                />
+              </span>
+              <div className="flex h-11 items-center gap-2">
+                <select
+                  aria-label="Hour"
+                  value={hour}
+                  onChange={(e) => setHour(e.target.value)}
+                  className={TIME_SELECT_CLASS}
+                >
+                  <option value="">--</option>
+                  {HOUR_OPTIONS.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
+
+                <span className="text-sm font-semibold text-textMuted">:</span>
+
+                <select
+                  aria-label="Minute"
+                  value={minute}
+                  onChange={(e) => setMinute(e.target.value)}
+                  className={TIME_SELECT_CLASS}
+                >
+                  <option value="">--</option>
+                  {MINUTE_OPTIONS.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  aria-label="AM or PM"
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value as "AM" | "PM")}
+                  className={TIME_SELECT_CLASS}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
               </div>
             </div>
           </div>
@@ -344,7 +425,7 @@ export default function PatientBookAppointment() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 required
-                className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className={SELECT_CLASS}
               >
                 {APPOINTMENT_LOCATIONS.map((option) => (
                   <option key={option} value={option}>
