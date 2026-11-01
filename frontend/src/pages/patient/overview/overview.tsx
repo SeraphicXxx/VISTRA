@@ -13,7 +13,6 @@ import {
 } from "../appointments/appointmentsData";
 import { myMedicalRecords } from "../medical/medicalData";
 import { myDentalRecords } from "../dental/dentalData";
-import { PATIENT_HEALTH_RISKS } from "./healthRisk";
 import { PATIENT_VITALS } from "./vitalsData";
 import { filterByQuery } from "/@/utils/FilterByQuery.js";
 import { statusLabels } from "/@/components/StatusBadge";
