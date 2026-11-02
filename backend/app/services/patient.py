@@ -157,3 +157,17 @@ def get_patient_medical_dental_summary(supabase: Client, patient_id: str):
     response = patient_repo.get_medical_dental_summary(patient_id)
 
     return ok(or_404(response.data, "Patient summary not found"))
+
+@handle_service_errors
+def create_personal_records(supabase: Client, patient_id:str, forms):
+    
+    patient_repo = PatientRepository(supabase)
+    medical_id = patient_repo.insert_personal_record(patient_id, forms.medical)
+    family_history = patient_repo.insert_family_history(patient_id, forms.family)
+    results = patient_repo.insert.family_history(patient_id, forms.results)
+
+    return {
+        "medical" : medical_id,
+        "family_history" : family_history,
+        "results" : results
+    }

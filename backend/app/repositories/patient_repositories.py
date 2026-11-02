@@ -1,3 +1,4 @@
+from app.schemas.patient import CreateMedicalhistory, Results, FamilyHistory
 from typing import Any
 
 from app.repositories.base import BaseRepository
@@ -80,3 +81,45 @@ class PatientRepository(BaseRepository):
             patient_id,
             profile_data,
         )
+    
+    def insert_personal_record(self, patient_id: str, data: CreateMedicalhistory):
+        response = (
+            self.supabase
+            .table("MEDICAL_HISTORY")
+            .insert(data.to_db_dict(patient_id))
+            .execute()
+        )
+
+        
+        if not response.data:
+            return None
+
+        return response.data[0]["id"]
+
+    def insert_family_history(self, patient_id: str, data: FamilyHistory):
+        response = (
+            self.supabase
+            .table("FAMILY_HISTORY")
+            .insert(data.to_db_dict(patient_id))
+            .execute()
+        )
+
+        if not response.data:
+            return None
+        
+        return response.data[0]["id"]
+
+    def insert_results(self, patient_id: str, data: Results):
+        response = (
+            self.supabase
+            .table("RESULTS")
+            .insert(data.to_db_dict(patient_id))
+            .execute()
+        )
+
+        if not response.data:
+            return None
+        
+        return response.data[0]["id"]
+
+    
