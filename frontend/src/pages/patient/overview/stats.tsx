@@ -1,8 +1,13 @@
 import React from "react";
-import { CalendarClock, Stethoscope, ShieldCheck, ClipboardList } from "lucide-react";
-import { LucideIcon } from "lucide-react";
-import { formatDate } from "/@/utils/FormatDate";
+import {
+  CalendarClock,
+  ClipboardList,
+  ShieldCheck,
+  Stethoscope,
+  type LucideIcon,
+} from "lucide-react";
 import { Appointment } from "../appointments/appointmentsData";
+import { formatDate } from "/@/utils/FormatDate";
 import { CountUp, Reveal } from "/@/components/adminanim";
 
 interface Stat {
@@ -11,6 +16,8 @@ interface Stat {
   value: string;
   numericValue?: number;
   delta: string;
+  footerText: string;
+  highlight?: boolean;
   icon: LucideIcon;
   accent: {
     ring: string;
@@ -36,6 +43,25 @@ const ACCENTS = {
   amber: { ring: "ring-amber-500/15", iconBg: "bg-amber-500/10", iconText: "text-amber-600" },
 };
 
+function getDaysUntil(dateStr: string): number | null {
+  const [year, month, day] = dateStr.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return null;
+
+  const target = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+}
+
+function getCountdownHint(dateStr: string): string | undefined {
+  const days = getDaysUntil(dateStr);
+  if (days === null || days < 0) return undefined;
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return `In ${days} days`;
+}
+
 function buildStatCards({
   nextAppointment,
   visitCount,
@@ -48,6 +74,10 @@ function buildStatCards({
       label: "Next Appointment",
       value: nextAppointment ? formatDate(nextAppointment.date) : "None scheduled",
       delta: nextAppointment ? `${nextAppointment.type} · ${nextAppointment.time}` : "Book one anytime",
+      footerText: nextAppointment
+        ? getCountdownHint(nextAppointment.date) ?? "Upcoming"
+        : "Nothing booked yet",
+      highlight: true,
       icon: CalendarClock,
       accent: ACCENTS.sky,
     },
@@ -57,6 +87,7 @@ function buildStatCards({
       value: String(visitCount),
       numericValue: visitCount,
       delta: "Logged to your record",
+      footerText: "View visit history",
       icon: Stethoscope,
       accent: ACCENTS.violet,
     },
@@ -65,6 +96,7 @@ function buildStatCards({
       label: "Medical Status",
       value: medicalStatus || "No record yet",
       delta: "Clinic clearance",
+      footerText: "Verified by clinic",
       icon: ShieldCheck,
       accent: ACCENTS.emerald,
     },
@@ -73,17 +105,30 @@ function buildStatCards({
       label: "Dental Status",
       value: dentalStatus || "No record yet",
       delta: "Clinic clearance",
+      footerText: "Checkup on file",
       icon: ClipboardList,
       accent: ACCENTS.amber,
     },
   ];
 }
 
+function CardFooter({ text, className }: { text: string; className: string }) {
+  return (
+    <div className="mt-auto pt-4">
+      <span
+        className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ${className}`}
+      >
+        {text}
+      </span>
+    </div>
+  );
+}
+
 function StatCard({ stat }: { stat: Stat }) {
   const Icon = stat.icon;
   return (
     <div
-      className={`rounded-2xl border border-border bg-surface p-5 shadow-card ring-1 transition-transform duration-200 hover:-translate-y-0.5 ${stat.accent.ring}`}
+      className={`flex h-full min-h-[11rem] flex-col rounded-2xl border border-border bg-surface p-5 shadow-card ring-1 transition-transform duration-200 hover:-translate-y-0.5 ${stat.accent.ring}`}
     >
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wide text-textMuted">{stat.label}</span>
@@ -93,6 +138,7 @@ function StatCard({ stat }: { stat: Stat }) {
           <Icon className="h-4 w-4" strokeWidth={2} />
         </span>
       </div>
+
       <p className="mt-4 truncate font-heading text-2xl font-semibold text-textPrimary capitalize">
         {stat.numericValue !== undefined ? (
           <CountUp to={stat.numericValue} duration={0.9} />
@@ -101,6 +147,41 @@ function StatCard({ stat }: { stat: Stat }) {
         )}
       </p>
       <p className="mt-1 truncate text-xs text-textMuted">{stat.delta}</p>
+
+      <CardFooter
+        text={stat.footerText}
+        className={`${stat.accent.iconBg} ${stat.accent.iconText}`}
+      />
+    </div>
+  );
+}
+
+function FeaturedStatCard({ stat }: { stat: Stat }) {
+  const Icon = stat.icon;
+  return (
+    <div className="relative flex h-full min-h-[11rem] flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primaryDark p-5 text-white shadow-card transition-transform duration-200 hover:-translate-y-0.5">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/15 blur-2xl"
+      />
+
+      <div className="relative flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-white/80">{stat.label}</span>
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+          <Icon className="h-4 w-4" strokeWidth={2} />
+        </span>
+      </div>
+
+      <p className="relative mt-4 truncate font-heading text-2xl font-semibold capitalize">
+        {stat.value}
+      </p>
+      <p className="relative mt-1 truncate text-xs text-white/80">{stat.delta}</p>
+
+      <div className="relative mt-auto pt-4">
+        <span className="inline-flex rounded-md bg-white/20 px-2 py-0.5 text-xs font-semibold">
+          {stat.footerText}
+        </span>
+      </div>
     </div>
   );
 }
@@ -115,7 +196,7 @@ export default function PatientStatsGrid({
   const statCards = buildStatCards({ nextAppointment, visitCount, medicalStatus, dentalStatus });
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {statCards.map((stat, index) => (
         <Reveal
           key={stat.id}
@@ -123,7 +204,9 @@ export default function PatientStatsGrid({
           delay={startDelay + index * CARD_STAGGER}
           distance={18}
         >
-          <StatCard stat={stat} />
+          <div className="h-full">
+            {stat.highlight ? <FeaturedStatCard stat={stat} /> : <StatCard stat={stat} />}
+          </div>
         </Reveal>
       ))}
     </div>

@@ -31,7 +31,6 @@ from document_intelligence import (  # noqa: E402
     OCRPipeline,
     apply_review,
 )
-from document_intelligence.formatter import OCRResult  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +38,10 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".pdf"}
 
 # In-memory cache for the review workflow (process-local, non-persistent).
-_OCR_RESULTS: Dict[str, OCRResult] = {}
+_OCR_RESULTS: Dict[str, Any] = {}
 
 
-def _run_ocr(content: bytes, filename: str) -> OCRResult:
+def _run_ocr(content: bytes, filename: str):
     if not content:
         raise HTTPException(status_code=400, detail="File cannot be empty")
     if len(content) > MAX_FILE_SIZE:
@@ -74,7 +73,7 @@ def extract_document(
     patient_id: Optional[str],
     supabase: Client,
     current_user: CurrentUser,
-) -> Dict[str, Any]:
+):
     result = _run_ocr(content, file_name)
     if patient_id:
         result.extracted_data.setdefault("patient_id", patient_id)
@@ -89,7 +88,7 @@ def extract_document(
 
 
 @handle_service_errors
-def get_ocr_result(document_id: str, supabase: Client) -> Dict[str, Any]:
+def get_ocr_result(document_id: str, supabase: Client):
     result = _OCR_RESULTS.get(document_id)
     if result is None:
         raise HTTPException(status_code=404, detail="OCR result not found")
@@ -104,7 +103,7 @@ def review_ocr_result(
     notes: Optional[str],
     supabase: Client,
     current_user: CurrentUser,
-) -> Dict[str, Any]:
+):
     result = _OCR_RESULTS.get(document_id)
     if result is None:
         raise HTTPException(status_code=404, detail="OCR result not found")

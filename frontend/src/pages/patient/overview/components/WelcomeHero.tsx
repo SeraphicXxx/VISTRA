@@ -48,7 +48,7 @@ export default function WelcomeHero({ name, studentId, isLoading = false }: Welc
             <div className="h-4 w-40 animate-pulse rounded bg-border" aria-hidden="true" />
           ) : (
             <p className="text-xs font-medium text-textMuted">
-              {studentId} · {todayLabel()}
+              {studentId} 
             </p>
           )}
 
