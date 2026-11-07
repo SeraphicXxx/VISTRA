@@ -10,7 +10,7 @@ import {sendEmail} from "/@/api/email.api";
 interface NotifyProfessionalModalProps {
     professionals: Professional[];
     defaultMessage: string;
-    onSend: (professional: Professional, message: string) => void;
+    onSend: (professional: Professional, message: string) => void | Promise<void>;
     onSkip: () => void;
     onCancel: () => void;
 }
@@ -48,6 +48,7 @@ export function NotifyProfessionalModal({
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [message, setMessage] = useState(defaultMessage);
     const [isAdding, setIsAdding] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const [newProfessor, setNewProfessor] = useState<NewProfessorForm>(EMPTY_NEW_PROFESSOR);
     const [addError, setAddError] = useState<string | null>(null);
 
@@ -346,45 +347,50 @@ export function NotifyProfessionalModal({
 
                         <button
                             type="button"
-                            disabled={!canSend}
+                            disabled={!canSend || isSending}
                             onClick={async () => {
-                                if (selected) {
-                                    const subject = `Record notification: ${selected.name}`;
-                                    const body = message.trim();
+                                if (selected && !isSending) {
+                                    setIsSending(true);
+                                    try {
+                                        const subject = `Record notification: ${selected.name}`;
+                                        const body = message.trim();
 
-                                    // Store notification in localStorage
-                                    saveNotification({
-                                        professional: selected,
-                                        subject,
-                                        message: body,
-                                        sentAt: new Date().toISOString(),
-                                    });
+                                        // Store notification in localStorage
+                                        saveNotification({
+                                            professional: selected,
+                                            subject,
+                                            message: body,
+                                            sentAt: new Date().toISOString(),
+                                        });
 
-                                    // Send email via backend (Gmail SMTP) if email is provided
-                                    if (selected.email) {
-                                        try {
-                                            await sendEmail({
-                                                to: selected.email,
-                                                subject,
-                                                body,
-                                            });
-                                            notify.success(`Email sent to ${selected.email}`, {
-                                                title: "Notification sent",
-                                            });
-                                        } catch (error) {
-                                            console.error("Failed to send email:", error);
-                                            notify.error("Failed to send email notification.", {
-                                                title: "Email failed",
-                                            });
+                                        // Send email via backend (Gmail SMTP) if email is provided
+                                        if (selected.email) {
+                                            try {
+                                                await sendEmail({
+                                                    to: selected.email,
+                                                    subject,
+                                                    body,
+                                                });
+                                                notify.success(`Email sent to ${selected.email}`, {
+                                                    title: "Notification sent",
+                                                });
+                                            } catch (error) {
+                                                console.error("Failed to send email:", error);
+                                                notify.error("Failed to send email notification.", {
+                                                    title: "Email failed",
+                                                });
+                                            }
                                         }
-                                    }
 
-                                    onSend(selected, message.trim());
+                                        await onSend(selected, message.trim());
+                                    } finally {
+                                        setIsSending(false);
+                                    }
                                 }
                             }}
                             className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-primary"
                         >
-                            Send email and save
+                            {isSending ? "Sending..." : "Send email and save"}
                         </button>
                     </div>
                 </div>
