@@ -46,3 +46,6 @@ vcs-versioning==2.2.4
 watchfiles==1.2.0
 websockets==15.0.1
 yarl==1.24.5
+
+# Document intelligence (OCR) package (pinned commit for Python 3.13 compatibility)
+vistra-document-intelligence @ git+https://github.com/KENJICHUA/vistra-document-intelligence.git@a623f9777dbcbf66fd2877283922cd2b3a232fd4
