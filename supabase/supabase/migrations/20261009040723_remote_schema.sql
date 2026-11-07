@@ -25,8 +25,6 @@ create or replace view "public"."medical_record_view" as  SELECT (mv.id)::text A
     mv.type,
     mv.status,
     mv.visit_date,
-    mv.complaint,
-    mv.treatment,
     mv.treatment_type,
     concat_ws(' '::text, s.first_name, s.middle_name, s.last_name) AS staff_name
    FROM ((public."MEDICAL_VISIT" mv
