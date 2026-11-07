@@ -4,6 +4,7 @@ import logging
 from typing import ParamSpec, TypeVar
 
 from fastapi import HTTPException, status
+from postgrest.exceptions import APIError
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,14 @@ R = TypeVar("R")
 T = TypeVar("T")
 
 _UNSET = object()
+
+# Postgres error codes mapped to HTTP status codes.
+# 23503 = foreign key violation (linked records block delete/update)
+# 23505 = unique violation (duplicate key)
+_PG_ERROR_MAP = {
+    "23503": status.HTTP_409_CONFLICT,
+    "23505": status.HTTP_422_UNPROCESSABLE_CONTENT,
+}
 
 
 def ok(data=_UNSET, message=None, **extra):
@@ -49,13 +58,31 @@ def or_404(value: T, detail: str) -> T:
 
 
 def handle_service_errors(fn: Callable[P, R]) -> Callable[P, R]:
-    """Raise-contract: re-raise HTTPException, wrap other errors."""
+    """Raise-contract: re-raise HTTPException, wrap other errors.
+
+    Postgres errors (APIError) are mapped to specific HTTP status
+    codes based on the PG error code; all other unexpected errors
+    become 500.
+    """
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except HTTPException:
             raise
+        except APIError as e:
+            pg_code = getattr(e, "code", None)
+            http_status = _PG_ERROR_MAP.get(
+                pg_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            logger.exception(
+                "Postgres error in %s: code=%s message=%s",
+                fn.__name__, pg_code, e,
+            )
+            raise HTTPException(
+                status_code=http_status,
+                detail=str(e),
+            )
         except ValueError as e:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

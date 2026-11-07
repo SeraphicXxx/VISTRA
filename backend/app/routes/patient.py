@@ -21,8 +21,12 @@ protected_patient_router = APIRouter(
 )
 
 @protected_patient_router.get("/", dependencies=[Depends(require_staff)])
-def get_patients(supabase: Client = Depends(get_supabase_for_user)):
-    return get_all_patients(supabase)
+def get_patients(
+    page: int = 1,
+    page_size: int = 10,
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    return get_all_patients(supabase, page=page, page_size=page_size)
 
 @protected_patient_router.post("/", dependencies=[Depends(require_staff)])
 def create_patient(request: CreatePatientRequest, supabase: Client = Depends(get_supabase_for_user)):
