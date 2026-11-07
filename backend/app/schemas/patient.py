@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
+from app.enums.personal_history import Frequency, Sexual_activity, Results
+from app.enums.family_history import Family_history
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
 
@@ -174,6 +176,65 @@ class UpdatePatientProfileRequest(BaseModel):
             return value
 
         return confirm_mobile_number(value)
+
+
+class CreateMedicalhistory(BaseModel):
+    hostpitalization_operation : str = Field(..., min_length=1, max_length=255)
+    hostpitalization_year : int
+    diagnosis: str = Field(..., min_length=2, max_length=255)
+    allergy_medicine : str =Field(..., min_length=2, max_length=255)
+    allergy_food : str = Field(..., min_length=2, max_length=255)
+    Smoking : Frequency | None = None
+    Vaping: Frequency | None = None
+    Alcohol: Frequency | None = None
+    Contraceptive: str = Field(..., min_length=2, max_length=255)
+    Sexual_activity: Sexual_activity 
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        return {
+            "patient_id" : patient_id,
+            "hospitalization_operation" : self.hostpitalization_operation,
+            "hospitalization_year" : self.hostpitalization_year,
+            "diagnosis" : self.diagnosis,
+            "allergy_medicine" : self.allergy_medicine,
+            "allergy_food" : self.allergy_food,
+            "Smoking" : self.Smoking.value,
+            "Vaping" : self.Vaping.value,
+            "Alcohol" : self.Alcohol.value,
+            "Contraceptive" : self.Contraceptive,
+            "Sexual_Activity" : self.Sexual_activity.value
+        }
+
+class FamilyHistory(BaseModel):
+    Family_history: Family_history 
+    Other : None | str = Field(..., min_length=2 ,max_length=255)
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        return {
+            "patient_id" : patient_id,
+            "Family_history" : self.Family_history.value,
+            "Other" : self.Other
+        }
+
+class Results(BaseModel): 
+    Chest_Xray : Results | str = "Normal"
+    CBC : Results | str = "Normal"
+    Urinalysis: Results | str = "Normal"
+    Other: str = Field(default=None, min_length=2, max_length=255)
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        return{
+            "patient_id" : patient_id,
+            "Chest_Xray" : self.Chest_Xray.value,
+            "CBC" : self.CBC.value,
+            "Urinalysis" : self.Urinalysis.value,
+            "Other" : self.Other
+        }
+
+class FullFormRequest(BaseModel):
+    medical: CreateMedicalhistory
+    family: FamilyHistory
+    results: Results
 
 class PatientRecord(BaseModel):
     id: int
