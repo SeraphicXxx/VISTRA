@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.settings import Config
-from app.routes import health, auth, staff, patient, appointment, dental, medical, overview, internal, screening, attachments, vital_signs, document_ocr
+from app.routes import health, auth, staff, patient, appointment, dental, medical, overview, internal, screening, attachments, vital_signs, document_ocr, email
 
 app = FastAPI(
     title="VISTRA API",
@@ -37,3 +37,4 @@ app.include_router(screening.screening_router, prefix=API_V1_PREFIX)
 app.include_router(attachments.protected_attachment_router, prefix=API_V1_PREFIX)
 app.include_router(vital_signs.vital_signs_router, prefix=API_V1_PREFIX)
 app.include_router(document_ocr.document_ocr_router, prefix=API_V1_PREFIX)
+app.include_router(email.email_router, prefix=API_V1_PREFIX)

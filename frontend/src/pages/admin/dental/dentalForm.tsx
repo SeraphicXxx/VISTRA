@@ -441,8 +441,16 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
         onSave?.(record, notification);
 
         createDentalVisitMutation.mutate(record, {
+            onSuccess: () => {
+                notify.success("The dental record was saved successfully.", {
+                    title: "Record saved",
+                });
+            },
             onError: (error) => {
                 console.error("Failed to create dental visit:", getFieldErrors(error));
+                notify.error("The dental record could not be saved. Please try again.", {
+                    title: "Save failed",
+                });
             },
         });
 

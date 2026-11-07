@@ -249,7 +249,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         });
     };
 
-    const handleNotify = (professional: Professional): void => {
+    const handleNotify = (professional: Professional, message: string): void => {
         setIsNotifyOpen(false);
         persistRecord(professional);
     };
@@ -469,6 +469,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             {isNotifyOpen && (
                 <NotifyProfessionalModal
                     professionals={NOTIFY_PROFESSIONALS}
+                    defaultMessage="A medical record was saved. Please review it at your earliest convenience."
                     onSend={handleNotify}
                     onSkip={handleSkipNotify}
                     onCancel={() => setIsNotifyOpen(false)}

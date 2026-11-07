@@ -60,5 +60,8 @@ export const API_ENDPOINTS = {
     },
     screening: {
         predict: `${API_V1}/screening/predict`,
+    },
+    email: {
+        send: `${API_V1}/email/send/`,
     }
 };
