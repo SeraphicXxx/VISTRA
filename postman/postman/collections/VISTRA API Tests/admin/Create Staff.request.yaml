@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/staff/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\n    \"staff_id\": \"{{created_staff_id}}\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"Staff\",\n    \"middle_name\": \"Q\",\n    \"password\": \"TestPass123!\",\n    \"position\": \"Nurse\",\n    \"specialty\": \"General\",\n    \"phone\": \"09170000000\",\n    \"email\": \"test.staff@example.com\"\n}"
+scripts:
+  - type: beforeRequest
+    code: pm.environment.set("created_staff_id", "STFT-" + Date.now());
+    language: text/javascript
+  - type: afterResponse
+    code: "pm.test(\"Create staff returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Staff creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json).to.have.property(\"message\");\n});"
+    language: text/javascript
+order: 500

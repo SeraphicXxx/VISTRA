@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"password\": \"TestPass123!\",\n    \"created_by\": \"{{user_id}}\",\n    \"name\": \"Test, Patient\",\n    \"address\": \"123 Test Street\",\n    \"age\": 20,\n    \"barangay\": \"Commonwealth\",\n    \"birthday\": \"2006-07-07\",\n    \"mobile_number\": \"09171234567\",\n    \"sex\": \"Male\",\n    \"civil_status\": \"Single\",\n    \"classification\": \"Student\",\n    \"course\": \"BS Computer Science\",\n    \"school_year\": \"3rd Year\",\n    \"section\": \"B\"\n}"
+scripts:
+  - type: beforeRequest
+    code: "const stamp = Date.now();\npm.environment.set(\"patient_id\", \"TEST-\" + stamp);\n\nconst birthday = new Date();\nbirthday.setFullYear(birthday.getFullYear() - 20);\npm.environment.set(\"patient_birthday\", birthday.toISOString().slice(0, 10));\npm.environment.set(\"patient_age\", \"20\");"
+    language: text/javascript
+  - type: afterResponse
+    code: "pm.test(\"Create patient returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Patient creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
+    language: text/javascript
+order: 1000

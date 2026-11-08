@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/dental/{{patient_id}}/{{dental_visit_id}}/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\n    \"status\": \"Completed\",\n    \"tooth_records\": [\n        {\n            \"tooth_number\": 11,\n            \"surface\": \"O\",\n            \"treatment\": \"Cleaning\"\n        }\n    ]\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Update dental visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visit is updated\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
+    language: text/javascript
+order: 2300

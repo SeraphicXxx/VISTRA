@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/medical/{{patient_id}}/{{medical_visit_id}}/"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\n    \"status\": \"Completed\",\n    \"complaint\": \"Updated complaint\",\n    \"treatment\": \"Updated treatment\"\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Update medical visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Medical visit is updated\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
+    language: text/javascript
+order: 2800

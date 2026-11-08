@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/medical/"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+body:
+  type: json
+  content: "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"visit_date\": \"2026-11-10\",\n    \"status\": \"Completed\",\n    \"type\": \"Consultation\",\n    \"staff_id\": \"{{staff_id}}\",\n    \"complaint\": \"General checkup\",\n    \"treatment\": \"Examination\",\n    \"treatment_type\": \"Routine\"\n}"
+scripts:
+  - type: beforeRequest
+    code: "if (!pm.environment.get(\"patient_id\")) {\n    pm.environment.set(\"patient_id\", \"TEST-\" + Date.now());\n}\nif (!pm.environment.get(\"staff_id\")) {\n    pm.environment.set(\"staff_id\", \"STFT-\" + Date.now());\n}"
+    language: text/javascript
+  - type: afterResponse
+    code: "pm.test(\"Create medical visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Medical visit creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json.data).to.have.property(\"medical_visit_id\");\n    pm.environment.set(\"medical_visit_id\", json.data.medical_visit_id);\n});"
+    language: text/javascript
+order: 2500

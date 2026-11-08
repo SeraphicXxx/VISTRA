@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/summary/medical-dental/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Get my medical-dental summary returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Summary data is returned\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
+    language: text/javascript
+order: 600
