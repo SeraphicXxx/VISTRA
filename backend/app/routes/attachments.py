@@ -16,6 +16,7 @@ from supabase import Client
 from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.enums.attachments import AttachmentCategory
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.schemas.user import CurrentUser
 from app.services.access import require_module
 
@@ -28,7 +29,7 @@ protected_attachment_router = APIRouter(
     ],
 )
 
-@protected_attachment_router.post("/upload", status_code=201)
+@protected_attachment_router.post("/upload", status_code=201, response_model=DataResponse)
 async def upload_attachment(
     patient_id: str = Form(...),
     medical_visit_id: int = Form(default=None),
@@ -52,7 +53,7 @@ async def upload_attachment(
     finally:
         await file.close()
 
-@protected_attachment_router.get("/patient/{patient_id}")
+@protected_attachment_router.get("/patient/{patient_id}", response_model=DataResponse)
 def get_patient_attachments(
     patient_id: str,
     category: AttachmentCategory | None = None,
@@ -90,7 +91,7 @@ def download_attachment(
 
 
 
-@protected_attachment_router.delete("/{attachment_id}")
+@protected_attachment_router.delete("/{attachment_id}", response_model=SuccessResponse)
 def delete_attachment(
     attachment_id: UUID,
     supabase: Client = Depends(get_supabase_for_user),

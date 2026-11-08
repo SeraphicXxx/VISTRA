@@ -7,6 +7,6 @@ auth:
     token: "{{access_token}}"
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Logout returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.environment.unset(\"access_token\");\npm.environment.unset(\"refresh_token\");"
+    code: "pm.test(\"Admin logout returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.environment.unset(\"access_token\");\npm.environment.unset(\"refresh_token\");"
     language: text/javascript
-order: 400
+order: 100
