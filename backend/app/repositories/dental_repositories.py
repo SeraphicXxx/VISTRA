@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, Optional
 
 from app.repositories.base import BaseRepository, fetch_visit_tab
+from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.schemas.dental import (
     EDITABLE_ODONTOGRAM_COLUMNS,
@@ -10,7 +11,7 @@ from app.schemas.query import FilterDental
 
 
 class DentalRepository(BaseRepository):
-    def create(self, data, staff_id):
+    def create(self, data: Any, staff_id: str) -> Optional[int]:
         response = (
             self.supabase
             .table("DENTAL_VISIT")
@@ -24,11 +25,11 @@ class DentalRepository(BaseRepository):
         return response.data[0]["id"]
 
     def create_odontogram(
-            self,
-            data,
-            patient_id,
-            dental_record_id: int
-    ):
+        self,
+        data: Any,
+        patient_id: str,
+        dental_record_id: int
+    ) -> Any:
         teeth = [
             item.to_db_dict(patient_id, dental_record_id)
             for item in data
@@ -42,7 +43,7 @@ class DentalRepository(BaseRepository):
 
         return response.data
 
-    def get_dental_visits(self, filters: FilterDental):
+    def get_dental_visits(self, filters: FilterDental) -> PaginatedResponse:
         return fetch_visit_tab(
             self.supabase,
             "dental_tab",
@@ -53,7 +54,7 @@ class DentalRepository(BaseRepository):
             filters=filters,
         )
 
-    def get_patient_dental_tab(self, patient_id: str, filters: FilterDental):
+    def get_patient_dental_tab(self, patient_id: str, filters: FilterDental) -> PaginatedResponse:
         builder = SupabaseQueryBuilder(
             self.supabase,
             "patient_dental_tab",
@@ -75,7 +76,7 @@ class DentalRepository(BaseRepository):
         builder.order("visit_date", desc=True)
         return self.fetch_page(builder, filters.page, filters.page_size)
 
-    def get_dental_record(self, patient_id: str, dental_visit_id: int):
+    def get_dental_record(self, patient_id: str, dental_visit_id: int) -> Optional[dict[str, Any]]:
         return self.fetch_one(
             "dental_record_view",
             filters={
@@ -84,25 +85,25 @@ class DentalRepository(BaseRepository):
             },
         )
 
-    def get_visit_by_id(self, dental_visit_id: int):
+    def get_visit_by_id(self, dental_visit_id: int) -> Optional[dict[str, Any]]:
         return self.fetch_one(
             "DENTAL_VISIT",
             select="id",
             filters={"id": dental_visit_id},
         )
 
-    def delete_visit_cascade(self, dental_visit_id: int):
+    def delete_visit_cascade(self, dental_visit_id: int) -> Any:
         # Atomic: odontogram + visit deleted in one transaction.
         # Requires migration 20261010120000_cascade_deletes.
-        self.supabase.rpc(
+        return self.supabase.rpc(
             "delete_dental_visit",
             {"p_visit_id": dental_visit_id},
         ).execute()
 
-    def delete_visit(self, dental_visit_id: int):
+    def delete_visit(self, dental_visit_id: int) -> bool:
         return self.delete_by_column("DENTAL_VISIT", "id", dental_visit_id)
 
-    def get_tooth_by_number(self, dental_record_id: int, tooth_number: int):
+    def get_tooth_by_number(self, dental_record_id: int, tooth_number: int) -> Optional[dict[str, Any]]:
         return self.fetch_one(
             "ODONTOGRAM",
             filters={
@@ -111,7 +112,7 @@ class DentalRepository(BaseRepository):
             },
         )
 
-    def insert_tooth(self, tooth_data: dict[str, Any]):
+    def insert_tooth(self, tooth_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("ODONTOGRAM")
@@ -124,7 +125,7 @@ class DentalRepository(BaseRepository):
 
         return response.data[0]
 
-    def update_visit(self, dental_visit_id: int, visit_data: dict[str, Any]):
+    def update_visit(self, dental_visit_id: int, visit_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         updatable = {
             key: value
             for key, value in (visit_data or {}).items()
@@ -144,7 +145,7 @@ class DentalRepository(BaseRepository):
             updatable,
         )
 
-    def update_odontogram(self, tooth_id: int, tooth_data: dict[str, Any]):
+    def update_odontogram(self, tooth_id: int, tooth_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         updatable = {
             key: value
             for key, value in (tooth_data or {}).items()

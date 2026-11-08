@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, Optional
 
 from app.repositories.base import BaseRepository, fetch_visit_tab
+from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.schemas.medical import EDITABLE_MEDICAL_VISIT_COLUMNS
 from app.schemas.query import FilterMedical
@@ -8,7 +9,7 @@ from app.schemas.query import FilterMedical
 
 class MedicalRepository(BaseRepository):
 
-    def get_medical_visits(self, filters: FilterMedical):
+    def get_medical_visits(self, filters: FilterMedical) -> PaginatedResponse:
         return fetch_visit_tab(
             self.supabase,
             "medical_tab",
@@ -20,7 +21,7 @@ class MedicalRepository(BaseRepository):
             include_type=True,
         )
 
-    def get_patient_medical_tab(self, patient_id: str, filters: FilterMedical):
+    def get_patient_medical_tab(self, patient_id: str, filters: FilterMedical) -> PaginatedResponse:
         builder = SupabaseQueryBuilder(
             self.supabase,
             "patient_medical_tab",
@@ -38,10 +39,10 @@ class MedicalRepository(BaseRepository):
         builder.order("visit_date", desc=True)
         return self.fetch_page(builder, filters.page, filters.page_size)
 
-    def delete_visit(self, medical_visit_id: int):
+    def delete_visit(self, medical_visit_id: int) -> bool:
         return self.delete_by_column("MEDICAL_VISIT", "id", medical_visit_id)
 
-    def update_visit(self, medical_visit_id: int, visit_data: dict[str, Any]):
+    def update_visit(self, medical_visit_id: int, visit_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         updatable = {
             key: value
             for key, value in (visit_data or {}).items()
@@ -61,7 +62,7 @@ class MedicalRepository(BaseRepository):
             updatable,
         )
 
-    def get_medical_record(self, patient_id: str, medical_visit_id: int):
+    def get_medical_record(self, patient_id: str, medical_visit_id: int) -> Optional[dict[str, Any]]:
         return self.fetch_one(
             "medical_record_view",
             filters={
@@ -70,7 +71,7 @@ class MedicalRepository(BaseRepository):
             },
         )
 
-    def create(self, data, staff_id: str):
+    def create(self, data: Any, staff_id: str) -> Optional[int]:
         response = (
             self.supabase
             .table("MEDICAL_VISIT")

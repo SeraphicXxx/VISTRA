@@ -1,9 +1,11 @@
+import logging
+from typing import NoReturn
+
+from fastapi import HTTPException, status
+
 from app.database.database_client import supabase_admin
 from app.utils.email_utils import add_ucc_domain
 from app.utils.service_helpers import ok
-from fastapi import HTTPException, status
-from typing import NoReturn
-import logging
 
 logger = logging.getLogger(__name__)
 

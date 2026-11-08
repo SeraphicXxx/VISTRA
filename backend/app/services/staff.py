@@ -1,3 +1,7 @@
+from fastapi import status, HTTPException
+from postgrest.exceptions import APIError
+from supabase import Client
+
 from app.repositories.base import insert_model
 from app.repositories.staff_repositories import StaffRepository
 from app.schemas.staff import (
@@ -15,9 +19,6 @@ from app.services.auth.user import (
 )
 from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
-from fastapi import status, HTTPException
-from postgrest.exceptions import APIError
-from supabase import Client
 
 
 @handle_service_errors

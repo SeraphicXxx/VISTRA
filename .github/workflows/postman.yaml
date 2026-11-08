@@ -44,6 +44,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Lint with ruff
+        working-directory: backend
+        run: |
+          ruff check app/
+
+      - name: Typecheck with mypy
+        working-directory: backend
+        run: |
+          mypy app/
+
       - name: Start backend
         working-directory: backend
         env:

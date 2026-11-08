@@ -1,15 +1,17 @@
+from typing import Any, Optional
+
 from app.repositories.base import BaseRepository
 
 
 class StaffRepository(BaseRepository):
 
-    def get_by_id(self, staff_id: str):
+    def get_by_id(self, staff_id: str) -> Optional[dict[str, Any]]:
         return self.fetch_one(
             "STAFF",
             filters={"staff_id": staff_id},
         )
 
-    def get_all_with_permissions(self):
+    def get_all_with_permissions(self) -> list[dict[str, Any]]:
         """All STAFF rows with their STAFF_PERMISSIONS merged.
 
         Two roundtrips regardless of row count (no per-row lookup):
@@ -29,14 +31,14 @@ class StaffRepository(BaseRepository):
             for row in staff_rows
         ]
 
-    def get_permissions(self, staff_id: str):
+    def get_permissions(self, staff_id: str) -> Optional[dict[str, Any]]:
         """STAFF_PERMISSIONS row, or None for legacy rows / denied reads."""
         return self.fetch_one(
             "STAFF_PERMISSIONS",
             filters={"staff_id": staff_id},
         )
 
-    def insert_permissions(self, staff_id: str, perms: dict):
+    def insert_permissions(self, staff_id: str, perms: dict[str, Any]) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("STAFF_PERMISSIONS")
@@ -49,7 +51,7 @@ class StaffRepository(BaseRepository):
 
         return response.data[0]
 
-    def update_permissions(self, staff_id: str, perms: dict):
+    def update_permissions(self, staff_id: str, perms: dict[str, Any]) -> Optional[dict[str, Any]]:
         return self.update_by_column(
             "STAFF_PERMISSIONS",
             "staff_id",
@@ -57,7 +59,7 @@ class StaffRepository(BaseRepository):
             perms,
         )
 
-    def update_role(self, staff_id: str, role: str):
+    def update_role(self, staff_id: str, role: str) -> Optional[dict[str, Any]]:
         return self.update_by_column(
             "STAFF",
             "staff_id",
@@ -65,11 +67,11 @@ class StaffRepository(BaseRepository):
             {"role": role},
         )
 
-    def get_staff(self):
+    def get_staff(self) -> Optional[list[dict[str, Any]]]:
         return self.fetch_all("STAFF")
 
-    def delete(self, staff_id: str):
+    def delete(self, staff_id: str) -> bool:
         return self.delete_by_column("STAFF", "staff_id", staff_id)
 
-    def delete_permissions(self, staff_id: str):
+    def delete_permissions(self, staff_id: str) -> bool:
         return self.delete_by_column("STAFF_PERMISSIONS", "staff_id", staff_id)
