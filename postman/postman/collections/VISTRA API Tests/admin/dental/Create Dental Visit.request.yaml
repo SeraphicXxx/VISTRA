@@ -7,7 +7,27 @@ auth:
     token: "{{access_token}}"
 body:
   type: json
-  content: "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"visit_date\": \"2026-11-10\",\n    \"status\": \"Completed\",\n    \"type\": \"Consultation\",\n    \"staff_id\": \"{{staff_id}}\",\n    \"tooth_records\": [\n        {\n            \"tooth_number\": 11,\n            \"surface\": \"O\",\n            \"treatment\": \"Examination\"\n        }\n    ]\n}"
+  content: |-
+    {
+        "patient_id": "{{patient_id}}",
+        "last_dental_visit": "2026-10-10",
+        "brushing_frequency": "twice_daily",
+        "floss": true,
+        "calculus_severity": "mild",
+        "current_medications": "None",
+        "notes": "Initial dental visit",
+        "status": "Completed",
+        "type": "Consultation",
+        "staff_id": "{{staff_id}}",
+        "tooth_records": [
+            {
+                "tooth_number": 11,
+                "condition": "healthy",
+                "dentition": "permanent",
+                "notes": "No issues found"
+            }
+        ]
+    }
 scripts:
   - type: beforeRequest
     code: "if (!pm.environment.get(\"patient_id\")) {\n    pm.environment.set(\"patient_id\", \"TEST-\" + Date.now());\n}\nif (!pm.environment.get(\"staff_id\")) {\n    pm.environment.set(\"staff_id\", \"STFT-\" + Date.now());\n}"
