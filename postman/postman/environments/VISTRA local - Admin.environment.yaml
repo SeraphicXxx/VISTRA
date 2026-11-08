@@ -3,11 +3,11 @@ values:
   - key: base_url
     value: 'http://localhost:8000'
   - key: api_version
-    value: 'api/v1'
+    value: api/v1
   - key: user_id
-    value: 'STF001'
+    value: STF001
   - key: admin_password
-    value: 'testpass123'
+    value: testpass123
   - key: admin_access_token
     value: ''
   - key: admin_refresh_token

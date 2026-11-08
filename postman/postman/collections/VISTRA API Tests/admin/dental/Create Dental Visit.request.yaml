@@ -13,6 +13,6 @@ scripts:
     code: "if (!pm.environment.get(\"patient_id\")) {\n    pm.environment.set(\"patient_id\", \"TEST-\" + Date.now());\n}\nif (!pm.environment.get(\"staff_id\")) {\n    pm.environment.set(\"staff_id\", \"STFT-\" + Date.now());\n}"
     language: text/javascript
   - type: afterResponse
-    code: "pm.test(\"Create dental visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visit creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json.data).to.have.property(\"dental_record_id\");\n    pm.environment.set(\"dental_visit_id\", json.data.dental_record_id);\n});"
+    code: "pm.test(\"Create dental visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visit creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json).to.have.property(\"dental_record_id\");\n    pm.environment.set(\"dental_visit_id\", json.dental_record_id);\n});"
     language: text/javascript
 order: 2000

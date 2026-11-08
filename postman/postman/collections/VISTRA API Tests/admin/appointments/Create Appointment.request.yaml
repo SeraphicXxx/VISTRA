@@ -7,12 +7,39 @@ auth:
     token: "{{access_token}}"
 body:
   type: json
-  content: "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"type\": \"Consultation\",\n    \"status\": \"Pending\",\n    \"scheduled_start\": \"2026-11-10T10:00:00Z\",\n    \"scheduled_end\": \"2026-11-10T11:00:00Z\",\n    \"reason\": \"General checkup\",\n    \"notes\": \"Test appointment\"\n}"
+  content: |-
+    {
+        "patient_id": "20230847-S",
+        "type": "Consultation",
+        "status": "Pending",
+        "scheduled_start": "2026-11-10T10:00:00Z",
+        "scheduled_end": "2026-11-10T11:00:00Z",
+        "reason": "General checkup",
+        "location": "UCC-South Campus",
+        "notes": "Test appointment"
+    }
 scripts:
   - type: beforeRequest
-    code: "if (!pm.environment.get(\"patient_id\")) {\n    pm.environment.set(\"patient_id\", \"TEST-\" + Date.now());\n}"
+    code: |-
+      if (!pm.environment.get("patient_id")) {
+          pm.environment.set("patient_id", "TEST-" + Date.now());
+      }
     language: text/javascript
   - type: afterResponse
-    code: "pm.test(\"Create appointment returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Appointment creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json.data).to.have.property(\"appointment_id\");\n    pm.environment.set(\"appointment_id\", json.data.appointment_id);\n});"
+    code: |-
+      pm.test("Create appointment returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Appointment creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json.data).to.have.property("id");
+          pm.environment.set("appointment_id", json.data.id);
+      });
     language: text/javascript
 order: 1500

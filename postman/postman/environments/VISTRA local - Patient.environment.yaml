@@ -3,13 +3,13 @@ values:
   - key: base_url
     value: 'http://localhost:8000'
   - key: api_version
-    value: 'api/v1'
+    value: api/v1
   - key: user_id
-    value: '20230847-S'
+    value: 20230847-S
   - key: patient_id
-    value: '20230847-S'
+    value: 20230847-S
   - key: patient_password
-    value: 'testpass123'
+    value: testpass123
   - key: patientA_access_token
     value: ''
   - key: patientA_refresh_token
@@ -27,8 +27,4 @@ values:
   - key: medical_visit_id
     value: ''
   - key: staff_id
-    value: ''
-  - key: access_token
-    value: ''
-  - key: refresh_token
     value: ''

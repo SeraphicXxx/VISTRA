@@ -26,5 +26,5 @@ values:
     value: ''
   - key: medical_visit_id
     value: ''
-  - key: staff_id
+  - key: patient_id_postman
     value: ''

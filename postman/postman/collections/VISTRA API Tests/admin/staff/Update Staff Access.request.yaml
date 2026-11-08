@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/staff/{{staff_id}}/access"
+url: "{{base_url}}/{{api_version}}/staff/{{created_staff_id}}/access"
 method: PATCH
 auth:
   type: bearer
@@ -7,9 +7,29 @@ auth:
     token: "{{access_token}}"
 body:
   type: json
-  content: "{\n    \"role\": \"staff\",\n    \"dental_module\": true,\n    \"medical_module\": true,\n    \"appointment_module\": true,\n    \"patient_module\": true,\n    \"staff_module\": true\n}"
+  content: |-
+    {
+        "role": "staff",
+        "dental_module": true,
+        "medical_module": true,
+        "appointment_module": true,
+        "patient_module": true,
+        "staff_module": true
+    }
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Update staff access returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Permissions are updated\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
+    code: |-
+      pm.test("Update staff access returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Permissions are updated", function () {
+          pm.expect(json.success).to.eql(true);
+      });
     language: text/javascript
 order: 800
