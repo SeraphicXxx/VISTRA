@@ -53,6 +53,17 @@ def get_patient_dental_tab(patient_id: str, filters: FilterDental, supabase: Cli
 
 @handle_service_errors
 def delete_dental_visit(dental_visit_id: int, supabase: Client):
+    """Delete a dental visit and its odontogram entries.
+
+    Cascade-delete dependency: uses the `delete_dental_visit` RPC
+    defined in migration `20261010120000_cascade_deletes` (and
+    recreated in `20261015055421_remote_schema`). The RPC deletes
+    ODONTOGRAM rows (where dental_record_id = visit_id) and the
+    DENTAL_VISIT row in a single transaction.
+
+    FK constraint: ODONTOGRAM.dental_record_id references
+    DENTAL_VISIT.id (NO ACTION on delete — hence the RPC).
+    """
     dental_repository = DentalRepository(supabase)
     or_404(
         dental_repository.get_visit_by_id(dental_visit_id),

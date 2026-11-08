@@ -98,6 +98,18 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
 
 @handle_service_errors
 def delete_patient(patient_id: str, supabase: Client):
+    """Delete a patient and all linked records.
+
+    Cascade-delete dependency: uses the `delete_patient_records` RPC
+    defined in migration `20261010120000_cascade_deletes` (and
+    recreated in `20261015055421_remote_schema`). The RPC deletes
+    APPOINTMENT, FAMILY_MEDICAL_HISTORY, PATIENT_PROFILE, and PATIENT
+    rows in a single transaction. Auth user is deleted separately
+    after the DB cascade succeeds.
+
+    FK constraints: APPOINTMENT.patient_id, FAMILY_MEDICAL_HISTORY.patient_id,
+    PATIENT_PROFILE.patient_id all reference PATIENT.patient_id.
+    """
     patient_repo = PatientRepository(supabase)
     existing = patient_repo.get_by_id(patient_id)
     or_404(existing, "Patient not found")
