@@ -1,12 +1,28 @@
 $kind: http-request
 url: "{{base_url}}/{{api_version}}/dental/?page=1&page_size=10"
 method: GET
+queryParams:
+  page: "1"
+  page_size: "10"
 auth:
   type: bearer
   credentials:
     token: "{{access_token}}"
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Get dental visits returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visits list is returned\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json.data).to.have.property(\"items\");\n});"
+    code: |-
+      pm.test("Get dental visits returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Dental visits list is returned", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json.data).to.have.property("items");
+      });
     language: text/javascript
 order: 2100

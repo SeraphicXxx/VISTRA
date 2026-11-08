@@ -9,7 +9,7 @@ body:
   type: json
   content: |-
     {
-        "patient_id": "{{patient_id}}",
+        "patient_id": "20230847-S",
         "last_dental_visit": "2026-10-10",
         "brushing_frequency": "twice_daily",
         "floss": true,
@@ -30,9 +30,31 @@ body:
     }
 scripts:
   - type: beforeRequest
-    code: "if (!pm.environment.get(\"patient_id\")) {\n    pm.environment.set(\"patient_id\", \"TEST-\" + Date.now());\n}\nif (!pm.environment.get(\"staff_id\")) {\n    pm.environment.set(\"staff_id\", \"STFT-\" + Date.now());\n}"
+    code: |-
+      if (!pm.environment.get("patient_id")) {
+          pm.environment.set("patient_id", "TEST-" + Date.now());
+      }
+      if (!pm.environment.get("staff_id")) {
+          pm.environment.set("staff_id", "STFT-" + Date.now());
+      }
     language: text/javascript
   - type: afterResponse
-    code: "pm.test(\"Create dental visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visit creation succeeds\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json).to.have.property(\"dental_record_id\");\n    pm.environment.set(\"dental_visit_id\", json.dental_record_id);\n});"
+    code: |-
+      pm.test("Create dental visit returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Dental visit creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+          const recordId = json.dental_record_id || (json.data && json.data.dental_record_id);
+          pm.expect(recordId).to.not.be.undefined;
+          pm.expect(recordId).to.not.be.null;
+          pm.environment.set("dental_visit_id", recordId);
+      });
     language: text/javascript
 order: 2000
