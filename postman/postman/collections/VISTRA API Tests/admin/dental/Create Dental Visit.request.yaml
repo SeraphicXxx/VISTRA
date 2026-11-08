@@ -49,9 +49,10 @@ scripts:
       });
 
       const json = pm.response.json();
+      console.log("Create dental full response:", JSON.stringify(json, null, 2));
+      const recordId = json.dental_record_id || (json.data && json.data.dental_record_id);
       pm.test("Dental visit creation succeeds", function () {
           pm.expect(json.success).to.eql(true);
-          const recordId = json.dental_record_id || (json.data && json.data.dental_record_id);
           pm.expect(recordId).to.not.be.undefined;
           pm.expect(recordId).to.not.be.null;
           pm.environment.set("dental_visit_id", recordId);
