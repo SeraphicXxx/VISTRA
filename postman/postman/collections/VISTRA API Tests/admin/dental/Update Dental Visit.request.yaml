@@ -7,7 +7,17 @@ auth:
     token: "{{access_token}}"
 body:
   type: json
-  content: "{\n    \"status\": \"Completed\",\n    \"tooth_records\": [\n        {\n            \"tooth_number\": 11,\n            \"surface\": \"O\",\n            \"treatment\": \"Cleaning\"\n        }\n    ]\n}"
+  content: |-
+    {
+        "status": "ongoingTreatment",
+        "tooth_records": [
+            {
+                "tooth_number": 11,
+                "condition": "healthy",
+                "notes": "No issues found"
+            }
+        ]
+    }
 scripts:
   - type: afterResponse
     code: "pm.test(\"Update dental visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Dental visit is updated\", function () {\n    pm.expect(json.success).to.eql(true);\n});"

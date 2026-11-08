@@ -7,7 +7,12 @@ auth:
     token: "{{access_token}}"
 body:
   type: json
-  content: "{\n    \"status\": \"Completed\",\n    \"complaint\": \"Updated complaint\",\n    \"treatment\": \"Updated treatment\"\n}"
+  content: |-
+    {
+        "status": "ongoingTreatment",
+        "complaint": "Updated complaint",
+        "treatment": "Updated treatment"
+    }
 scripts:
   - type: afterResponse
     code: "pm.test(\"Update medical visit returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Medical visit is updated\", function () {\n    pm.expect(json.success).to.eql(true);\n});"
