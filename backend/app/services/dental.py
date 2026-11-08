@@ -31,7 +31,7 @@ def create_dental_record(request: DentalVisitCreateRequest, supabase: Client, cu
         request.patient_id,
         dental_record_id
     )
-
+    print(ok(dental_record_id=dental_record_id))
     return ok(dental_record_id=dental_record_id)
 
 

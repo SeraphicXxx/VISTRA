@@ -20,7 +20,7 @@ protected_appointment_router = APIRouter(
     dependencies=[Depends(require_module("appointment"))]
 )
 
-@protected_appointment_router.post("/", response_model=DataResponse)
+@protected_appointment_router.post("/")
 def create_appointment(request: CreateAppointmentRequest, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, request.patient_id)
     return create_appointment_service(request, supabase)

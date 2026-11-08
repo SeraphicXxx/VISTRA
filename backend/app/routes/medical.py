@@ -22,7 +22,7 @@ protected_medical_router = APIRouter(
 )
 
 
-@protected_medical_router.post("/", response_model=DataResponse)
+@protected_medical_router.post("/")
 def create_medical_record(
         request: MedicalVisitCreateRequest,
         supabase: Client = Depends(get_supabase_for_user),

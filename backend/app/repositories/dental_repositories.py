@@ -18,7 +18,6 @@ class DentalRepository(BaseRepository):
             .insert(data.to_db_dict(staff_id))
             .execute()
         )
-
         if not response.data:
             return None
 

@@ -22,7 +22,7 @@ protected_dental_router = APIRouter(
 )
 
 
-@protected_dental_router.post("/", response_model=DataResponse)
+@protected_dental_router.post("/")
 def create_dental_record(
         request: DentalVisitCreateRequest,
         supabase: Client = Depends(get_supabase_for_user),
