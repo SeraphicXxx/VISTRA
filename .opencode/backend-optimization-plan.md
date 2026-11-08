@@ -80,8 +80,52 @@
 | `backend/app/routes/auth.py` | Added `Request`, `Limiter`, `get_remote_address` imports; added `limiter = Limiter(...)`; `@limiter.limit("5/minute")` on login endpoint |
 | `backend/requirements.txt` | Added `cachetools==5.5.0`, `slowapi==0.1.9` |
 
+### Phase 4 — Code Quality (feature → 5.2.0) ✅ DONE
+
+| Task | Status | File(s) |
+|------|--------|---------|
+| Standardize import ordering | ✅ Fixed in staff.py, auth/user.py | `services/staff.py`, `services/auth/user.py` |
+| Full type hints on repositories | ✅ BaseRepository + all domain repos | `repositories/base.py`, `repositories/*_repositories.py` |
+| `select` param on `fetch_all` | ✅ Already existed | `repositories/base.py` |
+| Pydantic response models + `response_model=` | ⏳ Pending (generic `Response`/`PaginatedResponse` exist in schemas) | `schemas/response_dto/responses.py` |
+| `ruff` + `mypy` dev dependencies | ✅ Added | `requirements.txt` |
+| CI lint + typecheck steps | ✅ Added to workflow | `.github/workflows/postman.yaml` |
+
+### Phase 5 — Database (pending)
+
+| Task | Status |
+|------|--------|
+| Audit/add indexes | ⏳ Pending (indexes already exist in 20261015055421 migration) |
+| Document cascade-delete dependency | ⏳ Pending |
+| Soft-delete consideration | ⏳ Pending |
+
+### Phase 6 — Observability & CI (pending)
+
+| Task | Status |
+|------|--------|
+| JSON structured logging | ⏳ Pending |
+| CI lint + typecheck | ✅ Done (ruff + mypy in workflow) |
+| Log rotation / stdout capture | ⏳ Pending |
+
+## Files Modified (Phase 4)
+
+| File | Changes |
+|------|---------|
+| `backend/app/repositories/base.py` | Full type hints on all methods (`__init__`, `delete_by_column`, `update_by_column`, `fetch_one`, `fetch_all`, `fetch_page`) |
+| `backend/app/repositories/staff_repositories.py` | Full type hints on all methods |
+| `backend/app/repositories/patient_repositories.py` | Full type hints on all methods |
+| `backend/app/repositories/dental_repositories.py` | Full type hints on all methods |
+| `backend/app/repositories/medical_repositories.py` | Full type hints on all methods |
+| `backend/app/repositories/appointment_repositories.py` | Full type hints on all methods |
+| `backend/app/repositories/overview_repositories.py` | Full type hints on all methods |
+| `backend/app/services/staff.py` | Import ordering standardized (stdlib → third-party → app) |
+| `backend/app/services/auth/user.py` | Import ordering standardized (stdlib → third-party → app) |
+| `backend/requirements.txt` | Added `ruff==0.9.0`, `mypy==1.13.0` |
+| `.github/workflows/postman.yaml` | Added ruff lint and mypy typecheck CI steps |
+
 ## Next Steps
 
-1. Continue with Phase 4 (type hints, import ordering, response models)
-2. Add CI lint + typecheck steps to `.github/workflows/postman.yaml`
-3. Bump version per `backend/versioning plan` on release
+1. Continue with Phase 5 (database indexes, cascade-delete docs, soft-delete)
+2. Phase 6 (JSON structured logging, log rotation)
+3. Phase 4.3 remaining: Pydantic response models + `response_model=` on routes
+4. Bump version per `backend/versioning plan` on release

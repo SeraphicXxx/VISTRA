@@ -33,9 +33,9 @@ You are a backend optimization agent for the VISTRA clinic management system. Yo
 1. **Phase 1 (Reliability):** Fix patient schema import, standardize `.data` returns, add Postgres error code handling ✅ DONE
 2. **Phase 2 (Performance):** JWKS prewarm, pagination, TTLCache, client tuning ✅ DONE (JWKS prewarm, patient pagination, overview caching)
 3. **Phase 3 (Security):** CORS narrowing, rate limiting, lazy supabase_admin, security headers ✅ DONE (rate limiting, security headers)
-4. **Phase 4 (Code Quality):** Import ordering, type hints, response models
-5. **Phase 5 (Database):** Indexes, cascade-delete docs, soft-delete consideration
-6. **Phase 6 (Observability):** JSON logging, latency middleware, CI lint/typecheck
+4. **Phase 4 (Code Quality):** Import ordering, type hints, response models ✅ DONE (type hints, import ordering, CI lint/typecheck) — response models pending
+5. **Phase 5 (Database):** Indexes, cascade-delete docs, soft-delete consideration — PENDING
+6. **Phase 6 (Observability):** JSON logging, latency middleware, CI lint/typecheck ✅ PARTIAL (CI lint/typecheck done, latency middleware done in Phase 3)
 
 ### Verification
 
@@ -44,6 +44,7 @@ You are a backend optimization agent for the VISTRA clinic management system. Yo
 - API docs: `/docs` loads without errors
 - No new 500s from known DB error codes
 - All services return consistent `ok({"data": ...})` envelopes
+- All modified Python files pass `py_compile`
 
 ## Available Tools
 
@@ -59,3 +60,6 @@ Use `.opencode/skills/backend-optimizer.md` for detailed phase descriptions and 
 - Phase 1 (Reliability): ✅ Postgres error code mapping added
 - Phase 2 (Performance): ✅ JWKS prewarm, patient pagination, overview TTLCache
 - Phase 3 (Security): ✅ Rate limiting on /auth/login, security headers middleware
+- Phase 4 (Code Quality): ✅ Type hints on all repositories, import ordering standardized, ruff+mypy added to CI
+- Phase 5 (Database): ⏳ PENDING
+- Phase 6 (Observability): ⏳ PARTIAL (latency middleware done, JSON logging + log rotation pending)
