@@ -3,6 +3,7 @@ from supabase import Client
 
 from app.config.security import require_staff
 from app.database.database_client import get_supabase_for_user
+from app.schemas.response_dto.responses import OverviewStatsResponse
 from app.services.overview import get_overview_stats as get_overview_stats_service
 
 protected_overview_router = APIRouter(
@@ -12,6 +13,6 @@ protected_overview_router = APIRouter(
 )
 
 
-@protected_overview_router.get("/stats/")
+@protected_overview_router.get("/stats/", response_model=OverviewStatsResponse)
 def get_overview_stats(supabase: Client = Depends(get_supabase_for_user)):
     return get_overview_stats_service(supabase)

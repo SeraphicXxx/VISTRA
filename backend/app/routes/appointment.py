@@ -5,6 +5,7 @@ from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.appointments import (CreateAppointmentRequest,UpdateAppointmentRequest)
 from app.schemas.query import FilterAppointment
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.appointment import (
     get_all_appointments,
@@ -19,19 +20,19 @@ protected_appointment_router = APIRouter(
     dependencies=[Depends(require_module("appointment"))]
 )
 
-@protected_appointment_router.post("/")
+@protected_appointment_router.post("/", response_model=DataResponse)
 def create_appointment(request: CreateAppointmentRequest, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, request.patient_id)
     return create_appointment_service(request, supabase)
 
-@protected_appointment_router.get("/")
+@protected_appointment_router.get("/", response_model=DataResponse)
 def get_appointments(filters: FilterAppointment = Depends(), scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     if scope is not None:
         filters.patient_id = scope
     return get_all_appointments(filters, supabase)
 
 
-@protected_appointment_router.get("/me/")
+@protected_appointment_router.get("/me/", response_model=DataResponse)
 def get_my_appointments(
     filters: FilterAppointment = Depends(),
     scope: str | None = Depends(get_patient_scope),
@@ -50,15 +51,15 @@ def get_my_appointments(
     filters.patient_id = scope
     return get_all_appointments(filters, supabase)
 
-@protected_appointment_router.get("/{patient_id}/{appointment_id}")
+@protected_appointment_router.get("/{patient_id}/{appointment_id}", response_model=DataResponse)
 def get_appointment(patient_id: str, appointment_id: int, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, patient_id)
     return get_appointment_by_id(appointment_id , patient_id, supabase)
 
-@protected_appointment_router.patch("/{patient_id}/{appointment_id}/", dependencies=[Depends(require_staff)])
+@protected_appointment_router.patch("/{patient_id}/{appointment_id}/", dependencies=[Depends(require_staff)], response_model=DataResponse)
 def update_appointment(patient_id: str, appointment_id: int, request: UpdateAppointmentRequest,supabase: Client = Depends(get_supabase_for_user),current_user=Depends(get_current_user)):
     return update_appointment_service(patient_id, appointment_id, request, supabase, current_user)
 
-@protected_appointment_router.delete("/{appointment_id}/", dependencies=[Depends(require_staff)])
+@protected_appointment_router.delete("/{appointment_id}/", dependencies=[Depends(require_staff)], response_model=SuccessResponse)
 def delete_appointment(appointment_id: int,supabase: Client = Depends(get_supabase_for_user)):
     return delete_appointment_service(appointment_id, supabase)

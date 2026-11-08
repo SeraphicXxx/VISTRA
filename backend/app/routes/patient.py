@@ -5,6 +5,7 @@ from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient, FilterMedical, FilterDental
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse, SummaryRecord, Response
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
     get_patient_summary_record, get_patient_medical_dental_summary
@@ -28,15 +29,15 @@ def get_patients(
 ):
     return get_all_patients(supabase, page=page, page_size=page_size)
 
-@protected_patient_router.post("/", dependencies=[Depends(require_staff)])
+@protected_patient_router.post("/", dependencies=[Depends(require_staff)], response_model=SuccessResponse)
 def create_patient(request: CreatePatientRequest, supabase: Client = Depends(get_supabase_for_user)):
     return create_patient_service(request, supabase)
 
-@protected_patient_router.get("/profiles/", dependencies=[Depends(require_staff)])
+@protected_patient_router.get("/profiles/", dependencies=[Depends(require_staff)], response_model=DataResponse)
 def get_all_profiles(filters : FilterPatient = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_patient_profiles(supabase, filters)
 
-@protected_patient_router.get("/record/medical-tab/")
+@protected_patient_router.get("/record/medical-tab/", response_model=DataResponse)
 def get_patient_medical_tab(
     filters: FilterMedical = Depends(),
     scope: str | None = Depends(get_patient_scope),
@@ -51,7 +52,7 @@ def get_patient_medical_tab(
     return get_patient_medical_tab_service(scope, filters, supabase)
 
 
-@protected_patient_router.get("/record/dental-tab/")
+@protected_patient_router.get("/record/dental-tab/", response_model=DataResponse)
 def get_patient_dental_tab(
     filters: FilterDental = Depends(),
     scope: str | None = Depends(get_patient_scope),
@@ -65,12 +66,12 @@ def get_patient_dental_tab(
     return get_patient_dental_tab_service(scope, filters, supabase)
 
 
-@protected_patient_router.get("/{patient_id}/")
+@protected_patient_router.get("/{patient_id}/", response_model=DataResponse)
 def get_patient(patient_id: str, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, patient_id)
     return get_patient_by_id(patient_id, supabase)
 
-@protected_patient_router.get("/profiles/me/")
+@protected_patient_router.get("/profiles/me/", response_model=DataResponse)
 def get_my_profile(
     scope: str | None = Depends(get_patient_scope),
     supabase: Client = Depends(get_supabase_for_user),
@@ -87,7 +88,7 @@ def get_my_profile(
         )
     return get_patient_summary_record(supabase, scope)
 
-@protected_patient_router.get("/summary/medical-dental/")
+@protected_patient_router.get("/summary/medical-dental/", response_model=DataResponse)
 def get_patient_medical_dental_summary_endpoint(
     scope: str | None = Depends(get_patient_scope),
     supabase: Client = Depends(get_supabase_for_user),
@@ -101,16 +102,16 @@ def get_patient_medical_dental_summary_endpoint(
         )
     return get_patient_medical_dental_summary(supabase, scope)
 
-@protected_patient_router.get("/profiles/{patient_id}/")
+@protected_patient_router.get("/profiles/{patient_id}/", response_model=DataResponse)
 def profile_summary(patient_id: str, scope: str | None = Depends(get_patient_scope), supabase: Client = Depends(get_supabase_for_user)):
     enforce_patient_scope(scope, patient_id)
     return get_patient_summary_record(supabase, patient_id)
 
-@protected_patient_router.delete("/{patient_id}/", dependencies=[Depends(require_staff)])
+@protected_patient_router.delete("/{patient_id}/", dependencies=[Depends(require_staff)], response_model=SuccessResponse)
 def delete_patient(patient_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return delete_patient_service(patient_id, supabase)
 
-@protected_patient_router.patch("/{patient_id}/", dependencies=[Depends(require_staff)])
+@protected_patient_router.patch("/{patient_id}/", dependencies=[Depends(require_staff)], response_model=SuccessResponse)
 def update_patient_profile(
     patient_id: str,
     request: UpdatePatientProfileRequest,

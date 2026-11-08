@@ -7,13 +7,14 @@ from app.services.vital_signs import (
     get_latest_patient_vital_signs,
 )
 from app.database.database_client import get_supabase_for_user
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.schemas.vital_signs import CreateVitalSignsRequest, UpdateVitalSignsRequest
 from app.services.access import get_patient_scope, enforce_patient_scope
 
 vital_signs_router = APIRouter(prefix="/vital-signs", tags=["Vital Signs"])
 
 
-@vital_signs_router.post("/")
+@vital_signs_router.post("/", response_model=DataResponse)
 def create_vital_signs_route(
     request: CreateVitalSignsRequest,
     scope: str | None = Depends(get_patient_scope),
@@ -29,7 +30,7 @@ def create_vital_signs_route(
     )
 
 
-@vital_signs_router.get("/patient/{patient_id}")
+@vital_signs_router.get("/patient/{patient_id}", response_model=DataResponse)
 def get_patient_vital_signs_route(
     patient_id: str,
     scope: str | None = Depends(get_patient_scope),
@@ -40,7 +41,7 @@ def get_patient_vital_signs_route(
     return get_patient_vital_signs(patient_id, supabase)
 
 
-@vital_signs_router.get("/patient/{patient_id}/latest")
+@vital_signs_router.get("/patient/{patient_id}/latest", response_model=DataResponse)
 def get_latest_patient_vital_signs_route(
     patient_id: str,
     scope: str | None = Depends(get_patient_scope),
@@ -51,7 +52,7 @@ def get_latest_patient_vital_signs_route(
     return get_latest_patient_vital_signs(patient_id, supabase)
 
 
-@vital_signs_router.get("/{vital_signs_id}")
+@vital_signs_router.get("/{vital_signs_id}", response_model=DataResponse)
 def get_vital_signs_by_id_route(
     vital_signs_id: int,
     scope: str | None = Depends(get_patient_scope),
@@ -71,7 +72,7 @@ def get_vital_signs_by_id_route(
     return get_vital_signs_by_id(vital_signs_id, supabase)
 
 
-@vital_signs_router.patch("/{vital_signs_id}")
+@vital_signs_router.patch("/{vital_signs_id}", response_model=DataResponse)
 def update_vital_signs_route(
     vital_signs_id: int,
     request: UpdateVitalSignsRequest,
@@ -99,7 +100,7 @@ def update_vital_signs_route(
     )
 
 
-@vital_signs_router.delete("/{vital_signs_id}")
+@vital_signs_router.delete("/{vital_signs_id}", response_model=SuccessResponse)
 def delete_vital_signs_route(
     vital_signs_id: int,
     scope: str | None = Depends(get_patient_scope),

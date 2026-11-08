@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from supabase import Client
 
 from app.config.security import get_current_user, require_staff
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import require_module
 from app.database.database_client import get_supabase_for_user
 from app.services.dental import (
@@ -21,7 +22,7 @@ protected_dental_router = APIRouter(
 )
 
 
-@protected_dental_router.post("/")
+@protected_dental_router.post("/", response_model=DataResponse)
 def create_dental_record(
         request: DentalVisitCreateRequest,
         supabase: Client = Depends(get_supabase_for_user),
@@ -30,7 +31,7 @@ def create_dental_record(
     return create_dental_record_service(request, supabase, current_user)
 
 
-@protected_dental_router.get("/")
+@protected_dental_router.get("/", response_model=DataResponse)
 def get_dental_visits(
         filters: FilterDental = Depends(),
         supabase: Client = Depends(get_supabase_for_user)
@@ -38,7 +39,7 @@ def get_dental_visits(
     return get_all_dental_visits(filters, supabase)
 
 
-@protected_dental_router.get("/{patient_id}/{dental_visit_id}")
+@protected_dental_router.get("/{patient_id}/{dental_visit_id}", response_model=DataResponse)
 def get_dental_record(
         patient_id: str,
         dental_visit_id: int,
@@ -47,7 +48,7 @@ def get_dental_record(
     return get_dental_record_by_id(patient_id, dental_visit_id, supabase)
 
 
-@protected_dental_router.delete("/{dental_visit_id}/")
+@protected_dental_router.delete("/{dental_visit_id}/", response_model=SuccessResponse)
 def delete_dental_visit(
         dental_visit_id: int,
         supabase: Client = Depends(get_supabase_for_user)
@@ -55,7 +56,7 @@ def delete_dental_visit(
     return delete_dental_visit_service(dental_visit_id, supabase)
 
 
-@protected_dental_router.patch("/{patient_id}/{dental_visit_id}/")
+@protected_dental_router.patch("/{patient_id}/{dental_visit_id}/", response_model=DataResponse)
 def update_dental_visit(
         patient_id: str,
         dental_visit_id: int,

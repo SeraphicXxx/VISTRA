@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from supabase import Client
 
 from app.config.security import get_current_user, require_staff
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import require_module
 from app.database.database_client import get_supabase_for_user
 from app.schemas.medical import MedicalVisitCreateRequest, MedicalVisitUpdateRequest
@@ -21,7 +22,7 @@ protected_medical_router = APIRouter(
 )
 
 
-@protected_medical_router.post("/")
+@protected_medical_router.post("/", response_model=DataResponse)
 def create_medical_record(
         request: MedicalVisitCreateRequest,
         supabase: Client = Depends(get_supabase_for_user),
@@ -30,7 +31,7 @@ def create_medical_record(
     return create_medical_record_service(request, supabase, current_user)
 
 
-@protected_medical_router.get("/")
+@protected_medical_router.get("/", response_model=DataResponse)
 def get_medical_visits(
         filters: FilterMedical = Depends(),
         supabase: Client = Depends(get_supabase_for_user)
@@ -38,7 +39,7 @@ def get_medical_visits(
     return get_all_medical_visits(filters, supabase)
 
 
-@protected_medical_router.get("/{patient_id}/{medical_visit_id}")
+@protected_medical_router.get("/{patient_id}/{medical_visit_id}", response_model=DataResponse)
 def get_medical_record(
         patient_id: str,
         medical_visit_id: int,
@@ -47,7 +48,7 @@ def get_medical_record(
     return get_medical_record_by_id(patient_id, medical_visit_id, supabase)
 
 
-@protected_medical_router.delete("/{medical_visit_id}/")
+@protected_medical_router.delete("/{medical_visit_id}/", response_model=SuccessResponse)
 def delete_medical_visit(
         medical_visit_id: int,
         supabase: Client = Depends(get_supabase_for_user)
@@ -55,7 +56,7 @@ def delete_medical_visit(
     return delete_medical_visit_service(medical_visit_id, supabase)
 
 
-@protected_medical_router.patch("/{patient_id}/{medical_visit_id}/")
+@protected_medical_router.patch("/{patient_id}/{medical_visit_id}/", response_model=DataResponse)
 def update_medical_visit(
         patient_id: str,
         medical_visit_id: int,
