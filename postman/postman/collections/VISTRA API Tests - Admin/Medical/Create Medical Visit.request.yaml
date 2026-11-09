@@ -34,4 +34,4 @@ scripts:
           pm.environment.set("medical_visit_id", json.medical_visit_id);
       });
     language: text/javascript
-order: 2000
+order: 1000

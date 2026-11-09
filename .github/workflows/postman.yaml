@@ -44,19 +44,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
-
       - name: Lint with ruff
         working-directory: backend
         run: |
           ruff check app/
 
-
       - name: Typecheck with mypy
         working-directory: backend
         run: |
           mypy app/
-
 
       - name: Start backend
         working-directory: backend
@@ -67,7 +63,6 @@ jobs:
           LOCAL_FRONTEND_URL: ${{ secrets.LOCAL_FRONTEND_URL }}
         run: |
           uvicorn app.main:app --host 127.0.0.1 --port 8000 > ${{ github.workspace }}/backend/backend.log 2>&1 &
-
 
       - name: Wait for backend
         run: |
@@ -85,16 +80,13 @@ jobs:
           cat "${{ github.workspace }}/backend/backend.log" 2>/dev/null || echo "(no backend log file)"
           exit 1
 
-
       - name: Install Postman CLI
         run: |
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
-
       - name: Login to Postman CLI
         run: |
           postman login --with-api-key "${{ secrets.POSTMAN_API_KEY }}"
-
 
       - name: Show API routes
         run: |
@@ -112,8 +104,6 @@ jobs:
               for method in methods:
                   print(f"{method.upper():6} {path}")
           PY
-
-
 
       - name: Run API tests - Patient
         run: |

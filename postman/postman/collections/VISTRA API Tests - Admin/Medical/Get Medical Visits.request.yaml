@@ -23,4 +23,4 @@ scripts:
           pm.expect(json.data).to.have.property("items");
       });
     language: text/javascript
-order: 3000
+order: 2000

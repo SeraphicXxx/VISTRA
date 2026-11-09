@@ -28,4 +28,4 @@ scripts:
           pm.expect(json.success).to.eql(true);
       });
     language: text/javascript
-order: 5000
+order: 4000
