@@ -19,6 +19,10 @@ body:
         "email": "test.staff@example.com"
     }
 scripts:
+  - type: beforeRequest
+    code: |-
+      pm.environment.set("created_staff_id", "STFT-" + Date.now());
+    language: text/javascript
   - type: afterResponse
     code: |-
       pm.test("Create staff returns 200", function () {
