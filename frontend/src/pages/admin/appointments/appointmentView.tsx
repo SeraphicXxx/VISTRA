@@ -548,6 +548,29 @@ export default function AppointmentDetailView() {
                         {appointment.notes || "No additional notes were submitted with this appointment."}
                     </div>
 
+                    {attachments.length > 0 && (
+                        <div className="mt-6 border-t border-border pt-6">
+                            <h2 className="mb-3 font-heading text-sm font-semibold text-primaryDark">
+                                Attachments
+                            </h2>
+                            <ul className="flex flex-col gap-2">
+                                {attachments.map((att) => (
+                                    <li
+                                        key={att.id}
+                                        className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
+                                    >
+                                        <span className="truncate text-xs text-textPrimary">
+                                            {att.file_name}
+                                        </span>
+                                        <span className="shrink-0 text-[10px] text-textMuted">
+                                            {(att.file_size / 1024).toFixed(1)} KB
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
                     <div className="mt-8 border-t border-border pt-6">
 
                         <div className="mb-4">
