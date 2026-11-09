@@ -22,9 +22,9 @@ export default function MedicalHistoryTab({
         <InfoField label="Diagnosis" value={diagnosis} />
         <InfoField label="Medication Allergies" value={allergy_medicine} />
         <InfoField label="Food Allergies" value={allergy_food} />
-        <InfoField label="Smoking" value={smoking ? "Yes" : "No"} />
-        <InfoField label="Vaping" value={vaping ? "Yes" : "No"} />
-        <InfoField label="Alcohol Intake" value={alcohol_intake ? "Yes" : "No"} />
+        <InfoField label="Smoking" value={smoking === true ? "Yes" : smoking === false ? "No" : null} />
+        <InfoField label="Vaping" value={vaping === true ? "Yes" : vaping === false ? "No" : null} />
+        <InfoField label="Alcohol Intake" value={alcohol_intake === true ? "Yes" : alcohol_intake === false ? "No" : null} />
         <InfoField label="Last Menstrual Period" value={last_menstrual_period} />
         <InfoField label="Family Planning Method" value={family_planning_method} />
       </FieldGrid>

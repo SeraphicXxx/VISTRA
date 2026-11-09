@@ -96,24 +96,24 @@ export default function PatientProfile({
   // Map API medical history to MedicalHistory
   const medical: MedicalHistory = medicalHistoryData
     ? {
-        hospitalization_operation: medicalHistoryData.hospitalization_operation ?? "",
-        hospitalization_year: medicalHistoryData.hospitalization_year ?? 0,
-        diagnosis: medicalHistoryData.diagnosis ?? "",
-        allergy_medicine: medicalHistoryData.allergy_medicine ?? "",
-        allergy_food: medicalHistoryData.allergy_food ?? "",
+        hospitalization_operation: medicalHistoryData.hospitalization_operation ?? null,
+        hospitalization_year: medicalHistoryData.hospitalization_year ?? null,
+        diagnosis: medicalHistoryData.diagnosis ?? null,
+        allergy_medicine: medicalHistoryData.allergy_medicine ?? null,
+        allergy_food: medicalHistoryData.allergy_food ?? null,
         smoking: medicalHistoryData.smoking ?? null,
         vaping: medicalHistoryData.vaping ?? null,
-        alcohol: medicalHistoryData.alcohol ?? null,
-        contraceptive: medicalHistoryData.contraceptive ?? "",
-        sexual_activity: medicalHistoryData.sexual_activity ?? "",
+        alcohol_intake: medicalHistoryData.alcohol_intake ?? null,
+        last_menstrual_period: medicalHistoryData.last_menstrual_period ?? null,
+        family_planning_method: medicalHistoryData.family_planning_method ?? null,
       }
     : (patientProp?.medical ?? samplePatient.medical);
 
   // Map API family history to FamilyHistory
   const family: FamilyHistory = familyHistoryData
     ? {
-        family_history: familyHistoryData.family_history ?? "",
-        other: familyHistoryData.other ?? null,
+        condition: familyHistoryData.condition ?? null,
+        other_condition: familyHistoryData.other_condition ?? null,
       }
     : (patientProp?.family ?? samplePatient.family);
 
