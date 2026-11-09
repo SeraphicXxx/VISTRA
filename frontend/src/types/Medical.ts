@@ -5,7 +5,7 @@
 export const medicalStatuses = {
     cleared: "Cleared",
     notCleared: "Not Cleared",
-    secondOption: "Second Option",
+    secondOption: "Second option",
     recovered: "Recovered",
     referred: "Referred",
     ongoingTreatment: "Ongoing Treatment",

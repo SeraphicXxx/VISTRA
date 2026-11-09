@@ -44,6 +44,11 @@ export const statusConfig = {
     className: "border-warning/30 bg-warning/10 text-warning",
   },
 
+  secondOption: {
+    label: "Second option",
+    className: "border-blue-300 bg-blue-50 text-blue-700",
+  },
+
   recovered: {
     label: "Recovered",
     className: "border-primary/30 bg-primary/10 text-primary",
@@ -60,6 +65,7 @@ export const statusLabels = {
   declined: "Declined",
   cleared: "Cleared",
   secondOpinion: "Second Opinion",
+  secondOption: "Second option",
   recovered: "Recovered",
 } as const;
 
