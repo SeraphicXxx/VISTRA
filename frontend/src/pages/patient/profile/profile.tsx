@@ -175,7 +175,7 @@ export default function PatientProfile({
           <FamilyHistoryTab {...patient.family} onEdit={edit("family")} />
         )}
         {activeTab === "vitals" && (
-          <VitalSignsTab {...patient.vitals} onEdit={edit("vitals")} />
+          <VitalSignsTab {...patient.vitals} />
         )}
         {activeTab === "results" && (
           <ExaminationResultsTab {...patient.results} onEdit={edit("results")} />

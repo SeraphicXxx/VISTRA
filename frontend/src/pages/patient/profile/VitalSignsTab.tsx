@@ -8,10 +8,9 @@ export default function VitalSignsTab({
   heart_rate,
   spo2,
   recorded_at,
-  onEdit,
-}: VitalSigns & { onEdit?: () => void }) {
+}: VitalSigns) {
   return (
-    <InfoCard title="Vital Signs" onEdit={onEdit}>
+    <InfoCard title="Vital Signs">
       <FieldGrid>
         <InfoField label="Height (cm)" value={height} />
         <InfoField label="Weight (kg)" value={weight} />
