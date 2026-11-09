@@ -30,14 +30,43 @@ export const courseFilterOptions: ColumnFilterOption[] = optionsFromValues([
     "BS Accountancy",
 ]);
 
-export function StudentCell({ name }: { name: string }) {
+import {useEffect, useState} from "react";
+import {fetchPatientProfilePictureBlob} from "/@/api/patient.api";
+
+export function StudentCell({ name, patientId }: { name: string; patientId?: string }) {
+    const [pictureUrl, setPictureUrl] = useState<string | null>(null);
+    const [hasPicture, setHasPicture] = useState(false);
+
+    useEffect(() => {
+        if (!patientId) return;
+        let objectUrl: string | null = null;
+        fetchPatientProfilePictureBlob(patientId).then((url) => {
+            if (url) {
+                objectUrl = url;
+                setPictureUrl(url);
+                setHasPicture(true);
+            }
+        });
+        return () => {
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
+    }, [patientId]);
+
     return (
         <div className="flex items-center gap-2.5">
-            <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(name)}`}
-            >
-                {getInitials(name)}
-            </span>
+            {hasPicture && pictureUrl ? (
+                <img
+                    src={pictureUrl}
+                    alt={name}
+                    className="h-8 w-8 shrink-0 rounded-full object-cover"
+                />
+            ) : (
+                <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${avatarColor(name)}`}
+                >
+                    {getInitials(name)}
+                </span>
+            )}
 
             <span className="text-sm font-medium text-textPrimary">
                 {name}

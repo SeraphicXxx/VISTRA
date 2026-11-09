@@ -14,7 +14,7 @@ export const patientColumns: Column<patientData>[] = [
     {
         key: "name",
         label: "Name",
-        render: (value) => <StudentCell name={value as string} />,
+        render: (value, record) => <StudentCell name={value as string} patientId={record.patient_id} />,
     },
     {
         key: "patient_id",
