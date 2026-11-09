@@ -33,7 +33,7 @@ body:
         "smoking": "None",
         "vaping": "None",
         "alcohol": "None",
-        "contraceptive": "None",
+        "family_planning_method": "None",
         "sexual_activity": "No",
         "family_history": "Hypertension",
         "family_history_others": "Diabetes",
