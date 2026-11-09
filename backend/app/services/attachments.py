@@ -123,6 +123,76 @@ def upload_attachment(
 
 
 @handle_service_errors
+def upload_patient_attachment(
+    patient_id: str,
+    category: AttachmentCategory,
+    file_name: str,
+    content: bytes,
+    appointment_id: int | None,
+    supabase: Client,
+):
+    """Patient-scoped attachment upload. Derives uploader from patient scope."""
+    repository = AttachmentRepository(supabase)
+
+    if not content:
+        raise HTTPException(400, "File cannot be empty")
+
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="File exceeds the 10 MB limit",
+        )
+
+    detected_type = magic.from_buffer(content, mime=True)
+    extension = ALLOWED_TYPES[category].get(detected_type)
+
+    if extension is None:
+        raise HTTPException(
+            status_code=415,
+            detail="Unsupported file type for this category",
+        )
+
+    attachment_id = uuid4()
+
+    relative_path = (
+        Path(patient_id)
+        / category.value
+        / f"{attachment_id}{extension}"
+    ).as_posix()
+
+    metadata = {
+        "id": str(attachment_id),
+        "patient_id": patient_id,
+        "appointment_id": appointment_id,
+        "uploaded_by": patient_id,
+        "category": category.value,
+        "file_name": Path(file_name or "attachment").name,
+        "storage_path": relative_path,
+        "mime_type": detected_type,
+        "file_size": len(content),
+    }
+
+    repository.save_file(relative_path, content)
+
+    try:
+        attachment = repository.create(metadata)
+        or_404(attachment, "Failed to create attachment metadata")
+    except Exception:
+        try:
+            repository.delete_file(relative_path)
+        except Exception:
+            logger.exception(
+                "Failed to remove local file after metadata insertion failed"
+            )
+        raise
+
+    return ok(
+        data=attachment,
+        message="Attachment uploaded successfully",
+    )
+
+
+@handle_service_errors
 def get_patient_attachments(
     patient_id: str,
     supabase: Client,

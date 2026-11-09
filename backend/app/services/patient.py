@@ -164,8 +164,8 @@ def _create_personal_records_from_request(
         patient_repo.insert_family_history(
             patient_id,
             FamilyHistory(
-                Family_history=Family_history(request.family_history) if request.family_history else Family_history.HYPERTENSION,
-                Other=request.family_history_others or "",
+                condition=Family_history(request.family_history) if request.family_history else Family_history.HYPERTENSION,
+                other_condition=request.family_history_others or "",
             ),
         )
 

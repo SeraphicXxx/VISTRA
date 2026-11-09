@@ -4,6 +4,7 @@ from uuid import UUID
 
 from app.services.attachments import (
     upload_attachment as upload_attachment_service,
+    upload_patient_attachment as upload_patient_attachment_service,
     get_patient_attachments as get_patient_attachments_service,
     get_attachment_download as get_attachment_download_service,
     delete_attachment as delete_attachment_service,
@@ -17,7 +18,7 @@ from app.database.database_client import get_supabase_for_user
 from app.enums.attachments import AttachmentCategory
 from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.schemas.user import CurrentUser
-from app.services.access import require_module
+from app.services.access import get_patient_scope, enforce_patient_scope, require_module
 
 protected_attachment_router = APIRouter(
     prefix="/attachments",
@@ -27,6 +28,39 @@ protected_attachment_router = APIRouter(
         Depends(require_module("medical")),
     ],
 )
+
+patient_attachment_router = APIRouter(
+    prefix="/attachments/patient",
+    tags=["Patient Attachments"],
+    dependencies=[Depends(get_current_user)],
+)
+
+@patient_attachment_router.post("/upload", status_code=201, response_model=DataResponse)
+async def upload_patient_attachment(
+    category: AttachmentCategory = Form(...),
+    file: UploadFile = File(...),
+    appointment_id: int | None = Form(default=None),
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+
+    content = await file.read(10 * 1024 * 1024 + 1)
+    await file.close()
+
+    return upload_patient_attachment_service(
+        patient_id=scope,
+        category=category,
+        file_name=file.filename or "attachment",
+        content=content,
+        appointment_id=appointment_id,
+        supabase=supabase,
+    )
+
 
 @protected_attachment_router.post("/upload", status_code=201, response_model=DataResponse)
 async def upload_attachment(
