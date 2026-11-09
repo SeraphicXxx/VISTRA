@@ -1,10 +1,10 @@
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import type { ReactNode } from "react";
 import type {
   PatientClassification,
   PersonalInfo,
 } from "./patient.sample";
-import {uploadProfilePicture, getProfilePictureUrl} from "/@/api/patient.api";
+import {uploadProfilePicture, fetchProfilePictureBlob} from "/@/api/patient.api";
 import {useNotify} from "/@/components/notifications/NotificationProvider";
 
 export const ID_LABELS: Record<PatientClassification, string> = {
@@ -53,9 +53,24 @@ export function ProfileHeader({
   const notify = useNotify();
   const [isUploading, setIsUploading] = useState(false);
   const [pictureUrl, setPictureUrl] = useState<string | null>(null);
+  const [hasPicture, setHasPicture] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const classificationLabel =
     classification.charAt(0).toUpperCase() + classification.slice(1);
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    fetchProfilePictureBlob().then((url) => {
+      if (url) {
+        objectUrl = url;
+        setPictureUrl(url);
+        setHasPicture(true);
+      }
+    });
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,8 +79,11 @@ export function ProfileHeader({
     setIsUploading(true);
     try {
       await uploadProfilePicture(file);
-      // Bust cache by appending timestamp
-      setPictureUrl(`${getProfilePictureUrl()}?t=${Date.now()}`);
+      const url = await fetchProfilePictureBlob();
+      if (url) {
+        setPictureUrl(url);
+        setHasPicture(true);
+      }
       notify.success("Profile picture updated.", { title: "Upload successful" });
     } catch (error) {
       console.error("Failed to upload profile picture:", error);
@@ -81,26 +99,15 @@ export function ProfileHeader({
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border bg-white p-5 sm:flex-row sm:items-center sm:p-6">
       <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xl font-bold text-primary overflow-hidden">
-        {pictureUrl ? (
+        {hasPicture && pictureUrl ? (
           <img
             src={pictureUrl}
             alt={name}
             className="h-full w-full object-cover"
           />
         ) : (
-          <img
-            src={getProfilePictureUrl()}
-            alt={name}
-            className="h-full w-full object-cover"
-            onLoad={() => setPictureUrl(getProfilePictureUrl())}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
+          <span>{getInitials(name)}</span>
         )}
-        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          {getInitials(name)}
-        </span>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
