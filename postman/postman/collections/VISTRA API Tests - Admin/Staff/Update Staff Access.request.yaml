@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/staff/{{staff_id}}/access"
+url: "{{base_url}}/{{api_version}}/staff/{{created_staff_id}}/access"
 method: PATCH
 headers:
   Content-Type: application/json
