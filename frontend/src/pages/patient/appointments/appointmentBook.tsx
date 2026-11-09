@@ -25,6 +25,7 @@ import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts, to12Hour } from "/@/utils/DateUtils";
 import { useCreateAppointment } from "/@/hooks/query/AppointmentQuery";
 import { getFieldErrorString } from "/@/utils/Formatters";
+import { uploadPatientAttachment } from "/@/api/attachments.api";
 import axios from "axios";
 
 const INPUT_CLASS =
@@ -122,6 +123,7 @@ export default function PatientBookAppointment() {
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const createAppointmentMutation = useCreateAppointment();
 
   const bookingWindow = getBookingWindow();
@@ -170,7 +172,7 @@ export default function PatientBookAppointment() {
     const trimmedNotes = notes.trim();
 
     try {
-      await createAppointmentMutation.mutateAsync({
+      const appointment = await createAppointmentMutation.mutateAsync({
         patient_id: studentId,
         scheduled_start: toLocalISO(start),
         scheduled_end: toLocalISO(end),
@@ -178,6 +180,18 @@ export default function PatientBookAppointment() {
         location,
         notes: trimmedNotes || null,
       });
+
+      // Upload attached files (Fit to Work Certificate only)
+      if (type === "Fit to Work Certificate" && attachedFiles.length > 0) {
+        const appointmentId = (appointment as { id?: number })?.id;
+        for (const file of attachedFiles) {
+          try {
+            await uploadPatientAttachment(file, "laboratory_result", appointmentId);
+          } catch (uploadErr) {
+            console.error("Failed to upload attachment:", uploadErr);
+          }
+        }
+      }
 
       navigate(ROUTES.patient.dashboard.appointments);
     } catch (err) {
@@ -449,6 +463,50 @@ export default function PatientBookAppointment() {
               className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-3 text-sm text-textPrimary placeholder:text-textMuted focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
+
+          {type === "Fit to Work Certificate" && (
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-textPrimary">
+                Attachments <span className="font-normal text-textMuted">(optional)</span>
+              </label>
+              <p className="mb-2 text-xs text-textMuted">
+                Upload supporting documents (images or PDF, up to 10 MB each).
+              </p>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  setAttachedFiles((prev) => [...prev, ...files]);
+                  e.target.value = "";
+                }}
+                className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary"
+              />
+              {attachedFiles.length > 0 && (
+                <ul className="mt-3 flex flex-col gap-2">
+                  {attachedFiles.map((file, index) => (
+                    <li
+                      key={`${file.name}-${index}`}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
+                    >
+                      <span className="truncate text-xs text-textPrimary">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAttachedFiles((prev) => prev.filter((_, i) => i !== index))
+                        }
+                        className="shrink-0 rounded-md p-1 text-textMuted transition-colors hover:bg-background hover:text-textPrimary"
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
             <button

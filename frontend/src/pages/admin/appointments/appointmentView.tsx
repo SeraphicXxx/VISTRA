@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
@@ -19,6 +19,7 @@ import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
 import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
+import {getAttachmentsByAppointment, type AttachmentRecord} from "/@/api/attachments.api";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -276,7 +277,21 @@ export default function AppointmentDetailView() {
     } | null>(null);
     const [optimisticStatus, setOptimisticStatus] =
         useState<AdminAppointmentStatus | null>(null);
+    const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
     const updateAppointmentMutation = useUpdateAppointment();
+
+    useEffect(() => {
+        if (!patientId || !appointmentId) return;
+        getAttachmentsByAppointment(patientId, Number(appointmentId))
+            .then((res) => {
+                if (res.data?.success && res.data?.data) {
+                    setAttachments(res.data.data);
+                }
+            })
+            .catch(() => {
+                setAttachments([]);
+            });
+    }, [patientId, appointmentId]);
     if (!appointmentId || !patientId) {
         return (
             <AppointmentNotFound

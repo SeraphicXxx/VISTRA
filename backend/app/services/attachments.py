@@ -197,12 +197,14 @@ def get_patient_attachments(
     patient_id: str,
     supabase: Client,
     category: str | None = None,
+    appointment_id: int | None = None,
 ):
     repository = AttachmentRepository(supabase)
 
     attachments = repository.get_by_patient(
         patient_id=patient_id,
         category=category,
+        appointment_id=appointment_id,
     )
 
     return ok(data=attachments)

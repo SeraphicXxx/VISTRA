@@ -50,6 +50,7 @@ export const API_ENDPOINTS = {
     },
     attachment: {
         patient_upload: `${API_V1}/attachments/patient/upload`,
+        get_by_patient: (patientId: string) => `${API_V1}/attachments/patient/${patientId}`,
     },
     appointment: {
         create_appointment: `${API_V1}/appointments/`,

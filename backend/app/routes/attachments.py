@@ -90,12 +90,14 @@ async def upload_attachment(
 def get_patient_attachments(
     patient_id: str,
     category: AttachmentCategory | None = None,
+    appointment_id: int | None = None,
     supabase: Client = Depends(get_supabase_for_user),
 ):
     return get_patient_attachments_service(
         patient_id=patient_id,
         supabase=supabase,
         category=category,
+        appointment_id=appointment_id,
     )
 
 

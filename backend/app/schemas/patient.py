@@ -258,10 +258,10 @@ class PatientResults(BaseModel):
     def to_db_dict(self, patient_id: str) -> dict:
         return{
             "patient_id" : patient_id,
-            "Chest_Xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
-            "CBC" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
-            "Urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
-            "Other" : self.Other,
+            "chest_xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
+            "cbc" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
+            "urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
+            "other" : self.Other,
             "recommendation" : self.recommendation
         }
 

@@ -83,7 +83,7 @@ class AttachmentRepository:
         )
         return response.data or []
 
-    def get_by_patient(self, patient_id: str, category: str | None = None):
+    def get_by_patient(self, patient_id: str, category: str | None = None, appointment_id: int | None = None):
         query = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -95,7 +95,21 @@ class AttachmentRepository:
         if category:
             query = query.eq("category", category)
 
+        if appointment_id is not None:
+            query = query.eq("appointment_id", appointment_id)
+
         response = query.execute()
+        return response.data or []
+
+    def get_by_appointment(self, appointment_id: int):
+        response = (
+            self.supabase
+            .table("PATIENT_ATTACHMENTS")
+            .select("*")
+            .eq("appointment_id", appointment_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
         return response.data or []
 
     def delete_metadata(self, attachment_id: UUID):
