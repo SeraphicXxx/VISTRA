@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/appointments/{{appointment_id}}/"
+url: "{{base_url}}/{{api_version}}/appointments/20230847-S/{{appointment_id}}"
 method: GET
 headers:
   Authorization: Bearer {{access_token}}
@@ -17,7 +17,7 @@ scripts:
       const json = pm.response.json();
       pm.test("Appointment record is returned", function () {
           pm.expect(json.success).to.eql(true);
-          pm.expect(json.data).to.have.property("appointment_id");
+          pm.expect(json.data).to.have.property("id");
       });
     language: text/javascript
 order: 3000

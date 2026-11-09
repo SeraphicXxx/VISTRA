@@ -8,11 +8,12 @@ body:
   type: text
   content: |-
     {
-        "patient_id": "{{patient_id}}",
+        "patient_id": "20230847-S",
         "type": "Consultation",
         "status": "Pending",
         "scheduled_start": "2026-11-10T10:00:00Z",
         "scheduled_end": "2026-11-10T11:00:00Z",
+        "location": "UCC-South Campus",
         "reason": "General checkup",
         "notes": "Test appointment"
     }

@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/medical/{{patient_id}}/{{medical_visit_id}}/"
+url: "{{base_url}}/{{api_version}}/medical/20230847-S/{{medical_visit_id}}"
 method: GET
 headers:
   Authorization: Bearer {{access_token}}

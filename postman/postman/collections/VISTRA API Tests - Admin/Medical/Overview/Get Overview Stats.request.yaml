@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/overview/"
+url: "{{base_url}}/{{api_version}}/overview/stats/"
 method: GET
 headers:
   Authorization: Bearer {{access_token}}

@@ -19,10 +19,9 @@ export default function PersonalTab({
   address,
   barangay,
   course,
-  year,
-  section,
+  school_year,
   department,
-  position,
+  person_type,
   onEdit,
 }: PersonalInfo & { onEdit?: () => void }) {
   return (
@@ -50,8 +49,8 @@ export default function PersonalTab({
         <InfoCard title="Enrollment Details" onEdit={onEdit}>
           <FieldGrid>
             <InfoField label="Course" value={course} />
-            <InfoField label="Year Level" value={year} />
-            <InfoField label="Section" value={section} />
+            <InfoField label="Year Level" value={school_year} />
+            <InfoField label="Department" value={department} />
           </FieldGrid>
         </InfoCard>
       )}
@@ -60,7 +59,7 @@ export default function PersonalTab({
         <InfoCard title="Employment Details" onEdit={onEdit}>
           <FieldGrid>
             <InfoField label="Department" value={department} />
-            <InfoField label="Position" value={position} />
+            <InfoField label="Classification" value={person_type ?? classification} />
           </FieldGrid>
         </InfoCard>
       )}

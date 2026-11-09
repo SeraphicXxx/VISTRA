@@ -1,22 +1,24 @@
 import type { VitalSigns } from "./patient.sample";
-import { FieldGrid, InfoCard, InfoField } from "/@/components/ProfileShared";
+import { FieldGrid, InfoCard, InfoField, formatDate } from "/@/components/ProfileShared";
 
 export default function VitalSignsTab({
+  height,
+  weight,
   temperature,
-  blood_pressure,
   heart_rate,
-  respiratory_rate,
-  eyes,
+  spo2,
+  recorded_at,
   onEdit,
 }: VitalSigns & { onEdit?: () => void }) {
   return (
     <InfoCard title="Vital Signs" onEdit={onEdit}>
       <FieldGrid>
+        <InfoField label="Height (cm)" value={height} />
+        <InfoField label="Weight (kg)" value={weight} />
         <InfoField label="Temperature (°C)" value={temperature} />
-        <InfoField label="Blood Pressure" value={blood_pressure} />
         <InfoField label="Heart Rate (bpm)" value={heart_rate} />
-        <InfoField label="Respiratory Rate" value={respiratory_rate} />
-        <InfoField label="Eyes" value={eyes} />
+        <InfoField label="SpO₂ (%)" value={spo2} />
+        <InfoField label="Recorded At" value={formatDate(recorded_at)} />
       </FieldGrid>
     </InfoCard>
   );
