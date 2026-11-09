@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
         create_patient: `${API_V1}/patients/`,
         get_all_patient_profile: `${API_V1}/patients/profiles/`,
         get_summary_record: (patientId: string) => `${API_V1}/patients/profiles/${patientId}/`,
+        get_my_profile: `${API_V1}/patients/profiles/me/`,
         get_patient_by_id: (patientId: string) => `${API_V1}/patients/${patientId}/`,
         update_patient_profile: (patientId: string) => `${API_V1}/patients/${patientId}/`,
         get_patient_medical_tab: `${API_V1}/patients/record/medical-tab/`,

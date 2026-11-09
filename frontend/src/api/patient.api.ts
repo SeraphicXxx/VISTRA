@@ -107,6 +107,15 @@ export function getPatientMedicalHistory(
     );
 }
 
+export function getMyProfile(
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<PatientInfo>>(
+        API_ENDPOINTS.patient.get_my_profile,
+        signal,
+    );
+}
+
 export function getPatientFamilyHistory(
     signal?: AbortSignal
 ) {

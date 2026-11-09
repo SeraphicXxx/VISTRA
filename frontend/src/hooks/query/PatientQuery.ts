@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory, getMyProfile} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -143,6 +143,22 @@ export function usePatientFamilyHistoryQuery() {
 
             if (!data.data) {
                 throw new Error("Family history data is missing");
+            }
+
+            return data.data;
+        },
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function useMyProfileQuery() {
+    return useQuery({
+        queryKey: ["patient", "my-profile"],
+        queryFn: async ({ signal }) => {
+            const { data } = await getMyProfile(signal);
+
+            if (!data.data) {
+                throw new Error("Profile data is missing");
             }
 
             return data.data;
