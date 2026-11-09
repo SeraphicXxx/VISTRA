@@ -1,10 +1,8 @@
 $kind: http-request
 url: "{{base_url}}/{{api_version}}/auth/refresh/"
 method: POST
-headers:
-  Content-Type: application/json
 body:
-  type: text
+  type: json
   content: |-
     {
         "refresh_token": "{{refresh_token}}"
@@ -13,17 +11,17 @@ scripts:
   - type: afterResponse
     code: |-
       pm.test("Refresh returns 200", function () {
-          pm.response.to.have.status(200);
+        pm.response.to.have.status(200);
       });
 
       pm.test("Response is JSON", function () {
-          pm.response.to.be.json;
+        pm.response.to.be.json;
       });
 
       const json = pm.response.json();
       pm.test("New access token is returned", function () {
-          pm.expect(json).to.have.property("access_token");
-          pm.environment.set("access_token", json.access_token);
+        pm.expect(json).to.have.property("access_token");
+        pm.environment.set("access_token", json.access_token);
       });
     language: text/javascript
-order: 8000
+order: 300

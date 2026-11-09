@@ -3,7 +3,7 @@ workspace:
 cloudResources:
   collections:
     ../postman/collections/VISTRA API Tests - Admin: 50029254-ba29902c-720f-44bd-8750-fb57ec157e44
-    ../postman/collections/VISTRA API Tests - Patient-1: 50029254-fad40a7d-2aaf-4371-bbc0-1a0e92229d09
+    ../postman/collections/VISTRA API Tests - Patient: 50029254-fad40a7d-2aaf-4371-bbc0-1a0e92229d09
   environments:
     ../postman/environments/VISTRA local-1.environment.yaml: 50029254-3315d264-c581-4815-a558-3b5e5f4dc7ca
     ../postman/environments/VISTRA local - Admin.environment.yaml: 50029254-5db91ccc-2d85-4587-a961-99436c44035d
