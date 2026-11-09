@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from supabase import Client
 
-from app.config.security import get_current_user
+from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.services.access import get_patient_scope, enforce_patient_scope
 from app.utils.service_helpers import handle_service_errors, ok
@@ -99,7 +99,35 @@ def get_my_profile_picture(
             return FileResponse(
                 path=path,
                 media_type=f"image/{ext.lstrip('.').replace('jpg', 'jpeg')}",
-                headers={"Cache-Control": "no-cache"},
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Access-Control-Allow-Origin": "*",
+                    "Cross-Origin-Resource-Policy": "cross-origin",
+                },
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No profile picture found",
+    )
+
+
+@profile_picture_router.get("/patient/{patient_id}", dependencies=[Depends(require_staff)])
+def get_patient_profile_picture(
+    patient_id: str,
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    for ext in ALLOWED_IMAGE_TYPES.values():
+        path = (PROFILE_PICTURE_ROOT / f"{patient_id}{ext}").resolve()
+        if path.is_file() and path.is_relative_to(PROFILE_PICTURE_ROOT):
+            return FileResponse(
+                path=path,
+                media_type=f"image/{ext.lstrip('.').replace('jpg', 'jpeg')}",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Access-Control-Allow-Origin": "*",
+                    "Cross-Origin-Resource-Policy": "cross-origin",
+                },
             )
 
     raise HTTPException(

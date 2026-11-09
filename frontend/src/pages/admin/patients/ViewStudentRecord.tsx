@@ -8,6 +8,7 @@ import { EditRecordModal, patientEditFields } from "/@/components/editModal";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 import { getInitials } from "/@/utils/RecordInfo";
+import { PatientAvatar } from "/@/components/PatientAvatar";
 import {
   RECORD_TABS,
   buildEditForm,
@@ -198,8 +199,8 @@ export default function ViewStudentRecord() {
 
           <div className="relative z-10 flex flex-col gap-5 px-6 pb-6  sm:flex-row sm:items-end sm:justify-between sm:px-8">
             <div className="flex min-w-0 items-end gap-5">
-              <div className="-mt-8 flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-primaryDark font-heading text-2xl font-semibold text-white shadow-md">
-                {getInitials(patient?.patient_name)}
+              <div className="-mt-8 flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-primaryDark font-heading text-2xl font-semibold text-white shadow-md overflow-hidden">
+                <PatientAvatar patientId={id} name={patient?.patient_name} size="xl" />
               </div>
 
               <div className="min-w-0 pb-1">

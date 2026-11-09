@@ -215,7 +215,7 @@ class CreateMedicalhistory(BaseModel):
     allergy_food : str = Field(..., min_length=2, max_length=255)
     Smoking : Frequency | None = None
     Vaping: Frequency | None = None
-    Alcohol: Frequency | None = None
+    alcohol_intake: Frequency | None = None
     Contraceptive: str = Field(..., min_length=2, max_length=255)
     Sexual_activity: Sexual_activity 
 
@@ -229,7 +229,7 @@ class CreateMedicalhistory(BaseModel):
             "allergy_food" : self.allergy_food,
             "Smoking" : self.Smoking.value if self.Smoking else None,
             "Vaping" : self.Vaping.value if self.Vaping else None,
-            "Alcohol" : self.Alcohol.value if self.Alcohol else None,
+            "alcohol_intake" : self.alcohol_intake.value if self.alcohol_intake else None,
             "Contraceptive" : self.Contraceptive,
             "Sexual_Activity" : self.Sexual_activity.value
         }

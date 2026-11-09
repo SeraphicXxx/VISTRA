@@ -27,8 +27,40 @@ export function uploadProfilePicture(
     );
 }
 
-export function getProfilePictureUrl(): string {
-    return `${getApiUrl()}${API_ENDPOINTS.profilePicture.get}`;
+export async function fetchProfilePictureBlob(): Promise<string | null> {
+    try {
+        const response = await apiClient(
+            API_ENDPOINTS.profilePicture.get,
+            { method: "GET", responseType: "blob" }
+        );
+        const blob = response.data as Blob;
+        if (blob && blob.size > 0) {
+            return URL.createObjectURL(blob);
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+export function getPatientProfilePictureUrl(patientId: string): string {
+    return `${getApiUrl()}${API_ENDPOINTS.profilePicture.getPatient(patientId)}`;
+}
+
+export async function fetchPatientProfilePictureBlob(patientId: string): Promise<string | null> {
+    try {
+        const response = await apiClient(
+            API_ENDPOINTS.profilePicture.getPatient(patientId),
+            { method: "GET", responseType: "blob" }
+        );
+        const blob = response.data as Blob;
+        if (blob && blob.size > 0) {
+            return URL.createObjectURL(blob);
+        }
+        return null;
+    } catch {
+        return null;
+    }
 }
 
 export async function createPatientAccount(
