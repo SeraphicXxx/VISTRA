@@ -17,7 +17,8 @@ import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/Appo
 import {useForm} from "/@/hooks/Form";
 import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
-import {getInitials} from "/@/utils/RecordInfo";
+import {PatientAvatar} from "/@/components/PatientAvatar";
+import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
@@ -407,7 +408,7 @@ export default function AppointmentDetailView() {
 
                             <span
                                 className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
-                                {getInitials(appointment.student)}
+                                <PatientAvatar patientId={patientId} name={appointment.student} size="lg" />
                             </span>
 
                             <div>

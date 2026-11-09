@@ -7,7 +7,6 @@ import { formatDate } from "/@/utils/FormatDate";
 import { EditRecordModal, patientEditFields } from "/@/components/editModal";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
-import { getInitials } from "/@/utils/RecordInfo";
 import { PatientAvatar } from "/@/components/PatientAvatar";
 import {
   RECORD_TABS,
