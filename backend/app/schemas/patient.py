@@ -217,7 +217,7 @@ class CreateMedicalhistory(BaseModel):
     Vaping: Frequency | None = None
     alcohol_intake: Frequency | None = None
     family_planning_method: str | None = Field(default=None, max_length=255)
-    Sexual_activity: Sexual_activity 
+    sexual_activity: Sexual_activity | None = None
 
     def to_db_dict(self, patient_id: str) -> dict:
         return {
@@ -231,7 +231,7 @@ class CreateMedicalhistory(BaseModel):
             "Vaping" : self.Vaping.value if self.Vaping else None,
             "alcohol_intake" : self.alcohol_intake.value if self.alcohol_intake else None,
             "family_planning_method" : self.family_planning_method,
-            "Sexual_Activity" : self.Sexual_activity.value
+            "sexual_activity" : self.sexual_activity.value if self.sexual_activity else None,
         }
 
 class FamilyHistory(BaseModel):
