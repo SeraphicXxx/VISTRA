@@ -13,6 +13,9 @@ export function uploadProfilePicture(
     file: File,
     signal?: AbortSignal
 ) {
+    // Invalidate cached picture before upload
+    invalidateProfilePictureCache("me");
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -27,7 +30,33 @@ export function uploadProfilePicture(
     );
 }
 
+// Module-level cache for profile picture object URLs.
+// Key: patientId or "me" for current user. Value: object URL string.
+const profilePictureCache = new Map<string, string>();
+
+export function getCachedProfilePicture(key: string): string | null {
+    return profilePictureCache.get(key) ?? null;
+}
+
+export function invalidateProfilePictureCache(key?: string): void {
+    if (key) {
+        const url = profilePictureCache.get(key);
+        if (url) URL.revokeObjectURL(url);
+        profilePictureCache.delete(key);
+    } else {
+        // Invalidate all
+        for (const url of profilePictureCache.values()) {
+            URL.revokeObjectURL(url);
+        }
+        profilePictureCache.clear();
+    }
+}
+
 export async function fetchProfilePictureBlob(): Promise<string | null> {
+    const cacheKey = "me";
+    const cached = profilePictureCache.get(cacheKey);
+    if (cached) return cached;
+
     try {
         const response = await apiClient(
             API_ENDPOINTS.profilePicture.get,
@@ -35,7 +64,9 @@ export async function fetchProfilePictureBlob(): Promise<string | null> {
         );
         const blob = response.data as Blob;
         if (blob && blob.size > 0) {
-            return URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob);
+            profilePictureCache.set(cacheKey, url);
+            return url;
         }
         return null;
     } catch {
@@ -48,6 +79,9 @@ export function getPatientProfilePictureUrl(patientId: string): string {
 }
 
 export async function fetchPatientProfilePictureBlob(patientId: string): Promise<string | null> {
+    const cached = profilePictureCache.get(patientId);
+    if (cached) return cached;
+
     try {
         const response = await apiClient(
             API_ENDPOINTS.profilePicture.getPatient(patientId),
@@ -55,7 +89,9 @@ export async function fetchPatientProfilePictureBlob(patientId: string): Promise
         );
         const blob = response.data as Blob;
         if (blob && blob.size > 0) {
-            return URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob);
+            profilePictureCache.set(patientId, url);
+            return url;
         }
         return null;
     } catch {

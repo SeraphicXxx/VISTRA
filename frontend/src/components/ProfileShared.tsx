@@ -59,17 +59,14 @@ export function ProfileHeader({
     classification.charAt(0).toUpperCase() + classification.slice(1);
 
   useEffect(() => {
-    let objectUrl: string | null = null;
     fetchProfilePictureBlob().then((url) => {
       if (url) {
-        objectUrl = url;
         setPictureUrl(url);
         setHasPicture(true);
       }
     });
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
+    // Don't revoke on unmount — the cache holds the reference.
+    // Cache is invalidated explicitly on upload via invalidateProfilePictureCache.
   }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

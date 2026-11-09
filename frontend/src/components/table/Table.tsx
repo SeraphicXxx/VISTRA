@@ -31,7 +31,7 @@ export const courseFilterOptions: ColumnFilterOption[] = optionsFromValues([
 ]);
 
 import {useEffect, useState} from "react";
-import {fetchPatientProfilePictureBlob} from "/@/api/patient.api";
+import {fetchPatientProfilePictureBlob, getCachedProfilePicture} from "/@/api/patient.api";
 
 export function StudentCell({ name, patientId }: { name: string; patientId?: string }) {
     const [pictureUrl, setPictureUrl] = useState<string | null>(null);
@@ -39,17 +39,19 @@ export function StudentCell({ name, patientId }: { name: string; patientId?: str
 
     useEffect(() => {
         if (!patientId) return;
-        let objectUrl: string | null = null;
+        const cached = getCachedProfilePicture(patientId);
+        if (cached) {
+            setPictureUrl(cached);
+            setHasPicture(true);
+            return;
+        }
         fetchPatientProfilePictureBlob(patientId).then((url) => {
             if (url) {
-                objectUrl = url;
                 setPictureUrl(url);
                 setHasPicture(true);
             }
         });
-        return () => {
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
-        };
+        // Don't revoke on unmount — the cache holds the reference.
     }, [patientId]);
 
     return (
