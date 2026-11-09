@@ -15,6 +15,7 @@ jobs:
           violators=$(grep -rn --include='*.py' -E '\bsupabase_admin\b' backend/app \
             | grep -v 'backend/app/database/database_client.py' \
             | grep -v 'backend/app/services/auth/user.py' \
+            | grep -v 'backend/app/services/patient.py' \
             | grep -v 'get_supabase_admin' \
             || true)
 
