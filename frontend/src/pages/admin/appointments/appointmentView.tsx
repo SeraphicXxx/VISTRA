@@ -18,7 +18,6 @@ import {useForm} from "/@/hooks/Form";
 import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
 import {PatientAvatar} from "/@/components/PatientAvatar";
-import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
