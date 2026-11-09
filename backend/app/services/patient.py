@@ -181,7 +181,6 @@ def _create_personal_records_from_request(
                 Chest_Xray=ResultsEnum(request.chest_xray) if request.chest_xray else ResultsEnum.NORMAL,
                 CBC=ResultsEnum(request.cbc) if request.cbc else ResultsEnum.NORMAL,
                 Urinalysis=ResultsEnum(request.urinalysis) if request.urinalysis else ResultsEnum.NORMAL,
-                Other=request.results_other or None,
                 recommendation=request.recommendation or None,
             ),
         )

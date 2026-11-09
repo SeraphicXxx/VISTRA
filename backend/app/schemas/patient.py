@@ -84,7 +84,6 @@ class CreatePatientRequest(BaseModel):
     chest_xray: str | None = None
     cbc: str | None = None
     urinalysis: str | None = None
-    results_other: str | None = Field(default=None, max_length=255)
 
     # Recommendation
     recommendation: str | None = Field(default=None, max_length=255)
@@ -252,7 +251,6 @@ class PatientResults(BaseModel):
     Chest_Xray : ResultsEnum | str = "Normal"
     CBC : ResultsEnum | str = "Normal"
     Urinalysis: ResultsEnum | str = "Normal"
-    Other: str | None = Field(default=None, min_length=2, max_length=255)
     recommendation: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
@@ -261,7 +259,6 @@ class PatientResults(BaseModel):
             "chest_xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
             "cbc" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
             "urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
-            "other" : self.Other,
             "recommendation" : self.recommendation
         }
 
