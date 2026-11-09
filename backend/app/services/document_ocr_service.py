@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import HTTPException
-from supabase import Client
+from supabase import Client  # type: ignore[import-untyped]
 
 from app.schemas.user import CurrentUser
 from app.utils.service_helpers import handle_service_errors, ok
@@ -25,7 +25,7 @@ os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")
 os.environ.setdefault("PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT", "False")
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
-from document_intelligence import (  # noqa: E402
+from document_intelligence import (  # type: ignore[import-not-found]  # noqa: E402
     OCRPipeline,
     apply_review,
 )

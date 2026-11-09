@@ -132,7 +132,7 @@ def get_patient_attachments(
 
     attachments = repository.get_by_patient(
         patient_id=patient_id,
-        category=category.value if category else None,
+        category=category,
     )
 
     return ok(data=attachments)

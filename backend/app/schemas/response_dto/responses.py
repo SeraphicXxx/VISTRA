@@ -13,8 +13,8 @@ class PaginatedResponse(BaseModel, Generic[T]):
     page: int
     page_size: int
 
-    @computed_field
     @property
+    @computed_field
     def total_pages(self) -> int:
         if self.page_size <= 0:
             return 0

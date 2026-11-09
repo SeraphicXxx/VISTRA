@@ -1,5 +1,5 @@
 from supabase import Client
-from cachetools import TTLCache
+from cachetools import TTLCache  # type: ignore[import-untyped]
 
 from app.repositories.overview_repositories import OverviewRepository
 from app.utils.service_helpers import handle_service_errors, ok, or_404

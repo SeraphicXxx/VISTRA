@@ -111,8 +111,8 @@ def delete_patient(patient_id: str, supabase: Client):
     PATIENT_PROFILE.patient_id all reference PATIENT.patient_id.
     """
     patient_repo = PatientRepository(supabase)
-    existing = patient_repo.get_by_id(patient_id)
-    or_404(existing, "Patient not found")
+    existing = or_404(patient_repo.get_by_id(patient_id), "Patient not found")
+    assert existing is not None
 
     try:
         patient_repo.delete_patient_cascade(patient_id)

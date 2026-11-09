@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from app.schemas.patient import CreateMedicalhistory, FamilyHistory, Results
+from app.schemas.patient import CreateMedicalhistory, FamilyHistory, PatientResults
 from app.schemas.response_dto.responses import PaginatedResponse
 from app.repositories.base import BaseRepository
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
@@ -110,7 +110,7 @@ class PatientRepository(BaseRepository):
 
         return response.data[0]["id"]
 
-    def insert_results(self, patient_id: str, data: Results) -> Optional[str]:
+    def insert_results(self, patient_id: str, data: PatientResults) -> Optional[str]:
         response = (
             self.supabase
             .table("RESULTS")

@@ -76,6 +76,7 @@ def get_all_staff(supabase: Client):
 def get_staff_by_id(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
     record = or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+    assert record is not None
 
     return ok({**record, "permissions": staff_repo.get_permissions(staff_id)})
 
@@ -83,8 +84,8 @@ def get_staff_by_id(staff_id: str, supabase: Client):
 @handle_service_errors
 def delete_staff(staff_id: str, supabase: Client):
     staff_repo = StaffRepository(supabase)
-    existing = staff_repo.get_by_id(staff_id)
-    or_404(existing, "Staff not found")
+    existing = or_404(staff_repo.get_by_id(staff_id), "Staff not found")
+    assert existing is not None
 
     # Permissions row first: its FK is NO ACTION, so deleting STAFF
     # while it exists would 409 on our own permissions record.

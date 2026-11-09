@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
-from app.enums.personal_history import Frequency, Sexual_activity, Results
+from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
 from app.enums.family_history import Family_history
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
@@ -198,9 +198,9 @@ class CreateMedicalhistory(BaseModel):
             "diagnosis" : self.diagnosis,
             "allergy_medicine" : self.allergy_medicine,
             "allergy_food" : self.allergy_food,
-            "Smoking" : self.Smoking.value,
-            "Vaping" : self.Vaping.value,
-            "Alcohol" : self.Alcohol.value,
+            "Smoking" : self.Smoking.value if self.Smoking else None,
+            "Vaping" : self.Vaping.value if self.Vaping else None,
+            "Alcohol" : self.Alcohol.value if self.Alcohol else None,
             "Contraceptive" : self.Contraceptive,
             "Sexual_Activity" : self.Sexual_activity.value
         }
@@ -216,25 +216,25 @@ class FamilyHistory(BaseModel):
             "Other" : self.Other
         }
 
-class Results(BaseModel): 
-    Chest_Xray : Results | str = "Normal"
-    CBC : Results | str = "Normal"
-    Urinalysis: Results | str = "Normal"
-    Other: str = Field(default=None, min_length=2, max_length=255)
+class PatientResults(BaseModel): 
+    Chest_Xray : ResultsEnum | str = "Normal"
+    CBC : ResultsEnum | str = "Normal"
+    Urinalysis: ResultsEnum | str = "Normal"
+    Other: str | None = Field(default=None, min_length=2, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
         return{
             "patient_id" : patient_id,
-            "Chest_Xray" : self.Chest_Xray.value,
-            "CBC" : self.CBC.value,
-            "Urinalysis" : self.Urinalysis.value,
+            "Chest_Xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
+            "CBC" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
+            "Urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
             "Other" : self.Other
         }
 
 class FullFormRequest(BaseModel):
     medical: CreateMedicalhistory
     family: FamilyHistory
-    results: Results
+    results: PatientResults
 
 class PatientRecord(BaseModel):
     id: int
