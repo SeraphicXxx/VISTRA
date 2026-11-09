@@ -24,6 +24,7 @@ from app.utils.service_helpers import handle_service_errors, ok, or_404
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
 from app.enums.family_history import Family_history
+from app.database.database_client import supabase_admin
 
 
 @handle_service_errors
@@ -105,7 +106,7 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
         # 6. Insert medical history, family history, and results if any
         # medical data was provided in the form
         _create_personal_records_from_request(
-            patient_repo, patient_id, request
+            patient_repo, patient_id, request, supabase_admin
         )
 
     except Exception as e:
@@ -128,10 +129,16 @@ def _create_personal_records_from_request(
     patient_repo: PatientRepository,
     patient_id: str,
     request: CreatePatientRequest,
+    supabase_admin: Client,
 ) -> None:
     """Insert medical history, family history, and results data
     submitted via the MedicalHistoryForm component on patient creation.
+    Uses supabase_admin to bypass RLS on medical tables since this is
+    an admin operation (staff creating patient records).
     """
+
+    # Use supabase_admin to bypass RLS on medical tables
+    patient_repo_admin = PatientRepository(supabase_admin)
 
     # --- Medical History ---
     medical_fields_present = any([
