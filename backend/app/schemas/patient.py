@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
-from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
+from app.enums.personal_history import Results as ResultsEnum
 from app.enums.family_history import Family_history
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
@@ -213,12 +213,17 @@ class CreateMedicalhistory(BaseModel):
     diagnosis: str = Field(..., min_length=2, max_length=255)
     allergy_medicine : str =Field(..., min_length=2, max_length=255)
     allergy_food : str = Field(..., min_length=2, max_length=255)
-    Smoking : Frequency | None = None
-    Vaping: Frequency | None = None
-    alcohol_intake: Frequency | None = None
+    Smoking : str | None = None
+    Vaping: str | None = None
+    alcohol_intake: str | None = None
     family_planning_method: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
+        def _to_freq(val: str | None) -> str | None:
+            if not val or val in ("None", "none", "NONE"):
+                return None
+            return val
+
         return {
             "patient_id" : patient_id,
             "hospitalization_operation" : self.hostpitalization_operation,
@@ -226,9 +231,9 @@ class CreateMedicalhistory(BaseModel):
             "diagnosis" : self.diagnosis,
             "allergy_medicine" : self.allergy_medicine,
             "allergy_food" : self.allergy_food,
-            "smoking" : self.Smoking.value if self.Smoking else None,
-            "vaping" : self.Vaping.value if self.Vaping else None,
-            "alcohol_intake" : self.alcohol_intake.value if self.alcohol_intake else None,
+            "smoking" : _to_freq(self.Smoking),
+            "vaping" : _to_freq(self.Vaping),
+            "alcohol_intake" : _to_freq(self.alcohol_intake),
             "family_planning_method" : self.family_planning_method,
         }
 

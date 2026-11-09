@@ -70,42 +70,55 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
         role_for_classification(request.classification),
     )
 
-    # 3. Insert PATIENT
-    patient_data = Patient(
-        id=user.id,
-        patient_id=patient_id,
-        created_by=request.created_by,
-    )
-
-    insert_response = insert_model(supabase, "PATIENT", patient_data)
-
-    if not insert_response["success"]:
-        compensate_auth_user(
-            user.id,
-            insert_response["message"],
-            "Failed to insert patient into database and failed "
-            "to delete user from auth",
+    try:
+        # 3. Insert PATIENT
+        patient_data = Patient(
+            id=user.id,
+            patient_id=patient_id,
+            created_by=request.created_by,
         )
 
-    # 4. Convert request into profile
-    patient_profile = request.to_patient_profile()
+        insert_response = insert_model(supabase, "PATIENT", patient_data)
 
-    # 5. Insert patient profile
-    profile_response = insert_model(supabase, "PATIENT_PROFILE", patient_profile)
+        if not insert_response["success"]:
+            compensate_auth_user(
+                user.id,
+                insert_response["message"],
+                "Failed to insert patient into database and failed "
+                "to delete user from auth",
+            )
 
-    if not profile_response["success"]:
-        compensate_auth_user(
-            user.id,
-            profile_response["message"],
-            "Failed to insert patient profile and failed "
-            "to delete auth user",
+        # 4. Convert request into profile
+        patient_profile = request.to_patient_profile()
+
+        # 5. Insert patient profile
+        profile_response = insert_model(supabase, "PATIENT_PROFILE", patient_profile)
+
+        if not profile_response["success"]:
+            compensate_auth_user(
+                user.id,
+                profile_response["message"],
+                "Failed to insert patient profile and failed "
+                "to delete auth user",
+            )
+
+        # 6. Insert medical history, family history, and results if any
+        # medical data was provided in the form
+        _create_personal_records_from_request(
+            patient_repo, patient_id, request
         )
 
-    # 6. Insert medical history, family history, and results if any
-    # medical data was provided in the form
-    _create_personal_records_from_request(
-        patient_repo, patient_id, request
-    )
+    except Exception as e:
+        # Rollback: delete the patient and auth user if anything fails
+        try:
+            patient_repo.delete_patient_cascade(patient_id)
+        except Exception:
+            pass
+        try:
+            delete_auth_user(user.id)
+        except Exception:
+            pass
+        raise
 
     # Everything succeeded
     return ok(message="Patient created successfully")
@@ -124,8 +137,8 @@ def _create_personal_records_from_request(
     medical_fields_present = any([
         request.hospitalization_year, request.diagnosis,
         request.allergy_medicine, request.allergy_food,
-        request.smoking, request.vaping, request.alcohol,
-        request.contraceptive, request.sexual_activity,
+        request.Smoking, request.Vaping, request.alcohol_intake,
+        request.family_planning_method,
     ])
     if medical_fields_present:
         patient_repo.insert_personal_record(
@@ -136,11 +149,10 @@ def _create_personal_records_from_request(
                 diagnosis=request.diagnosis or "",
                 allergy_medicine=request.allergy_medicine or "",
                 allergy_food=request.allergy_food or "",
-                Smoking=Frequency(request.smoking) if request.smoking else Frequency.NONE,
-                Vaping=Frequency(request.vaping) if request.vaping else Frequency.NONE,
-                Alcohol=Frequency(request.alcohol) if request.alcohol else Frequency.NONE,
-                Contraceptive=request.contraceptive or "",
-                Sexual_activity=Sexual_activity(request.sexual_activity) if request.sexual_activity else Sexual_activity.NO,
+                Smoking=request.Smoking or None,
+                Vaping=request.Vaping or None,
+                alcohol_intake=request.alcohol_intake or None,
+                family_planning_method=request.family_planning_method or None,
             ),
         )
 
