@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -81,6 +81,40 @@ export function usePatientMedicalDentalSummaryQuery() {
 
             return data.data;
         },
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientMedicalRecordQuery(medicalId: string) {
+    return useQuery({
+        queryKey: ["patient", "medical-record", medicalId],
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientMedicalRecord(medicalId, signal);
+
+            if (!data.data) {
+                throw new Error("Medical record data is missing");
+            }
+
+            return data.data;
+        },
+        enabled: Boolean(medicalId),
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientDentalRecordQuery(dentalId: string) {
+    return useQuery({
+        queryKey: ["patient", "dental-record", dentalId],
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientDentalRecord(dentalId, signal);
+
+            if (!data.data) {
+                throw new Error("Dental record data is missing");
+            }
+
+            return data.data;
+        },
+        enabled: Boolean(dentalId),
         refetchOnWindowFocus: false,
     });
 }

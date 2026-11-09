@@ -35,6 +35,8 @@ export const API_ENDPOINTS = {
         update_patient_profile: (patientId: string) => `${API_V1}/patients/${patientId}/`,
         get_patient_medical_tab: `${API_V1}/patients/record/medical-tab/`,
         get_patient_dental_tab: `${API_V1}/patients/record/dental-tab/`,
+        get_patient_medical_record: (medicalId: string) => `${API_V1}/patients/record/medical/${medicalId}`,
+        get_patient_dental_record: (dentalId: string) => `${API_V1}/patients/record/dental/${dentalId}`,
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
     },
     appointment: {

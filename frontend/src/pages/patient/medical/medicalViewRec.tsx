@@ -1,41 +1,97 @@
+import {ArrowLeft, Printer} from "lucide-react";
 import {useMemo} from "react";
-import {ArrowLeft, ClipboardList, Printer, User} from "lucide-react";
-import {useNavigate} from "react-router-dom";
-
-import {InfoField, getInitials} from "/@/utils/RecordInfo";
+import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
 import {ROUTES} from "/@/config/RoutePaths";
 import {formatDate} from "/@/utils/FormatDate";
 import {sessionManager} from "/@/utils/SessionManager";
-import {resolveStudentId} from "../appointments/appointmentsData";
-import {myMedicalRecords, myVisits} from "./medicalData";
+import {usePatientMedicalRecordQuery} from "/@/hooks/query/PatientQuery";
+import {MedicalRecordDetailSchema} from "/@/api/schema/MedicalSchema";
 
-function ReadOnlyBlock({label, value}: {label: string; value?: string | null}) {
+function Field({label, value}: {label: string; value?: string | null}) {
     return (
-        <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium text-textMuted">{label}</p>
-            <div className="min-h-[72px] whitespace-pre-wrap rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary">
-                {value || "—"}
+        <div className="flex flex-col gap-1">
+            <span className="text-xs font-medium uppercase tracking-wide text-textMuted">{label}</span>
+            <span className="text-sm">{value || "—"}</span>
+        </div>
+    );
+}
+
+function SkeletonBlock({className}: {className?: string}) {
+    return (
+        <div className={`animate-pulse rounded-lg bg-border ${className ?? ""}`} />
+    );
+}
+
+function MedicalRecordSkeleton() {
+    return (
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+            <div className="flex items-center justify-between gap-3">
+                <SkeletonBlock className="h-8 w-24" />
+                <SkeletonBlock className="h-8 w-16" />
+            </div>
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
+                <div className="flex flex-col gap-5 md:flex-row md:items-center">
+                    <SkeletonBlock className="h-16 w-16 rounded-full" />
+                    <div className="flex flex-1 flex-col gap-2">
+                        <SkeletonBlock className="h-6 w-48" />
+                        <SkeletonBlock className="h-4 w-32" />
+                    </div>
+                    <SkeletonBlock className="h-6 w-20" />
+                </div>
+            </div>
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
+                <SkeletonBlock className="mb-4 h-5 w-32" />
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                    <SkeletonBlock className="h-12" />
+                    <SkeletonBlock className="h-12" />
+                    <SkeletonBlock className="h-12" />
+                </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
+                    <SkeletonBlock className="mb-4 h-5 w-40" />
+                    <div className="flex flex-col gap-4">
+                        <SkeletonBlock className="h-10" />
+                        <SkeletonBlock className="h-10" />
+                        <SkeletonBlock className="h-10" />
+                    </div>
+                </div>
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card lg:col-span-2">
+                    <SkeletonBlock className="mb-4 h-5 w-32" />
+                    <div className="flex flex-col gap-4">
+                        <SkeletonBlock className="h-10" />
+                        <SkeletonBlock className="h-24" />
+                        <SkeletonBlock className="h-24" />
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
 
+function getInitialsFrom(name: string) {
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join("");
+}
+
 export default function PatientMedicalRecordView() {
     const navigate = useNavigate();
-    const user = sessionManager.getUser();
-    const studentId = resolveStudentId(user);
-    const record = myMedicalRecords[studentId];
+    const params = useParams<{ medicalId: string }>();
+    const medicalId = params.medicalId ?? "";
+    const { data: record, isLoading, isError } = usePatientMedicalRecordQuery(medicalId);
 
-    const visits = useMemo(
-        () => [...(myVisits[studentId] ?? [])].sort((a, b) => b.date.localeCompare(a.date)),
-        [studentId]
-    );
-    const visit = visits[0];
+    if (isLoading) {
+        return <MedicalRecordSkeleton />;
+    }
 
-    if (!record || !visit) {
+    if (isError || !record) {
         return (
-            <div className="rounded-2xl border border-border bg-surface p-8 text-center shadow-sm">
+            <div className="rounded-2xl border border-border bg-surface p-8 text-center shadow-card">
                 <p className="text-sm text-textMuted">No medical record found.</p>
             </div>
         );
@@ -46,127 +102,112 @@ export default function PatientMedicalRecordView() {
         : undefined;
 
     return (
-        <div className="mx-auto w-full">
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+            <div className="flex items-center justify-between gap-3">
+                <button
+                    type="button"
+                    onClick={() => navigate(ROUTES.patient.dashboard.medical)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-primaryDark shadow-card transition hover:bg-surfaceMuted"
+                >
+                    <ArrowLeft className="h-4 w-4"/>
+                    Back
+                </button>
+                <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-primaryDark shadow-card transition hover:bg-surfaceMuted"
+                >
+                    <Printer className="h-4 w-4"/>
+                    Print
+                </button>
+            </div>
 
-                <div className="relative p-6 sm:p-8">
-                    <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-                        <button
-                            type="button"
-                            onClick={() => navigate(ROUTES.patient.dashboard.medical)}
-                            className="inline-flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-textMuted hover:text-textPrimary"
-                        >
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            Back to records
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => window.print()}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-textSecondary hover:bg-surfaceMuted"
-                        >
-                            <Printer className="h-3.5 w-3.5" />
-                            Print record
-                        </button>
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
+                <div className="flex flex-col gap-5 md:flex-row md:items-center">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
+                        {getInitialsFrom(record.patient_name)}
                     </div>
-
-                    <div className="flex items-center gap-5">
-                        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
-                            {getInitials(record.name)}
-                        </span>
-
-                        <div>
-                            <div className="flex flex-wrap items-center gap-2.5">
-                                <h1 className="font-heading text-2xl font-semibold text-primaryDark">
-                                    {record.name}
-                                </h1>
-                                <span className="rounded-md bg-surfaceMuted px-2 py-0.5 text-xs text-textMuted">
-                                    {visit.id}
-                                </span>
-                                <StatusBadge status={visit.status} />
-                            </div>
-
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textMuted">
-                                <span>{record.studentId}</span>
-                                <span>•</span>
-                                <span>Medical Record</span>
-                            </div>
-                        </div>
+                    <div className="flex flex-1 flex-col gap-1">
+                        <h1 className="text-xl font-semibold text-primaryDark">{record.patient_name}</h1>
+                        <p className="text-sm text-textMuted">Medical Record</p>
                     </div>
+                    <StatusBadge status={record.status} />
                 </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
-                <div className="rounded-2xl border border-border bg-surface shadow-sm">
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
+                <h2 className="mb-4 text-base font-semibold text-primaryDark">Visit Summary</h2>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                    <Field label="Visit Date" value={record.visit_date ? formatDate(record.visit_date) : undefined} />
+                    <Field label="Attending Staff" value={record.staff_name} />
+                    <Field label="Visit Type" value={record.treatment_type} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
                     <div className="border-b border-border px-5 py-4">
                         <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-primary" />
-                            <h2 className="font-heading text-sm font-semibold text-primaryDark">
-                                Patient Information
-                            </h2>
+                            <h2 className="text-base font-semibold text-primaryDark">Patient Information</h2>
                         </div>
                     </div>
-
                     <div className="flex flex-col gap-y-4 p-6">
                         <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-                            <InfoField label="Course" value={record.course} />
-                            <InfoField label="Year and Section" value={record.yearSection} />
+                            <Field label="Course" value={record.course} />
+                            <Field label="Year and Section" value={record.year_section} />
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-                            <InfoField label="Age" value={record.age} />
-                            <InfoField label="Sex" value={record.sex} />
+                            <Field label="Age" value={record.age} />
+                            <Field label="Sex" value={record.sex} />
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-                            <InfoField label="Civil status" value={record.civilStatus} />
-                            <InfoField
-                                label="Birthday"
-                                value={record.birthday ? formatDate(record.birthday) : undefined}
-                            />
+                            <Field label="Civil status" value={record.civil_status} />
+                            <Field label="Birthday" value={record.birthday ? formatDate(record.birthday) : undefined} />
                         </div>
                         <div className="grid grid-cols-1 gap-x-4 gap-y-5">
-                            <InfoField label="Address" value={address} />
+                            <Field label="Address" value={address} />
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-                            <InfoField label="Mobile Number" value={record.mobileNumber} />
-                            <InfoField
-                                label="Visit Date"
-                                value={visit.date ? formatDate(visit.date) : undefined}
-                            />
+                            <Field label="Mobile Number" value={record.mobileNumber} />
+                            <Field label="Visit Date" value={record.visit_date ? formatDate(record.visit_date) : undefined} />
                         </div>
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-border bg-surface shadow-sm lg:col-span-2">
+                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card lg:col-span-2">
                     <div className="border-b border-border px-5 py-4">
                         <div className="flex items-center gap-2">
                             <ClipboardList className="h-4 w-4 text-primary" />
                             <div>
-                                <h2 className="font-heading text-sm font-semibold text-primaryDark">
-                                    Consultation
-                                </h2>
+                                <h2 className="text-base font-semibold text-primaryDark">Consultation</h2>
                                 <p className="text-xs text-textMuted">
-                                    {visit.doctor
-                                        ? `Attending staff: ${visit.doctor}`
+                                    {record.staff_name
+                                        ? `Attending staff: ${record.staff_name}`
                                         : "Visit record details below."}
                                 </p>
                             </div>
                         </div>
                     </div>
-
                     <div className="p-5">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <InfoField
-                                label="Visit date"
-                                value={visit.date ? formatDate(visit.date) : undefined}
-                            />
-                            <InfoField label="Attending Staff" value={visit.doctor} />
-                            <InfoField label="Visit Type" value={visit.treatmentType} />
+                            <Field label="Visit date" value={record.visit_date ? formatDate(record.visit_date) : undefined} />
+                            <Field label="Attending Staff" value={record.staff_name} />
+                            <Field label="Visit Type" value={record.treatment_type} />
                         </div>
-
                         <div className="mt-6 flex flex-col gap-5">
-                            <ReadOnlyBlock label="Complaint / findings" value={visit.complaint} />
-                            <ReadOnlyBlock label="Treatment" value={visit.treatment} />
+                            <div className="flex flex-col gap-2">
+                                <p className="text-xs font-medium text-textMuted">Complaint / findings</p>
+                                <div className="min-h-[72px] whitespace-pre-wrap rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary">
+                                    {record.complaint || "—"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <p className="text-xs font-medium text-textMuted">Treatment</p>
+                                <div className="min-h-[72px] whitespace-pre-wrap rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-textPrimary">
+                                    {record.treatment || "—"}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

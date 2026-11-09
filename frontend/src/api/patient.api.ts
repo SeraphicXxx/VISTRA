@@ -4,6 +4,8 @@ import {CreatePatientSchema, PatientProfile, PatientInfo, PatientRecord, UpdateP
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
 import {PatientDentalTabVisit} from "/@/api/schema/PatientDentalTabSchema";
+import {MedicalRecordDetailSchema} from "/@/api/schema/MedicalSchema";
+import {DentalRecordDetailSchema} from "/@/api/schema/DentalSchema";
 import {getResource, listResource, sendResource} from "/@/api/resource";
 
 export async function createPatientAccount(
@@ -72,6 +74,26 @@ export function getPatientDentalTab(
     return listResource<ApiResponse<PaginatedData<PatientDentalTabVisit>>>(
         API_ENDPOINTS.patient.get_patient_dental_tab,
         filters,
+        signal,
+    );
+}
+
+export function getPatientMedicalRecord(
+    medicalId: string,
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<MedicalRecordDetailSchema>>(
+        API_ENDPOINTS.patient.get_patient_medical_record(medicalId),
+        signal,
+    );
+}
+
+export function getPatientDentalRecord(
+    dentalId: string,
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<DentalRecordDetailSchema>>(
+        API_ENDPOINTS.patient.get_patient_dental_record(dentalId),
         signal,
     );
 }
