@@ -110,6 +110,7 @@ jobs:
           postman collection run \
             "50029254-ad5ecc2b-5f62-4ab4-9b0a-5bfcce774647" \
             -e "50029254-88ef77d4-3e40-4133-885e-c650adba9490" \
+            --folder "patient" \
             --env-var "base_url=http://localhost:8000" \
             --reporters cli
 
@@ -118,6 +119,7 @@ jobs:
           postman collection run \
             "50029254-ad5ecc2b-5f62-4ab4-9b0a-5bfcce774647" \
             -e "50029254-5db91ccc-2d85-4587-a961-99436c44035d" \
+            --folder "admin" \
             --env-var "base_url=http://localhost:8000" \
             --reporters cli
 
