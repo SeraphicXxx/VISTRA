@@ -1,0 +1,43 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access_token}}
+body:
+  type: text
+  content: |-
+    {
+        "patient_id": "{{patient_id}}",
+        "password": "TestPass123!",
+        "created_by": "{{user_id}}",
+        "name": "Test, Patient",
+        "address": "123 Test Street",
+        "age": 20,
+        "barangay": "Commonwealth",
+        "birthday": "2006-07-07",
+        "mobile_number": "09171234567",
+        "sex": "Male",
+        "civil_status": "Single",
+        "classification": "Student",
+        "course": "BS Computer Science",
+        "school_year": "3rd Year",
+        "section": "B"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Create patient returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Patient creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+    language: text/javascript
+order: 1000

@@ -44,15 +44,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+
+
       - name: Lint with ruff
         working-directory: backend
         run: |
           ruff check app/
 
+
       - name: Typecheck with mypy
         working-directory: backend
         run: |
           mypy app/
+
 
       - name: Start backend
         working-directory: backend
@@ -63,6 +67,7 @@ jobs:
           LOCAL_FRONTEND_URL: ${{ secrets.LOCAL_FRONTEND_URL }}
         run: |
           uvicorn app.main:app --host 127.0.0.1 --port 8000 > ${{ github.workspace }}/backend/backend.log 2>&1 &
+
 
       - name: Wait for backend
         run: |
@@ -80,13 +85,16 @@ jobs:
           cat "${{ github.workspace }}/backend/backend.log" 2>/dev/null || echo "(no backend log file)"
           exit 1
 
+
       - name: Install Postman CLI
         run: |
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
+
       - name: Login to Postman CLI
         run: |
           postman login --with-api-key "${{ secrets.POSTMAN_API_KEY }}"
+
 
       - name: Show API routes
         run: |
@@ -105,19 +113,21 @@ jobs:
                   print(f"{method.upper():6} {path}")
           PY
 
+
+
       - name: Run API tests - Patient
         run: |
           postman collection run \
-            "PATIENT_COLLECTION_ID" \
-            -e "PATIENT_ENV_ID" \
+            "50029254-fad40a7d-2aaf-4371-bbc0-1a0e92229d09" \
+            -e "50029254-88ef77d4-3e40-4133-885e-c650adba9490" \
             --env-var "base_url=http://localhost:8000" \
             --reporters cli
 
       - name: Run API tests - Admin
         run: |
           postman collection run \
-            "ADMIN_COLLECTION_ID" \
-            -e "ADMIN_ENV_ID" \
+            "50029254-ba29902c-720f-44bd-8750-fb57ec157e44" \
+            -e "50029254-5db91ccc-2d85-4587-a961-99436c44035d" \
             --env-var "base_url=http://localhost:8000" \
             --reporters cli
 

@@ -1,8 +1,0 @@
-$kind: http-request
-url: "{{base_url}}/{{api_version}}/health"
-method: GET
-scripts:
-  - type: afterResponse
-    code: "pm.test(\"Health check returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Response has success field\", function () {\n    pm.expect(json).to.have.property(\"success\");\n    pm.expect(json.success).to.eql(true);\n});"
-    language: text/javascript
-order: 100

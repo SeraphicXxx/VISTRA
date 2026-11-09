@@ -1,0 +1,38 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/auth/login/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+        "identifier": "{{user_id}}",
+        "password": "{{admin_password}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Admin login returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Response contains access token", function () {
+          pm.expect(json).to.have.property("access_token");
+          pm.expect(json.access_token).to.be.a("string");
+      });
+
+      pm.test("User role is staff", function () {
+          pm.expect(json.user).to.have.property("role");
+          pm.expect(json.user.role).to.eql("staff");
+      });
+
+      pm.environment.set("access_token", json.access_token);
+      pm.environment.set("refresh_token", json.refresh_token);
+    language: text/javascript
+order: 1000
