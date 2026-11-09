@@ -72,12 +72,20 @@ export default function PatientProfile({
   const user = sessionManager.getUser();
   const patientId = user?.user_id ?? "";
 
-  const { data: profileData, isLoading: profileLoading } = useMyProfileQuery();
-  const { data: medicalHistoryData, isLoading: medicalLoading } = usePatientMedicalHistoryQuery();
-  const { data: familyHistoryData, isLoading: familyLoading } = usePatientFamilyHistoryQuery();
-  const { data: vitalsData, isLoading: vitalsLoading } = usePatientLatestVitalSignsQuery(patientId);
+  const { data: profileData, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useMyProfileQuery();
+  const { data: medicalHistoryData, isLoading: medicalLoading, isError: medicalError, refetch: refetchMedical } = usePatientMedicalHistoryQuery();
+  const { data: familyHistoryData, isLoading: familyLoading, isError: familyError, refetch: refetchFamily } = usePatientFamilyHistoryQuery();
+  const { data: vitalsData, isLoading: vitalsLoading, isError: vitalsError, refetch: refetchVitals } = usePatientLatestVitalSignsQuery(patientId);
 
   const isLoading = profileLoading || medicalLoading || familyLoading || vitalsLoading;
+  const hasError = profileError || medicalError || familyError || vitalsError;
+
+  const handleRetry = () => {
+    if (profileError) refetchProfile();
+    if (medicalError) refetchMedical();
+    if (familyError) refetchFamily();
+    if (vitalsError) refetchVitals();
+  };
 
   // Map API profile to PersonalInfo
   const personal: PersonalInfo = profileData
@@ -146,6 +154,25 @@ export default function PatientProfile({
 
   if (isLoading) {
     return <ProfileSkeleton />;
+  }
+
+  if (hasError) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <p className="text-sm font-medium text-red-600">
+            Failed to load profile data. Please try again.
+          </p>
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const activeLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? "";
