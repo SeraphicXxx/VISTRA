@@ -33,6 +33,8 @@ class PatientProfile(BaseModel):
     contact_no: str | None = None
     school_year: str | None = None
     department: str | None = None
+    section: str | None = None
+    position: str | None = None
     person_type: str | None = None
 
 
@@ -62,6 +64,31 @@ class CreatePatientRequest(BaseModel):
     department: str | None = None
     position: str | None = None
 
+    # Medical history form fields (from MedicalHistoryForm component)
+    hospitalization_year: int | None = Field(default=None, ge=1900, le=2100)
+    hospitalization_operation: str | None = Field(default=None, max_length=255)
+    diagnosis: str | None = Field(default=None, max_length=255)
+    allergy_medicine: str | None = Field(default=None, max_length=255)
+    allergy_food: str | None = Field(default=None, max_length=255)
+    smoking: str | None = None
+    vaping: str | None = None
+    alcohol: str | None = None
+    contraceptive: str | None = Field(default=None, max_length=255)
+    sexual_activity: str | None = None
+
+    # Family history
+    family_history: str | None = Field(default=None, max_length=255)
+    family_history_others: str | None = Field(default=None, max_length=255)
+
+    # Results
+    chest_xray: str | None = None
+    cbc: str | None = None
+    urinalysis: str | None = None
+    results_other: str | None = Field(default=None, max_length=255)
+
+    # Recommendation
+    recommendation: str | None = Field(default=None, max_length=255)
+
     def to_patient_profile(self) -> PatientProfile:
         name = separate_name(self.name)
 
@@ -80,6 +107,8 @@ class CreatePatientRequest(BaseModel):
             contact_no=self.mobile_number,
             school_year=self.school_year,
             department=self.department,
+            section=self.section,
+            position=self.position,
             person_type=self.classification,
 
         )
@@ -221,6 +250,7 @@ class PatientResults(BaseModel):
     CBC : ResultsEnum | str = "Normal"
     Urinalysis: ResultsEnum | str = "Normal"
     Other: str | None = Field(default=None, min_length=2, max_length=255)
+    recommendation: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
         return{
@@ -228,7 +258,8 @@ class PatientResults(BaseModel):
             "Chest_Xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
             "CBC" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
             "Urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
-            "Other" : self.Other
+            "Other" : self.Other,
+            "recommendation" : self.recommendation
         }
 
 class FullFormRequest(BaseModel):

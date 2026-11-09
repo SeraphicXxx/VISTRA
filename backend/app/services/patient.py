@@ -92,8 +92,78 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
             "to delete auth user",
         )
 
+    # 6. Insert medical history, family history, and results if any
+    # medical data was provided in the form
+    _create_personal_records_from_request(
+        patient_repo, patient_id, request
+    )
+
     # Everything succeeded
     return ok(message="Patient created successfully")
+
+
+def _create_personal_records_from_request(
+    patient_repo: PatientRepository,
+    patient_id: str,
+    request: CreatePatientRequest,
+) -> None:
+    """Insert medical history, family history, and results data
+    submitted via the MedicalHistoryForm component on patient creation.
+    """
+
+    # --- Medical History ---
+    medical_fields_present = any([
+        request.hospitalization_year, request.diagnosis,
+        request.allergy_medicine, request.allergy_food,
+        request.smoking, request.vaping, request.alcohol,
+        request.contraceptive, request.sexual_activity,
+    ])
+    if medical_fields_present:
+        patient_repo.insert_personal_record(
+            patient_id,
+            CreateMedicalhistory(
+                hostpitalization_operation=request.hospitalization_operation or "",
+                hostpitalization_year=request.hospitalization_year or 0,
+                diagnosis=request.diagnosis or "",
+                allergy_medicine=request.allergy_medicine or "",
+                allergy_food=request.allergy_food or "",
+                Smoking=Frequency(request.smoking) if request.smoking else Frequency.NONE,
+                Vaping=Frequency(request.vaping) if request.vaping else Frequency.NONE,
+                Alcohol=Frequency(request.alcohol) if request.alcohol else Frequency.NONE,
+                Contraceptive=request.contraceptive or "",
+                Sexual_activity=Sexual_activity(request.sexual_activity) if request.sexual_activity else Sexual_activity.NO,
+            ),
+        )
+
+    # --- Family History ---
+    family_fields_present = bool(
+        request.family_history or request.family_history_others
+    )
+    if family_fields_present:
+        patient_repo.insert_family_history(
+            patient_id,
+            FamilyHistory(
+                Family_history=Family_history(request.family_history) if request.family_history else Family_history.HYPERTENSION,
+                Other=request.family_history_others or "",
+            ),
+        )
+
+    # --- Results ---
+    results_fields_present = any([
+        request.chest_xray, request.cbc, request.urinalysis,
+        request.recommendation,
+    ])
+    if results_fields_present:
+        patient_repo.insert_results(
+            patient_id,
+            PatientResults(
+                Chest_Xray=ResultsEnum(request.chest_xray) if request.chest_xray else ResultsEnum.NORMAL,
+                CBC=ResultsEnum(request.cbc) if request.cbc else ResultsEnum.NORMAL,
+                Urinalysis=ResultsEnum(request.urinalysis) if request.urinalysis else ResultsEnum.NORMAL,
+                Other=request.results_other or None,
+                recommendation=request.recommendation or None,
+            ),
+        )
 
 
 @handle_service_errors
