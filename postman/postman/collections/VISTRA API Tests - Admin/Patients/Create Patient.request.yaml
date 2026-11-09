@@ -22,7 +22,26 @@ body:
         "classification": "Student",
         "course": "BS Computer Science",
         "school_year": "3rd Year",
-        "section": "B"
+        "section": "B",
+        "department": "College of Computer Studies",
+        "position": "Student",
+        "hospitalization_year": 2022,
+        "hospitalization_operation": "Appendectomy",
+        "diagnosis": "Acute appendicitis",
+        "allergy_medicine": "Penicillin",
+        "allergy_food": "Peanuts",
+        "smoking": "Never",
+        "vaping": "Never",
+        "alcohol": "None",
+        "contraceptive": "None",
+        "sexual_activity": "No",
+        "family_history": "Hypertension",
+        "family_history_others": "Diabetes",
+        "chest_xray": "Normal",
+        "cbc": "Normal",
+        "urinalysis": "Normal",
+        "results_other": "None",
+        "recommendation": "Annual physical exam recommended"
     }
 scripts:
   - type: beforeRequest
@@ -46,6 +65,9 @@ scripts:
 
       const json = pm.response.json();
       pm.test("Patient creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+      pm.test("Medical history saved", function () {
           pm.expect(json.success).to.eql(true);
       });
     language: text/javascript
