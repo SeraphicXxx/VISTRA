@@ -137,8 +137,8 @@ def _create_personal_records_from_request(
     medical_fields_present = any([
         request.hospitalization_year, request.diagnosis,
         request.allergy_medicine, request.allergy_food,
-        request.Smoking, request.Vaping, request.alcohol_intake,
-        request.family_planning_method,
+        request.smoking, request.vaping, request.alcohol,
+        request.contraceptive,
     ])
     if medical_fields_present:
         patient_repo.insert_personal_record(
@@ -149,10 +149,10 @@ def _create_personal_records_from_request(
                 diagnosis=request.diagnosis or "",
                 allergy_medicine=request.allergy_medicine or "",
                 allergy_food=request.allergy_food or "",
-                Smoking=request.Smoking or None,
-                Vaping=request.Vaping or None,
-                alcohol_intake=request.alcohol_intake or None,
-                family_planning_method=request.family_planning_method or None,
+                Smoking=request.smoking or None,
+                Vaping=request.vaping or None,
+                alcohol_intake=request.alcohol or None,
+                family_planning_method=request.contraceptive or None,
             ),
         )
 
