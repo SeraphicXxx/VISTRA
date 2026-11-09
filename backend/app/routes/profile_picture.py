@@ -6,8 +6,6 @@ from supabase import Client
 
 from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
-from app.services.access import get_patient_scope, enforce_patient_scope
-from app.utils.service_helpers import handle_service_errors, ok
 
 # Resolve to backend project root / PROFILE_PICTURES.
 PROFILE_PICTURE_ROOT = (

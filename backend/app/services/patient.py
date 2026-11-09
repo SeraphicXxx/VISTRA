@@ -23,6 +23,7 @@ from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
+from app.enums.family_history import Family_history
 
 
 @handle_service_errors
