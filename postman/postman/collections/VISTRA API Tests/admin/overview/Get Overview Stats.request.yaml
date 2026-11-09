@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{base_url}}/{{api_version}}/overview/"
+url: "{{base_url}}/{{api_version}}/overview/stats"
 method: GET
 auth:
   type: bearer
@@ -7,6 +7,22 @@ auth:
     token: "{{access_token}}"
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Get overview stats returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is JSON\", function () {\n    pm.response.to.be.json;\n});\n\nconst json = pm.response.json();\npm.test(\"Overview stats are returned\", function () {\n    pm.expect(json.success).to.eql(true);\n    pm.expect(json.data).to.be.an(\"object\");\n    pm.expect(json.data).to.have.property(\"appointments_today\");\n    pm.expect(json.data).to.have.property(\"medical_today\");\n    pm.expect(json.data).to.have.property(\"dental_today\");\n});"
+    code: |-
+      pm.test("Get overview stats returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Overview stats are returned", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json.data).to.be.an("object");
+          pm.expect(json.data).to.have.property("appointments_today");
+          pm.expect(json.data).to.have.property("medical_today");
+          pm.expect(json.data).to.have.property("dental_today");
+      });
     language: text/javascript
 order: 3000
