@@ -216,7 +216,7 @@ class CreateMedicalhistory(BaseModel):
     Smoking : Frequency | None = None
     Vaping: Frequency | None = None
     alcohol_intake: Frequency | None = None
-    family_planning_method: str = Field(..., min_length=2, max_length=255)
+    family_planning_method: str | None = Field(default=None, max_length=255)
     Sexual_activity: Sexual_activity 
 
     def to_db_dict(self, patient_id: str) -> dict:
