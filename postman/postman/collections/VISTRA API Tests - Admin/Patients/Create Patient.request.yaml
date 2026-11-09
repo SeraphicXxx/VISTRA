@@ -25,6 +25,15 @@ body:
         "section": "B"
     }
 scripts:
+  - type: beforeRequest
+    code: |-
+      if (!pm.environment.get("patient_id")) {
+          pm.environment.set("patient_id", "PT-" + Date.now());
+      }
+      if (!pm.environment.get("user_id")) {
+          pm.environment.set("user_id", "STF001");
+      }
+    language: text/javascript
   - type: afterResponse
     code: |-
       pm.test("Create patient returns 200", function () {
