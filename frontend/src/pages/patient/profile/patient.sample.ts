@@ -27,22 +27,22 @@ export interface PersonalInfo {
 
 // ── Medical History (matches MEDICAL_HISTORY table) ──
 export interface MedicalHistory {
-  hospitalization_operation: string;
-  hospitalization_year: number;
-  diagnosis: string;
-  allergy_medicine: string;
-  allergy_food: string;
-  smoking: "Yes" | "No" | null;
-  vaping: "Yes" | "No" | null;
-  alcohol: "Yes" | "No" | null;
-  contraceptive: string;
-  sexual_activity: string;
+  hospitalization_operation: string | null;
+  hospitalization_year: string | null;
+  diagnosis: string | null;
+  allergy_medicine: string | null;
+  allergy_food: string | null;
+  smoking: boolean | null;
+  vaping: boolean | null;
+  alcohol_intake: boolean | null;
+  last_menstrual_period: string | null;
+  family_planning_method: string | null;
 }
 
 // ── Family History (matches FAMILY_HISTORY table) ──
 export interface FamilyHistory {
-  family_history: string;
-  other: string | null;
+  condition: string | null;
+  other_condition: string | null;
 }
 
 // ── Vital Signs (matches VITAL_SIGNS table) ──
@@ -94,20 +94,20 @@ export const samplePersonal: PersonalInfo = {
 
 export const sampleMedical: MedicalHistory = {
   hospitalization_operation: "Appendectomy",
-  hospitalization_year: 2022,
+  hospitalization_year: "2022",
   diagnosis: "Appendicitis",
   allergy_medicine: "Penicillin",
   allergy_food: "None",
-  smoking: "No",
-  vaping: "No",
-  alcohol: "Yes",
-  contraceptive: "None",
-  sexual_activity: "Inactive",
+  smoking: false,
+  vaping: false,
+  alcohol_intake: true,
+  last_menstrual_period: "2026-10-01",
+  family_planning_method: "None",
 };
 
 export const sampleFamily: FamilyHistory = {
-  family_history: "Hypertension, Asthma",
-  other: "None",
+  condition: "Hypertension, Asthma",
+  other_condition: "None",
 };
 
 export const sampleVitals: VitalSigns = {

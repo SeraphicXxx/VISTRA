@@ -8,6 +8,7 @@ export const ID_LABELS: Record<PatientClassification, string> = {
   student: "Student ID",
   faculty: "Faculty ID",
   staff: "Admin ID",
+  university_staff: "Staff ID",
 };
 
 export function display(value?: string | number | null): string {

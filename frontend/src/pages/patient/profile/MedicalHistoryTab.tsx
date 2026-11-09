@@ -9,9 +9,9 @@ export default function MedicalHistoryTab({
   allergy_food,
   smoking,
   vaping,
-  alcohol,
-  contraceptive,
-  sexual_activity,
+  alcohol_intake,
+  last_menstrual_period,
+  family_planning_method,
   onEdit,
 }: MedicalHistory & { onEdit?: () => void }) {
   return (
@@ -22,11 +22,11 @@ export default function MedicalHistoryTab({
         <InfoField label="Diagnosis" value={diagnosis} />
         <InfoField label="Medication Allergies" value={allergy_medicine} />
         <InfoField label="Food Allergies" value={allergy_food} />
-        <InfoField label="Smoking" value={smoking} />
-        <InfoField label="Vaping" value={vaping} />
-        <InfoField label="Alcohol Intake" value={alcohol} />
-        <InfoField label="Contraceptive" value={contraceptive} />
-        <InfoField label="Sexual Activity" value={sexual_activity} />
+        <InfoField label="Smoking" value={smoking ? "Yes" : "No"} />
+        <InfoField label="Vaping" value={vaping ? "Yes" : "No"} />
+        <InfoField label="Alcohol Intake" value={alcohol_intake ? "Yes" : "No"} />
+        <InfoField label="Last Menstrual Period" value={last_menstrual_period} />
+        <InfoField label="Family Planning Method" value={family_planning_method} />
       </FieldGrid>
     </InfoCard>
   );

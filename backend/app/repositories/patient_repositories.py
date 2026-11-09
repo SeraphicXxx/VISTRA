@@ -78,7 +78,7 @@ class PatientRepository(BaseRepository):
     def get_family_history(self, patient_id: str) -> Optional[dict[str, Any]]:
         """Retrieve the family history record for a patient."""
         return self.fetch_one(
-            "FAMILY_HISTORY",
+            "FAMILY_MEDICAL_HISTORY",
             filters={"patient_id": patient_id},
         )
 
@@ -114,7 +114,7 @@ class PatientRepository(BaseRepository):
     def insert_family_history(self, patient_id: str, data: FamilyHistory) -> Optional[str]:
         response = (
             self.supabase
-            .table("FAMILY_HISTORY")
+            .table("FAMILY_MEDICAL_HISTORY")
             .insert(data.to_db_dict(patient_id))
             .execute()
         )
