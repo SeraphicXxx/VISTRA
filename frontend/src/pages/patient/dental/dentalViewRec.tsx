@@ -1,6 +1,5 @@
-import {useMemo, useState} from "react";
-import {ArrowLeft, ClipboardList, Printer, User, X} from "lucide-react";
-import {createPortal} from "react-dom";
+import {useMemo} from "react";
+import {ArrowLeft, ClipboardList, Printer, User} from "lucide-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
 import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
@@ -79,8 +78,6 @@ export default function PatientDentalRecordView() {
     const dentalId = params.dentalId ?? "";
     const { data: record, isLoading, isError } = usePatientDentalRecordQuery(dentalId);
 
-    const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
-
     const toothRecords = useMemo(() => {
         const map: Record<number, { dentition: string; condition: string; notes: string | null }> = {};
         if (!record?.tooth_records) return map;
@@ -96,14 +93,6 @@ export default function PatientDentalRecordView() {
         return map;
     }, [record?.tooth_records]);
 
-    const relatedVisits = useMemo(() => {
-        if (selectedTooth === null || !record) return [];
-        const pattern = new RegExp(`\\b${selectedTooth}\\b`);
-        const notes = record.notes ?? "";
-        const treatment = record.notes ?? "";
-        return pattern.test(`${treatment} ${notes}`) ? [record] : [];
-    }, [selectedTooth, record]);
-
     if (isLoading) {
         return <DentalRecordSkeleton />;
     }
@@ -115,9 +104,6 @@ export default function PatientDentalRecordView() {
     const address = record.address
         ? `${record.address}${record.barangay ? `, ${record.barangay}` : ""}`
         : undefined;
-
-    const selectedCondition: string | null =
-        selectedTooth !== null ? (record.tooth_records?.find((t) => t.tooth_number === selectedTooth)?.condition ?? "healthy") : null;
 
     const latestVisit = record;
 
@@ -233,9 +219,9 @@ export default function PatientDentalRecordView() {
                                 <p className="text-xs text-textMuted">Click a tooth to view details</p>
                             </div>
                             <div className="overflow-x-auto rounded-xl border border-border bg-background p-5">
-                                <ToothArch teeth={upperTeeth} flip={false} records={toothRecords} onToothClick={(n: number) => setSelectedTooth(n)} />
+                                <ToothArch teeth={upperTeeth} flip={false} records={toothRecords} onToothClick={() => {}} />
                                 <div className="my-5 border-t border-dashed border-border" />
-                                <ToothArch teeth={lowerTeeth} flip={true} records={toothRecords} onToothClick={(n: number) => setSelectedTooth(n)} />
+                                <ToothArch teeth={lowerTeeth} flip={true} records={toothRecords} onToothClick={() => {}} />
                             </div>
                         </div>
 
@@ -246,15 +232,7 @@ export default function PatientDentalRecordView() {
                 </div>
             </div>
 
-            {selectedTooth !== null && selectedCondition !== null && createPortal(
-                <ToothDetailModal
-                    toothNumber={selectedTooth}
-                    condition={selectedCondition as any}
-                    relatedVisits={[]}
-                    onClose={() => setSelectedTooth(null)}
-                />,
-                document.body
-            )}
+
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import {ArrowLeft, Printer} from "lucide-react";
+import {ArrowLeft, Printer, User} from "lucide-react";
 import {useMemo} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
