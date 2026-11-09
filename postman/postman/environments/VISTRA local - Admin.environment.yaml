@@ -34,3 +34,7 @@ values:
     value: ''
   - key: staff_id
     value: ''
+  - key: access_token
+    value: ''
+  - key: refresh_token
+    value: ''

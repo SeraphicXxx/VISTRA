@@ -4,7 +4,14 @@ from supabase import Client
 
 from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
-from app.schemas.patient import Patient, CreatePatientRequest, UpdatePatientProfileRequest
+from app.schemas.patient import (
+    Patient,
+    CreatePatientRequest,
+    UpdatePatientProfileRequest,
+    CreateMedicalhistory,
+    FamilyHistory,
+    PatientResults,
+)
 from app.schemas.query import FilterPatient
 from app.schemas.user import role_for_classification
 from app.services.auth.user import (
@@ -15,6 +22,7 @@ from app.services.auth.user import (
 from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
+from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
 
 
 @handle_service_errors
