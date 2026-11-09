@@ -15,9 +15,10 @@ import {
   type VitalSigns,
   type ExaminationResults,
 } from "./patient.sample";
-import { useMyProfileQuery } from "/@/hooks/query/PatientQuery";
+import { useMyProfileQuery, usePatientLatestVitalSignsQuery } from "/@/hooks/query/PatientQuery";
 import { usePatientMedicalHistoryQuery } from "/@/hooks/query/PatientQuery";
 import { usePatientFamilyHistoryQuery } from "/@/hooks/query/PatientQuery";
+import { sessionManager } from "/@/utils/SessionManager";
 
 interface PatientProfileProps {
   patient?: PatientProfileData;
@@ -68,11 +69,15 @@ export default function PatientProfile({
   const [activeTab, setActiveTab] = useState<PatientProfileSection>("personal");
   const edit = (section: PatientProfileSection) => () => onEdit?.(section);
 
+  const user = sessionManager.getUser();
+  const patientId = user?.user_id ?? "";
+
   const { data: profileData, isLoading: profileLoading } = useMyProfileQuery();
   const { data: medicalHistoryData, isLoading: medicalLoading } = usePatientMedicalHistoryQuery();
   const { data: familyHistoryData, isLoading: familyLoading } = usePatientFamilyHistoryQuery();
+  const { data: vitalsData, isLoading: vitalsLoading } = usePatientLatestVitalSignsQuery(patientId);
 
-  const isLoading = profileLoading || medicalLoading || familyLoading;
+  const isLoading = profileLoading || medicalLoading || familyLoading || vitalsLoading;
 
   // Map API profile to PersonalInfo
   const personal: PersonalInfo = profileData
@@ -117,8 +122,17 @@ export default function PatientProfile({
       }
     : (patientProp?.family ?? samplePatient.family);
 
-  // Vitals still use mock data (no patient-scoped vitals endpoint wired yet)
-  const vitals: VitalSigns = patientProp?.vitals ?? samplePatient.vitals;
+  // Map API vitals to VitalSigns
+  const vitals: VitalSigns = vitalsData
+    ? {
+        height: vitalsData.height ?? undefined,
+        weight: vitalsData.weight ?? undefined,
+        temperature: vitalsData.temperature ?? undefined,
+        heart_rate: vitalsData.heart_rate ?? undefined,
+        spo2: vitalsData.spo2 ?? undefined,
+        recorded_at: vitalsData.recorded_at,
+      }
+    : (patientProp?.vitals ?? samplePatient.vitals);
 
   const results: ExaminationResults = patientProp?.results ?? samplePatient.results;
 

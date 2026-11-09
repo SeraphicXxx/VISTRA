@@ -125,6 +125,25 @@ export function getPatientFamilyHistory(
     );
 }
 
+export function getLatestVitalSigns(
+    patientId: string,
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<{
+        id: number;
+        patient_id: string;
+        height: number | null;
+        weight: number | null;
+        temperature: number | null;
+        heart_rate: number | null;
+        spo2: number | null;
+        recorded_at: string;
+    }>>(
+        API_ENDPOINTS.patient.get_latest_vital_signs(patientId),
+        signal,
+    );
+}
+
 export function getPatientMedicalDentalSummary(
     signal?: AbortSignal
 ) {

@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory, getMyProfile} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory, getMyProfile, getLatestVitalSigns} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -163,6 +163,23 @@ export function useMyProfileQuery() {
 
             return data.data;
         },
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientLatestVitalSignsQuery(patientId: string) {
+    return useQuery({
+        queryKey: ["patient", "latest-vital-signs", patientId],
+        queryFn: async ({ signal }) => {
+            const { data } = await getLatestVitalSigns(patientId, signal);
+
+            if (!data.data) {
+                throw new Error("Vital signs data is missing");
+            }
+
+            return data.data;
+        },
+        enabled: Boolean(patientId),
         refetchOnWindowFocus: false,
     });
 }
