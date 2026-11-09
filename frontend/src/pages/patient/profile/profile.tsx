@@ -152,76 +152,76 @@ export default function PatientProfile({
     results,
   };
 
-  if (isLoading) {
-    return <ProfileSkeleton />;
-  }
-
-  if (hasError) {
-    return (
-      <div className="space-y-6">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
-          <p className="text-sm font-medium text-red-600">
-            Failed to load profile data. Please try again.
-          </p>
-          <button
-            type="button"
-            onClick={handleRetry}
-            className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const activeLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? "";
 
   return (
     <div className="space-y-6">
-      <ProfileHeader {...patient.personal} />
+      {isLoading ? (
+        <ProfileSkeleton />
+      ) : (
+        <>
+          <ProfileHeader {...patient.personal} />
 
-      <div className="rounded-2xl border border-border bg-white p-2">
-        <div className="flex gap-1 overflow-x-auto">
-          {tabs.map((tab) => {
-            const active = activeTab === tab.id;
+          <div className="rounded-2xl border border-border bg-white p-2">
+            <div className="flex gap-1 overflow-x-auto">
+              {tabs.map((tab) => {
+                const active = activeTab === tab.id;
 
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                  active
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-textMuted hover:bg-slate-50 hover:text-textPrimary"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    aria-current={active ? "page" : undefined}
+                    className={`shrink-0 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                      active
+                        ? "bg-primary text-white shadow-sm"
+                        : "text-textMuted hover:bg-slate-50 hover:text-textPrimary"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-      <div key={activeTab} className="fade-in-up">
-        {activeTab === "personal" && (
-          <PersonalTab {...patient.personal} onEdit={edit("personal")} />
-        )}
-        {activeTab === "medical" && (
-          <MedicalHistoryTab {...patient.medical} onEdit={edit("medical")} />
-        )}
-        {activeTab === "family" && (
-          <FamilyHistoryTab {...patient.family} onEdit={edit("family")} />
-        )}
-        {activeTab === "vitals" && (
-          <VitalSignsTab {...patient.vitals} />
-        )}
-        {activeTab === "results" && (
-          <ExaminationResultsTab {...patient.results} onEdit={edit("results")} />
-        )}
-      </div>
+          <div key={activeTab} className="fade-in-up">
+            {hasError ? (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+                <p className="text-sm font-medium text-red-600">
+                  Failed to load profile data. Please try again.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleRetry}
+                  className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <>
+                {activeTab === "personal" && (
+                  <PersonalTab {...patient.personal} onEdit={edit("personal")} />
+                )}
+                {activeTab === "medical" && (
+                  <MedicalHistoryTab {...patient.medical} onEdit={edit("medical")} />
+                )}
+                {activeTab === "family" && (
+                  <FamilyHistoryTab {...patient.family} onEdit={edit("family")} />
+                )}
+                {activeTab === "vitals" && (
+                  <VitalSignsTab {...patient.vitals} />
+                )}
+                {activeTab === "results" && (
+                  <ExaminationResultsTab {...patient.results} onEdit={edit("results")} />
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
