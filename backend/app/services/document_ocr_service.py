@@ -25,7 +25,7 @@ os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")
 os.environ.setdefault("PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT", "False")
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
-from document_intelligence import (  # type: ignore[import-not-found]  # noqa: E402
+from document_intelligence import (  # type: ignore  # noqa: E402
     OCRPipeline,
     apply_review,
 )
