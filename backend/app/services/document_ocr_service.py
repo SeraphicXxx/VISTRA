@@ -13,12 +13,10 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
-from uuid import uuid4
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from supabase import Client
 
-from app.config.security import require_user_email
 from app.schemas.user import CurrentUser
 from app.utils.service_helpers import handle_service_errors, ok
 

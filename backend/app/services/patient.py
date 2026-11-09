@@ -5,7 +5,7 @@ from supabase import Client
 from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
 from app.schemas.patient import Patient, CreatePatientRequest, UpdatePatientProfileRequest
-from app.schemas.query import FilterPatient, PaginationParams
+from app.schemas.query import FilterPatient
 from app.schemas.user import role_for_classification
 from app.services.auth.user import (
     compensate_auth_user,

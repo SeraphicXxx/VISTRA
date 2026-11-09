@@ -120,6 +120,7 @@ jobs:
             -e "50029254-5db91ccc-2d85-4587-a961-99436c44035d" \
             --env-var "base_url=http://localhost:8000" \
             --reporters cli
+
       - name: Show backend logs
         if: always()
         run: |

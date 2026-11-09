@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
-from app.config.security import get_current_user, require_staff
+from app.config.security import require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
 from app.schemas.query import FilterPatient, FilterMedical, FilterDental
-from app.schemas.response_dto.responses import DataResponse, SuccessResponse, SummaryRecord, Response
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
 from app.services.patient import get_all_patients, get_patient_by_id, get_all_patient_profiles, \
     get_patient_summary_record, get_patient_medical_dental_summary

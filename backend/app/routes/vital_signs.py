@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
 from app.services.vital_signs import (
     create_vital_signs,
     get_patient_vital_signs,
     get_latest_patient_vital_signs,
+    update_vital_signs,
+    delete_vital_signs,
 )
 from app.database.database_client import get_supabase_for_user
+from app.repositories.vital_signs_repository import VitalSignsRepository
 from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.schemas.vital_signs import CreateVitalSignsRequest, UpdateVitalSignsRequest
 from app.services.access import get_patient_scope, enforce_patient_scope
+from app.services.vital_signs import get_vital_signs_by_id
 
 vital_signs_router = APIRouter(prefix="/vital-signs", tags=["Vital Signs"])
 

@@ -41,7 +41,7 @@ def require_module(module: str):
         if current_user.role != STAFF_ROLE:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions for this resource",
+                detail="Insufficient permissions for this resource",
             )
 
         staff_id = staff_id_format(require_user_email(current_user))
