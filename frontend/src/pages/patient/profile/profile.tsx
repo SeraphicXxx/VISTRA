@@ -78,14 +78,6 @@ export default function PatientProfile({
   const { data: vitalsData, isLoading: vitalsLoading, isError: vitalsError, refetch: refetchVitals } = usePatientLatestVitalSignsQuery(patientId);
 
   const isLoading = profileLoading || medicalLoading || familyLoading || vitalsLoading;
-  const hasError = profileError || medicalError || familyError || vitalsError;
-
-  const handleRetry = () => {
-    if (profileError) refetchProfile();
-    if (medicalError) refetchMedical();
-    if (familyError) refetchFamily();
-    if (vitalsError) refetchVitals();
-  };
 
   // Map API profile to PersonalInfo
   const personal: PersonalInfo = profileData
@@ -187,37 +179,48 @@ export default function PatientProfile({
           </div>
 
           <div key={activeTab} className="fade-in-up">
-            {hasError ? (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
-                <p className="text-sm font-medium text-red-600">
-                  Failed to load profile data. Please try again.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleRetry}
-                  className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : (
-              <>
-                {activeTab === "personal" && (
-                  <PersonalTab {...patient.personal} onEdit={edit("personal")} />
-                )}
-                {activeTab === "medical" && (
-                  <MedicalHistoryTab {...patient.medical} onEdit={edit("medical")} />
-                )}
-                {activeTab === "family" && (
-                  <FamilyHistoryTab {...patient.family} onEdit={edit("family")} />
-                )}
-                {activeTab === "vitals" && (
-                  <VitalSignsTab {...patient.vitals} />
-                )}
-                {activeTab === "results" && (
-                  <ExaminationResultsTab {...patient.results} onEdit={edit("results")} />
-                )}
-              </>
+            {activeTab === "personal" && (
+              profileError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+                  <p className="text-sm font-medium text-red-600">Failed to load personal info. Please try again.</p>
+                  <button type="button" onClick={() => refetchProfile()} className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark">Retry</button>
+                </div>
+              ) : (
+                <PersonalTab {...patient.personal} onEdit={edit("personal")} />
+              )
+            )}
+            {activeTab === "medical" && (
+              medicalError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+                  <p className="text-sm font-medium text-red-600">Failed to load medical history. Please try again.</p>
+                  <button type="button" onClick={() => refetchMedical()} className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark">Retry</button>
+                </div>
+              ) : (
+                <MedicalHistoryTab {...patient.medical} onEdit={edit("medical")} />
+              )
+            )}
+            {activeTab === "family" && (
+              familyError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+                  <p className="text-sm font-medium text-red-600">Failed to load family history. Please try again.</p>
+                  <button type="button" onClick={() => refetchFamily()} className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark">Retry</button>
+                </div>
+              ) : (
+                <FamilyHistoryTab {...patient.family} onEdit={edit("family")} />
+              )
+            )}
+            {activeTab === "vitals" && (
+              vitalsError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+                  <p className="text-sm font-medium text-red-600">Failed to load vital signs. Please try again.</p>
+                  <button type="button" onClick={() => refetchVitals()} className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark">Retry</button>
+                </div>
+              ) : (
+                <VitalSignsTab {...patient.vitals} />
+              )
+            )}
+            {activeTab === "results" && (
+              <ExaminationResultsTab {...patient.results} onEdit={edit("results")} />
             )}
           </div>
         </>
