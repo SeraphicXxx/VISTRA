@@ -43,6 +43,10 @@ export const API_ENDPOINTS = {
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
         get_latest_vital_signs: (patientId: string) => `${API_V1}/vital-signs/patient/${patientId}/latest`,
     },
+    profilePicture: {
+        upload: `${API_V1}/profile-picture/upload`,
+        get: `${API_V1}/profile-picture/me`,
+    },
     appointment: {
         create_appointment: `${API_V1}/appointments/`,
         get_appointment: `${API_V1}/appointments/`,

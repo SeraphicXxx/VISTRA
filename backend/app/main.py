@@ -7,7 +7,7 @@ import logging
 from app.config.settings import Config
 from app.config.jwks import _get_client
 from app.routes.auth import limiter as auth_limiter
-from app.routes import health, auth, staff, patient, appointment, dental, medical, overview, internal, screening, attachments, vital_signs, document_ocr, email
+from app.routes import health, auth, staff, patient, appointment, dental, medical, overview, internal, screening, attachments, vital_signs, document_ocr, email, profile_picture
 
 app = FastAPI(
     title="VISTRA API",
@@ -90,3 +90,4 @@ app.include_router(attachments.protected_attachment_router, prefix=API_V1_PREFIX
 app.include_router(vital_signs.vital_signs_router, prefix=API_V1_PREFIX)
 app.include_router(document_ocr.document_ocr_router, prefix=API_V1_PREFIX)
 app.include_router(email.email_router, prefix=API_V1_PREFIX)
+app.include_router(profile_picture.profile_picture_router, prefix=API_V1_PREFIX)

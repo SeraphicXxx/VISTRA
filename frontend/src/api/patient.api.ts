@@ -1,4 +1,4 @@
-import {API_ENDPOINTS} from "/@/config/ApiConfig";
+import {API_ENDPOINTS, getApiUrl} from "/@/config/ApiConfig";
 import {ApiResponse, ApiMessageResponse, PaginatedData} from "/@/api/schema/ApiResponseSchema"
 import {CreatePatientSchema, PatientProfile, PatientInfo, PatientRecord, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
@@ -6,7 +6,30 @@ import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
 import {PatientDentalTabVisit} from "/@/api/schema/PatientDentalTabSchema";
 import {MedicalRecordDetailSchema} from "/@/api/schema/MedicalSchema";
 import {DentalRecordDetailSchema} from "/@/api/schema/DentalSchema";
+import {apiClient} from "/@/api/axios_client";
 import {getResource, listResource, sendResource} from "/@/api/resource";
+
+export function uploadProfilePicture(
+    file: File,
+    signal?: AbortSignal
+) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return apiClient<{ success: boolean; data: { path: string }; message: string }>(
+        API_ENDPOINTS.profilePicture.upload,
+        {
+            method: "POST",
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+            signal,
+        }
+    );
+}
+
+export function getProfilePictureUrl(): string {
+    return `${getApiUrl()}${API_ENDPOINTS.profilePicture.get}`;
+}
 
 export async function createPatientAccount(
     request: CreatePatientSchema,
