@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
 import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord} from "/@/api/patient.api";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -115,6 +115,38 @@ export function usePatientDentalRecordQuery(dentalId: string) {
             return data.data;
         },
         enabled: Boolean(dentalId),
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientMedicalHistoryQuery() {
+    return useQuery({
+        queryKey: ["patient", "medical-history"],
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientMedicalHistory(signal);
+
+            if (!data.data) {
+                throw new Error("Medical history data is missing");
+            }
+
+            return data.data;
+        },
+        refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientFamilyHistoryQuery() {
+    return useQuery({
+        queryKey: ["patient", "family-history"],
+        queryFn: async ({ signal }) => {
+            const { data } = await getPatientFamilyHistory(signal);
+
+            if (!data.data) {
+                throw new Error("Family history data is missing");
+            }
+
+            return data.data;
+        },
         refetchOnWindowFocus: false,
     });
 }

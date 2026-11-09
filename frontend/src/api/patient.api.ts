@@ -98,6 +98,24 @@ export function getPatientDentalRecord(
     );
 }
 
+export function getPatientMedicalHistory(
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<Record<string, unknown>>>(
+        API_ENDPOINTS.patient.get_patient_medical_history,
+        signal,
+    );
+}
+
+export function getPatientFamilyHistory(
+    signal?: AbortSignal
+) {
+    return getResource<ApiResponse<Record<string, unknown>>>(
+        API_ENDPOINTS.patient.get_patient_family_history,
+        signal,
+    );
+}
+
 export function getPatientMedicalDentalSummary(
     signal?: AbortSignal
 ) {

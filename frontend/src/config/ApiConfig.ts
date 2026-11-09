@@ -37,6 +37,8 @@ export const API_ENDPOINTS = {
         get_patient_dental_tab: `${API_V1}/patients/record/dental-tab/`,
         get_patient_medical_record: (medicalId: string) => `${API_V1}/patients/record/medical/${medicalId}`,
         get_patient_dental_record: (dentalId: string) => `${API_V1}/patients/record/dental/${dentalId}`,
+        get_patient_medical_history: `${API_V1}/patients/record/medical-history/`,
+        get_patient_family_history: `${API_V1}/patients/record/family-history/`,
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
     },
     appointment: {

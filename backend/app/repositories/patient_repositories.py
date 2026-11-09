@@ -68,6 +68,20 @@ class PatientRepository(BaseRepository):
             .execute()
         )
 
+    def get_medical_history(self, patient_id: str) -> Optional[dict[str, Any]]:
+        """Retrieve the medical history record for a patient."""
+        return self.fetch_one(
+            "MEDICAL_HISTORY",
+            filters={"patient_id": patient_id},
+        )
+
+    def get_family_history(self, patient_id: str) -> Optional[dict[str, Any]]:
+        """Retrieve the family history record for a patient."""
+        return self.fetch_one(
+            "FAMILY_HISTORY",
+            filters={"patient_id": patient_id},
+        )
+
     def delete_patient_cascade(self, patient_id: str) -> Any:
         # Atomic: profile + patient deleted in one transaction.
         # Requires migration 20261010120000_cascade_deletes.
