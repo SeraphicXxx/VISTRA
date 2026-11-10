@@ -447,7 +447,7 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
                 });
             },
             onError: (error) => {
-                console.error("Failed to create dental visit:", getFieldErrors(error));
+
                 notify.error("The dental record could not be saved. Please try again.", {
                     title: "Save failed",
                 });
@@ -507,7 +507,7 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
             });
             handleBack();
         } catch (error) {
-            console.error("Failed to create dental visit:", getFieldErrors(error));
+            // error reported via notify.error below
             notify.error("The dental record could not be saved. Please try again.", {
                 title: "Save failed",
             });

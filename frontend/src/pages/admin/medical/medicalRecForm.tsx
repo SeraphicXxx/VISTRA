@@ -194,7 +194,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
 
         const staffId = sessionManager.getUser()?.user_id ?? "";
         if (!staffId) {
-            console.error("Failed to create medical visit: no staff session found.");
+            // error reported via notify.error below
             notify.error("Your staff session was not found. Please log in again.", {
                 title: "Session not found",
             });
@@ -228,7 +228,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
                 handleBack();
             },
             onError: (error) => {
-                console.error("Failed to create medical visit:", getFieldErrors(error));
+                // error reported via notify.error below
                 notify.error("The medical record could not be saved. Please try again.", {
                     title: "Save failed",
                 });
@@ -262,7 +262,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             handleClear();
             handleBack();
         } catch (error) {
-            console.error("Failed to create medical visit:", getFieldErrors(error));
+            // error reported via notify.error below
             notify.error("The medical record could not be saved. Please try again.", {
                 title: "Save failed",
             });

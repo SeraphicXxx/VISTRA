@@ -29,7 +29,7 @@ export function TermsAgreementModal({ onAccept, onCancel }: TermsAgreementModalP
     try {
       await generateTermsPdf();
     } catch (err) {
-      console.error(err);
+      // PDF generation error handled by caller
     } finally {
       setIsDownloading(false);
     }

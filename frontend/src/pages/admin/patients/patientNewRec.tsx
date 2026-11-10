@@ -16,7 +16,7 @@ import {
     validateFacultyId,
 } from "/@/utils/NewPatientValidation.jsx";
 import {useSavePatient} from "/@/hooks/SavePatient";
-import {getFieldErrors, FieldErrors, getFieldErrorString} from "/@/utils/Formatters.js";
+import {getFieldErrors, FieldErrors, getFieldErrorString} from "/@/utils/Formatters";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 import {useNotify} from "/@/components/notifications/NotificationProvider";
 
@@ -161,7 +161,7 @@ export default function NewPatientRecordForm() {
             });
             window.history.back();
         } catch (error) {
-            console.error("Failed to create patient:", error);
+            // error reported via notify.error below
             notify.error("The patient record could not be saved. Please check the highlighted fields and try again.", {
                 title: "Save failed",
             });

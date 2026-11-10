@@ -311,7 +311,7 @@ export default function MedicalReportPdfButton({
     try {
       await generateMedicalReportPdf({ visit, patientId });
     } catch (err) {
-      console.error(err);
+      // PDF generation error handled by caller
       setError("Could not open the report. Please try again.");
     } finally {
       setIsBusy(false);

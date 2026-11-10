@@ -303,7 +303,7 @@ export default function TermsPdfDownloadButton({
     try {
       await generateTermsPdf();
     } catch (err) {
-      console.error(err);
+      // PDF generation error handled by caller
       setError("Could not open the PDF. Please try again.");
     } finally {
       setIsBusy(false);

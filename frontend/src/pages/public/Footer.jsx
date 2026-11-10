@@ -10,7 +10,7 @@ const navLinks = [
 ];
 
 const openTermsPdf = () => {
-  generateTermsPdf().catch((err) => console.error(err));
+  generateTermsPdf().catch(() => { /* PDF generation error handled by caller */ });
 };
 
 export default function Footer() {

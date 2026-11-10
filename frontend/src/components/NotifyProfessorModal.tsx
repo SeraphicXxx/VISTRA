@@ -375,7 +375,7 @@ export function NotifyProfessionalModal({
                                                     title: "Notification sent",
                                                 });
                                             } catch (error) {
-                                                console.error("Failed to send email:", error);
+                                                // error reported via notify.error below
                                                 notify.error("Failed to send email notification.", {
                                                     title: "Email failed",
                                                 });

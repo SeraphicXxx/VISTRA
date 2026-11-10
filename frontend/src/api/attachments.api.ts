@@ -101,6 +101,6 @@ export async function downloadAttachment(attachmentId: string): Promise<void> {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } catch (error) {
-        console.error("Failed to download attachment:", error);
+        // error reported by caller
     }
 }

@@ -190,7 +190,7 @@ export default function PatientBookAppointment() {
           try {
             await uploadPatientAttachment(file, "laboratory_result", appointmentId);
           } catch (uploadErr) {
-            console.error("Failed to upload attachment:", uploadErr);
+            // error reported via notify.error below
           }
         }
       }

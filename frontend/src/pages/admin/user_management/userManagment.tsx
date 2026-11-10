@@ -213,7 +213,7 @@ export function RoleManagementPage() {
         toast.success("Staff member deleted");
       }
     } catch (error) {
-      console.error("Staff action failed:", error);
+      // error reported via toast.error below
       toast.error("Action failed. Check the connection and try again.");
       return;
     } finally {
