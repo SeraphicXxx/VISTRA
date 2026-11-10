@@ -375,7 +375,7 @@ export default function PatientBookAppointment() {
                 />
               </div>
               <p className="mt-1.5 text-xs text-textMuted">
-                Up to {maxDateParts.short}
+                Up to {maxDateParts?.short}
               </p>
             </div>
 

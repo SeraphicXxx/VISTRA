@@ -113,7 +113,7 @@ export default function PatientOverviewTab() {
         <PatientStatsGrid
           nextAppointment={nextAppointment}
           visitCount={visits.length}
-          medicalStatus={statusLabels[medicalStatus as keyof typeof statusLabels] ?? "No record yet"}
+          medicalStatus={medicalStatus ? statusLabels[medicalStatus as keyof typeof statusLabels] ?? medicalStatus : "No record yet"}
           dentalStatus={dentalStatus}
         />
       </Reveal>

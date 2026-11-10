@@ -129,7 +129,7 @@ export default function PatientAppointmentView() {
     isLoading,
     isError,
     refetch,
-  } = useAppointmentQuery({ patient_id: studentId, page_size: 100, orderBy: "scheduled_start desc" });
+  } = useAppointmentQuery({ patient_id: studentId, page_size: 100, order_by: "scheduled_start desc" });
 
   const appointment: Appointment | undefined = requestedId
     ? (appointmentsData?.items ?? [])
@@ -145,7 +145,7 @@ export default function PatientAppointmentView() {
 
   useEffect(() => {
     if (!rawAppointment?.id) return;
-    getMyAttachments(rawAppointment.id)
+    getMyAttachments(Number(rawAppointment.id))
         .then((res) => {
             if (res.data?.success && res.data?.data) {
                 setAttachments(res.data.data);
@@ -245,7 +245,7 @@ export default function PatientAppointmentView() {
             <div className="rounded-2xl border border-primary bg-white/50 px-5 py-4">
               <p className="text-xs text-primary">{labels.date}</p>
               <p className="mt-1 mb-1 text-lg font-semibold text-primary">
-                {slotDate?.full ?? slot.date}
+                {slotDate?.short ?? slot.date}
               </p>
               {slotDate && (
                 <p className="text-xs text-primary">{slotDate.weekday}</p>
@@ -263,7 +263,7 @@ export default function PatientAppointmentView() {
 
         {isRescheduled && originalDate && (
           <div className="border-t border-white/10 bg-white/5 px-6 py-4 text-sm text-white/70 sm:px-8">
-            Originally scheduled for {originalDate.full} at {appointment.time}.
+            Originally scheduled for {originalDate.short} at {appointment.time}.
           </div>
         )}
       </section>
@@ -330,16 +330,16 @@ export default function PatientAppointmentView() {
             {isRescheduled && originalDate ? (
               <>
                 <DetailRow label="Original slot">
-                  {originalDate.full}, {appointment.time}
+                  {originalDate.short}, {appointment.time}
                 </DetailRow>
                 <DetailRow label="New slot">
-                  {slotDate?.full ?? slot.date}, {slot.time}
+                  {slotDate?.short ?? slot.date}, {slot.time}
                 </DetailRow>
               </>
             ) : (
               <>
                 <DetailRow label={labels.date}>
-                  {slotDate?.full ?? slot.date}
+                  {slotDate?.short ?? slot.date}
                 </DetailRow>
                 <DetailRow label={labels.time}>{slot.time}</DetailRow>
               </>

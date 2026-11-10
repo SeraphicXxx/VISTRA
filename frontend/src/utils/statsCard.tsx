@@ -91,7 +91,7 @@ export function StatCard({
 
   return (
     <div
-      ref={ref}
+      ref={ref as any}
       className="hover-lift group relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm"
     >
       <div style={revealStyle(visible, reduced, { distance: 16 })}>

@@ -9,6 +9,7 @@ export function toDentalTableRow(visit: DentalVisitSchema): DentalData {
         student: visit.patient_name,
         course: visit.course,
         time: formatDate(visit.visit_date),
+        type: "Dental Consultation",
         status: visit.status
     };
 }

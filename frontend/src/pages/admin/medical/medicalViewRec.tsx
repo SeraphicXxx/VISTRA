@@ -172,7 +172,7 @@ export default function PatientRecordView() {
     refetch,
   } = useMedicalVisitDetail(patientId, medicalId);
 
-  const visit: MedicalVisitView | undefined = fetchedVisit;
+  const visit = fetchedVisit as MedicalVisitView | undefined;
 
   if (!patientId || !medicalId) {
     return <MedicalNotFound patientId={patientId} medicalId={medicalId} />;

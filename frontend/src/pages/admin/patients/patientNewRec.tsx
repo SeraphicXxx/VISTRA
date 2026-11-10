@@ -155,7 +155,7 @@ export default function NewPatientRecordForm() {
         if (!record) return;
 
         try {
-            await savePatient(record);
+            await savePatient(record as any);
             notify.success("The patient record was saved successfully.", {
                 title: "Patient saved",
             });

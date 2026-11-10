@@ -81,7 +81,7 @@ export default function PatientDentalRecordView() {
         const map: Record<number, { dentition: string; condition: string; notes: string | null }> = {};
         if (!record?.tooth_records) return map;
         for (const tooth of record.tooth_records) {
-            if (tooth.condition && tooth.condition !== "healthy") {
+            if (tooth.condition && tooth.condition !== "sound") {
                 map[tooth.tooth_number] = {
                     dentition: tooth.dentition ?? "permanent",
                     condition: tooth.condition,

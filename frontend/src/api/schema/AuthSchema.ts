@@ -7,6 +7,8 @@ export interface LoginRequest {
     staff_id?: string;
     password: string;
     on_duty?: boolean;
+    accepted_terms?: boolean;
+    accepted_at?: string;
 }
 
 export interface LoginStaffResponse {

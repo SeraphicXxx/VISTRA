@@ -6,6 +6,7 @@ export const dentalRecords: DentalData[] = [
 
     {
         id: "DEN-1042",
+        studentId: "STU-0001",
         student: "James Bontogon",
         course: "BS Computer Science",
         time: "2026-10-20",
@@ -15,6 +16,7 @@ export const dentalRecords: DentalData[] = [
 
     {
         id: "DEN-1043",
+        studentId: "STU-0001",
         student: "Heart Combinido",
         course: "BS Psychology",
         time: "2026-10-20",
@@ -24,6 +26,7 @@ export const dentalRecords: DentalData[] = [
 
     {
         id: "DEN-1044",
+        studentId: "STU-0001",
         student: "Angelo Bejamino",
         course: "BS Industrial Engineering",
         time: "2026-10-20",
@@ -33,6 +36,7 @@ export const dentalRecords: DentalData[] = [
 
     {
         id: "DEN-1045",
+        studentId: "STU-0001",
         student: "Natasha Pinon",
         course: "BS Electronics Engineering",
         time: "2026-10-20",
@@ -42,6 +46,7 @@ export const dentalRecords: DentalData[] = [
 
     {
         id: "DEN-1046",
+        studentId: "STU-0001",
         student: "Rosh Ingel",
         course: "BS Accountancy",
         time: "2026-10-20",
@@ -107,3 +112,4 @@ export const DentalColumns: Column<DentalData>[] = [
     },
 
 ];
+

@@ -109,18 +109,19 @@ export default function PatientProfile({
       });
 
   // Map API medical history to MedicalHistory
+  const mh = medicalHistoryData as any;
   const medical: MedicalHistory = medicalHistoryData
     ? {
-        hospitalization_operation: medicalHistoryData.hospitalization_operation ?? null,
-        hospitalization_year: medicalHistoryData.hospitalization_year ?? null,
-        diagnosis: medicalHistoryData.diagnosis ?? null,
-        allergy_medicine: medicalHistoryData.allergy_medicine ?? null,
-        allergy_food: medicalHistoryData.allergy_food ?? null,
-        smoking: medicalHistoryData.smoking ?? null,
-        vaping: medicalHistoryData.vaping ?? null,
-        alcohol_intake: medicalHistoryData.alcohol_intake ?? null,
-        last_menstrual_period: medicalHistoryData.last_menstrual_period ?? null,
-        family_planning_method: medicalHistoryData.family_planning_method ?? null,
+        hospitalization_operation: mh?.hospitalization_operation ?? null,
+        hospitalization_year: mh?.hospitalization_year ?? null,
+        diagnosis: mh?.diagnosis ?? null,
+        allergy_medicine: mh?.allergy_medicine ?? null,
+        allergy_food: mh?.allergy_food ?? null,
+        smoking: mh?.smoking ?? null,
+        vaping: mh?.vaping ?? null,
+        alcohol_intake: mh?.alcohol_intake ?? null,
+        last_menstrual_period: mh?.last_menstrual_period ?? null,
+        family_planning_method: mh?.family_planning_method ?? null,
       }
     : (patientProp?.medical ?? {
         hospitalization_operation: null,
@@ -136,10 +137,11 @@ export default function PatientProfile({
       });
 
   // Map API family history to FamilyHistory
+  const fh = familyHistoryData as any;
   const family: FamilyHistory = familyHistoryData
     ? {
-        condition: familyHistoryData.condition ?? null,
-        other_condition: familyHistoryData.other_condition ?? null,
+        condition: fh?.condition ?? null,
+        other_condition: fh?.other_condition ?? null,
       }
     : (patientProp?.family ?? {
         condition: null,
@@ -252,3 +254,5 @@ export default function PatientProfile({
     </div>
   );
 }
+
+
