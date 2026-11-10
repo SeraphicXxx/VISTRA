@@ -35,6 +35,24 @@ patient_attachment_router = APIRouter(
     dependencies=[Depends(get_current_user)],
 )
 
+
+@patient_attachment_router.get("/me", response_model=DataResponse)
+def get_my_attachments(
+    appointment_id: int | None = None,
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    if scope is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Patient account required",
+        )
+    return get_patient_attachments_service(
+        patient_id=scope,
+        supabase=supabase,
+        appointment_id=appointment_id,
+    )
+
 @patient_attachment_router.post("/upload", status_code=201, response_model=DataResponse)
 async def upload_patient_attachment(
     category: AttachmentCategory = Form(...),

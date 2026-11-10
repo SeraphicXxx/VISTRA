@@ -67,3 +67,16 @@ export function getAttachmentsByAppointment(
         { method: "GET", signal }
     );
 }
+
+export function getMyAttachments(
+    appointmentId?: number,
+    signal?: AbortSignal
+) {
+    const url = appointmentId !== undefined
+        ? `${API_ENDPOINTS.attachment.get_my}?appointment_id=${appointmentId}`
+        : API_ENDPOINTS.attachment.get_my;
+    return apiClient<{ success: boolean; data: AttachmentRecord[] }>(
+        url,
+        { method: "GET", signal }
+    );
+}
