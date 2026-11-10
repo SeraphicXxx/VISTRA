@@ -89,6 +89,21 @@ def get_patient_scope(
     return row["patient_id"]
 
 
+def require_patient_scope():
+    """Dependency that requires a patient scope. Staff get None scope,
+    so this dependency ensures the caller is a patient-type user with
+    a resolved patient_id.
+    """
+    def check_scope(scope: str | None = Depends(get_patient_scope)) -> str:
+        if scope is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Patient account required",
+            )
+        return scope
+    return check_scope
+
+
 def enforce_patient_scope(scope: str | None, patient_id: str) -> None:
     """Reject cross-patient access. Staff scope (None) always passes."""
     if scope is not None and patient_id != scope:
