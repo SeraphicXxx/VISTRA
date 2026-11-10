@@ -42,7 +42,7 @@ ALLOWED_TYPES = {
 
 
 @handle_service_errors
-def upload_attachment(
+def upload_medical_attachment(
     patient_id: str,
     category: AttachmentCategory,
     file_name: str,
@@ -123,7 +123,7 @@ def upload_attachment(
 
 
 @handle_service_errors
-def upload_patient_attachment(
+def upload_appointment_attachment(
     patient_id: str,
     category: AttachmentCategory,
     file_name: str,
