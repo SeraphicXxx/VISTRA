@@ -1,5 +1,6 @@
 
 from pathlib import Path
+from typing import Any, Optional
 from uuid import UUID
 
 from supabase import Client
@@ -50,7 +51,7 @@ class AttachmentRepository(BaseRepository):
 
         return destination
 
-    def create(self, data: dict):
+    def create(self, data: dict) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -63,7 +64,7 @@ class AttachmentRepository(BaseRepository):
 
         return response.data[0]
 
-    def get_by_id(self, attachment_id: UUID):
+    def get_by_id(self, attachment_id: UUID) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -75,7 +76,7 @@ class AttachmentRepository(BaseRepository):
 
         return response.data[0] if response.data else None
 
-    def get_by_medical_visit(self, medical_visit_id: int):
+    def get_by_medical_visit(self, medical_visit_id: int) -> list[dict[str, Any]]:
         response = (
             self.supabase.table("patient_attachments")
             .select("*")
@@ -85,7 +86,7 @@ class AttachmentRepository(BaseRepository):
         )
         return response.data or []
 
-    def get_by_patient(self, patient_id: str, category: str | None = None, appointment_id: int | None = None):
+    def get_by_patient(self, patient_id: str, category: str | None = None, appointment_id: int | None = None) -> list[dict[str, Any]]:
         query = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -103,7 +104,7 @@ class AttachmentRepository(BaseRepository):
         response = query.execute()
         return response.data or []
 
-    def get_by_appointment(self, appointment_id: int):
+    def get_by_appointment(self, appointment_id: int) -> list[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -114,7 +115,7 @@ class AttachmentRepository(BaseRepository):
         )
         return response.data or []
 
-    def delete_metadata(self, attachment_id: UUID):
+    def delete_metadata(self, attachment_id: UUID) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
