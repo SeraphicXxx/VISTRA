@@ -17,12 +17,13 @@ from app.schemas.user import role_for_classification
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
+    delete_auth_user,
     provision_auth_or_raise,
 )
 from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
-from app.enums.personal_history import Frequency, Sexual_activity, Results as ResultsEnum
+from app.enums.personal_history import Results as ResultsEnum
 from app.enums.family_history import Family_history
 from app.database.database_client import supabase_admin
 
@@ -129,7 +130,7 @@ def _create_personal_records_from_request(
     patient_repo: PatientRepository,
     patient_id: str,
     request: CreatePatientRequest,
-    supabase_admin: Client,
+    supabase_admin: Client | None,
 ) -> None:
     """Insert medical history, family history, and results data
     submitted via the MedicalHistoryForm component on patient creation.
@@ -138,6 +139,8 @@ def _create_personal_records_from_request(
     """
 
     # Use supabase_admin to bypass RLS on medical tables
+    if supabase_admin is None:
+        return
     patient_repo_admin = PatientRepository(supabase_admin)
 
     # --- Medical History ---

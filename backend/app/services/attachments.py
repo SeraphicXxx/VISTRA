@@ -221,6 +221,7 @@ def get_attachment_download(
         repository.get_by_id(attachment_id),
         "Attachment not found",
     )
+    assert attachment is not None
 
     path = repository.get_file_path(
         attachment["storage_path"]
@@ -262,10 +263,11 @@ def delete_attachment(
         deleted,
         "Failed to delete attachment metadata",
     )
+    assert deleted is not None
 
     # Filesystem cleanup can fail independently of PostgreSQL.
     try:
-        repository.delete_file(attachment["storage_path"])
+        repository.delete_file(deleted["storage_path"])
     except Exception:
         logger.exception(
             "Attachment metadata deleted, but local file cleanup failed"
