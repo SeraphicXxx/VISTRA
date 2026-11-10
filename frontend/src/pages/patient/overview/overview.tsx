@@ -13,6 +13,7 @@ import {
 } from "../appointments/appointmentsData";
 // Mock-data fallbacks removed: name/status derived from API data only.
 import { filterByQuery } from "/@/utils/FilterByQuery";
+import { SkeletonBlock } from "/@/components/SkeletonBlock";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
 import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
@@ -33,7 +34,7 @@ export default function PatientOverviewTab() {
   const user = sessionManager.getUser();
   const studentId = resolveStudentId(user);
 
-  const { data: appointmentsData } = useAppointmentQuery({
+  const { data: appointmentsData, isLoading: appointmentsLoading } = useAppointmentQuery({
     patient_id: studentId,
     page_size: 100,
     order_by: "scheduled_start desc",
@@ -44,7 +45,7 @@ export default function PatientOverviewTab() {
 
   const patientName = "there";
 
-  const { data: summaryData } = usePatientMedicalDentalSummaryQuery();
+  const { data: summaryData, isLoading: summaryLoading } = usePatientMedicalDentalSummaryQuery();
 
   const visits = useMemo(
     () => toPatientMedicalDentalVisits(summaryData ?? { medical: [], dental: [] }),
@@ -86,6 +87,19 @@ export default function PatientOverviewTab() {
     age: patientAge,
     sex: patientSex
   });
+
+  if (appointmentsLoading || summaryLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <SkeletonBlock className="h-24 rounded-2xl" />
+        <SkeletonBlock className="h-32 rounded-2xl" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <SkeletonBlock className="h-64 rounded-2xl" />
+          <SkeletonBlock className="h-64 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
