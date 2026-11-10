@@ -474,17 +474,20 @@ export default function PatientBookAppointment() {
               <p className="mb-2 text-xs text-textMuted">
                 Upload supporting documents (images or PDF, up to 10 MB each).
               </p>
-              <input
-                type="file"
-                accept="image/*,application/pdf"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files ?? []);
-                  setAttachedFiles((prev) => [...prev, ...files]);
-                  e.target.value = "";
-                }}
-                className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary"
-              />
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-textPrimary transition-colors hover:bg-surfaceMuted">
+                <span className="text-primary">Choose files</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? []);
+                    setAttachedFiles((prev) => [...prev, ...files]);
+                    e.target.value = "";
+                  }}
+                  className="hidden"
+                />
+              </label>
               {attachedFiles.length > 0 && (
                 <ul className="mt-3 flex flex-col gap-2">
                   {attachedFiles.map((file, index) => (
