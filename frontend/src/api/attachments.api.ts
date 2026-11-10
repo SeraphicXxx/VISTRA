@@ -1,4 +1,4 @@
-import {API_ENDPOINTS} from "/@/config/ApiConfig";
+import {API_ENDPOINTS, getApiUrl} from "/@/config/ApiConfig";
 import {apiClient} from "/@/api/axios_client";
 
 export type AttachmentCategory = "laboratory_result" | "clinical_photo";
@@ -79,4 +79,28 @@ export function getMyAttachments(
         url,
         { method: "GET", signal }
     );
+}
+
+export function getAttachmentDownloadUrl(attachmentId: string): string {
+    return `${getApiUrl()}/api/v1/attachments/patient/download/${attachmentId}`;
+}
+
+export async function downloadAttachment(attachmentId: string): Promise<void> {
+    try {
+        const response = await apiClient(
+            `/api/v1/attachments/patient/download/${attachmentId}`,
+            { method: "GET", responseType: "blob" }
+        );
+        const blob = response.data as Blob;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Failed to download attachment:", error);
+    }
 }
