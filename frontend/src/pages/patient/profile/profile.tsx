@@ -81,21 +81,32 @@ export default function PatientProfile({
   // Map API profile to PersonalInfo
   const personal: PersonalInfo = profileData
     ? {
-        name: profileData.patient_name ?? samplePatient.personal.name,
+        name: profileData.patient_name ?? "",
         classification: "student",
-        patient_id: profileData.patient_id ?? samplePatient.personal.patient_id,
-        birthday: profileData.birthday ?? samplePatient.personal.birthday,
-        age: profileData.age ?? samplePatient.personal.age,
-        sex: profileData.sex ?? samplePatient.personal.sex,
-        civil_status: profileData.civil_status ?? samplePatient.personal.civil_status,
-        mobile_number: profileData.mobile_number ?? samplePatient.personal.mobile_number,
-        address: profileData.address ?? samplePatient.personal.address,
-        barangay: profileData.barangay ?? samplePatient.personal.barangay,
-        course: profileData.course ?? samplePatient.personal.course,
-        school_year: profileData.school_year ?? samplePatient.personal.school_year,
-        department: profileData.department ?? samplePatient.personal.department,
+        patient_id: profileData.patient_id ?? "",
+        birthday: profileData.birthday ?? "",
+        age: profileData.age ?? 0,
+        sex: profileData.sex ?? "",
+        civil_status: profileData.civil_status ?? "",
+        mobile_number: profileData.mobile_number ?? "",
+        address: profileData.address ?? "",
+        barangay: profileData.barangay ?? "",
+        course: profileData.course ?? "",
+        school_year: profileData.school_year ?? "",
+        department: profileData.department ?? "",
       }
-    : (patientProp?.personal ?? samplePatient.personal);
+    : (patientProp?.personal ?? {
+        name: "",
+        classification: "student",
+        patient_id: "",
+        birthday: "",
+        age: 0,
+        sex: "",
+        civil_status: "",
+        mobile_number: "",
+        address: "",
+        barangay: "",
+      });
 
   // Map API medical history to MedicalHistory
   const medical: MedicalHistory = medicalHistoryData
@@ -111,7 +122,18 @@ export default function PatientProfile({
         last_menstrual_period: medicalHistoryData.last_menstrual_period ?? null,
         family_planning_method: medicalHistoryData.family_planning_method ?? null,
       }
-    : (patientProp?.medical ?? samplePatient.medical);
+    : (patientProp?.medical ?? {
+        hospitalization_operation: null,
+        hospitalization_year: null,
+        diagnosis: null,
+        allergy_medicine: null,
+        allergy_food: null,
+        smoking: null,
+        vaping: null,
+        alcohol_intake: null,
+        last_menstrual_period: null,
+        family_planning_method: null,
+      });
 
   // Map API family history to FamilyHistory
   const family: FamilyHistory = familyHistoryData
@@ -119,7 +141,10 @@ export default function PatientProfile({
         condition: familyHistoryData.condition ?? null,
         other_condition: familyHistoryData.other_condition ?? null,
       }
-    : (patientProp?.family ?? samplePatient.family);
+    : (patientProp?.family ?? {
+        condition: null,
+        other_condition: null,
+      });
 
   // Map API vitals to VitalSigns
   const vitals: VitalSigns = vitalsData
@@ -131,7 +156,7 @@ export default function PatientProfile({
         spo2: vitalsData.spo2 ?? undefined,
         recorded_at: vitalsData.recorded_at,
       }
-    : (patientProp?.vitals ?? samplePatient.vitals);
+    : (patientProp?.vitals ?? { recorded_at: "" });
 
   const results: ExaminationResults = patientProp?.results ?? samplePatient.results;
 
