@@ -4,6 +4,8 @@ from uuid import UUID
 
 from supabase import Client
 
+from app.repositories.base import BaseRepository
+
 
 # Resolves to the backend project root / PATIENT_ATTACHMENTS.
 ATTACHMENT_ROOT = (
@@ -11,9 +13,9 @@ ATTACHMENT_ROOT = (
 ).resolve()
 
 
-class AttachmentRepository:
+class AttachmentRepository(BaseRepository):
     def __init__(self, supabase: Client):
-        self.supabase = supabase
+        super().__init__(supabase)
 
     def save_file(self, relative_path: str, content: bytes) -> Path:
         destination = self._resolve_path(relative_path)
