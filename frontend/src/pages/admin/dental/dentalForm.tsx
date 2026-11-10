@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {ArrowLeft, Save, Stethoscope, Info} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
-import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
+import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign";
 import {FormInput} from "/@/components/InputCollection.jsx";
 import {CheckboxRow} from "/@/utils/CheckboxRow.jsx";
 import {StudentInfoSection} from "/@/components/StudentInfoSection.jsx";

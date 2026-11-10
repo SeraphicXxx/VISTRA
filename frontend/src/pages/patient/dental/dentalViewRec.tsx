@@ -2,7 +2,7 @@ import {useMemo} from "react";
 import {ArrowLeft, ClipboardList, Printer, User} from "lucide-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
-import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign.jsx";
+import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign";
 import {InfoField, getInitials} from "/@/utils/RecordInfo";
 import {formatDate} from "/@/utils/FormatDate";
 import {usePatientDentalRecordQuery} from "/@/hooks/query/PatientQuery";

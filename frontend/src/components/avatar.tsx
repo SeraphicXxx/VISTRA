@@ -20,7 +20,7 @@ const AVATAR_PALETTE = [
 
 ];
 
-export function getInitials(name = "") {
+export function getInitials(name: string = "") {
   return name
     .split(" ")
     .filter(Boolean)
@@ -29,7 +29,7 @@ export function getInitials(name = "") {
     .join("");
 }
 
-export function avatarColor(name = "") {
+export function avatarColor(name: string = "") {
   const sum = name
     .split("")
     .reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
@@ -37,7 +37,7 @@ export function avatarColor(name = "") {
   return AVATAR_PALETTE[sum % AVATAR_PALETTE.length];
 }
 
-export function getTypeIcon(type = "") {
+export function getTypeIcon(type: string = "") {
   const found = TYPE_ICONS.find((entry) => entry.match.test(type));
   return found ? found.icon : ClipboardList;
 }

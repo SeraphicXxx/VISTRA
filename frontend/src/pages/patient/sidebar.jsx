@@ -1,13 +1,13 @@
 import React, { forwardRef, useRef } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useSidebar } from "/@/hooks/UseSidebar.js";
+import { useSidebar } from "/@/hooks/UseSidebar";
 import {
   LogOut,
   Menu,
   X,
 } from "lucide-react";
 import { logoutSession } from "/@/hooks/UseLogout";
-import { PatientRoutes } from "/@/config/PatientRoutes.js";
+import { PatientRoutes } from "/@/config/PatientRoutes";
 import { ROUTES } from "/@/config/RoutePaths.js";
 
 import { LogoClickable } from "/@/components/Button.jsx";

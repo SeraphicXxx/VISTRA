@@ -54,7 +54,7 @@ export const conditionDesign = {
   },
 };
 
-export function getToothType(number) {
+export function getToothType(number: number) {
   const last = number % 10;
 
   if (last === 1 || last === 2) return "incisor";
@@ -64,7 +64,7 @@ export function getToothType(number) {
   return "molar";
 }
 
-export function ToothShape({ type, flip, className, dashed }) {
+export function ToothShape({ type, flip, className, dashed }: { type: string; flip?: boolean; className?: string; dashed?: boolean }) {
   const dashProps = dashed ? { strokeDasharray: "3 2.5" } : {};
 
   const crowns = {
@@ -130,8 +130,8 @@ export function ToothShape({ type, flip, className, dashed }) {
       style={flip ? { transform: "scaleY(-1)" } : undefined}
     >
       <g>
-        {roots[type]}
-        {crowns[type]}
+        {roots[type as keyof typeof roots]}
+        {crowns[type as keyof typeof crowns]}
       </g>
     </svg>
   );
@@ -144,18 +144,25 @@ export function ToothBox({
   record,
   onClick,
   verticalOffset,
+}: {
+  number: number;
+  type: string;
+  flip?: boolean;
+  record?: any;
+  onClick?: (n: number) => void;
+  verticalOffset?: number;
 }) {
   const condition = record?.condition || "sound";
-  const style = conditionDesign[condition] || conditionDesign.sound;
+  const style = conditionDesign[condition as keyof typeof conditionDesign] || conditionDesign.sound;
   const hasNote = Boolean(record);
 
   return (
     <button
       type="button"
-      onClick={() => onClick(number)}
+      onClick={() => onClick?.(number)}
       className="group flex flex-col items-center gap-0.5 rounded-lg px-0.5 py-1 transition-colors duration-150 hover:bg-primary/5"
       style={{
-        transform: `translateY(${flip ? -verticalOffset : verticalOffset}px)`,
+        transform: `translateY(${flip ? -(verticalOffset ?? 0) : (verticalOffset ?? 0)}px)`,
       }}
       title={`Tooth ${number}`}
     >
@@ -172,7 +179,7 @@ export function ToothBox({
       <ToothShape
         type={type}
         flip={flip}
-        dashed={style.dashed}
+        dashed={(style as { dashed?: boolean }).dashed}
         className={`h-12 w-8 shrink-0 ${style.fill} ${style.stroke} transition-transform duration-150 group-hover:scale-110 ${
           hasNote ? "drop-shadow-sm" : ""
         }`}
@@ -197,7 +204,7 @@ export function ToothBox({
   );
 }
 
-export function archOffset(index, total, amplitude) {
+export function archOffset(index: number, total: number, amplitude: number) {
   const center = (total - 1) / 2;
   const t = Math.abs(index - center) / center;
 
@@ -209,6 +216,11 @@ export function ToothArch({
   flip,
   records = {},
   onToothClick,
+}: {
+  teeth: number[];
+  flip?: boolean;
+  records?: Record<number, any>;
+  onToothClick?: (n: number) => void;
 }) {
   return (
     <div className="flex min-w-max items-end justify-center gap-1">
@@ -227,7 +239,7 @@ export function ToothArch({
   );
 }
 
-function ToothModal({ title, onClose, children, footer }) {
+function ToothModal({ title, onClose, children, footer }: { title: string; onClose: () => void; children: React.ReactNode; footer?: React.ReactNode }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -267,6 +279,12 @@ export function ToothNoteModal({
   onSave,
   onClear,
   onClose,
+}: {
+  toothNumber: number;
+  initialRecord?: any;
+  onSave: (r: any) => void;
+  onClear: () => void;
+  onClose: () => void;
 }) {
   const [dentition, setDentition] = useState(
     initialRecord?.dentition || "permanent"

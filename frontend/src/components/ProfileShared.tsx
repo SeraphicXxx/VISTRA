@@ -1,11 +1,9 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type {
-  PatientClassification,
-  PersonalInfo,
-} from "./patient.sample";
-import {uploadProfilePicture, fetchProfilePictureBlob} from "/@/api/patient.api";
-import {useNotify} from "/@/components/notifications/NotificationProvider";
+
+import { uploadProfilePicture, fetchProfilePictureBlob } from "/@/api/patient.api";
+import { useNotify } from "/@/components/notifications/NotificationProvider";
+import type { PatientClassification, PersonalInfo } from "/@/pages/patient/profile/patient.sample";
 
 export const ID_LABELS: Record<PatientClassification, string> = {
   student: "Student ID",
@@ -82,8 +80,7 @@ export function ProfileHeader({
         setHasPicture(true);
       }
       notify.success("Profile picture updated.", { title: "Upload successful" });
-    } catch (error) {
-      console.error("Failed to upload profile picture:", error);
+    } catch {
       notify.error("Could not upload profile picture. Please try again.", {
         title: "Upload failed",
       });

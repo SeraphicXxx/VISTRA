@@ -7,7 +7,7 @@ import {
   ToothArch,
   upperTeeth,
   lowerTeeth,
-} from "/@/components/teethDesign.jsx";
+} from "/@/components/teethDesign";
 import { StatusBadge } from "/@/components/StatusBadge";
 import {
   EditRecordModal,
