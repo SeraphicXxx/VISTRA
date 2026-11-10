@@ -172,7 +172,7 @@ export default function PatientBookAppointment() {
     const trimmedNotes = notes.trim();
 
     try {
-      const appointment = await createAppointmentMutation.mutateAsync({
+      const appointmentResponse = await createAppointmentMutation.mutateAsync({
         patient_id: studentId,
         scheduled_start: toLocalISO(start),
         scheduled_end: toLocalISO(end),
@@ -181,9 +181,11 @@ export default function PatientBookAppointment() {
         notes: trimmedNotes || null,
       });
 
+      const appointmentId = (appointmentResponse as { data?: { id?: number } })?.data?.id
+        ?? (appointmentResponse as { id?: number })?.id;
+
       // Upload attached files (Fit to Work Certificate only)
       if (type === "Fit to Work Certificate" && attachedFiles.length > 0) {
-        const appointmentId = (appointment as { id?: number })?.id;
         for (const file of attachedFiles) {
           try {
             await uploadPatientAttachment(file, "laboratory_result", appointmentId);
