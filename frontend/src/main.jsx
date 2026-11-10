@@ -36,10 +36,10 @@ function QueryClientWrapper({ children }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-      <CrossTabSync />
       <AuthProvider>
           <NotificationProvider>
               <QueryClientWrapper>
+                <CrossTabSync />
                 <App />
               </QueryClientWrapper>
           </NotificationProvider>
