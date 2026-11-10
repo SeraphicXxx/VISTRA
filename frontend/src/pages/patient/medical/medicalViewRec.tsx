@@ -2,6 +2,7 @@ import {ArrowLeft, ClipboardList, Printer, User} from "lucide-react";
 import {useMemo} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
+import {SkeletonBlock} from "/@/components/SkeletonBlock";
 import {ROUTES} from "/@/config/RoutePaths";
 import {formatDate} from "/@/utils/FormatDate";
 import {sessionManager} from "/@/utils/SessionManager";
@@ -17,11 +18,7 @@ function Field({label, value}: {label: string; value?: string | null}) {
     );
 }
 
-function SkeletonBlock({className}: {className?: string}) {
-    return (
-        <div className={`animate-pulse rounded-lg bg-border ${className ?? ""}`} />
-    );
-}
+
 
 function MedicalRecordSkeleton() {
     return (

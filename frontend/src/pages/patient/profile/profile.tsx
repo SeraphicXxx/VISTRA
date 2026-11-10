@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ProfileHeader } from "/@/components/ProfileShared";
+import { SkeletonBlock } from "/@/components/SkeletonBlock";
 import PersonalTab from "./PersonalTab";
 import MedicalHistoryTab from "./MedicalHistoryTab";
 import FamilyHistoryTab from "./FamilyHistoryTab";
@@ -33,9 +34,7 @@ const tabs: { id: PatientProfileSection; label: string }[] = [
   { id: "results", label: "Examination Results" },
 ];
 
-function SkeletonBlock({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-border ${className ?? ""}`} />;
-}
+
 
 function ProfileSkeleton() {
   return (

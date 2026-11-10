@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { uploadProfilePicture, fetchProfilePictureBlob } from "/@/api/patient.api";
 import { useNotify } from "/@/components/notifications/NotificationProvider";
+import { getInitials } from "/@/utils/getInitials";
 import type { PatientClassification, PersonalInfo } from "/@/pages/patient/profile/patient.sample";
 
 export const ID_LABELS: Record<PatientClassification, string> = {
@@ -32,15 +33,7 @@ export function formatDate(value?: string): string {
   });
 }
 
-function getInitials(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0))
-    .join("")
-    .toUpperCase();
-}
+
 
 export function ProfileHeader({
   name,

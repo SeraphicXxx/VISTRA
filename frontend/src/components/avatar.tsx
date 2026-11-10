@@ -20,14 +20,7 @@ const AVATAR_PALETTE = [
 
 ];
 
-export function getInitials(name: string = "") {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
+export { getInitials } from "/@/utils/getInitials";
 
 export function avatarColor(name: string = "") {
   const sum = name

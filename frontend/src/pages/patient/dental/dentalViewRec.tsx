@@ -2,6 +2,7 @@ import {useMemo} from "react";
 import {ArrowLeft, ClipboardList, Printer, User} from "lucide-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {StatusBadge} from "/@/components/StatusBadge";
+import {SkeletonBlock} from "/@/components/SkeletonBlock";
 import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign";
 import {InfoField, getInitials} from "/@/utils/RecordInfo";
 import {formatDate} from "/@/utils/FormatDate";
@@ -17,9 +18,7 @@ const TOOTH_CONDITION_META: Record<string, { label: string; text: string; bg: st
     missing: { label: "Missing", text: "text-slate-600", bg: "bg-slate-100", border: "border-slate-300" },
 };
 
-function SkeletonBlock({className}: {className?: string}) {
-    return <div className={`animate-pulse rounded-lg bg-border ${className ?? ""}`} />;
-}
+
 
 function DentalRecordSkeleton() {
     return (
