@@ -11,7 +11,7 @@ import {
   resolveStudentId,
 } from "./appointmentsData";
 import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
-import { getMyAttachments, type AttachmentRecord } from "/@/api/attachments.api";
+import { getMyAttachments, downloadAttachment, type AttachmentRecord } from "/@/api/attachments.api";
 import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts } from "/@/utils/DateUtils";
@@ -373,9 +373,13 @@ export default function PatientAppointmentView() {
                   key={att.id}
                   className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
                 >
-                  <span className="truncate text-xs text-textPrimary">
+                  <button
+                    type="button"
+                    onClick={() => void downloadAttachment(att.id)}
+                    className="truncate text-xs text-primary hover:underline"
+                  >
                     {att.file_name}
-                  </span>
+                  </button>
                   <span className="shrink-0 text-[10px] text-textMuted">
                     {(att.file_size / 1024).toFixed(1)} KB
                   </span>

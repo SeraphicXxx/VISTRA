@@ -19,7 +19,7 @@ import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
 import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
-import {getAttachmentsByAppointment, type AttachmentRecord} from "/@/api/attachments.api";
+import {getAttachmentsByAppointment, downloadAttachment, type AttachmentRecord} from "/@/api/attachments.api";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -559,9 +559,9 @@ export default function AppointmentDetailView() {
                                         key={att.id}
                                         className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
                                     >
-                                        <span className="truncate text-xs text-textPrimary">
+                                        <button type="button" onClick={() => void downloadAttachment(att.id)} className="truncate text-xs text-primary hover:underline">
                                             {att.file_name}
-                                        </span>
+                                        </button>
                                         <span className="shrink-0 text-[10px] text-textMuted">
                                             {(att.file_size / 1024).toFixed(1)} KB
                                         </span>
