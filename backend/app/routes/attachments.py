@@ -3,8 +3,8 @@ from pathlib import Path
 from uuid import UUID
 
 from app.services.attachments import (
-    upload_attachment as upload_attachment_service,
-    upload_patient_attachment as upload_patient_attachment_service,
+    upload_medical_attachment as upload_medical_attachment_service,
+    upload_appointment_attachment as upload_appointment_attachment_service,
     get_patient_attachments as get_patient_attachments_service,
     get_attachment_download as get_attachment_download_service,
     delete_attachment as delete_attachment_service,
@@ -52,7 +52,7 @@ async def upload_patient_attachment(
     content = await file.read(10 * 1024 * 1024 + 1)
     await file.close()
 
-    return upload_patient_attachment_service(
+    return upload_appointment_attachment_service(
         patient_id=scope,
         category=category,
         file_name=file.filename or "attachment",
@@ -74,7 +74,7 @@ async def upload_attachment(
     try:
         content = await file.read(10 * 1024 * 1024 + 1)
 
-        return upload_attachment_service(
+        return upload_medical_attachment_service(
             patient_id=patient_id,
             category=category,
             file_name=file.filename or "attachment",
