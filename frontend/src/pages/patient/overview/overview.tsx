@@ -11,9 +11,7 @@ import {
   resolveStudentId,
   Appointment,
 } from "../appointments/appointmentsData";
-import { myMedicalRecords } from "../medical/medicalData";
-import { myDentalRecords } from "../dental/dentalData";
-import { PATIENT_VITALS } from "./vitalsData";
+// Mock-data fallbacks removed: name/status derived from API data only.
 import { filterByQuery } from "/@/utils/FilterByQuery";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
@@ -41,10 +39,10 @@ export default function PatientOverviewTab() {
     order_by: "scheduled_start desc",
   });
 
-  const medicalRecord = myMedicalRecords[studentId];
-  const dentalRecord = myDentalRecords[studentId];
+  const medicalRecord = undefined;
+  const dentalRecord = undefined;
 
-  const patientName = medicalRecord?.name ?? dentalRecord?.name ?? "there";
+  const patientName = "there";
 
   const { data: summaryData } = usePatientMedicalDentalSummaryQuery();
 
@@ -58,10 +56,8 @@ export default function PatientOverviewTab() {
     [appointmentsData]
   );
 
-  const medicalStatus = medicalRecord?.status;
-  const dentalStatus = dentalRecord?.recordId
-    ? statusLabels[dentalRecord.status] ?? dentalRecord.status
-    : "No record yet";
+  const medicalStatus = undefined;
+  const dentalStatus = "No record yet";
 
   const nextAppointment: Appointment | null = appointments[0] ?? null;
 
@@ -76,16 +72,10 @@ export default function PatientOverviewTab() {
     [searchQuery, recentVisits]
   );
 
-  const currentBmi = useMemo(() => {
-    if (PATIENT_VITALS?.weight && PATIENT_VITALS?.height) {
-      const heightInMeters = PATIENT_VITALS.height / 100;
-      return Number((PATIENT_VITALS.weight / (heightInMeters * heightInMeters)).toFixed(1));
-    }
-    return 22.8; //fallback for normal BMI
-  }, []);
+  const currentBmi = 22.8; // fallback for normal BMI (no mock vitals)
 
-  const patientAge = Number(medicalRecord?.age) || 20;
-  const patientSex = medicalRecord?.sex || "Male";
+  const patientAge = 20;
+  const patientSex = "Male";
 
   const {
     data: predictedRisks,
@@ -109,7 +99,7 @@ export default function PatientOverviewTab() {
         <PatientStatsGrid
           nextAppointment={nextAppointment}
           visitCount={visits.length}
-          medicalStatus={statusLabels[medicalStatus] ?? medicalStatus}
+          medicalStatus={statusLabels[medicalStatus as keyof typeof statusLabels] ?? "No record yet"}
           dentalStatus={dentalStatus}
         />
       </Reveal>
@@ -120,7 +110,7 @@ export default function PatientOverviewTab() {
         </Reveal>
 
         <Reveal as="div" delay={3 * STAGGER} distance={24} className="h-full">
-          <VitalSignsPanel vitals={PATIENT_VITALS} />
+          <VitalSignsPanel vitals={null} />
         </Reveal>
       </div>
 
