@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 
 import { InfoField, getInitials } from "/@/utils/RecordInfo";
+import { PatientAvatar } from "/@/components/PatientAvatar";
 import { StatusBadge } from "/@/components/StatusBadge";
 import { EditRecordModal, statusEditFields } from "/@/components/editModal";
 import MedicalReportPdfButton from "/@/components/medical/medicalreportpdf";
@@ -288,7 +289,7 @@ export default function PatientRecordView() {
 
             <div className="flex items-center gap-5">
               <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
-                {getInitials(visit.patient_name)}
+                <PatientAvatar patientId={visit.patient_id} name={visit.patient_name} size="lg" />
               </span>
 
               <div>

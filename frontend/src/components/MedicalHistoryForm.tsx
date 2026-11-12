@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { FieldLabel } from "/@/utils/FieldLabel.jsx";
 import { SelectField, FormInput } from "/@/components/InputCollection";
 
-const YES_NO_OPTIONS: string[] = ["Yes", "No"];
 const NORMAL_ABNORMAL_OPTIONS: string[] = ["Normal", "Abnormal"];
 const FREQUENCY_OPTIONS: string[] = ["Everyday", "Moderate", "Occasional", "None"];
 const FAMILY_HISTORY_OPTIONS: string[] = [
@@ -294,13 +293,6 @@ export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryForm
               name="contraceptive_method"
               label="Contraceptive method"
               placeholder="e.g. None, Pills, IUD, Condom"
-            />
-            <SelectField
-              id="often_sexual_activity"
-              name="often_sexual_activity"
-              label="Often sexual activity"
-              options={YES_NO_OPTIONS}
-              required
             />
           </div>
         </div>

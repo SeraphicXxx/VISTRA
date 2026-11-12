@@ -1,8 +1,11 @@
 
 from pathlib import Path
+from typing import Any, Optional
 from uuid import UUID
 
 from supabase import Client
+
+from app.repositories.base import BaseRepository
 
 
 # Resolves to the backend project root / PATIENT_ATTACHMENTS.
@@ -11,9 +14,9 @@ ATTACHMENT_ROOT = (
 ).resolve()
 
 
-class AttachmentRepository:
+class AttachmentRepository(BaseRepository):
     def __init__(self, supabase: Client):
-        self.supabase = supabase
+        super().__init__(supabase)
 
     def save_file(self, relative_path: str, content: bytes) -> Path:
         destination = self._resolve_path(relative_path)
@@ -48,7 +51,7 @@ class AttachmentRepository:
 
         return destination
 
-    def create(self, data: dict):
+    def create(self, data: dict) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -61,7 +64,7 @@ class AttachmentRepository:
 
         return response.data[0]
 
-    def get_by_id(self, attachment_id: UUID):
+    def get_by_id(self, attachment_id: UUID) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -73,7 +76,7 @@ class AttachmentRepository:
 
         return response.data[0] if response.data else None
 
-    def get_by_medical_visit(self, medical_visit_id: int):
+    def get_by_medical_visit(self, medical_visit_id: int) -> list[dict[str, Any]]:
         response = (
             self.supabase.table("patient_attachments")
             .select("*")
@@ -83,7 +86,7 @@ class AttachmentRepository:
         )
         return response.data or []
 
-    def get_by_patient(self, patient_id: str, category: str | None = None):
+    def get_by_patient(self, patient_id: str, category: str | None = None, appointment_id: int | None = None) -> list[dict[str, Any]]:
         query = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")
@@ -95,10 +98,24 @@ class AttachmentRepository:
         if category:
             query = query.eq("category", category)
 
+        if appointment_id is not None:
+            query = query.eq("appointment_id", appointment_id)
+
         response = query.execute()
         return response.data or []
 
-    def delete_metadata(self, attachment_id: UUID):
+    def get_by_appointment(self, appointment_id: int) -> list[dict[str, Any]]:
+        response = (
+            self.supabase
+            .table("PATIENT_ATTACHMENTS")
+            .select("*")
+            .eq("appointment_id", appointment_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return response.data or []
+
+    def delete_metadata(self, attachment_id: UUID) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("PATIENT_ATTACHMENTS")

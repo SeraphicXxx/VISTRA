@@ -1,13 +1,16 @@
+from typing import Any, Optional
+
 from app.repositories.base import BaseRepository
 from app.schemas.appointments import EDITABLE_APPOINTMENT_COLUMNS
+from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 
 
 class AppointmentRepository(BaseRepository):
-    def __init__(self, supabase):
+    def __init__(self, supabase: Any) -> None:
         self.supabase = supabase
 
-    def create_appointment(self, appointment_data):
+    def create_appointment(self, appointment_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table("APPOINTMENT")
@@ -20,9 +23,9 @@ class AppointmentRepository(BaseRepository):
 
         return None
 
-    def get_appointments(self, filters):
+    def get_appointments(self, filters: Any) -> PaginatedResponse:
         use_course_filter = bool(getattr(filters, "course", None))
-        columns = """
+        columns = """\
                     *,
                     PATIENT!inner(
                         PATIENT_PROFILE!inner(
@@ -32,7 +35,7 @@ class AppointmentRepository(BaseRepository):
                             course
                         )
                     )
-                """ if use_course_filter else """
+                """ if use_course_filter else """\
                     *,
                     PATIENT(
                         PATIENT_PROFILE(
@@ -72,10 +75,10 @@ class AppointmentRepository(BaseRepository):
 
         return result
 
-    def get_appointment_by_id(self, appointment_id: int, patient_id: str):
+    def get_appointment_by_id(self, appointment_id: int, patient_id: str) -> Optional[dict[str, Any]]:
         row = self.fetch_one(
             "APPOINTMENT",
-            select="""
+            select="""\
                 *,
                 PATIENT(
                     PATIENT_PROFILE(
@@ -97,7 +100,7 @@ class AppointmentRepository(BaseRepository):
 
         return self._map_appointment(row)
 
-    def update_appointment(self, appointment_id: int, updated_appointment_data: dict):
+    def update_appointment(self, appointment_id: int, updated_appointment_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         updatable = {
             key: value
             for key, value in (updated_appointment_data or {}).items()
@@ -123,11 +126,11 @@ class AppointmentRepository(BaseRepository):
 
         return None
 
-    def delete_appointment(self, appointment_id: int):
+    def delete_appointment(self, appointment_id: int) -> bool:
         return self.delete_by_column("APPOINTMENT", "id", appointment_id)
 
     @staticmethod
-    def _map_appointment(appointment):
+    def _map_appointment(appointment: Any) -> Any:
         if not isinstance(appointment, dict):
             return appointment
 

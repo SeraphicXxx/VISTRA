@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
 
 class ScreeningPredictRequest(BaseModel):
-    bmi : float = Field(..., ge = 10.0, le=100.0, description="Calculated Bmi", example = 23.4)
+    bmi : float = Field(..., ge=10.0, le=100.0, description="Calculated Bmi", examples=[23.4])  # type: ignore[call-overload]
     age : int = Field(..., ge=1, le=120, description="Age in years")
-    sex : str | int  = Field(..., description="Male/Female or 1/0", example="Male")
+    sex : str | int  = Field(..., description="Male/Female or 1/0", examples=["Male"])  # type: ignore[call-overload]
 
 
 class ConditionResult(BaseModel):

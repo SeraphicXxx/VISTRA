@@ -1,7 +1,8 @@
 import type { MedicalHistory } from "./patient.sample";
-import { FieldGrid, InfoCard, InfoField, formatDate } from "/@/components/ProfileShared";
+import { FieldGrid, InfoCard, InfoField } from "/@/components/ProfileShared";
 
 export default function MedicalHistoryTab({
+  hospitalization_operation,
   hospitalization_year,
   diagnosis,
   allergy_medicine,
@@ -10,19 +11,22 @@ export default function MedicalHistoryTab({
   vaping,
   alcohol_intake,
   last_menstrual_period,
+  family_planning_method,
   onEdit,
 }: MedicalHistory & { onEdit?: () => void }) {
   return (
     <InfoCard title="Medical History" onEdit={onEdit}>
       <FieldGrid>
-        <InfoField label="Hospitalization / Operation Year" value={hospitalization_year} />
+        <InfoField label="Hospitalization / Operation" value={hospitalization_operation} />
+        <InfoField label="Hospitalization Year" value={hospitalization_year} />
         <InfoField label="Diagnosis" value={diagnosis} />
         <InfoField label="Medication Allergies" value={allergy_medicine} />
         <InfoField label="Food Allergies" value={allergy_food} />
-        <InfoField label="Smoking" value={smoking} />
-        <InfoField label="Vaping" value={vaping} />
-        <InfoField label="Alcohol Intake" value={alcohol_intake} />
-        <InfoField label="Last Menstrual Period" value={formatDate(last_menstrual_period)} />
+        <InfoField label="Smoking" value={smoking === true ? "Yes" : smoking === false ? "No" : null} />
+        <InfoField label="Vaping" value={vaping === true ? "Yes" : vaping === false ? "No" : null} />
+        <InfoField label="Alcohol Intake" value={alcohol_intake === true ? "Yes" : alcohol_intake === false ? "No" : null} />
+        <InfoField label="Last Menstrual Period" value={last_menstrual_period} />
+        <InfoField label="Family Planning Method" value={family_planning_method} />
       </FieldGrid>
     </InfoCard>
   );

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardList, Pencil, Printer, User } from "lucide-react";
 import { InfoField, getInitials } from "/@/utils/RecordInfo";
+import { PatientAvatar } from "/@/components/PatientAvatar";
 import {
   ToothArch,
   upperTeeth,
@@ -342,7 +343,7 @@ export default function DentalRecordView() {
 
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
-                {getInitials(record.patient_name)}
+                <PatientAvatar patientId={record.patient_id} name={record.patient_name} size="lg" />
               </div>
 
               <div className="min-w-0">

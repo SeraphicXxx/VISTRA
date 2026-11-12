@@ -9,7 +9,7 @@ export function toPatientMedicalTableRow(item: PatientMedicalTabVisit): Visit {
         doctor: item.doctor ?? item.staff_id ?? "",
         complaint: item.complaint ?? "",
         treatmentType: item.treatment_type ?? "",
-        treatment: "",
+        treatment: item.treatment ?? "",
         status: (item.status ?? "pending") as Visit["status"],
     };
 }

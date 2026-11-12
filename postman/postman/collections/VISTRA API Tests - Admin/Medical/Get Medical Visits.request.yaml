@@ -1,0 +1,26 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/medical/?page=1&page_size=10"
+method: GET
+headers:
+  Authorization: Bearer {{access_token}}
+queryParams:
+  page: "1"
+  page_size: "10"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Get medical visits returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Medical visits list is returned", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json.data).to.have.property("items");
+      });
+    language: text/javascript
+order: 2000

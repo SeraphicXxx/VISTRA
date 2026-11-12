@@ -1,0 +1,38 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/appointments/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access_token}}
+body:
+  type: text
+  content: |-
+    {
+        "patient_id": "20230847-S",
+        "type": "Consultation",
+        "status": "Pending",
+        "scheduled_start": "2026-11-10T10:00:00Z",
+        "scheduled_end": "2026-11-10T11:00:00Z",
+        "location": "UCC-South Campus",
+        "reason": "General checkup",
+        "notes": "Test appointment"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Create appointment returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Appointment creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json.data).to.have.property("id");
+          pm.environment.set("appointment_id", json.data.id);
+      });
+    language: text/javascript
+order: 1000

@@ -1,0 +1,74 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access_token}}
+body:
+  type: text
+  content: |-
+    {
+        "patient_id": "{{patient_id}}",
+        "password": "TestPass123!",
+        "created_by": "{{user_id}}",
+        "name": "Test, Patient",
+        "address": "123 Test Street",
+        "age": 20,
+        "barangay": "Commonwealth",
+        "birthday": "2006-07-07",
+        "mobile_number": "09171234567",
+        "sex": "Male",
+        "civil_status": "Single",
+        "classification": "Student",
+        "course": "BS Computer Science",
+        "school_year": "3rd Year",
+        "section": "B",
+        "department": "College of Computer Studies",
+        "position": "Student",
+        "hospitalization_year": 2022,
+        "hospitalization_operation": "Appendectomy",
+        "diagnosis": "Acute appendicitis",
+        "allergy_medicine": "Penicillin",
+        "allergy_food": "Peanuts",
+        "smoking": "None",
+        "vaping": "None",
+        "alcohol": "None",
+        "family_planning_method": "None",
+        "sexual_activity": "No",
+        "family_history": "Hypertension",
+        "family_history_others": "Diabetes",
+        "chest_xray": "Normal",
+        "cbc": "Normal",
+        "urinalysis": "Normal",
+        "results_other": "None",
+        "recommendation": "Annual physical exam recommended"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      if (!pm.environment.get("patient_id")) {
+          pm.environment.set("patient_id", "PT-" + Date.now());
+      }
+      if (!pm.environment.get("user_id")) {
+          pm.environment.set("user_id", "STF001");
+      }
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Create patient returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Patient creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+      pm.test("Medical history saved", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+    language: text/javascript
+order: 1000

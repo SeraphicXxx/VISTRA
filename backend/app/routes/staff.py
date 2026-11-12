@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from supabase import Client
 
 from app.config.security import require_staff
+from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.schemas.staff import CreateStaffRequest, UpdateStaffAccessRequest
 from app.services.access import require_module
 from app.services.staff import get_all_staff
@@ -17,23 +18,23 @@ protected_staff_router = APIRouter(
     dependencies=[Depends(require_staff)]
 )
 
-@protected_staff_router.get("/", dependencies=[Depends(require_module("staff"))])
+@protected_staff_router.get("/", dependencies=[Depends(require_module("staff"))], response_model=DataResponse)
 def list_staff(supabase: Client = Depends(get_supabase_for_user)):
     return get_all_staff(supabase)
 
-@protected_staff_router.post("/", dependencies=[Depends(require_module("staff"))])
+@protected_staff_router.post("/", dependencies=[Depends(require_module("staff"))], response_model=SuccessResponse)
 def create_staff(request: CreateStaffRequest, supabase: Client = Depends(get_supabase_for_user)):
     return create_staff_service(request, supabase)
 
-@protected_staff_router.get("/{staff_id}/")
+@protected_staff_router.get("/{staff_id}/", response_model=DataResponse)
 def get_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return get_staff_by_id(staff_id, supabase)
 
-@protected_staff_router.delete("/{staff_id}/", dependencies=[Depends(require_module("staff"))])
+@protected_staff_router.delete("/{staff_id}/", dependencies=[Depends(require_module("staff"))], response_model=SuccessResponse)
 def delete_staff(staff_id: str, supabase: Client = Depends(get_supabase_for_user)):
     return delete_staff_service(staff_id, supabase)
 
-@protected_staff_router.patch("/{staff_id}/access", dependencies=[Depends(require_module("staff"))])
+@protected_staff_router.patch("/{staff_id}/access", dependencies=[Depends(require_module("staff"))], response_model=DataResponse)
 def update_staff_access(
     staff_id: str,
     request: UpdateStaffAccessRequest,

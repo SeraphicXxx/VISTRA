@@ -10,15 +10,16 @@ import {
 } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
 import {useForm} from "/@/hooks/Form";
 import {getFieldErrorString} from "/@/utils/Formatters";
 import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
-import {getInitials} from "/@/utils/RecordInfo";
+import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
+import {getAttachmentsByAppointment, downloadAttachment, type AttachmentRecord} from "/@/api/attachments.api";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -276,7 +277,21 @@ export default function AppointmentDetailView() {
     } | null>(null);
     const [optimisticStatus, setOptimisticStatus] =
         useState<AdminAppointmentStatus | null>(null);
+    const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
     const updateAppointmentMutation = useUpdateAppointment();
+
+    useEffect(() => {
+        if (!patientId || !appointmentId) return;
+        getAttachmentsByAppointment(patientId, Number(appointmentId))
+            .then((res) => {
+                if (res.data?.success && res.data?.data) {
+                    setAttachments(res.data.data);
+                }
+            })
+            .catch(() => {
+                setAttachments([]);
+            });
+    }, [patientId, appointmentId]);
     if (!appointmentId || !patientId) {
         return (
             <AppointmentNotFound
@@ -407,7 +422,7 @@ export default function AppointmentDetailView() {
 
                             <span
                                 className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
-                                {getInitials(appointment.student)}
+                                <PatientAvatar patientId={patientId} name={appointment.student} size="lg" />
                             </span>
 
                             <div>
@@ -532,6 +547,29 @@ export default function AppointmentDetailView() {
                         className="mt-5 rounded-xl border border-dashed border-border bg-surfaceMuted/20 px-4 py-4 text-sm text-textMuted">
                         {appointment.notes || "No additional notes were submitted with this appointment."}
                     </div>
+
+                    {attachments.length > 0 && (
+                        <div className="mt-6 border-t border-border pt-6">
+                            <h2 className="mb-3 font-heading text-sm font-semibold text-primaryDark">
+                                Attachments
+                            </h2>
+                            <ul className="flex flex-col gap-2">
+                                {attachments.map((att) => (
+                                    <li
+                                        key={att.id}
+                                        className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
+                                    >
+                                        <button type="button" onClick={() => void downloadAttachment(att.id)} className="truncate text-xs text-primary hover:underline">
+                                            {att.file_name}
+                                        </button>
+                                        <span className="shrink-0 text-[10px] text-textMuted">
+                                            {(att.file_size / 1024).toFixed(1)} KB
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="mt-8 border-t border-border pt-6">
 

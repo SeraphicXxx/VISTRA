@@ -441,8 +441,16 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
         onSave?.(record, notification);
 
         createDentalVisitMutation.mutate(record, {
+            onSuccess: () => {
+                notify.success("The dental record was saved successfully.", {
+                    title: "Record saved",
+                });
+            },
             onError: (error) => {
                 console.error("Failed to create dental visit:", getFieldErrors(error));
+                notify.error("The dental record could not be saved. Please try again.", {
+                    title: "Save failed",
+                });
             },
         });
 
@@ -483,17 +491,27 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
         setPendingRecord(record);
     };
 
-    const handleSendNotification = (
+    const handleSendNotification = async (
         professional: MedicalNotification["professional"],
         message: string
-    ) => {
+    ): Promise<void> => {
         if (!pendingRecord) return;
 
-        persistRecord(pendingRecord, {
-            professional,
-            subject: `Dental record saved: ${pendingRecord.patient_id}`,
-            message,
-        });
+        const record = pendingRecord;
+        setPendingRecord(null);
+
+        try {
+            await createDentalVisitMutation.mutateAsync(record);
+            notify.success("The dental record was saved successfully.", {
+                title: "Record saved",
+            });
+            handleBack();
+        } catch (error) {
+            console.error("Failed to create dental visit:", getFieldErrors(error));
+            notify.error("The dental record could not be saved. Please try again.", {
+                title: "Save failed",
+            });
+        }
     };
 
     const handleSkipNotify = () => {

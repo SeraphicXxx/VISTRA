@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
+from app.enums.personal_history import Results as ResultsEnum
+from app.enums.family_history import Family_history
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
 
@@ -31,6 +33,8 @@ class PatientProfile(BaseModel):
     contact_no: str | None = None
     school_year: str | None = None
     department: str | None = None
+    section: str | None = None
+    position: str | None = None
     person_type: str | None = None
 
 
@@ -60,6 +64,30 @@ class CreatePatientRequest(BaseModel):
     department: str | None = None
     position: str | None = None
 
+    # Medical history form fields (from MedicalHistoryForm component)
+    hospitalization_year: int | None = Field(default=None, ge=1900, le=2100)
+    hospitalization_operation: str | None = Field(default=None, max_length=255)
+    diagnosis: str | None = Field(default=None, max_length=255)
+    allergy_medicine: str | None = Field(default=None, max_length=255)
+    allergy_food: str | None = Field(default=None, max_length=255)
+    smoking: str | None = None
+    vaping: str | None = None
+    alcohol: str | None = None
+    contraceptive: str | None = Field(default=None, max_length=255)
+    sexual_activity: str | None = None
+
+    # Family history
+    family_history: str | None = Field(default=None, max_length=255)
+    family_history_others: str | None = Field(default=None, max_length=255)
+
+    # Results
+    chest_xray: str | None = None
+    cbc: str | None = None
+    urinalysis: str | None = None
+
+    # Recommendation
+    recommendation: str | None = Field(default=None, max_length=255)
+
     def to_patient_profile(self) -> PatientProfile:
         name = separate_name(self.name)
 
@@ -78,6 +106,8 @@ class CreatePatientRequest(BaseModel):
             contact_no=self.mobile_number,
             school_year=self.school_year,
             department=self.department,
+            section=self.section,
+            position=self.position,
             person_type=self.classification,
 
         )
@@ -174,6 +204,68 @@ class UpdatePatientProfileRequest(BaseModel):
             return value
 
         return confirm_mobile_number(value)
+
+
+class CreateMedicalhistory(BaseModel):
+    hostpitalization_operation : str = Field(..., min_length=1, max_length=255)
+    hostpitalization_year : int
+    diagnosis: str = Field(..., min_length=2, max_length=255)
+    allergy_medicine : str =Field(..., min_length=2, max_length=255)
+    allergy_food : str = Field(..., min_length=2, max_length=255)
+    Smoking : str | None = None
+    Vaping: str | None = None
+    alcohol_intake: str | None = None
+    family_planning_method: str | None = Field(default=None, max_length=255)
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        def _to_freq(val: str | None) -> str | None:
+            if not val or val in ("None", "none", "NONE"):
+                return None
+            return val
+
+        return {
+            "patient_id" : patient_id,
+            "hospitalization_operation" : self.hostpitalization_operation,
+            "hospitalization_year" : self.hostpitalization_year,
+            "diagnosis" : self.diagnosis,
+            "allergy_medicine" : self.allergy_medicine,
+            "allergy_food" : self.allergy_food,
+            "smoking" : _to_freq(self.Smoking),
+            "vaping" : _to_freq(self.Vaping),
+            "alcohol_intake" : _to_freq(self.alcohol_intake),
+            "family_planning_method" : self.family_planning_method,
+        }
+
+class FamilyHistory(BaseModel):
+    condition: Family_history
+    other_condition: str | None = Field(default=None, max_length=255)
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        return {
+            "patient_id" : patient_id,
+            "condition" : self.condition.value if self.condition else None,
+            "other_condition" : self.other_condition if self.other_condition else None,
+        }
+
+class PatientResults(BaseModel): 
+    Chest_Xray : ResultsEnum | str = "Normal"
+    CBC : ResultsEnum | str = "Normal"
+    Urinalysis: ResultsEnum | str = "Normal"
+    recommendation: str | None = Field(default=None, max_length=255)
+
+    def to_db_dict(self, patient_id: str) -> dict:
+        return{
+            "patient_id" : patient_id,
+            "chest_xray" : self.Chest_Xray.value if isinstance(self.Chest_Xray, ResultsEnum) else self.Chest_Xray,
+            "cbc" : self.CBC.value if isinstance(self.CBC, ResultsEnum) else self.CBC,
+            "urinalysis" : self.Urinalysis.value if isinstance(self.Urinalysis, ResultsEnum) else self.Urinalysis,
+            "recommendation" : self.recommendation
+        }
+
+class FullFormRequest(BaseModel):
+    medical: CreateMedicalhistory
+    family: FamilyHistory
+    results: PatientResults
 
 class PatientRecord(BaseModel):
     id: int

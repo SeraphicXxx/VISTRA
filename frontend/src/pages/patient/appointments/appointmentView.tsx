@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarPlus, Check, X } from "lucide-react";
 
@@ -11,6 +11,7 @@ import {
   resolveStudentId,
 } from "./appointmentsData";
 import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
+import { getMyAttachments, downloadAttachment, type AttachmentRecord } from "/@/api/attachments.api";
 import { sessionManager } from "/@/utils/SessionManager";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { getDateParts } from "/@/utils/DateUtils";
@@ -135,6 +136,25 @@ export default function PatientAppointmentView() {
         .map(mapBackendAppointmentToAppointment)
         .find((item) => item.id === requestedId)
     : (appointmentsData?.items ?? []).map(mapBackendAppointmentToAppointment)[0];
+
+  const rawAppointment = requestedId
+    ? (appointmentsData?.items ?? []).find((item) => String(item.id) === requestedId)
+    : (appointmentsData?.items ?? [])[0];
+
+  const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
+
+  useEffect(() => {
+    if (!rawAppointment?.id) return;
+    getMyAttachments(rawAppointment.id)
+        .then((res) => {
+            if (res.data?.success && res.data?.data) {
+                setAttachments(res.data.data);
+            }
+        })
+        .catch(() => {
+            setAttachments([]);
+        });
+  }, [rawAppointment?.id]);
 
   const handleBack = () => navigate(ROUTES.patient.dashboard.appointments);
   const handleBook = () => navigate(ROUTES.patient.appointment.bookAppointment);
@@ -341,6 +361,33 @@ export default function PatientAppointmentView() {
             {appointment.notes || "No additional notes for this appointment."}
           </p>
         </section>
+
+        {attachments.length > 0 && (
+          <section className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <h2 className="font-heading text-sm font-semibold text-textPrimary">
+              Attachments
+            </h2>
+            <ul className="mt-4 flex flex-col gap-2">
+              {attachments.map((att) => (
+                <li
+                  key={att.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
+                >
+                  <button
+                    type="button"
+                    onClick={() => void downloadAttachment(att.id)}
+                    className="truncate text-xs text-primary hover:underline"
+                  >
+                    {att.file_name}
+                  </button>
+                  <span className="shrink-0 text-[10px] text-textMuted">
+                    {(att.file_size / 1024).toFixed(1)} KB
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );

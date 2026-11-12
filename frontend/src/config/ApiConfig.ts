@@ -31,11 +31,27 @@ export const API_ENDPOINTS = {
         create_patient: `${API_V1}/patients/`,
         get_all_patient_profile: `${API_V1}/patients/profiles/`,
         get_summary_record: (patientId: string) => `${API_V1}/patients/profiles/${patientId}/`,
+        get_my_profile: `${API_V1}/patients/profiles/me/`,
         get_patient_by_id: (patientId: string) => `${API_V1}/patients/${patientId}/`,
         update_patient_profile: (patientId: string) => `${API_V1}/patients/${patientId}/`,
         get_patient_medical_tab: `${API_V1}/patients/record/medical-tab/`,
         get_patient_dental_tab: `${API_V1}/patients/record/dental-tab/`,
+        get_patient_medical_record: (medicalId: string) => `${API_V1}/patients/record/medical/${medicalId}`,
+        get_patient_dental_record: (dentalId: string) => `${API_V1}/patients/record/dental/${dentalId}`,
+        get_patient_medical_history: `${API_V1}/patients/record/medical-history/`,
+        get_patient_family_history: `${API_V1}/patients/record/family-history/`,
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
+        get_latest_vital_signs: (patientId: string) => `${API_V1}/vital-signs/patient/${patientId}/latest`,
+    },
+    profilePicture: {
+        upload: `${API_V1}/profile-picture/upload`,
+        get: `${API_V1}/profile-picture/me`,
+        getPatient: (patientId: string) => `${API_V1}/profile-picture/patient/${patientId}`,
+    },
+    attachment: {
+        patient_upload: `${API_V1}/attachments/patient/upload`,
+        get_by_patient: (patientId: string) => `${API_V1}/attachments/patient/${patientId}`,
+        get_my: `${API_V1}/attachments/patient/me`,
     },
     appointment: {
         create_appointment: `${API_V1}/appointments/`,
@@ -60,5 +76,8 @@ export const API_ENDPOINTS = {
     },
     screening: {
         predict: `${API_V1}/screening/predict`,
+    },
+    email: {
+        send: `${API_V1}/email/send/`,
     }
 };

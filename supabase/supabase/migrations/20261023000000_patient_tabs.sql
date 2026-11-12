@@ -1,20 +1,32 @@
 -- Views supporting the patient portal medical/dental tabs.
 
 create or replace view "public"."patient_medical_tab" as
-SELECT mv.id,
+select
+    mv.id,
     mv.patient_id,
-    concat_ws(' '::text, pp.first_name, pp.middle_name, pp.last_name) AS patient_name,
+    concat_ws(
+            ' '::text,
+            pp.first_name,
+            pp.middle_name,
+            pp.last_name
+    ) as patient_name,
     pp.course,
     mv.visit_date,
     mv.staff_id,
-    concat_ws(' '::text, s.first_name, s.middle_name, s.last_name) AS doctor,
+    concat_ws(
+            ' '::text,
+            s.first_name,
+            s.middle_name,
+            s.last_name
+    ) as doctor,
     mv.status,
-    mv.type AS treatment_type,
+    mv.type as treatment_type,
     mv.complaint,
     mv.treatment
-FROM ((public."MEDICAL_VISIT" mv
-  JOIN public."PATIENT_PROFILE" pp ON ((pp.patient_id = mv.patient_id)))
-  LEFT JOIN public."STAFF" s ON ((s.staff_id = mv.staff_id)));
+from
+    "MEDICAL_VISIT" mv
+        join "PATIENT_PROFILE" pp on pp.patient_id = mv.patient_id
+        left join "STAFF" s on s.staff_id = mv.staff_id;
 
 
 create or replace view "public"."patient_dental_tab" as

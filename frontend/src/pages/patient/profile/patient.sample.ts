@@ -1,4 +1,4 @@
-export type PatientClassification = "student" | "faculty" | "staff";
+export type PatientClassification = "student" | "faculty" | "staff" | "university_staff";
 
 export type PatientProfileSection =
   | "personal"
@@ -7,56 +7,62 @@ export type PatientProfileSection =
   | "vitals"
   | "results";
 
+// ── Personal Info (matches PATIENT_PROFILE table + patient_summary view) ──
 export interface PersonalInfo {
   name: string;
-  classification: PatientClassification;
+  classification: PatientClassification;   // person_type in DB
   patient_id: string;
   birthday: string;
   age: number;
   sex: string;
   civil_status: string;
-  mobile_number: string;
-  address: string;
+  mobile_number: string;                  // contact_no in DB
+  address: string;                       // complete_address in DB
   barangay: string;
   course?: string;
-  year?: string;
-  section?: string;
+  school_year?: string;                  // year level in DB
   department?: string;
-  position?: string;
+  person_type?: string;                  // classification alias
 }
 
+// ── Medical History (matches MEDICAL_HISTORY table) ──
 export interface MedicalHistory {
-  hospitalization_year: string;
-  diagnosis: string;
-  allergy_medicine: string;
-  allergy_food: string;
-  smoking: string;
-  vaping: string;
-  alcohol_intake: string;
-  last_menstrual_period: string;
+  hospitalization_operation: string | null;
+  hospitalization_year: string | null;
+  diagnosis: string | null;
+  allergy_medicine: string | null;
+  allergy_food: string | null;
+  smoking: boolean | null;
+  vaping: boolean | null;
+  alcohol_intake: boolean | null;
+  last_menstrual_period: string | null;
+  family_planning_method: string | null;
 }
 
+// ── Family History (matches FAMILY_HISTORY table) ──
 export interface FamilyHistory {
-  family_history: string[];
-  family_history_others: string;
-  family_planning_method: string;
+  condition: string | null;
+  other_condition: string | null;
 }
 
+// ── Vital Signs (matches VITAL_SIGNS table) ──
 export interface VitalSigns {
-  temperature: string;
-  blood_pressure: string;
-  heart_rate: string;
-  respiratory_rate: string;
-  eyes: string;
+  height?: number;
+  weight?: number;
+  temperature?: number;
+  heart_rate?: number;
+  spo2?: number;
+  recorded_at: string;
 }
 
+// ── Examination Results (matches RESULTS table) ──
 export interface ExaminationResults {
   chest_xray: string;
   cbc: string;
   urinalysis: string;
-  recommendation: string;
-  examination_date: string;
-  examining_physician: string;
+  recommendation: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PatientProfileData {
@@ -66,6 +72,8 @@ export interface PatientProfileData {
   vitals: VitalSigns;
   results: ExaminationResults;
 }
+
+// ── Sample data matching Supabase table shapes ──
 
 export const samplePersonal: PersonalInfo = {
   name: "Juan Dela Cruz",
@@ -79,33 +87,36 @@ export const samplePersonal: PersonalInfo = {
   address: "123 Mabini Street",
   barangay: "Brgy. 176",
   course: "BS Computer Science",
-  year: "3rd Year",
-  section: "A",
+  school_year: "3rd Year",
+  department: "College of Computer Studies",
+  person_type: "student",
 };
 
 export const sampleMedical: MedicalHistory = {
+  hospitalization_operation: "Appendectomy",
   hospitalization_year: "2022",
-  diagnosis: "Appendicitis (appendectomy)",
+  diagnosis: "Appendicitis",
   allergy_medicine: "Penicillin",
   allergy_food: "None",
-  smoking: "No",
-  vaping: "No",
-  alcohol_intake: "Yes",
-  last_menstrual_period: "",
-};
-
-export const sampleFamily: FamilyHistory = {
-  family_history: ["Hypertension", "Asthma"],
-  family_history_others: "None",
+  smoking: false,
+  vaping: false,
+  alcohol_intake: true,
+  last_menstrual_period: "2026-10-01",
   family_planning_method: "None",
 };
 
+export const sampleFamily: FamilyHistory = {
+  condition: "Hypertension, Asthma",
+  other_condition: "None",
+};
+
 export const sampleVitals: VitalSigns = {
-  temperature: "36.5",
-  blood_pressure: "120/80",
-  heart_rate: "78",
-  respiratory_rate: "18",
-  eyes: "Anicteric, pink conjunctiva",
+  height: 165,
+  weight: 62,
+  temperature: 36.5,
+  heart_rate: 78,
+  spo2: 98,
+  recorded_at: "2026-10-20T08:00:00",
 };
 
 export const sampleResults: ExaminationResults = {
@@ -113,8 +124,8 @@ export const sampleResults: ExaminationResults = {
   cbc: "Normal",
   urinalysis: "Normal",
   recommendation: "Maintain a balanced diet and regular exercise.",
-  examination_date: "2026-10-01",
-  examining_physician: "Dr. Maria Santos",
+  created_at: "2026-10-01T00:00:00",
+  updated_at: "2026-10-01T00:00:00",
 };
 
 export const samplePatient: PatientProfileData = {

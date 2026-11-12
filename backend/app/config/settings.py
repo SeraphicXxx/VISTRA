@@ -23,6 +23,9 @@ class Config:
     ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://127.0.0.1:8001")
     ML_SERVICE_API_KEY = os.getenv("ML_SERVICE_API_KEY")
 
+    GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS")
+    GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+
     @classmethod
     def _pick(cls, cloud_value, selfhosted_value):
         if cls.USE_SELFHOSTED_SUPABASE:

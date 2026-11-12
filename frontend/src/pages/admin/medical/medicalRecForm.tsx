@@ -249,9 +249,24 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
         });
     };
 
-    const handleNotify = (professional: Professional): void => {
+    const handleNotify = async (professional: Professional, message: string): Promise<void> => {
         setIsNotifyOpen(false);
-        persistRecord(professional);
+        const record = buildRecord();
+        if (!record) return;
+
+        try {
+            await createMedicalVisitMutation.mutateAsync(record);
+            notify.success("The medical record was saved successfully.", {
+                title: "Record saved",
+            });
+            handleClear();
+            handleBack();
+        } catch (error) {
+            console.error("Failed to create medical visit:", getFieldErrors(error));
+            notify.error("The medical record could not be saved. Please try again.", {
+                title: "Save failed",
+            });
+        }
     };
 
     const handleSkipNotify = (): void => {
@@ -469,6 +484,7 @@ export default function PatientRecordForm({onSave}: PatientRecordFormProps) {
             {isNotifyOpen && (
                 <NotifyProfessionalModal
                     professionals={NOTIFY_PROFESSIONALS}
+                    defaultMessage="A medical record was saved. Please review it at your earliest convenience."
                     onSend={handleNotify}
                     onSkip={handleSkipNotify}
                     onCancel={() => setIsNotifyOpen(false)}

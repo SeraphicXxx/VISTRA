@@ -1,7 +1,9 @@
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.14.2
+cachetools==5.5.0
 certifi==2026.7.22
+slowapi==0.1.9
 cffi==2.1.1
 click==8.4.2
 colorama==0.4.6
@@ -26,10 +28,10 @@ pydantic-settings==2.15.0
 pydantic_core==2.46.4
 PyJWT==2.13.0
 python-dotenv==1.2.2
-python-magic==0.4.27
+python-magic==0.4.27; sys_platform != "win32"
 python-magic-bin==0.4.14; sys_platform == "win32"
 python-multipart==0.0.32
-PyYAML==6.0.3
+PyYAML==6.0.2
 realtime==2.31.0
 setuptools==84.0.0
 setuptools-scm==10.2.1
@@ -46,3 +48,10 @@ vcs-versioning==2.2.4
 watchfiles==1.2.0
 websockets==15.0.1
 yarl==1.24.5
+
+# Dev tools (linting, typechecking)
+ruff==0.9.0
+mypy==1.13.0
+
+# Document intelligence (OCR) package (pinned commit for Python 3.13 compatibility)
+vistra-document-intelligence @ git+https://github.com/KENJICHUA/vistra-document-intelligence.git@a623f9777dbcbf66fd2877283922cd2b3a232fd4

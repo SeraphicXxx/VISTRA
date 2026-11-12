@@ -6,8 +6,8 @@ export default function ExaminationResultsTab({
   cbc,
   urinalysis,
   recommendation,
-  examination_date,
-  examining_physician,
+  created_at,
+  updated_at,
   onEdit,
 }: ExaminationResults & { onEdit?: () => void }) {
   return (
@@ -16,9 +16,9 @@ export default function ExaminationResultsTab({
         <InfoField label="Chest X-Ray" value={chest_xray} />
         <InfoField label="CBC" value={cbc} />
         <InfoField label="Urinalysis" value={urinalysis} />
-        <InfoField label="Examination Date" value={formatDate(examination_date)} />
-        <InfoField label="Examining Physician" value={examining_physician} />
         <InfoField label="Recommendations" value={recommendation} />
+        <InfoField label="Created At" value={formatDate(created_at)} />
+        <InfoField label="Updated At" value={formatDate(updated_at)} />
       </FieldGrid>
     </InfoCard>
   );

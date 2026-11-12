@@ -2,12 +2,15 @@ import {useEffect, useState} from "react";
 import {createPortal} from "react-dom";
 import {Bell, Check, Mail, Plus, X} from "lucide-react";
 import {getInitials} from "/@/utils/RecordInfo";
+import {useNotify} from "/@/components/notifications/NotificationProvider";
 import type {Professional} from "/@/pages/admin/medical/notifyProfessor";
+import {loadExtraProfessors, saveExtraProfessors, saveNotification} from "/@/pages/admin/medical/notifyProfessor";
+import {sendEmail} from "/@/api/email.api";
 
 interface NotifyProfessionalModalProps {
     professionals: Professional[];
     defaultMessage: string;
-    onSend: (professional: Professional, message: string) => void;
+    onSend: (professional: Professional, message: string) => void | Promise<void>;
     onSkip: () => void;
     onCancel: () => void;
 }
@@ -36,15 +39,16 @@ const labelClass = "mb-1.5 block text-xs font-medium text-textMuted";
 export function NotifyProfessionalModal({
                                             professionals,
                                             defaultMessage,
-                                            onNotify,
                                             onSend,
                                             onSkip,
                                             onCancel,
                                         }: NotifyProfessionalModalProps) {
-    const [extraProfessors, setExtraProfessors] = useState<Professional[]>([]);
+    const notify = useNotify();
+    const [extraProfessors, setExtraProfessors] = useState<Professional[]>(() => loadExtraProfessors());
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [message, setMessage] = useState(defaultMessage);
     const [isAdding, setIsAdding] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const [newProfessor, setNewProfessor] = useState<NewProfessorForm>(EMPTY_NEW_PROFESSOR);
     const [addError, setAddError] = useState<string | null>(null);
 
@@ -99,7 +103,11 @@ export function NotifyProfessionalModal({
             email,
         };
 
-        setExtraProfessors((prev) => [...prev, created]);
+        setExtraProfessors((prev) => {
+            const next = [...prev, created];
+            saveExtraProfessors(next);
+            return next;
+        });
         setSelectedId(created.id);
         setIsAdding(false);
         setAddError(null);
@@ -339,11 +347,50 @@ export function NotifyProfessionalModal({
 
                         <button
                             type="button"
-                            disabled={!canSend}
-                            onClick={() => selected && onSend(selected, message.trim())}
+                            disabled={!canSend || isSending}
+                            onClick={async () => {
+                                if (selected && !isSending) {
+                                    setIsSending(true);
+                                    try {
+                                        const subject = `Record notification: ${selected.name}`;
+                                        const body = message.trim();
+
+                                        // Store notification in localStorage
+                                        saveNotification({
+                                            professional: selected,
+                                            subject,
+                                            message: body,
+                                            sentAt: new Date().toISOString(),
+                                        });
+
+                                        // Send email via backend (Gmail SMTP) if email is provided
+                                        if (selected.email) {
+                                            try {
+                                                await sendEmail({
+                                                    to: selected.email,
+                                                    subject,
+                                                    body,
+                                                });
+                                                notify.success(`Email sent to ${selected.email}`, {
+                                                    title: "Notification sent",
+                                                });
+                                            } catch (error) {
+                                                console.error("Failed to send email:", error);
+                                                notify.error("Failed to send email notification.", {
+                                                    title: "Email failed",
+                                                });
+                                            }
+                                        }
+
+                                        await onSend(selected, message.trim());
+                                    } finally {
+                                        setIsSending(false);
+                                    }
+                                }
+                            }}
                             className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-primary"
                         >
-                            Send email and save
+                            {isSending ? "Sending..." : "Send email and save"}
                         </button>
                     </div>
                 </div>

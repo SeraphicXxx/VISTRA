@@ -168,7 +168,7 @@ export const AppointmentsColumns: Column<AppointmentTableFormat>[] = [
     {
         key: "student",
         label: "Student",
-        render: (value) => <StudentCell name={value as string} />,
+        render: (value, record) => <StudentCell name={value as string} patientId={record.studentId} />,
     },
     {
         key: "course",

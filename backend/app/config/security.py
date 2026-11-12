@@ -18,7 +18,7 @@ def _current_user_from_claims(user_id: str | None, email, role) -> CurrentUser:
         role = None
 
     return CurrentUser(
-        id=user_id,
+        id=user_id or "",
         email=email,
         role=role,
     )
@@ -36,7 +36,7 @@ def _get_current_user_remote(access_token: str) -> CurrentUser:
             detail="Invalid or expired access token",
         )
 
-    if not response.user:
+    if not response or not response.user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",

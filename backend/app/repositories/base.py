@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from app.schemas.response_dto.responses import PaginatedResponse
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 class BaseRepository:
-    def __init__(self, supabase):
+    def __init__(self, supabase: Any) -> None:
         self.supabase = supabase
 
-    def delete_by_column(self, table: str, column: str, value) -> bool:
+    def delete_by_column(self, table: str, column: str, value: Any) -> bool:
         response = (
             self.supabase
             .table(table)
@@ -26,9 +26,9 @@ class BaseRepository:
         self,
         table: str,
         column: str,
-        value,
+        value: Any,
         data: dict[str, Any],
-    ):
+    ) -> Optional[dict[str, Any]]:
         response = (
             self.supabase
             .table(table)
@@ -42,7 +42,12 @@ class BaseRepository:
 
         return response.data[0]
 
-    def fetch_one(self, table: str, select: str = "*", filters: dict | None = None):
+    def fetch_one(
+        self,
+        table: str,
+        select: str = "*",
+        filters: Optional[dict[str, Any]] = None,
+    ) -> Optional[dict[str, Any]]:
         query = self.supabase.table(table).select(select)
 
         for column, value in (filters or {}).items():
@@ -55,7 +60,11 @@ class BaseRepository:
 
         return response.data[0]
 
-    def fetch_all(self, table: str, select: str = "*"):
+    def fetch_all(
+        self,
+        table: str,
+        select: str = "*",
+    ) -> Optional[list[dict[str, Any]]]:
         response = (
             self.supabase
             .table(table)
@@ -65,7 +74,12 @@ class BaseRepository:
 
         return response.data
 
-    def fetch_page(self, builder: SupabaseQueryBuilder, page: int, page_size: int):
+    def fetch_page(
+        self,
+        builder: SupabaseQueryBuilder,
+        page: int,
+        page_size: int,
+    ) -> PaginatedResponse:
         response = (
             builder
             .paginate(page, page_size)

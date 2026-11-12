@@ -1,0 +1,42 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/staff/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access_token}}
+body:
+  type: text
+  content: |-
+    {
+        "staff_id": "{{created_staff_id}}",
+        "first_name": "Test",
+        "last_name": "Staff",
+        "middle_name": "Q",
+        "password": "TestPass123!",
+        "position": "Nurse",
+        "specialty": "General",
+        "phone": "09170000000",
+        "email": "test.staff@example.com"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      pm.environment.set("created_staff_id", "STFT-" + Date.now());
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Create staff returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Staff creation succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+          pm.expect(json).to.have.property("message");
+      });
+    language: text/javascript
+order: 1000
