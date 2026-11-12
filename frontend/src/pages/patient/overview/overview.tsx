@@ -5,7 +5,7 @@ import PatientStatsGrid from "./stats";
 import WelcomeHero from "./components/WelcomeHero";
 import RecentVisitsPanel from "./components/RecentVisitsPanel";
 import HealthRiskPanel from "./components/HealthRiskPanel";
-import VitalSignsPanel from "./components/VitalSignsPanel";
+import VitalSignsPanel, { type VitalReadings } from "./components/VitalSignsPanel";
 import {
   mapBackendAppointmentToAppointment,
   resolveStudentId,
@@ -17,7 +17,7 @@ import { SkeletonBlock } from "/@/components/SkeletonBlock";
 import { statusLabels } from "/@/components/StatusBadge";
 import { sessionManager } from "/@/utils/SessionManager";
 import { useAppointmentQuery } from "/@/hooks/query/AppointmentQuery";
-import { usePatientMedicalDentalSummaryQuery } from "/@/hooks/query/PatientQuery";
+import { usePatientMedicalDentalSummaryQuery, useMyProfileQuery, usePatientLatestVitalSignsQuery } from "/@/hooks/query/PatientQuery";
 import { toPatientMedicalDentalVisits } from "/@/repository/PatientMedicalDentalModel";
 import { Visit } from "/@/types/types";
 import { AdminAnimStyles, Reveal } from "/@/components/adminanim";
@@ -40,10 +40,13 @@ export default function PatientOverviewTab() {
     order_by: "scheduled_start desc",
   });
 
+  const { data: profileData, isLoading: profileLoading } = useMyProfileQuery();
+  const { data: vitalsApiData, isLoading: vitalsLoading } = usePatientLatestVitalSignsQuery(studentId);
+
   const medicalRecord = undefined;
   const dentalRecord = undefined;
 
-  const patientName = "there";
+  const patientName = profileData?.patient_name ?? "there";
 
   const { data: summaryData, isLoading: summaryLoading } = usePatientMedicalDentalSummaryQuery();
 
@@ -60,6 +63,17 @@ export default function PatientOverviewTab() {
   const medicalStatus = undefined;
   const dentalStatus = "No record yet";
 
+  const vitalsReadings: VitalReadings | null = vitalsApiData
+    ? {
+        recordedAt: vitalsApiData.recorded_at,
+        heartRate: vitalsApiData.heart_rate ?? undefined,
+        temperature: vitalsApiData.temperature ?? undefined,
+        spo2: vitalsApiData.spo2 ?? undefined,
+        weight: vitalsApiData.weight ?? undefined,
+        height: vitalsApiData.height ?? undefined,
+      }
+    : null;
+
   const nextAppointment: Appointment | null = appointments[0] ?? null;
 
   const recentVisits = useMemo(() => {
@@ -73,7 +87,9 @@ export default function PatientOverviewTab() {
     [searchQuery, recentVisits]
   );
 
-  const currentBmi = 22.8; // fallback for normal BMI (no mock vitals)
+  const currentBmi = vitalsApiData?.weight && vitalsApiData?.height
+    ? Number((vitalsApiData.weight / ((vitalsApiData.height / 100) ** 2)).toFixed(1))
+    : 22.8;
 
   const patientAge = 20;
   const patientSex = "Male";
@@ -88,7 +104,7 @@ export default function PatientOverviewTab() {
     sex: patientSex
   });
 
-  if (appointmentsLoading || summaryLoading) {
+  if (appointmentsLoading || summaryLoading || profileLoading || vitalsLoading) {
     return (
       <div className="flex flex-col gap-6">
         <SkeletonBlock className="h-24 rounded-2xl" />
@@ -124,7 +140,7 @@ export default function PatientOverviewTab() {
         </Reveal>
 
         <Reveal as="div" delay={3 * STAGGER} distance={24} className="h-full">
-          <VitalSignsPanel vitals={null} />
+          <VitalSignsPanel vitals={vitalsReadings} />
         </Reveal>
       </div>
 
