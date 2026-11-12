@@ -80,6 +80,7 @@ export default function VitalsPreviewScreen({
       Alert.alert("Success", "Vital signs saved successfully.");
 
       console.log("Saved vital signs:", saved);
+      console.log("content:", payload);
       onConfirm?.(mappedVitals);
       void router.back();
     } catch (error) {
