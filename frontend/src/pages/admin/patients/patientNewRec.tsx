@@ -205,14 +205,31 @@ export default function NewPatientRecordForm() {
             )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-2">
+                <div className="grid grid-cols-1 gap-4 sm:col-span-4 sm:grid-cols-3">
                     <FormInput
-                        id="name"
-                        name="name"
-                        label="Name"
-                        placeholder="Last name, First name, Middle name"
+                        id="lastName"
+                        name="last_name"
+                        label="Last name"
+                        placeholder="e.g. Dela Cruz"
                         required
-                        error={saveErrorMessage?.name}
+                        error={saveErrorMessage?.last_name}
+                    />
+
+                    <FormInput
+                        id="firstName"
+                        name="first_name"
+                        label="First name"
+                        placeholder="e.g. Juan"
+                        required
+                        error={saveErrorMessage?.first_name}
+                    />
+
+                    <FormInput
+                        id="middleName"
+                        name="middle_name"
+                        label="Middle name"
+                        placeholder="Optional"
+                        error={saveErrorMessage?.middle_name}
                     />
                 </div>
 

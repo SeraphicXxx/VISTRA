@@ -20,6 +20,7 @@ import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPa
 import ProtectedPatientRoute from "/@/routes/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
 import PatientLoginPage from "/@/pages/patient/login";
+import PatientRegisterPage from "/@/pages/patient/register";
 import PatientOverviewTab from "/@/pages/patient/overview/overview";
 import PatientAppointmentsTab from "/@/pages/patient/appointments/appointmentsTab";
 import PatientBookAppointment from "/@/pages/patient/appointments/appointmentBook";
@@ -49,8 +50,9 @@ function AppRoutes() {
                 <Route element={<GuestRoute/>}>
                     <Route path={ROUTES.staff.login} element={<StaffLoginPage/>}/>
 
-                    {/* Patient Login (standalone page, no layout) */}
+                    {/* Patient Login and Register (standalone pages, no layout) */}
                     <Route path={ROUTES.patient.login} element={<PatientLoginPage/>}/>
+                    <Route path={ROUTES.patient.register} element={<PatientRegisterPage/>}/>
                 </Route>
 
                 {/* Admin */}

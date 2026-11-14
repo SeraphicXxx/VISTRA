@@ -5,7 +5,7 @@ export const ROUTES = {
 
     staff: {
         home: "/staff",
-        login: "/login",
+        login: "/login",    
         dashboard: {
             overview: "/staff/dashboard/overview",
             medical: "/staff/dashboard/medical",
@@ -52,6 +52,7 @@ export const ROUTES = {
 
     patient: {
         login: "/patient/login",
+        register: "/patient/register",
         dashboard: {
             overview: "/patient/dashboard/overview",
             appointments: "/patient/dashboard/appointments",

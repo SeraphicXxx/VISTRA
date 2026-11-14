@@ -9,7 +9,7 @@ import {
   LoaderCircle,
   ShieldCheck,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "/@/config/RoutePaths.js";
 import { usePatientLogin, usePatientLoginForm } from "/@/hooks/UsePatientLogin";
 import { TermsAgreementModal } from "/@/components/legal/TermsAgreementModal";
@@ -21,15 +21,8 @@ import {
   getRoleFromId,
   iconClass,
 } from "/@/components/register/authShared";
-import { AuthModal, SuccessModal } from "/@/components/register/AuthModal";
-import { RegisterForm } from "/@/components/register/RegisterForm";
-import { PreRegisterForm } from "/@/components/register/PreRegisterForm";
 
-type FormModal = "register" | "preregister";
-
-type SuccessState = { title: string; message: string } | null;
-
-const switchButtonClass = `rounded font-semibold text-primary transition-colors duration-200 hover:text-primaryDark ${focusRing}`;
+const switchLinkClass = `rounded font-semibold text-primary transition-colors duration-200 hover:text-primaryDark ${focusRing}`;
 
 export default function PatientLoginPage() {
   const navigate = useNavigate();
@@ -45,8 +38,6 @@ export default function PatientLoginPage() {
   const [idTouched, setIdTouched] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
-  const [openModal, setOpenModal] = useState<FormModal | null>(null);
-  const [success, setSuccess] = useState<SuccessState>(null);
 
   const idNumber: string = credentials.idNumber ?? "";
   const idMessage = getIdError(idNumber);
@@ -81,11 +72,6 @@ export default function PatientLoginPage() {
       });
       navigate(homeHref);
     } catch {}
-  };
-
-  const handleFormSuccess = (title: string, message: string) => {
-    setOpenModal(null);
-    setSuccess({ title, message });
   };
 
   return (
@@ -228,47 +214,10 @@ export default function PatientLoginPage() {
 
       <p className="mt-8 text-sm text-textSecondary">
         Don't have an account?{" "}
-        <button type="button" onClick={() => setOpenModal("register")} className={switchButtonClass}>
+                <Link to={ROUTES.patient.register} className={switchLinkClass}>
           Register
-        </button>
-        {" · "}
-        <button type="button" onClick={() => setOpenModal("preregister")} className={switchButtonClass}>
-          Pre-register
-        </button>
+        </Link>
       </p>
-
-      {openModal === "register" && (
-        <AuthModal
-          title="Create your account"
-          subtitle="Upload your school ID and we will fill in your details."
-          onClose={() => setOpenModal(null)}
-        >
-          <RegisterForm
-            onSuccess={(message) => handleFormSuccess("Account created", message)}
-          />
-        </AuthModal>
-      )}
-
-      {openModal === "preregister" && (
-        <AuthModal
-          title="Pre-register"
-          subtitle="Reserve your account before your first clinic visit."
-          onClose={() => setOpenModal(null)}
-        >
-          <PreRegisterForm
-            onSuccess={(message) => handleFormSuccess("Pre-registration received", message)}
-          />
-        </AuthModal>
-      )}
-
-      {success && (
-        <SuccessModal
-          title={success.title}
-          message={success.message}
-          actionLabel="Continue"
-          onClose={() => setSuccess(null)}
-        />
-      )}
 
       {isAgreementOpen && (
         <TermsAgreementModal
