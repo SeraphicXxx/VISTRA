@@ -25,12 +25,22 @@ export const PatientRoutes = [
         label: "Medical Records",
         icon: HeartPulse,
         component: "medical",
+        activePaths: [
+            ROUTES.patient.dashboard.medical,
+            // Add the view/add/update prefix here, for example:
+            // "/patient/medical-records",
+        ],
     },
     {
         path: ROUTES.patient.dashboard.dental,
         label: "Dental Records",
         icon: Stethoscope,
         component: "dental",
+        activePaths: [
+            ROUTES.patient.dashboard.dental,
+            // Add the view/add/update prefix here, for example:
+            // "/patient/dental-records",
+        ],
     },
     {
         path: ROUTES.patient.profile,
