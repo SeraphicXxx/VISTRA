@@ -7,7 +7,7 @@ export default function FamilyHistoryTab({
   onEdit,
 }: FamilyHistory & { onEdit?: () => void }) {
   return (
-    <InfoCard title="Family History & Planning" onEdit={onEdit}>
+    <InfoCard title="Family History" onEdit={onEdit}>
       <FieldGrid>
         <InfoField label="Family History / Condition" value={condition} />
         <InfoField label="Other Condition" value={other_condition} />

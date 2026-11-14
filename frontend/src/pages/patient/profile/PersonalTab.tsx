@@ -18,6 +18,9 @@ export default function PersonalTab({
   mobile_number,
   address,
   barangay,
+  emergency_name,
+  emergency_relation,
+  emergency_phone,
   course,
   school_year,
   department,
@@ -42,6 +45,14 @@ export default function PersonalTab({
         <FieldGrid>
           <InfoField label="Address" value={address} />
           <InfoField label="Barangay" value={barangay} />
+        </FieldGrid>
+      </InfoCard>
+
+      <InfoCard title="Emergency Contact" onEdit={onEdit}>
+        <FieldGrid>
+          <InfoField label="Contact Name" value={emergency_name} />
+          <InfoField label="Relationship" value={emergency_relation} />
+          <InfoField label="Contact Phone" value={emergency_phone} />
         </FieldGrid>
       </InfoCard>
 

@@ -1,5 +1,7 @@
 import { FieldLabel } from "./FieldLabel";
 
+export const OTHER_OPTION = "Other";
+
 export const COURSE_OPTIONS = [
   { code: "BS PSY", label: "BS Psychology" },
   { code: "BS MATH", label: "BS Mathematics" },
@@ -71,6 +73,19 @@ export const CIVIL_STATUS_OPTIONS = [
   "Widowed",
   "Separated",
   "Divorced",
+];
+
+export const EMERGENCY_RELATIONSHIP_OPTIONS = [
+  "Mother",
+  "Father",
+  "Guardian",
+  "Sibling",
+  "Spouse",
+  "Grandparent",
+  "Aunt/Uncle",
+  "Relative",
+  "Friend",
+  OTHER_OPTION,
 ];
 
 export const POSITION_OPTIONS = [

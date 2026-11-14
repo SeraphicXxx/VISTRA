@@ -202,16 +202,16 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
                   <Logo className="h-12" />
                 </a>
 
-                <h1 className="mt-8 font-heading text-4xl font-semibold leading-tight tracking-tight text-textPrimary">
+                <h1 className="mt-8 font-heading text-3xl font-semibold leading-tight tracking-tight text-textPrimary">
                   {title}
                 </h1>
 
-                <p className="mt-3 text-base leading-relaxed text-textSecondary">{subtitle}</p>
+                <p className="mt-3 text-sm leading-relaxed text-textSecondary">{subtitle}</p>
               </div>
 
               {children}
 
-              <p className="fade-in-up -mx-12 mt-10 text-xs leading-relaxed text-textMuted [animation-delay:1.1s] sm:-mx-14">
+              <p className="fade-in-up -mx-12 mt-6 text-xs leading-relaxed text-textMuted [animation-delay:1.1s] sm:-mx-14">
                 Access is limited to registered students, faculty, and university staff.
                 Contact your administrator if you need an account.
               </p>

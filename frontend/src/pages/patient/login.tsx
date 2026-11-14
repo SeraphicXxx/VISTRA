@@ -79,7 +79,11 @@ export default function PatientLoginPage() {
       title="Sign in to your account"
       subtitle="Use your Student, Faculty, or University Staff number."
     >
-      <form onSubmit={handleSubmit} noValidate className="form-stagger relative mt-8 w-full text-left">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="form-stagger relative mt-8 w-full text-left"
+      >
         {isError && error ? (
           <div
             key={String(error)}
@@ -93,12 +97,18 @@ export default function PatientLoginPage() {
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <label htmlFor="idNumber" className="block text-sm font-semibold uppercase tracking-wide text-textMuted">
+            <label
+              htmlFor="idNumber"
+              className="block text-sm font-semibold uppercase tracking-wide text-textMuted"
+            >
               ID Number
             </label>
 
             {detectedRole ? (
-              <span key={detectedRole} className="row-in rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <span
+                key={detectedRole}
+                className="row-in rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+              >
                 {detectedRole}
               </span>
             ) : null}
@@ -134,19 +144,20 @@ export default function PatientLoginPage() {
               showIdError ? "text-danger" : "text-textMuted"
             }`}
           >
-            {showIdError ? idMessage : "Format: 8-digit number + suffix -S, -F, or -U."}
+            {showIdError
+              ? idMessage
+              : "Format: 8-digit number + suffix -S, -F, or -U."}
           </p>
         </div>
 
         <div className="mt-6">
           <div className="mb-2 flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm font-semibold uppercase tracking-wide text-textMuted">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold uppercase tracking-wide text-textMuted"
+            >
               Password
             </label>
-
-            <a href="#forgot-password" className={`link-underline rounded text-sm font-medium text-primary hover:text-primaryDark ${focusRing}`}>
-              Forgot password?
-            </a>
           </div>
 
           <div className="group/field relative">
@@ -174,24 +185,60 @@ export default function PatientLoginPage() {
               className={`absolute right-4 top-1/2 -translate-y-1/2 rounded text-textMuted transition-all duration-200 hover:scale-110 hover:text-primary ${focusRing}`}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="h-5 w-5" strokeWidth={2} /> : <Eye className="h-5 w-5" strokeWidth={2} />}
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" strokeWidth={2} />
+              ) : (
+                <Eye className="h-5 w-5" strokeWidth={2} />
+              )}
             </button>
           </div>
 
           {showPasswordError ? (
-            <p id="password-error" role="alert" className="mt-2 text-left text-sm text-danger">
+            <p
+              id="password-error"
+              role="alert"
+              className="mt-2 text-left text-sm text-danger"
+            >
               {passwordMessage}
             </p>
           ) : null}
         </div>
+        <div className="mt-3 flex flex-col items-center justify-between gap-2 sm:flex-row ">
+          <label className="group flex w-fit cursor-pointer select-none items-center gap-3">
+            <div className="relative h-5 w-5">
+              <input
+                type="checkbox"
+                className="peer absolute inset-0 z-10 h-4 w-4 cursor-pointer opacity-0"
+              />
 
-        <label className="group mt-5 flex w-fit cursor-pointer items-center gap-2.5 text-base text-textSecondary transition-colors duration-200 hover:text-textPrimary">
-          <input
-            type="checkbox"
-            className="h-5 w-5 rounded border-border text-primary transition-transform duration-200 focus:ring-primary/30 group-hover:scale-110"
-          />
-          Keep me signed in on this device
-        </label>
+              <div className="absolute inset-0 flex items-center justify-center rounded-md border-2 border-border bg-white transition-all duration-200 group-hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-4 peer-focus-visible:ring-primary/20"></div>
+
+              <svg
+                className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 scale-75 text-white opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 10l4 4 8-8" />
+              </svg>
+            </div>
+
+            <span className="text-xs text-textSecondary transition-colors duration-200 group-hover:text-textPrimary">
+              Keep me signed in on this device
+            </span>
+          </label>
+          <div className="flex items-end justify-end">
+            <a
+              href="#forgot-password"
+              className={`link rounded text-xs font-medium text-primary hover:text-primaryDark ${focusRing}`}
+            >
+              Forgot password?
+            </a>
+          </div>
+        </div>
 
         <button
           type="submit"
@@ -212,9 +259,9 @@ export default function PatientLoginPage() {
         </p>
       </form>
 
-      <p className="mt-8 text-sm text-textSecondary">
+      <p className="mt-6 text-sm text-textSecondary">
         Don't have an account?{" "}
-                <Link to={ROUTES.patient.register} className={switchLinkClass}>
+        <Link to={ROUTES.patient.register} className={switchLinkClass}>
           Register
         </Link>
       </p>

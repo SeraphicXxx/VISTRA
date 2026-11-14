@@ -6,7 +6,7 @@ import { View } from "react-native";
 export function FamilyHistoryTab(family: FamilyHistory) {
   return (
     <View style={styles.stack}>
-      <InfoCard title="Family History & Planning">
+      <InfoCard title="Family History">
         <FieldGrid>
           <InfoField
             label="Family History"

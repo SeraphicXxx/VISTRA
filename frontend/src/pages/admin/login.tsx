@@ -82,7 +82,7 @@ export function LoginForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="form-stagger relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center px-2 py-12 text-center sm:px-5 sm:py-14"
+      className="form-stagger relative mx-auto flex w-full max-w-sm flex-1 flex-col items-start justify-center px-2 py-6 text-center sm:px-5 sm:py-14"
     >
       <div className="mb-9">
         <a
@@ -96,7 +96,7 @@ export function LoginForm({
           Sign in to the Medical Personnel Portal
         </h1>
 
-        <p className="text-xs leading-relaxed text-textSecondary">
+        <p className="text-base leading-relaxed text-textSecondary">
           Use your Medical Personnel ID and password.
         </p>
       </div>
@@ -132,43 +132,43 @@ export function LoginForm({
           onChange={onChange}
           error={validationErrors.password}
         />
+      </div>
+      <div className="flex flex-col items-center justify-between gap-2 w-full sm:flex-row ">
+        <label className="group flex w-fit cursor-pointer select-none items-center gap-3">
+          <div className="relative h-5 w-5">
+            <input
+              type="checkbox"
+              className="peer absolute inset-0 z-10 h-4 w-4 cursor-pointer opacity-0"
+            />
 
-        <div className="mt-3 flex items-end justify-end">
+            <div className="absolute inset-0 flex items-center justify-center rounded-md border-2 border-border bg-white transition-all duration-200 group-hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-4 peer-focus-visible:ring-primary/20"></div>
+
+            <svg
+              className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 scale-75 text-white opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 10l4 4 8-8" />
+            </svg>
+          </div>
+
+          <span className="text-xs text-textSecondary transition-colors duration-200 group-hover:text-textPrimary">
+            Keep me signed in on this device
+          </span>
+        </label>
+        <div className="flex items-end justify-end">
           <a
             href="#forgot-password"
-            className={`link rounded text-sm font-medium text-primary hover:text-primaryDark ${focusRing}`}
+            className={`link rounded text-xs font-medium text-primary hover:text-primaryDark ${focusRing}`}
           >
             Forgot password?
           </a>
         </div>
       </div>
-
-      <label className="group mb-7 flex w-fit cursor-pointer select-none items-center gap-3">
-        <div className="relative h-5 w-5">
-          <input
-            type="checkbox"
-            className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer opacity-0"
-          />
-
-          <div className="absolute inset-0 flex items-center justify-center rounded-md border-2 border-border bg-white transition-all duration-200 group-hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-4 peer-focus-visible:ring-primary/20"></div>
-
-          <svg
-            className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 scale-75 text-white opacity-0 transition-all duration-200 peer-checked:scale-100 peer-checked:opacity-100"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4 10l4 4 8-8" />
-          </svg>
-        </div>
-
-        <span className="text-sm text-textSecondary transition-colors duration-200 group-hover:text-textPrimary">
-          Keep me signed in on this device
-        </span>
-      </label>
 
       <div className="mb-5 w-full">
         <LoginButton isLoading={isLoading} />
@@ -297,7 +297,7 @@ export function AdminLoginLayout({ children }: AdminLoginLayoutProps) {
 
         <LoginPanel />
 
-        <div className="relative flex min-h-screen flex-col bg-surface">
+        <div className="relative flex flex-col bg-surface justify-between">
           <div
             className="bar-grow absolute inset-x-0 top-0 h-1 bg-primary lg:hidden"
             aria-hidden="true"
@@ -367,7 +367,7 @@ export default function AdminLoginPage() {
 
     try {
       const staffId = toStaffId(
-        credentials.identifier ?? credentials.email ?? ""
+        credentials.identifier ?? credentials.email ?? "",
       );
       setIsCheckingPresence(true);
       const { data } = await getStaffById(staffId);
@@ -431,8 +431,8 @@ export default function AdminLoginPage() {
           }
         >
           <p className="text-sm text-textSecondary">
-            Your active status will be shown to the clinic while you are
-            signed in, and it will remain until 5pm.
+            Your active status will be shown to the clinic while you are signed
+            in, and it will remain until 5pm.
           </p>
         </Modal>
       )}

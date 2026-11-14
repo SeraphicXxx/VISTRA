@@ -28,7 +28,7 @@ interface PatientProfileProps {
 const tabs: { id: PatientProfileSection; label: string }[] = [
   { id: "personal", label: "Personal Information" },
   { id: "medical", label: "Medical History" },
-  { id: "family", label: "Family History & Planning" },
+  { id: "family", label: "Family History" },
   { id: "vitals", label: "Vital Signs" },
   { id: "results", label: "Examination Results" },
 ];

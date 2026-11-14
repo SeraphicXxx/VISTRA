@@ -278,6 +278,15 @@ export default function ViewStudentRecord() {
                 <InfoTile label="Address" value={patient?.address} className="sm:col-span-2 lg:col-span-2" />
               </dl>
             </div>
+
+            <div>
+              <InfoGroupLabel>Emergency contact</InfoGroupLabel>
+              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <InfoTile label="Contact name" value={patient?.emergency_name} />
+                <InfoTile label="Relationship" value={patient?.emergency_relation} />
+                <InfoTile label="Contact phone" value={patient?.emergency_phone} />
+              </dl>
+            </div>
           </div>
         </section>
 

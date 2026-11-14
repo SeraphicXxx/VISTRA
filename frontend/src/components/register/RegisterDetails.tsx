@@ -10,6 +10,7 @@ import {
 import {
   CIVIL_STATUS_OPTIONS,
   COURSE_OPTIONS,
+  EMERGENCY_RELATIONSHIP_OPTIONS,
   SECTION_OPTIONS,
   SEX_OPTIONS,
   YEAR_OPTIONS,
@@ -31,7 +32,7 @@ function toOptions(list: readonly RawOption[]): Option[] {
 
 export const OTHER = "Other";
 
-type SelectKey = "course" | "year" | "section" | "civil_status";
+type SelectKey = "course" | "year" | "section" | "civil_status" | "emergency_relation";
 export type OtherKey = `${SelectKey}_other`;
 
 export type FieldKey =
@@ -85,6 +86,9 @@ const CIVIL_STATUS_CHOICES = toOptions(CIVIL_STATUS_OPTIONS as readonly RawOptio
 const COURSE_CHOICES = toOptions(COURSE_OPTIONS as readonly RawOption[]);
 const YEAR_CHOICES = toOptions(YEAR_OPTIONS as readonly RawOption[]);
 const SECTION_CHOICES = toOptions(SECTION_OPTIONS as readonly RawOption[]);
+const EMERGENCY_RELATION_CHOICES = toOptions(
+  EMERGENCY_RELATIONSHIP_OPTIONS as readonly RawOption[]
+);
 
 export const DETAIL_GROUPS: FieldGroup[] = [
   {
@@ -170,7 +174,8 @@ export const DETAIL_GROUPS: FieldGroup[] = [
         label: "Relationship",
         required: true,
         half: true,
-        placeholder: "e.g. Mother",
+        options: EMERGENCY_RELATION_CHOICES,
+        allowOther: true,
       },
       {
         key: "emergency_phone",
