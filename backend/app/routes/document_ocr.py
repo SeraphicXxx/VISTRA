@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
@@ -7,11 +8,16 @@ from app.config.security import get_current_user, require_staff
 from app.database.database_client import get_supabase_for_user
 from app.schemas.user import CurrentUser
 from app.services.access import require_module
-from app.services.document_ocr_service import (
-    extract_document,
-    get_ocr_result,
-    review_ocr_result,
-)
+try:
+    from app.services.document_ocr_service import (
+        extract_document,
+        get_ocr_result,
+        review_ocr_result,
+    )
+except Exception:  # pragma: no cover - optional dependency (document_intelligence)
+    extract_document = None  # type: ignore
+    get_ocr_result = None  # type: ignore
+    review_ocr_result = None  # type: ignore
 
 document_ocr_router = APIRouter(
     prefix="/ocr",
@@ -79,7 +85,57 @@ def review_ocr_result_route(
     )
 @public_ocr_router.post("/application-form")
 async def extract_application_form(file: UploadFile = File(...)):
-    # Stub: OCR not wired for self-registration yet.
-    # Frontend falls back to manual entry.
+    content = await file.read()
     await file.close()
-    return {}
+
+    extracted: dict = {}
+
+    filename = (file.filename or "").lower()
+    if filename.endswith(".pdf"):
+        try:
+            from io import BytesIO
+            from pypdf import PdfReader
+
+            reader = PdfReader(BytesIO(content))
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+
+            m = re.search(r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)", text, re.IGNORECASE)
+            if m:
+                extracted["patient_id"] = m.group(1).strip()
+
+            m = re.search(r"NAME\s*:\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["name"] = m.group(1).strip()
+
+            m = re.search(r"AGE\s*:\s*(\d+)", text, re.IGNORECASE)
+            if m:
+                extracted["age"] = m.group(1).strip()
+
+            m = re.search(r"SEX\s*:\s*(\w+)", text, re.IGNORECASE)
+            if m:
+                extracted["sex"] = m.group(1).strip()
+
+            m = re.search(r"ADDRESS\s*:\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["address"] = m.group(1).strip()
+
+            m = re.search(r"BARANGAY\s*NO\.?\s*:\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["barangay"] = m.group(1).strip()
+
+            m = re.search(r"DATE OF BIRTH\s*:\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["birthday"] = m.group(1).strip()
+
+            m = re.search(r"CIVIL STATUS\s*:\s*(\w+)", text, re.IGNORECASE)
+            if m:
+                extracted["civil_status"] = m.group(1).strip()
+
+            m = re.search(r"CELLPHONE NO\.?\s*:\s*([0-9]+)", text, re.IGNORECASE)
+            if m:
+                extracted["mobile_number"] = m.group(1).strip()
+
+        except Exception:
+            pass
+
+    return extracted
