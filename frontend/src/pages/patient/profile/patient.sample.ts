@@ -23,6 +23,9 @@ export interface PersonalInfo {
   school_year?: string;                  // year level in DB
   department?: string;
   person_type?: string;                  // classification alias
+  emergency_name?: string;
+  emergency_relation?: string;
+  emergency_phone?: string;
 }
 
 // ── Medical History (matches MEDICAL_HISTORY table) ──

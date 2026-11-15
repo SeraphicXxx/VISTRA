@@ -234,7 +234,7 @@ function FeaturedFact({ fact, step }) {
         className="pointer-events-none absolute inset-0 opacity-60 [background-image:radial-gradient(circle,rgba(255,255,255,0.18)_1px,transparent_1px)] [background-size:16px_16px]"
       />
 
-      {/* Only this content re-mounts per step; the card itself stays put, so nothing flashes. */}
+   
       <div
         key={fact.key}
         className="relative"
@@ -252,7 +252,7 @@ function FeaturedFact({ fact, step }) {
         </span>
 
         <p className="mt-5 font-heading text-6xl font-bold tracking-tight md:text-6xl">
-          {fact.big}
+          {fact.big.replace("–", " – ")}
           <span className="ml-2 font-mono text-base font-normal text-white/75">{fact.unit}</span>
         </p>
 
@@ -270,17 +270,18 @@ function FeaturedFact({ fact, step }) {
   );
 }
 
+
 function FactIndex({ step }) {
   const nextFact = FACTS[(step + 1) % FACTS.length];
 
   return (
-    <div>
-      <ol className="flex flex-col gap-3">
+    <div className="flex h-full flex-col">
+      <ol className="flex flex-1 flex-col justify-between gap-3">
         {FACTS.map((fact, i) => {
           const isActive = i === step;
           const Icon = fact.icon;
-          // Stair: top step is inset; each step below widens, and the bottom step overlaps the featured card.
-          const left = (FACTS.length - 1 - i) * STAIR_STEP - STAIR_OVERLAP;
+
+          const right = (FACTS.length - 1 - i)  * STAIR_OVERLAP -  STAIR_STEP;
 
           return (
             <ScrollReveal
@@ -288,11 +289,11 @@ function FactIndex({ step }) {
               as="li"
               variants={scrollStair}
               custom={i}
-              style={{ "--stair": `${left}rem` }}
-              className={`relative z-20 flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-[border-color,background-color,box-shadow] duration-500 ease-out md:ml-[var(--stair)] ${
+              style={{ "--stair-r": `${right}rem` }}
+              className={`relative z-20 flex items-center gap-3 overflow-hidden rounded-2xl border bg-white px-4 py-3.5 transition-all duration-500 ease-out md:mr-[var(--stair-r)] ${
                 isActive
-                  ? "border-primary/40 bg-white shadow-card"
-                  : "border-border/60 bg-white/90"
+                  ? "border-primary/50 shadow-[0_18px_40px_-12px_rgba(13,148,136,0.45)] ring-2 ring-primary/15"
+                  : "border-primary/25 shadow-[0_10px_24px_-14px_rgba(13,148,136,0.4)]"
               }`}
             >
               <span
@@ -368,12 +369,12 @@ function AssessmentDemo({ active }) {
         </span>
       </ScrollReveal>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-start">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-stretch">
         <ScrollReveal variants={fadeLeft} className="relative z-10 md:col-span-7">
           <FeaturedFact fact={FACTS[step]} step={step} />
         </ScrollReveal>
 
-        <aside className="relative md:col-span-5 md:mt-12">
+        <aside className="relative md:col-span-5">
           <FactIndex step={step} />
         </aside>
       </div>

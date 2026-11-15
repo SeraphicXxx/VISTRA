@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {ArrowLeft, Save, Stethoscope, Info} from "lucide-react";
+import {useState, type FormEvent} from "react";
+import {ArrowLeft, ArrowRight, Check, Plus, Save, Stethoscope, Info, X} from "lucide-react";
 import {FieldLabel} from "/@/utils/FieldLabel.jsx";
 import {ToothArch, upperTeeth, lowerTeeth} from "/@/components/teethDesign";
 import {FormInput} from "/@/components/InputCollection.jsx";
@@ -23,23 +23,143 @@ const medicalHistoryItems = ["Allergy", "Asthma", "Bleeder", "Diabetes", "Epilep
 
 const oralStatusRows = ["Date of Oral Examination", "Dental Caries", "Gingivitis / Periodontal Disease", "Debris", "Calculus", "Cleft Lip / Palate", "Others (Supernumerary/Mesiodens)", "No. of Permanent Teeth Present", "No. of Permanent Sound Present", "No. of Decayed Teeth (D)", "No. of Missing Teeth (M)", "No. of Filled Teeth (F)", "No. of Teeth for Extraction (X)", "No. of DMFX Teeth", "No. of Temporary Teeth Present"];
 
+// Rename these to match the column headings on the paper form.
+const oralStatusColumns = ["Age", "Age", "Age", "Age"];
+
 const dentalStudentFields = [
     {id: "age", label: "Age"},
     {id: "sex", label: "Gender"},
     {id: "year_section", label: "Year and section / course / department", span: "sm:col-span-3"},
 ];
 
+const STEPS = [
+    {
+        title: "Student",
+        description: "Select the student and enter the visit date.",
+    },
+    {
+        title: "Dental habits",
+        description: "Dentist visits, brushing, and flossing.",
+    },
+    {
+        title: "Odontogram",
+        description: "Click a tooth to record its condition and notes.",
+    },
+    {
+        title: "Condition & history",
+        description: "Calculus, medication, notes, and medical history.",
+    },
+    {
+        title: "Oral health status",
+        description: "Examination results for each item you add.",
+    },
+];
+
+const LAST_STEP = STEPS.length - 1;
+
 interface DentalRecordFormProps {
     onSave?: (record: CreateDentalVisit, notification: MedicalNotification | null) => void;
 }
 
+const inputClass =
+    "w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20";
+
+type StepperProps = {
+    steps: {title: string; description: string}[];
+    current: number;
+    onStepClick: (index: number) => void;
+};
+
+function Stepper({steps, current, onStepClick}: StepperProps) {
+    return (
+        <nav aria-label="Form progress" className="mb-12">
+            <ol className="flex items-start">
+                {steps.map((step, index) => {
+                    const done = index < current;
+                    const active = index === current;
+                    const isLast = index === steps.length - 1;
+
+                    return (
+                        <li key={step.title} className={`flex items-start ${isLast ? "" : "flex-1"}`}>
+                            <button
+                                type="button"
+                                onClick={() => onStepClick(index)}
+                                disabled={!done}
+                                aria-current={active ? "step" : undefined}
+                                className="group flex flex-col items-center gap-2 text-center disabled:cursor-default"
+                            >
+                                <span
+                                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300 ${
+                                        done
+                                            ? "border-primary bg-primary text-white group-hover:bg-primaryDark"
+                                            : active
+                                                ? "border-primary bg-white text-primary ring-4 ring-primary/15"
+                                                : "border-border bg-white text-textMuted"
+                                    }`}
+                                >
+                                    {done ? <Check className="h-4 w-4" strokeWidth={2.5}/> : index + 1}
+                                </span>
+                                <span
+                                    className={`hidden whitespace-nowrap text-xs font-medium transition-colors duration-200 lg:block ${
+                                        active
+                                            ? "text-textPrimary"
+                                            : done
+                                                ? "text-textSecondary"
+                                                : "text-textMuted"
+                                    }`}
+                                >
+                                    {step.title}
+                                </span>
+                            </button>
+
+                            {!isLast && (
+                                <span
+                                    className={`mx-3 mt-4 h-0.5 flex-1 rounded-full transition-colors duration-300 ${
+                                        done ? "bg-primary" : "bg-border"
+                                    }`}
+                                />
+                            )}
+                        </li>
+                    );
+                })}
+            </ol>
+
+            <p className="mt-5 text-center text-xs font-medium text-textMuted lg:hidden">
+                Step {current + 1} of {steps.length}: {steps[current].title}
+            </p>
+        </nav>
+    );
+}
+
+function StepHeading({title, description}: {title: string; description: string}) {
+    return (
+        <div>
+            <h3 className="font-heading text-lg font-semibold text-textPrimary">{title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-textMuted">{description}</p>
+        </div>
+    );
+}
+
+function SectionLabel({title}: {title: string}) {
+    return (
+        <div className="mb-6 flex items-center gap-3">
+            <h4 className="shrink-0 text-xs font-semibold uppercase tracking-wide text-primary">
+                {title}
+            </h4>
+            <span className="h-px flex-1 bg-border" />
+        </div>
+    );
+}
+
 function DentalConditionSection() {
     return (
-        <>
-            <div className="mt-8 grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-2">
+        <section className="space-y-6">
+            <SectionLabel title="Condition" />
+
+            <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
                 <div>
                     <FieldLabel htmlFor="calculus_severity">Calculus</FieldLabel>
-                    <div className="flex flex-wrap items-center gap-4 pt-1">
+                    <div className="flex flex-wrap items-center gap-4 pt-2">
                         {["Light", "Moderate", "Heavy"].map((option) => (
                             <label key={option} className="flex items-center gap-1.5 text-sm text-textPrimary">
                                 <input type="radio" name="calculus_severity" value={option}
@@ -58,111 +178,16 @@ function DentalConditionSection() {
                 />
             </div>
 
-            <div className="mt-6">
-                <FieldLabel htmlFor="notes">
-                    Notes
-                </FieldLabel>
+            <div>
+                <FieldLabel htmlFor="notes">Notes</FieldLabel>
 
                 <textarea
                     id="notes"
                     name="notes"
-                    rows={3}
+                    rows={4}
                     placeholder="Additional observations"
-                    className="w-full resize-none rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className={inputClass}
                 />
-            </div>
-        </>
-    );
-}
-
-function RecordFormFooter({onBack,}: { onBack: () => void }) {
-    return (
-        <>
-            <div className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-info">
-                <Info
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                    strokeWidth={2}
-                />
-
-                <span>
-                    Please ensure all information is accurate before saving.
-                    This record will be stored in the system for future
-                    reference.
-                </span>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
-                <button
-                    type="button"
-                    onClick={onBack}
-                    className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary"
-                >
-                    <ArrowLeft
-                        className="h-4 w-4"
-                        strokeWidth={2}
-                    />
-
-                    Back
-                </button>
-
-                <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark"
-                >
-                    <Save
-                        className="h-4 w-4"
-                        strokeWidth={2}
-                    />
-
-                    Save Record
-                </button>
-            </div>
-        </>
-    );
-}
-
-function OralHealthStatusSection() {
-    return (
-        <section className="mt-8 border-t border-border pt-6">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-                Oral health status
-            </h2>
-
-            <div className="overflow-x-auto rounded-xl border border-border">
-                <table className="w-full border-collapse">
-                    <thead>
-                    <tr className="border-b border-border bg-background text-left">
-                        <th className="p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Item</th>
-                        <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                        <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                        <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                        <th className="w-28 p-3 text-xs font-semibold uppercase tracking-wide text-textSecondary">Age</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {oralStatusRows.map((row, index) => {
-                        const fieldName = row
-                            .toLowerCase()
-                            .replace(/[()./]/g, "")
-                            .replace(/[^a-z0-9]+/g, "_")
-                            .replace(/^_|_$/g, "");
-
-                        return (
-                            <tr key={row}
-                                className={`border-b border-border last:border-b-0 ${index % 2 === 1 ? "bg-background/40" : ""}`}>
-                                <td className="p-3 text-sm text-textPrimary">{row}</td>
-                                {[1, 2, 3, 4].map((column) => (
-                                    <td key={column} className="p-3">
-                                        <input name={`${fieldName}_${column}`} type="text"
-                                               className="w-full rounded-lg border border-textPrimary bg-surface px-2 py-1.5 text-sm text-textPrimary focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"/>
-                                    </td>
-                                ))}
-                            </tr>
-                        );
-                    })}
-                    </tbody>
-                </table>
             </div>
         </section>
     );
@@ -170,12 +195,10 @@ function OralHealthStatusSection() {
 
 function MedicalHistorySection() {
     return (
-        <section className="mt-8 border-t border-border pt-6">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-                Medical history
-            </h2>
+        <section>
+            <SectionLabel title="Medical history" />
 
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
                 {medicalHistoryItems.map((item) => (
                     <CheckboxRow
                         key={item}
@@ -245,7 +268,7 @@ function PermanentLegend() {
 
 function OdontogramLegend() {
     return (
-        <div className="mt-4 grid grid-cols-2 gap-6 rounded-xl border border-border p-4 text-xs">
+        <div className="mt-6 grid grid-cols-1 gap-6 rounded-xl border border-border p-5 text-xs sm:grid-cols-2">
             <PermanentLegend/>
             <TemporaryLegend/>
         </div>
@@ -262,12 +285,10 @@ function OdontogramSection({
                                onToothClick,
                            }: OdontogramSectionProps) {
     return (
-        <section className="mt-8 border-t border-border pt-6">
-            <h2 className="mb-1 text-sm font-bold uppercase tracking-wide text-primaryDark">
-                Odontogram
-            </h2>
+        <section>
+            <SectionLabel title="Odontogram" />
 
-            <p className="mb-4 text-xs text-textMuted">
+            <p className="mb-5 text-xs text-textMuted">
                 Click a tooth to record its dentition, condition, and notes.
             </p>
 
@@ -300,7 +321,7 @@ function OdontogramSection({
 
 function DentalRecordHeader() {
     return (
-        <div className="mb-8 flex items-center gap-3 border-b border-border pb-6">
+        <div className="mb-10 flex items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                 <Stethoscope
                     className="h-5 w-5 text-primary"
@@ -324,88 +345,201 @@ function DentalRecordHeader() {
 
 function DentalHabitsSection() {
     return (
-        <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-2">
-            <div>
-                <FieldLabel htmlFor="last_dental_visit">
-                    When was the last time you visited a dentist?
-                </FieldLabel>
+        <section className="space-y-6">
+            <SectionLabel title="Dental habits" />
 
-                <input
-                    id="last_dental_visit"
-                    name="last_dental_visit"
-                    type="text"
-                    placeholder="e.g. 6 months ago"
-                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-            </div>
+            <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+                <div>
+                    <FieldLabel htmlFor="last_dental_visit">
+                        When was the last time you visited a dentist?
+                    </FieldLabel>
 
-            <div>
-                <FieldLabel htmlFor="status">Status</FieldLabel>
-                <select
-                    id="status"
-                    name="status"
-                    defaultValue=""
-                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                    <option value="" disabled>Select Status</option>
-                    {statusOptions.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                    ))}
-                </select>
-            </div>
-
-            <div>
-                <FieldLabel htmlFor="floss">
-                    Do you floss?
-                </FieldLabel>
-
-                <div className="flex items-center gap-4 pt-1">
-                    <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-                        <input
-                            type="radio"
-                            name="floss"
-                            value="true"
-                            className="h-4 w-4 border-border text-primary focus:ring-primary/30"
-                        />
-                        Yes
-                    </label>
-
-                    <label className="flex items-center gap-1.5 text-sm text-textPrimary">
-                        <input
-                            type="radio"
-                            name="floss"
-                            value="false"
-                            className="h-4 w-4 border-border text-primary focus:ring-primary/30"
-                        />
-                        No
-                    </label>
+                    <input
+                        id="last_dental_visit"
+                        name="last_dental_visit"
+                        type="text"
+                        placeholder="e.g. 6 months ago"
+                        className={inputClass}
+                    />
                 </div>
-            </div>
 
-            <div>
-                <FieldLabel htmlFor="brushing_frequency">
-                    How often do you brush your teeth?
-                </FieldLabel>
+                <div>
+                    <FieldLabel htmlFor="status">Status</FieldLabel>
+                    <select
+                        id="status"
+                        name="status"
+                        defaultValue=""
+                        className={inputClass}
+                    >
+                        <option value="" disabled>Select Status</option>
+                        {statusOptions.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}
+                    </select>
+                </div>
 
-                <div className="flex flex-wrap items-center gap-4 pt-1">
-                    {["1x", "2x", "3-4x/day"].map((option) => (
-                        <label
-                            key={option}
-                            className="flex items-center gap-1.5 text-sm text-textPrimary"
-                        >
+                <div>
+                    <FieldLabel htmlFor="floss">
+                        Do you floss?
+                    </FieldLabel>
+
+                    <div className="flex items-center gap-4 pt-2">
+                        <label className="flex items-center gap-1.5 text-sm text-textPrimary">
                             <input
                                 type="radio"
-                                name="brushing_frequency"
-                                value={option}
+                                name="floss"
+                                value="true"
                                 className="h-4 w-4 border-border text-primary focus:ring-primary/30"
                             />
-
-                            {option}
+                            Yes
                         </label>
-                    ))}
+
+                        <label className="flex items-center gap-1.5 text-sm text-textPrimary">
+                            <input
+                                type="radio"
+                                name="floss"
+                                value="false"
+                                className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+                            />
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <FieldLabel htmlFor="brushing_frequency">
+                        How often do you brush your teeth?
+                    </FieldLabel>
+
+                    <div className="flex flex-wrap items-center gap-4 pt-2">
+                        {["1x", "2x", "3-4x/day"].map((option) => (
+                            <label
+                                key={option}
+                                className="flex items-center gap-1.5 text-sm text-textPrimary"
+                            >
+                                <input
+                                    type="radio"
+                                    name="brushing_frequency"
+                                    value={option}
+                                    className="h-4 w-4 border-border text-primary focus:ring-primary/30"
+                                />
+
+                                {option}
+                            </label>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+    );
+}
+
+function OralHealthStatusSection() {
+    const [addedRows, setAddedRows] = useState<string[]>([]);
+    const [pickedRow, setPickedRow] = useState<string>("");
+
+    // Items already added are removed from the dropdown.
+    const availableRows = oralStatusRows.filter((row) => !addedRows.includes(row));
+
+    const handleAdd = (): void => {
+        if (!pickedRow) return;
+        setAddedRows((prev) => [...prev, pickedRow]);
+        setPickedRow("");
+    };
+
+    const handleRemove = (row: string): void => {
+        setAddedRows((prev) => prev.filter((item) => item !== row));
+    };
+
+    return (
+        <section>
+            <SectionLabel title="Oral health status" />
+
+            <div className="flex items-end gap-2">
+                <div className="min-w-0 flex-1">
+                    <FieldLabel htmlFor="oralItem">Add an item</FieldLabel>
+                    <select
+                        id="oralItem"
+                        value={pickedRow}
+                        onChange={(e) => setPickedRow(e.target.value)}
+                        className={inputClass}
+                    >
+                        <option value="">Select an item</option>
+                        {availableRows.map((row) => (
+                            <option key={row} value={row}>{row}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <button
+                    type="button"
+                    onClick={handleAdd}
+                    disabled={!pickedRow}
+                    className="inline-flex h-[42px] shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                    <Plus className="h-4 w-4" strokeWidth={2}/>
+                    Add
+                </button>
+            </div>
+
+            {addedRows.length === 0 ? (
+                <p className="mt-4 rounded-xl border border-dashed border-border px-4 py-6 text-center text-xs text-textMuted">
+                    No items added yet. Choose an item above to record it.
+                </p>
+            ) : (
+                <div className="mt-4 space-y-2">
+                    {addedRows.map((row) => {
+                        const fieldName = row
+                            .toLowerCase()
+                            .replace(/[()./]/g, "")
+                            .replace(/[^a-z0-9]+/g, "_")
+                            .replace(/^_|_$/g, "");
+                        const isDateRow = row.startsWith("Date");
+
+                        return (
+                            <div key={row} className="rounded-lg border border-border bg-surface px-3 py-2.5">
+                                <div className="mb-2 flex items-center justify-between gap-2">
+                                    <p className="text-xs font-medium text-textPrimary">{row}</p>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemove(row)}
+                                        aria-label={`Remove ${row}`}
+                                        className="rounded-md p-1 text-textMuted transition-colors duration-200 hover:bg-background hover:text-textPrimary"
+                                    >
+                                        <X className="h-3.5 w-3.5" strokeWidth={2}/>
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-4 gap-1.5">
+                                    {oralStatusColumns.map((label, index) => {
+                                        const column = index + 1;
+                                        const inputId = `${fieldName}_${column}`;
+
+                                        return (
+                                            <div key={column} className="min-w-0">
+                                                <label
+                                                    htmlFor={inputId}
+                                                    className="mb-1 block truncate text-center text-[10px] font-semibold uppercase tracking-wide text-textMuted"
+                                                >
+                                                    {label}
+                                                </label>
+                                                <input
+                                                    id={inputId}
+                                                    name={inputId}
+                                                    type={isDateRow ? "date" : "text"}
+                                                    className="h-8 w-full rounded-md border border-border bg-background px-1.5 text-center text-xs text-textPrimary transition-colors duration-200 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </section>
     );
 }
 
@@ -426,6 +560,8 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
 
     const [pendingRecord, setPendingRecord] = useState<CreateDentalVisit | null>(null);
     const [notifyMessage, setNotifyMessage] = useState("");
+    const [stepIndex, setStepIndex] = useState<number>(0);
+    const [stepError, setStepError] = useState<string | null>(null);
     const notify = useNotify();
 
     const handleBack = () => {
@@ -433,6 +569,27 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
     };
 
     const createDentalVisitMutation = useCreateDentalVisit();
+
+    const goToStep = (index: number): void => {
+        setStepError(null);
+        setStepIndex(index);
+    };
+
+    const goNext = (): void => {
+        if (stepIndex === 0 && selectedStudent === null) {
+            setStepError("Select a student to continue.");
+            return;
+        }
+        goToStep(Math.min(stepIndex + 1, LAST_STEP));
+    };
+
+    const handlePrevious = (): void => {
+        if (stepIndex === 0) {
+            handleBack();
+            return;
+        }
+        goToStep(stepIndex - 1);
+    };
 
     const persistRecord = (
         record: CreateDentalVisit,
@@ -457,13 +614,18 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
         setPendingRecord(null);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Pressing Enter on an earlier step moves forward instead of saving.
+        if (stepIndex !== LAST_STEP) {
+            goNext();
+            return;
+        }
+
         if (selectedStudent === null) {
-            notify.warning("Please select a student before saving the record.", {
-                title: "No student selected",
-            });
+            goToStep(0);
+            setStepError("Select a student before saving the record.");
             return;
         }
 
@@ -523,39 +685,119 @@ export default function DentalRecordForm({onSave}: DentalRecordFormProps) {
     return (
         <form
             onSubmit={handleSubmit}
-            className="mx-auto w-full max-w-5xl rounded-2xl border border-border bg-surface p-8 shadow-lg"
+            noValidate
+            className="mx-auto w-full max-w-5xl rounded-2xl border border-border bg-surface p-6 shadow-lg sm:p-10"
         >
             <DentalRecordHeader />
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <StudentInfoSection
-                    selectedStudent={selectedStudent}
-                    onSelect={setSelectedStudent}
-                    fields={dentalStudentFields}
-                />
+            <Stepper steps={STEPS} current={stepIndex} onStepClick={goToStep} />
 
-                <FormInput
-                    id="date"
-                    name="date"
-                    label="Date"
-                    type="date"
+            {/* All steps stay mounted (hidden when inactive) so the form values are kept. */}
+
+            {/* Step 1: Student */}
+            <div className={stepIndex === 0 ? "space-y-10" : "hidden"}>
+                <StepHeading title={STEPS[0].title} description={STEPS[0].description} />
+
+                <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-4">
+                    <StudentInfoSection
+                        selectedStudent={selectedStudent}
+                        onSelect={setSelectedStudent}
+                        fields={dentalStudentFields}
+                    />
+
+                    <FormInput
+                        id="date"
+                        name="date"
+                        label="Date"
+                        type="date"
+                    />
+                </div>
+            </div>
+
+            {/* Step 2: Dental habits */}
+            <div className={stepIndex === 1 ? "space-y-10" : "hidden"}>
+                <StepHeading title={STEPS[1].title} description={STEPS[1].description} />
+                <DentalHabitsSection />
+            </div>
+
+            {/* Step 3: Odontogram */}
+            <div className={stepIndex === 2 ? "space-y-10" : "hidden"}>
+                <StepHeading title={STEPS[2].title} description={STEPS[2].description} />
+                <OdontogramSection
+                    records={toothRecords}
+                    onToothClick={openTooth}
                 />
             </div>
 
-            <DentalHabitsSection />
+            {/* Step 4: Condition and medical history */}
+            <div className={stepIndex === 3 ? "space-y-10" : "hidden"}>
+                <StepHeading title={STEPS[3].title} description={STEPS[3].description} />
+                <DentalConditionSection />
+                <MedicalHistorySection />
+            </div>
 
-            <OdontogramSection
-                records={toothRecords}
-                onToothClick={openTooth}
-            />
+            {/* Step 5: Oral health status */}
+            <div className={stepIndex === 4 ? "space-y-10" : "hidden"}>
+                <StepHeading title={STEPS[4].title} description={STEPS[4].description} />
+                <OralHealthStatusSection />
 
-            <DentalConditionSection />
+                <div className="flex items-start justify-center gap-1.5 text-center text-xs text-info">
+                    <Info
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                        strokeWidth={2}
+                    />
 
-            <MedicalHistorySection />
+                    <span>
+                        Please ensure all information is accurate before saving.
+                        This record will be stored in the system for future
+                        reference.
+                    </span>
+                </div>
+            </div>
 
-            <OralHealthStatusSection />
+            {stepError && (
+                <p role="alert" className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                    {stepError}
+                </p>
+            )}
 
-            <RecordFormFooter onBack={handleBack} />
+            <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-8">
+                <button
+                    type="button"
+                    onClick={handlePrevious}
+                    className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-textSecondary transition-colors duration-200 hover:bg-background hover:text-textPrimary"
+                >
+                    <ArrowLeft
+                        className="h-4 w-4"
+                        strokeWidth={2}
+                    />
+
+                    {stepIndex === 0 ? "Back" : "Previous"}
+                </button>
+
+                {stepIndex < LAST_STEP ? (
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark"
+                    >
+                        Continue
+                        <ArrowRight className="h-4 w-4" strokeWidth={2}/>
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primaryDark"
+                    >
+                        <Save
+                            className="h-4 w-4"
+                            strokeWidth={2}
+                        />
+
+                        Save record
+                    </button>
+                )}
+            </div>
 
             {selectedTooth !== null && (
                 <ToothNoteModal

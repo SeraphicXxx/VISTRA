@@ -182,7 +182,7 @@ export function ScrollReveal({
   as = "div",
   children,
   className = "",
-  style,
+  style = undefined,
   variants = scrollRise,
   custom,
   delay = 0,

@@ -79,6 +79,9 @@ export interface PatientInfo {
     mobile_number?: string;
     barangay?: string;
     address?: string;
+    emergency_name?: string;
+    emergency_relation?: string;
+    emergency_phone?: string;
     appointment: PatientRecord[];
     medical: PatientRecord[];
     dental: PatientRecord[];
