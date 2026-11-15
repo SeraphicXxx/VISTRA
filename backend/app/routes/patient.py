@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
+from fastapi import APIRouter, Depends, HTTPException, status, Form, File, UploadFile
 from supabase import Client
 
 from app.config.security import require_staff
 from app.database.database_client import get_supabase_for_user
-from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest
+from app.services.auth.user import get_supabase_admin
+from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest, RegistrationReviewRequest
 from app.schemas.query import FilterPatient, FilterMedical, FilterDental
 from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
@@ -189,3 +191,84 @@ def update_patient_profile(
         supabase: Client = Depends(get_supabase_for_user),
 ):
     return update_patient_profile_service(patient_id, request, supabase)
+# Public self-registration router (no auth required)
+public_patient_router = APIRouter(
+    prefix="/patients",
+    tags=["Patients"],
+)
+
+
+@public_patient_router.post("/register", response_model=SuccessResponse)
+def register_patient(
+    data: str = Form(...),
+    application_form: UploadFile | None = File(None),
+):
+    from app.services.auth.user import get_supabase_admin
+    from app.services.patient import create_patient as create_patient_service
+    import json
+
+    try:
+        payload = json.loads(data)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid data JSON")
+
+    payload["registration_status"] = "pending"
+    payload["created_by"] = None
+
+    # Default classification if missing
+    payload.setdefault("classification", "student")
+
+    try:
+        request = CreatePatientRequest(**payload)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+
+    admin = get_supabase_admin()
+    result = create_patient_service(request, admin)
+    return result
+
+
+@protected_patient_router.get("/registrations", dependencies=[Depends(require_staff)], response_model=DataResponse)
+def list_registrations(
+    status_filter: str = "pending",
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    admin = get_supabase_admin()
+    try:
+        res = (
+            admin.table("PATIENT")
+            .select("*, PATIENT_PROFILE(*)")
+            .eq("registration_status", status_filter)
+            .execute()
+        )
+        return DataResponse(data=res.data)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@protected_patient_router.patch("/{patient_id}/registration", dependencies=[Depends(require_staff)], response_model=SuccessResponse)
+def review_registration(
+    patient_id: str,
+    body: RegistrationReviewRequest,
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    from datetime import datetime, timezone
+
+    admin = get_supabase_admin()
+    if body.status not in ("approved", "rejected"):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="status must be approved or rejected")
+
+    update_data = {
+        "registration_status": body.status,
+    }
+    if body.status == "approved":
+        update_data["approved_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        update_data["rejection_reason"] = body.rejection_reason
+
+    try:
+        admin.table("PATIENT").update(update_data).eq("patient_id", patient_id).execute()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+    return SuccessResponse(success=True, message=f"Registration {body.status}")

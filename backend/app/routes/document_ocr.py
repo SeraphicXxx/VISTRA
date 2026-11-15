@@ -22,6 +22,12 @@ document_ocr_router = APIRouter(
     ],
 )
 
+# Public OCR router for self-registration (no auth)
+public_ocr_router = APIRouter(
+    prefix="/ocr",
+    tags=["Document OCR"],
+)
+
 
 @document_ocr_router.post("/extract", status_code=201)
 async def extract_document_route(
@@ -71,3 +77,9 @@ def review_ocr_result_route(
         supabase=supabase,
         current_user=current_user,
     )
+@public_ocr_router.post("/application-form")
+async def extract_application_form(file: UploadFile = File(...)):
+    # Stub: OCR not wired for self-registration yet.
+    # Frontend falls back to manual entry.
+    await file.close()
+    return {}

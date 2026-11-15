@@ -1,4 +1,6 @@
 from fastapi import status, HTTPException
+import secrets
+
 from postgrest.exceptions import APIError
 from supabase import Client
 
@@ -66,9 +68,10 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
     # 2. Create Auth user. JWT role is the canonical role for the
     # form classification (staff for Admins); unknown values 422.
     # Classification detail lives on as PATIENT_PROFILE.person_type.
+    password = request.password or secrets.token_urlsafe(16)
     user = provision_auth_or_raise(
         patient_id,
-        request.password,
+        password,
         role_for_classification(request.classification),
     )
 
@@ -78,6 +81,7 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
             id=user.id,
             patient_id=patient_id,
             created_by=request.created_by,
+            registration_status=request.registration_status,
         )
 
         insert_response = insert_model(supabase, "PATIENT", patient_data)

@@ -42,11 +42,15 @@ export const API_ENDPOINTS = {
         get_patient_family_history: `${API_V1}/patients/record/family-history/`,
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
         get_latest_vital_signs: (patientId: string) => `${API_V1}/vital-signs/patient/${patientId}/latest`,
+        register: `${API_V1}/patients/register`,
     },
     profilePicture: {
         upload: `${API_V1}/profile-picture/upload`,
         get: `${API_V1}/profile-picture/me`,
         getPatient: (patientId: string) => `${API_V1}/profile-picture/patient/${patientId}`,
+    },
+    ocr: {
+        application_form: `${API_V1}/ocr/application-form`,
     },
     attachment: {
         patient_upload: `${API_V1}/attachments/patient/upload`,

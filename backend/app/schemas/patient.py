@@ -15,7 +15,7 @@ from app.utils.validator.common import confirm_mobile_number, confirm_not_blank,
 class Patient(BaseModel):
     id: UUID
     patient_id: str
-    created_by: str
+    created_by: str | None = None
 
 
 class PatientProfile(BaseModel):
@@ -36,12 +36,21 @@ class PatientProfile(BaseModel):
     section: str | None = None
     position: str | None = None
     person_type: str | None = None
+    emergency_name: str | None = None
+    emergency_relation: str | None = None
+    emergency_phone: str | None = None
+
+
+class RegistrationReviewRequest(BaseModel):
+    status: str
+    rejection_reason: str | None = None
 
 
 class CreatePatientRequest(BaseModel):
     patient_id: str = Field(..., min_length=1, max_length=50)
-    password: str = Field(..., min_length=8, max_length=128)
-    created_by: str = Field(..., min_length=1)
+    password: str | None = Field(default=None, min_length=8, max_length=128)
+    registration_status: str = Field(default="approved")
+    created_by: str | None = Field(default=None)
 
     name: str = Field(..., min_length=2, max_length=150)
     address: str = Field(..., min_length=1, max_length=255)
@@ -50,6 +59,10 @@ class CreatePatientRequest(BaseModel):
     birthday: date
 
     mobile_number: str = Field(..., min_length=10, max_length=15)
+
+    emergency_name: str | None = Field(default=None, max_length=150)
+    emergency_relation: str | None = Field(default=None, max_length=100)
+    emergency_phone: str | None = Field(default=None, max_length=15)
 
     sex: Sex
     civil_status: CivilStatus
@@ -109,6 +122,9 @@ class CreatePatientRequest(BaseModel):
             section=self.section,
             position=self.position,
             person_type=self.classification,
+            emergency_name=self.emergency_name,
+            emergency_relation=self.emergency_relation,
+            emergency_phone=self.emergency_phone,
 
         )
 
