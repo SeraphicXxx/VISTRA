@@ -22,7 +22,7 @@ BEGIN
             ADD CONSTRAINT patient_registration_status_check
             CHECK (registration_status IN ('pending', 'approved', 'rejected'));
     END IF;
-END $$;
+END $$;;
 
 CREATE INDEX IF NOT EXISTS idx_patient_registration_status
     ON public."PATIENT" (registration_status);
@@ -44,7 +44,7 @@ BEGIN
                 AND registration_status = 'pending'
             );
     END IF;
-END $$;
+END $$;;
 
 -- 4. RLS: staff can update registration status (approve/reject)
 DO $$
@@ -71,6 +71,5 @@ BEGIN
                 )
             );
     END IF;
-END $$;
-```<|end|><|start|>write to=assistant<|channel|>analysis<|message|>Created original migration file. Now create separate migration for section 5.<|end|><|start|>Assistant to=write<|channel|>analysis <|constrain|>xml<|message|><rfl:parameter name="path">
-C:\Users\Administrator\WebstormProjects\VISTRA\supabase\supabase\migrations\20261115000001_patient_self_register_related_rls.sql
+END $$;-- Allow self-registration (no staff creator)
+ALTER TABLE public."PATIENT" ALTER COLUMN created_by DROP NOT NULL;
