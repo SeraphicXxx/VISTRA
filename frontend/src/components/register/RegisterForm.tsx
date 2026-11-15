@@ -137,7 +137,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     stepIndex >= 1 && stepIndex < MEDICAL_STEP ? DETAIL_GROUPS[stepIndex - 1] : null;
   const isReading = readStatus === "reading";
   const canContinueFromUpload =
-    skipped || (Boolean(file) && readStatus === "done" && !isReading);
+    skipped || (Boolean(file) && (readStatus === "done" || readStatus === "error") && !isReading);
 
   const update = (key: DetailKey, value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -174,12 +174,12 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       } else {
         setReadStatus("error");
         setReadMessage(
-          "We could not find a valid student ID on this form. Upload a clearer photo or PDF."
+          "We could not find a valid student ID on this form. You can continue and enter your details manually, or upload a clearer photo or PDF."
         );
       }
     } catch {
       setReadStatus("error");
-      setReadMessage("We could not read this form. Upload a clearer photo or PDF.");
+      setReadMessage("We could not read this form. You can continue and enter your details manually, or upload a clearer photo or PDF.");
     }
   };
 
