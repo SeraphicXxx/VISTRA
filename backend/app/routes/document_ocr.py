@@ -89,53 +89,65 @@ async def extract_application_form(file: UploadFile = File(...)):
     await file.close()
 
     extracted: dict = {}
+    text = ""
 
-    filename = (file.filename or "").lower()
-    if filename.endswith(".pdf"):
+    # Use the OCR pipeline for both images and PDFs.
+    try:
+        import os
+        import tempfile
+        from pathlib import Path
+
+        suffix = Path(file.filename or "document").suffix.lower()
+        if suffix not in {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".pdf"}:
+            suffix = ".png"
+
+        tmp_path = None
         try:
-            from io import BytesIO
-            from pypdf import PdfReader
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(content)
+                tmp_path = tmp.name
+            from document_intelligence import OCRPipeline
 
-            reader = PdfReader(BytesIO(content))
-            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+            pipeline = OCRPipeline()
+            result = pipeline.process(tmp_path)
+            text = result.raw_text or ""
+            # Also try extracted fields from the pipeline
+            if result.patient and result.patient.get("patient_id"):
+                extracted["patient_id"] = result.patient["patient_id"]
+            if result.patient and result.patient.get("name"):
+                extracted["name"] = result.patient["name"]
+            if result.extracted_data:
+                for k, v in result.extracted_data.items():
+                    if v is not None and v != "":
+                        extracted.setdefault(k, str(v))
+        finally:
+            if tmp_path:
+                try:
+                    Path(tmp_path).unlink(missing_ok=True)
+                except Exception:
+                    pass
+    except Exception:
+        text = ""
 
-            m = re.search(r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)", text, re.IGNORECASE)
+    # Fallback regex extraction from raw OCR text (works for the
+    # UCC application form layout).
+    if text:
+        patterns = {
+            "patient_id": r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)",
+            "name": r"NAME\s*:\s*(.+)",
+            "age": r"AGE\s*:\s*(\d+)",
+            "sex": r"SEX\s*:\s*(\w+)",
+            "address": r"ADDRESS\s*:\s*(.+)",
+            "barangay": r"BARANGAY\s*NO\.?\s*:\s*(.+)",
+            "birthday": r"DATE OF BIRTH\s*:\s*(.+)",
+            "civil_status": r"CIVIL STATUS\s*:\s*(\w+)",
+            "mobile_number": r"CELLPHONE NO\.?\s*:\s*([0-9]+)",
+        }
+        for key, pat in patterns.items():
+            if key in extracted:
+                continue
+            m = re.search(pat, text, re.IGNORECASE)
             if m:
-                extracted["patient_id"] = m.group(1).strip()
-
-            m = re.search(r"NAME\s*:\s*(.+)", text, re.IGNORECASE)
-            if m:
-                extracted["name"] = m.group(1).strip()
-
-            m = re.search(r"AGE\s*:\s*(\d+)", text, re.IGNORECASE)
-            if m:
-                extracted["age"] = m.group(1).strip()
-
-            m = re.search(r"SEX\s*:\s*(\w+)", text, re.IGNORECASE)
-            if m:
-                extracted["sex"] = m.group(1).strip()
-
-            m = re.search(r"ADDRESS\s*:\s*(.+)", text, re.IGNORECASE)
-            if m:
-                extracted["address"] = m.group(1).strip()
-
-            m = re.search(r"BARANGAY\s*NO\.?\s*:\s*(.+)", text, re.IGNORECASE)
-            if m:
-                extracted["barangay"] = m.group(1).strip()
-
-            m = re.search(r"DATE OF BIRTH\s*:\s*(.+)", text, re.IGNORECASE)
-            if m:
-                extracted["birthday"] = m.group(1).strip()
-
-            m = re.search(r"CIVIL STATUS\s*:\s*(\w+)", text, re.IGNORECASE)
-            if m:
-                extracted["civil_status"] = m.group(1).strip()
-
-            m = re.search(r"CELLPHONE NO\.?\s*:\s*([0-9]+)", text, re.IGNORECASE)
-            if m:
-                extracted["mobile_number"] = m.group(1).strip()
-
-        except Exception:
-            pass
+                extracted[key] = m.group(1).strip()
 
     return extracted
