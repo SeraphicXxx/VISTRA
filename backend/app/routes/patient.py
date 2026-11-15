@@ -41,6 +41,17 @@ def create_patient(request: CreatePatientRequest, supabase: Client = Depends(get
     return create_patient_service(request, supabase)
 
 
+@protected_patient_router.get("/registration-status", response_model=DataResponse)
+def get_registration_status(
+    scope: str | None = Depends(get_patient_scope),
+    supabase: Client = Depends(get_supabase_for_user),
+):
+    if scope is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Patient account required")
+    row = supabase.table("PATIENT").select("registration_status, rejection_reason").eq("patient_id", scope).single().execute()
+    return DataResponse(data=row.data)
+
+
 @protected_patient_router.get("/profiles/", dependencies=[Depends(require_staff)], response_model=DataResponse)
 def get_all_profiles(filters: FilterPatient = Depends(), supabase: Client = Depends(get_supabase_for_user)):
     return get_all_patient_profiles(supabase, filters)

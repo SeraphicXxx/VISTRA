@@ -17,6 +17,7 @@ import ProtectedRoute from "/@/routes/ProtectedRoute";
 import GuestRoute from "/@/routes/GuestRoute";
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
+import PatientRegistrations from "/@/pages/admin/patients/PatientRegistrations";
 import ProtectedPatientRoute from "/@/routes/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
 import PatientLoginPage from "/@/pages/patient/login";
@@ -30,6 +31,7 @@ import PatientMedicalRecordView from "/@/pages/patient/medical/medicalViewRec";
 import PatientDentalTab from "/@/pages/patient/dental/dentalTabPage";
 import PatientDentalRecordView from "/@/pages/patient/dental/dentalViewRec";
 import PatientProfilePage from "/@/pages/patient/profile/profile";
+import PendingRegistration from "/@/pages/patient/PendingRegistration";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
@@ -52,6 +54,7 @@ function AppRoutes() {
 
                     {/* Patient Login and Register (standalone pages, no layout) */}
                     <Route path={ROUTES.patient.login} element={<PatientLoginPage/>}/>
+                    <Route path={ROUTES.patient.pending} element={<PendingRegistration/>}/>
                     <Route path={ROUTES.patient.register} element={<PatientRegisterPage/>}/>
                 </Route>
 
@@ -80,6 +83,10 @@ function AppRoutes() {
                         <Route
                             path={ROUTES.staff.dashboard.patients}
                             element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
+                        />
+                        <Route
+                            path="/staff/dashboard/registrations"
+                            element={<RequireModule module="patient_module"><PatientRegistrations/></RequireModule>}
                         />
                         <Route
                             path={ROUTES.staff.dashboard.accessControl}

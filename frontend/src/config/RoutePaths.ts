@@ -82,5 +82,6 @@ export const ROUTES = {
             },
         },
         profile: "/patient/profile",
+    pending: "/patient/pending",
     },
 };

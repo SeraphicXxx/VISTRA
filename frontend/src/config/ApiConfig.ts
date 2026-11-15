@@ -43,6 +43,9 @@ export const API_ENDPOINTS = {
         get_patient_medical_dental_summary: `${API_V1}/patients/summary/medical-dental/`,
         get_latest_vital_signs: (patientId: string) => `${API_V1}/vital-signs/patient/${patientId}/latest`,
         register: `${API_V1}/patients/register`,
+        registrations: (status: string = "pending") => `${API_V1}/patients/registrations?status_filter=${status}`,
+        review_registration: (patientId: string) => `${API_V1}/patients/${patientId}/registration`,
+        registration_status: `${API_V1}/patients/registration-status`,
     },
     profilePicture: {
         upload: `${API_V1}/profile-picture/upload`,
