@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { TermsAgreementModal } from "/@/components/legal/TermsAgreementModal";
 import { focusRing } from "/@/components/register/authShared";
-import { API_ENDPOINTS } from "/@/config/ApiConfig";
+import { API_ENDPOINTS, getApiUrl } from "/@/config/ApiConfig";
 import {
   ACCEPTED_FORM_TYPES,
   ApplicationFormUpload,
@@ -73,7 +73,7 @@ function formDataToMedical(fd: FormData): MedicalValues {
 async function readApplicationForm(file: File): Promise<ExtractedForm> {
   const body = new FormData();
   body.append("file", file);
-  const res = await fetch(API_ENDPOINTS.ocr.application_form, { method: "POST", body });
+  const res = await fetch(`${getApiUrl()}${API_ENDPOINTS.ocr.application_form}`, { method: "POST", body });
   if (!res.ok) throw new Error("Could not read the form.");
   return (await res.json()) as ExtractedForm;
 }
@@ -254,7 +254,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           accepted_at: new Date().toISOString(),
         })
       );
-      const res = await fetch(API_ENDPOINTS.patient.register, { method: "POST", body });
+      const res = await fetch(`${getApiUrl()}${API_ENDPOINTS.patient.register}`, { method: "POST", body });
       if (!res.ok) throw new Error("Submission failed. Please try again.");
       onSuccess(
         `Your application was submitted. We will email ${details.email} once an admin approves your account.`
