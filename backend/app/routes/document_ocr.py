@@ -144,7 +144,7 @@ async def extract_application_form(file: UploadFile = File(...)):
             if civil:
                 extracted["civil_status"] = str(civil).strip()
 
-            # Address / barangay / mobile from raw text (pipeline doesn't extract them)
+            # Address / barangay / mobile from raw text
             m = re.search(r"ADDRESS\s*\n\s*(.+)", text, re.IGNORECASE)
             if m and "address" not in extracted:
                 extracted["address"] = m.group(1).strip()
@@ -154,6 +154,29 @@ async def extract_application_form(file: UploadFile = File(...)):
             m = re.search(r"CELLPHONE NO\.?\s*:\s*([0-9]+)", text, re.IGNORECASE)
             if m and "mobile_number" not in extracted:
                 extracted["mobile_number"] = m.group(1).strip()
+
+            # Name from three consecutive uppercase lines after NAME
+            m = re.search(r"NAME\s*\n\s*([A-Z]+)\s*\n\s*([A-Z]+)\s*\n\s*([A-Z]+)", text, re.IGNORECASE)
+            if m:
+                extracted.setdefault("last_name", m.group(1).title())
+                extracted.setdefault("first_name", m.group(2).title())
+                extracted.setdefault("middle_name", m.group(3).title())
+
+            m = re.search(r"AGE\s*:\s*(\d+)", text, re.IGNORECASE)
+            if m and "age" not in extracted:
+                extracted["age"] = m.group(1).strip()
+
+            m = re.search(r"SEX\s*\n\s*(\w+)", text, re.IGNORECASE)
+            if m and "sex" not in extracted:
+                extracted["sex"] = m.group(1).strip()
+
+            m = re.search(r"DATE OF BIRTH\s*:\s*(.+)", text, re.IGNORECASE)
+            if m and "birthday" not in extracted:
+                extracted["birthday"] = m.group(1).strip()
+
+            m = re.search(r"CIVIL STATUS\s*\n\s*(\w+)", text, re.IGNORECASE)
+            if m and "civil_status" not in extracted:
+                extracted["civil_status"] = m.group(1).strip()
 
         finally:
             if tmp_path:
@@ -166,7 +189,7 @@ async def extract_application_form(file: UploadFile = File(...)):
 
     # Fallback regex extraction from raw OCR text.
     if text and "patient_id" not in extracted:
-        m = re.search(r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)", text, re.IGNORECASE)
+        m = re.search(r"STUDENT\s*NO\.?\s*[:\n]\s*([A-Za-z0-9-]+)", text, re.IGNORECASE)
         if not m:
             m = re.search(r"\b(\d+-[A-Z])\b", text)
         if m:
