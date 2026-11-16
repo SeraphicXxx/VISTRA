@@ -1,6 +1,6 @@
 import {PatientFilters, MedicalVisitFilters, DentalVisitFilters} from "/@/api/schema/FilterSchemaCollection";
-import {useQuery} from "@tanstack/react-query";
-import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory, getMyProfile, getLatestVitalSigns} from "/@/api/patient.api";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {getAllPatientProfiles, getPatientSummaryRecord, updatePatientProfile, getPatientMedicalTab, getPatientDentalTab, getPatientMedicalDentalSummary, getPatientMedicalRecord, getPatientDentalRecord, getPatientMedicalHistory, getPatientFamilyHistory, getMyProfile, getLatestVitalSigns, getPatientRegistrations, reviewPatientRegistration} from "/@/api/patient.api";
 import {PaginatedData} from "/@/api/schema/ApiResponseSchema";
 import {PatientProfile, UpdatePatientProfile} from "/@/api/schema/PatientSchema";
 import {PatientMedicalTabVisit} from "/@/api/schema/PatientMedicalTabSchema";
@@ -181,5 +181,27 @@ export function usePatientLatestVitalSignsQuery(patientId: string) {
         },
         enabled: Boolean(patientId),
         refetchOnWindowFocus: false,
+    });
+}
+
+export function usePatientRegistrationsQuery(status: string = "pending") {
+    return useQuery({
+        queryKey: ["patient", "registrations", status],
+        queryFn: async () => {
+            const { data } = await getPatientRegistrations(status);
+            return (data as any)?.data ?? data ?? [];
+        },
+    });
+}
+
+export function useReviewPatientRegistration() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ patientId, status, rejectionReason }: { patientId: string; status: "approved" | "rejected"; rejectionReason?: string }) => {
+            await reviewPatientRegistration(patientId, status, rejectionReason);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["patient", "registrations"] });
+        },
     });
 }

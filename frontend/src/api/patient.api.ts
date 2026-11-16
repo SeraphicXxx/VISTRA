@@ -246,3 +246,14 @@ export function getPatientMedicalDentalSummary(
         signal,
     );
 }
+
+export async function getPatientRegistrations(status: string = "pending") {
+    return apiClient(API_ENDPOINTS.patient.registrations(status));
+}
+
+export async function reviewPatientRegistration(patientId: string, status: "approved" | "rejected", rejectionReason?: string) {
+    return apiClient(API_ENDPOINTS.patient.review_registration(patientId), {
+        method: "PATCH",
+        data: { status, rejection_reason: rejectionReason },
+    });
+}

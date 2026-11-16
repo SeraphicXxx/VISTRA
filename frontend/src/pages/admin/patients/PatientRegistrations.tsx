@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { apiClient } from "/@/api/axios_client";
-import { API_ENDPOINTS } from "/@/config/ApiConfig";
-
+import { useState } from "react";
+import { usePatientRegistrationsQuery, useReviewPatientRegistration } from "/@/hooks/query/PatientQuery";
 
 interface PendingPatient {
   patient_id: string;
@@ -10,46 +8,27 @@ interface PendingPatient {
 }
 
 export default function PatientRegistrations() {
-  const [items, setItems] = useState<PendingPatient[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, error, refetch } = usePatientRegistrationsQuery("pending");
+  const reviewMutation = useReviewPatientRegistration();
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await apiClient<{ data: PendingPatient[] }>(
-        API_ENDPOINTS.patient.registrations("pending")
-      );
-      setItems((data as any)?.data ?? (data as any) ?? []);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
+  const items: PendingPatient[] = Array.isArray(data) ? data : [];
 
   const review = async (patientId: string, status: "approved" | "rejected") => {
+    setActionError(null);
     try {
-      await apiClient(API_ENDPOINTS.patient.review_registration(patientId), {
-        method: "PATCH",
-        data: { status },
-      });
-      load();
+      await reviewMutation.mutateAsync({ patientId, status });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Action failed");
+      setActionError(e instanceof Error ? e.message : "Action failed");
     }
   };
 
   return (
     <div className="p-6 space-y-4">
       <h1 className="text-xl font-semibold">Pending Registrations</h1>
-      {loading && <p>Loading…</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      {isLoading && <p>Loading…</p>}
+      {isError && <p className="text-red-600">{error instanceof Error ? error.message : "Failed to load"}</p>}
+      {actionError && <p className="text-red-600">{actionError}</p>}
       <div className="space-y-3">
         {items.map((p) => {
           const profile = Array.isArray(p.PATIENT_PROFILE) ? p.PATIENT_PROFILE[0] : null;
@@ -61,14 +40,27 @@ export default function PatientRegistrations() {
                 <p className="text-sm text-textMuted">{p.patient_id}</p>
               </div>
               <div className="flex gap-2">
-                <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white" onClick={() => review(p.patient_id, "approved")}>Approve</button>
-                <button className="rounded-xl border border-border px-4 py-2 text-sm font-semibold" onClick={() => review(p.patient_id, "rejected")}>Reject</button>
+                <button
+                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  disabled={reviewMutation.isPending}
+                  onClick={() => review(p.patient_id, "approved")}
+                >
+                  Approve
+                </button>
+                <button
+                  className="rounded-xl border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                  disabled={reviewMutation.isPending}
+                  onClick={() => review(p.patient_id, "rejected")}
+                >
+                  Reject
+                </button>
               </div>
             </div>
           );
         })}
-        {!loading && items.length === 0 && <p className="text-textMuted">No pending registrations.</p>}
+        {!isLoading && items.length === 0 && <p className="text-textMuted">No pending registrations.</p>}
       </div>
+      <button className="text-sm text-primary" onClick={() => refetch()}>Refresh</button>
     </div>
   );
 }
