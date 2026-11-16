@@ -53,6 +53,19 @@ def create_auth_user(
 
     except Exception as e:
         logger.exception("Auth admin create_user failed: %s", e)
+        # If the user already exists, reuse it (idempotent registration).
+        try:
+            users = admin.auth.admin.list_users()
+            for u in getattr(users, "users", users or []):
+                if (getattr(u, "email", None) or "").lower() == auth_email.lower():
+                    # Ensure role metadata is set
+                    try:
+                        admin.auth.admin.update_user_by_id(u.id, {"app_metadata": {"role": role}})
+                    except Exception:
+                        pass
+                    return ok(user=u)
+        except Exception:
+            pass
         return {
             "success": False,
             "message": "Failed to provision auth user"
