@@ -155,6 +155,21 @@ async def extract_application_form(file: UploadFile = File(...)):
             if m and "mobile_number" not in extracted:
                 extracted["mobile_number"] = m.group(1).strip()
 
+            # Guardian / emergency contact
+            m = re.search(r"GUARDIAN\s*\n\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["emergency_name"] = m.group(1).strip()
+            m = re.search(r"RELATION\s*\n\s*(.+)", text, re.IGNORECASE)
+            if m:
+                extracted["emergency_relation"] = m.group(1).strip()
+            phones = re.findall(r"CELLPHONE NO\.?\s*[:\n]\s*([0-9]+)", text, re.IGNORECASE)
+            mobile = extracted.get("mobile_number")
+            guardian_phones = [p for p in phones if p != mobile]
+            if guardian_phones:
+                extracted["emergency_phone"] = guardian_phones[0].strip()
+            elif phones:
+                extracted["emergency_phone"] = phones[0].strip()
+
             # Name from three consecutive uppercase lines after NAME
             m = re.search(r"NAME\s*\n\s*([A-Z]+)\s*\n\s*([A-Z]+)\s*\n\s*([A-Z]+)", text, re.IGNORECASE)
             if m:
