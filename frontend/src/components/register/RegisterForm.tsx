@@ -283,7 +283,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           accepted_at: new Date().toISOString(),
         })
       );
-      const res = await fetch(`${getApiUrl()}${API_ENDPOINTS.patient.register}`, { method: "POST", body });
+      const res = await fetch(`${getApiUrl()}${API_ENDPOINTS.patient.pre_register}`, { method: "POST", body });
       if (!res.ok) throw new Error("Submission failed. Please try again.");
       onSuccess(
         `Your application was submitted. We will email ${details.email} once an admin approves your account.`

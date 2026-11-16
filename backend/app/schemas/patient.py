@@ -16,6 +16,7 @@ class Patient(BaseModel):
     id: UUID
     patient_id: str
     created_by: str | None = None
+    registration_status: str = "approved"
 
 
 class PatientProfile(BaseModel):

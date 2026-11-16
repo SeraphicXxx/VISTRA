@@ -211,7 +211,7 @@ public_patient_router = APIRouter(
 )
 
 
-@public_patient_router.post("/register", response_model=SuccessResponse)
+@public_patient_router.post("/pre_register", response_model=SuccessResponse)
 def register_patient(
     data: str = Form(...),
     application_form: UploadFile | None = File(None),
