@@ -358,6 +358,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             errors={getGroupErrors(currentGroup, values)}
             showErrors={showErrors}
             onChange={update}
+            onConfirmEmail={handleConfirmEmail}
+            confirmCooldown={confirmCooldown}
+            confirming={confirming}
           />
         )}
 
@@ -365,18 +368,6 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       </Reveal>
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-5">
-        <button
-          type="button"
-          onClick={handleConfirmEmail}
-          disabled={confirming || confirmCooldown > 0 || !values.email}
-          className={secondaryButton}
-        >
-          {confirming
-            ? "Sending..."
-            : confirmCooldown > 0
-              ? `Resend in ${confirmCooldown}s`
-              : "Confirm email"}
-        </button>
         {stepIndex > 0 ? (
           <button type="button" onClick={goBack} className={secondaryButton}>
             Back

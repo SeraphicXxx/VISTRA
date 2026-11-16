@@ -387,6 +387,9 @@ type RegisterDetailsStepProps = {
   errors: Partial<Record<DetailKey, string>>;
   showErrors: boolean;
   onChange: (key: DetailKey, value: string) => void;
+  onConfirmEmail?: () => void;
+  confirmCooldown?: number;
+  confirming?: boolean;
 };
 
 export function RegisterDetailsStep({
@@ -395,6 +398,9 @@ export function RegisterDetailsStep({
   errors,
   showErrors,
   onChange,
+  onConfirmEmail,
+  confirmCooldown = 0,
+  confirming = false,
 }: RegisterDetailsStepProps) {
   const shownError = (key: DetailKey) => (showErrors ? (errors[key] ?? null) : null);
 
@@ -439,6 +445,21 @@ export function RegisterDetailsStep({
                   readOnly={field.computed}
                 />
               )}
+
+              {key === "email" && onConfirmEmail ? (
+                <button
+                  type="button"
+                  onClick={onConfirmEmail}
+                  disabled={confirming || confirmCooldown > 0 || !value}
+                  className="mt-1 text-sm font-medium text-primary hover:underline disabled:opacity-50"
+                >
+                  {confirming
+                    ? "Sending..."
+                    : confirmCooldown > 0
+                      ? `Resend in ${confirmCooldown}s`
+                      : "Confirm this email"}
+                </button>
+              ) : null}
 
               {isOther ? (
                 <div className="mt-4">
