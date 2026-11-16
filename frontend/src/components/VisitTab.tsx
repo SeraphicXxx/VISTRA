@@ -1,4 +1,4 @@
-import {useMemo, type ComponentType} from "react";
+import {useMemo, type ComponentType, type ReactNode} from "react";
 import {ChevronRight, Plus} from "lucide-react";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
@@ -21,6 +21,9 @@ interface VisitTabProps<Row extends { id: string }, Item, F extends object> {
     page?: number;
     createAction?: VisitTabCreateAction;
     buildViewLink?: (row: Row) => string;
+    renderAction?: (row: Row) => ReactNode;
+    showFilters?: boolean;
+    showPagination?: boolean;
     setFilters?: (filters: F) => void;
 }
 
@@ -35,6 +38,9 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
     page,
     createAction,
     buildViewLink,
+    renderAction,
+    showFilters = true,
+    showPagination = true,
     setFilters,
 }: VisitTabProps<Row, Item, F>) {
     const rows = useMemo(
@@ -61,16 +67,20 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
                 ) : undefined
             }
             renderAction={
-                buildViewLink
-                    ? (row) => (
-                        <HyperlinkText
-                            title="View"
-                            link={buildViewLink(row)}
-                            icon={ChevronRight}
-                        />
-                    )
-                    : undefined
+                renderAction
+                    ? renderAction
+                    : buildViewLink
+                        ? (row) => (
+                            <HyperlinkText
+                                title="View"
+                                link={buildViewLink(row)}
+                                icon={ChevronRight}
+                            />
+                        )
+                        : undefined
             }
+            showFilters={showFilters}
+            showPagination={showPagination}
             onRun={
                 setFilters
                     ? (search, filters, page, pageSize) =>
