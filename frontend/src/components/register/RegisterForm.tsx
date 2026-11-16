@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { TermsAgreementModal } from "/@/components/legal/TermsAgreementModal";
 import { focusRing } from "/@/components/register/authShared";
 import { API_ENDPOINTS, getApiUrl } from "/@/config/ApiConfig";
+import { apiClient } from "/@/api/axios_client";
 import {
   ACCEPTED_FORM_TYPES,
   ApplicationFormUpload,
@@ -125,12 +126,22 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [pendingMedical, setPendingMedical] = useState<MedicalValues | null>(null);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmCooldown, setConfirmCooldown] = useState(0);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
+
+  useEffect(() => {
+    if (confirmCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setConfirmCooldown((c) => (c > 0 ? c - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [confirmCooldown]);
 
   const isLastStep = stepIndex === MEDICAL_STEP;
   const currentGroup =
@@ -205,6 +216,24 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   };
 
   const goBack = () => moveTo(Math.max(0, stepIndex - 1));
+
+  const handleConfirmEmail = async () => {
+    const email = values.email?.trim();
+    if (!email) return;
+    setConfirming(true);
+    try {
+      await apiClient(API_ENDPOINTS.patient.confirm_email, {
+        method: "POST",
+        data: new URLSearchParams({ email }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      setConfirmCooldown(60);
+    } catch (e) {
+      // ignore; cooldown not started
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -336,6 +365,18 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       </Reveal>
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-5">
+        <button
+          type="button"
+          onClick={handleConfirmEmail}
+          disabled={confirming || confirmCooldown > 0 || !values.email}
+          className={secondaryButton}
+        >
+          {confirming
+            ? "Sending..."
+            : confirmCooldown > 0
+              ? `Resend in ${confirmCooldown}s`
+              : "Confirm email"}
+        </button>
         {stepIndex > 0 ? (
           <button type="button" onClick={goBack} className={secondaryButton}>
             Back

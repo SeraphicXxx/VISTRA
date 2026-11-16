@@ -1,4 +1,5 @@
 import json
+import time
 from fastapi import APIRouter, Depends, HTTPException, status, Form, File, UploadFile
 from supabase import Client
 
@@ -6,6 +7,7 @@ from app.config.security import require_staff
 from app.database.database_client import get_supabase_for_user
 from app.services.auth.user import get_supabase_admin
 from app.schemas.patient import CreatePatientRequest, UpdatePatientProfileRequest, RegistrationReviewRequest
+from app.services.email import send_email as send_email_service
 from app.schemas.query import FilterPatient, FilterMedical, FilterDental
 from app.schemas.response_dto.responses import DataResponse, SuccessResponse
 from app.services.access import enforce_patient_scope, get_patient_scope, require_module
@@ -283,3 +285,30 @@ def review_registration(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     return SuccessResponse(success=True, message=f"Registration {body.status}")
+
+# In-memory cooldown for email confirmation (per email, 60s)
+_email_cooldowns: dict[str, float] = {}
+
+
+@public_patient_router.post("/confirm-email", response_model=SuccessResponse)
+def confirm_email(email: str = Form(...)):
+    now = time.time()
+    last = _email_cooldowns.get(email)
+    if last and now - last < 60:
+        remaining = int(60 - (now - last))
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Please wait {remaining}s before requesting another confirmation email.",
+        )
+
+    try:
+        send_email_service(
+            to=email,
+            subject="Confirm your VISTRA account email",
+            body="Please confirm your email address to complete your pre-registration.",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+    _email_cooldowns[email] = now
+    return SuccessResponse(success=True, message="Confirmation email sent")

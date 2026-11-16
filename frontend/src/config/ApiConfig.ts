@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
         registrations: (status: string = "pending") => `${API_V1}/patients/registrations?status_filter=${status}`,
         review_registration: (patientId: string) => `${API_V1}/patients/${patientId}/registration`,
         registration_status: `${API_V1}/patients/registration-status`,
+        confirm_email: `${API_V1}/patients/confirm-email`,
     },
     profilePicture: {
         upload: `${API_V1}/profile-picture/upload`,
