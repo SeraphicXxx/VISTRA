@@ -85,7 +85,7 @@ function AppRoutes() {
                             element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
                         />
                         <Route
-                            path="/staff/dashboard/registrations"
+                            path={ROUTES.staff.dashboard.registrations}
                             element={<RequireModule module="patient_module"><PatientRegistrations/></RequireModule>}
                         />
                         <Route

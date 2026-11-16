@@ -5,6 +5,7 @@ import {
     HeartPulse,
     UsersRound,
     Users,
+    UserPlus,
 } from "lucide-react";
 import { TbDental } from "react-icons/tb";
 
@@ -59,6 +60,15 @@ export const AdminRoutes = [
             ROUTES.staff.dashboard.patients,
             ROUTES.staff.patient.createNewRecord,
             ROUTES.staff.patient.patientRecordTab,
+        ],
+    },
+    {
+        path: ROUTES.staff.dashboard.registrations,
+        label: "Registrations",
+        icon: UserPlus,
+        component: "registrations",
+        activePaths: [
+            ROUTES.staff.dashboard.registrations,
         ],
     },
     {
