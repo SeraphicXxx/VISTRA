@@ -111,15 +111,50 @@ async def extract_application_form(file: UploadFile = File(...)):
             pipeline = OCRPipeline()
             result = pipeline.process(tmp_path)
             text = result.raw_text or ""
-            # Also try extracted fields from the pipeline
-            if result.patient and result.patient.get("patient_id"):
-                extracted["patient_id"] = result.patient["patient_id"]
-            if result.patient and result.patient.get("name"):
-                extracted["name"] = result.patient["name"]
-            if result.extracted_data:
-                for k, v in result.extracted_data.items():
-                    if v is not None and v != "":
-                        extracted.setdefault(k, str(v))
+
+            # Map pipeline extracted_data to frontend DetailKeys.
+            ed = result.extracted_data or {}
+            def val(k):
+                v = ed.get(k)
+                if isinstance(v, dict):
+                    return v.get("value")
+                return v
+
+            student_no = val("student_number")
+            if student_no:
+                extracted["patient_id"] = str(student_no).strip()
+
+            name = val("name")
+            if name:
+                extracted["name"] = str(name).strip()
+
+            age = val("age")
+            if age:
+                extracted["age"] = str(age).strip()
+
+            sex = val("sex")
+            if sex:
+                extracted["sex"] = str(sex).strip()
+
+            dob = val("date_of_birth")
+            if dob:
+                extracted["birthday"] = str(dob).strip()
+
+            civil = val("civil_status")
+            if civil:
+                extracted["civil_status"] = str(civil).strip()
+
+            # Address / barangay / mobile from raw text (pipeline doesn't extract them)
+            m = re.search(r"ADDRESS\s*\n\s*(.+)", text, re.IGNORECASE)
+            if m and "address" not in extracted:
+                extracted["address"] = m.group(1).strip()
+            m = re.search(r"BARANGAY\s*NO\.?\s*:\s*(.+)", text, re.IGNORECASE)
+            if m and "barangay" not in extracted:
+                extracted["barangay"] = m.group(1).strip()
+            m = re.search(r"CELLPHONE NO\.?\s*:\s*([0-9]+)", text, re.IGNORECASE)
+            if m and "mobile_number" not in extracted:
+                extracted["mobile_number"] = m.group(1).strip()
+
         finally:
             if tmp_path:
                 try:
@@ -129,25 +164,12 @@ async def extract_application_form(file: UploadFile = File(...)):
     except Exception:
         text = ""
 
-    # Fallback regex extraction from raw OCR text (works for the
-    # UCC application form layout).
-    if text:
-        patterns = {
-            "patient_id": r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)",
-            "name": r"NAME\s*:\s*(.+)",
-            "age": r"AGE\s*:\s*(\d+)",
-            "sex": r"SEX\s*:\s*(\w+)",
-            "address": r"ADDRESS\s*:\s*(.+)",
-            "barangay": r"BARANGAY\s*NO\.?\s*:\s*(.+)",
-            "birthday": r"DATE OF BIRTH\s*:\s*(.+)",
-            "civil_status": r"CIVIL STATUS\s*:\s*(\w+)",
-            "mobile_number": r"CELLPHONE NO\.?\s*:\s*([0-9]+)",
-        }
-        for key, pat in patterns.items():
-            if key in extracted:
-                continue
-            m = re.search(pat, text, re.IGNORECASE)
-            if m:
-                extracted[key] = m.group(1).strip()
+    # Fallback regex extraction from raw OCR text.
+    if text and "patient_id" not in extracted:
+        m = re.search(r"STUDENT\s*NO\.?\s*:\s*([A-Za-z0-9-]+)", text, re.IGNORECASE)
+        if not m:
+            m = re.search(r"\b(\d+-[A-Z])\b", text)
+        if m:
+            extracted["patient_id"] = m.group(1).strip()
 
     return extracted
