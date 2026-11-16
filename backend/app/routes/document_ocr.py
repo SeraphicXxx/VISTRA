@@ -172,7 +172,13 @@ async def extract_application_form(file: UploadFile = File(...)):
 
             m = re.search(r"DATE OF BIRTH\s*:\s*(.+)", text, re.IGNORECASE)
             if m and "birthday" not in extracted:
-                extracted["birthday"] = m.group(1).strip()
+                raw_bday = m.group(1).strip()
+                try:
+                    from datetime import datetime
+                    parsed = datetime.strptime(raw_bday, "%B %d, %Y")
+                    extracted["birthday"] = parsed.strftime("%Y-%m-%d")
+                except ValueError:
+                    extracted["birthday"] = raw_bday
 
             m = re.search(r"CIVIL STATUS\s*\n\s*(\w+)", text, re.IGNORECASE)
             if m and "civil_status" not in extracted:
