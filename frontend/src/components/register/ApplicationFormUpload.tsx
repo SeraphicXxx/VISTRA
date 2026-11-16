@@ -107,7 +107,10 @@ export function ApplicationFormUpload({
       ) : null}
 
       {isReading ? (
-        <p className="text-sm text-textMuted">Reading your form...</p>
+        <div className="flex items-center gap-2 text-sm text-textMuted">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span>Reading your form... This will take a minute.</span>
+        </div>
       ) : message ? (
         <p
           className={`text-sm leading-relaxed ${
