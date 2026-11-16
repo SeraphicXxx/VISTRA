@@ -10,8 +10,11 @@ export const PatientsPage = createVisitPage<PatientFilters, PatientProfile>({
     initialFilters: {
         page: 1,
         page_size: 10,
+        status: "approved",
     },
-    useListQuery: usePatientQuery,
+    // Always exclude pending registrations from the patient management page.
+    // Pending records are handled on the dedicated Pending Registrations page.
+    useListQuery: (filters) => usePatientQuery({ ...filters, status: "approved" }),
     Provider: PatientProvider,
     Tab: PatientsTab,
 });

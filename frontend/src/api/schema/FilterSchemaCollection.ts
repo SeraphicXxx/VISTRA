@@ -6,6 +6,7 @@ export interface PageParams {
 export interface PatientFilters extends PageParams {
     search?: string;
     sex?: string;
+    status?: string;
     user_type?: string;
     course?: string;
     yearSection?: string;
