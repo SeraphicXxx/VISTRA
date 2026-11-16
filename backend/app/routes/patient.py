@@ -230,8 +230,11 @@ def register_patient(
 
     # Build full name from split fields if not provided
     if not payload.get("name"):
-        parts = [payload.get("first_name"), payload.get("middle_name"), payload.get("last_name")]
-        payload["name"] = " ".join(p for p in parts if p).strip() or payload.get("last_name", "")
+        first = payload.get("first_name") or ""
+        middle = payload.get("middle_name") or ""
+        last = payload.get("last_name") or ""
+        name = f"{last}, {first} {middle}".strip().strip(",")
+        payload["name"] = name or last or first
 
     # Default classification if missing
     payload.setdefault("classification", "student")
