@@ -1,6 +1,5 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import {useMemo, useRef, useState, type FormEvent} from "react";
 import {
-  AlertCircle,
   ArrowRight,
   Eye,
   EyeOff,
@@ -9,10 +8,11 @@ import {
   LoaderCircle,
   ShieldCheck,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { ROUTES } from "/@/config/RoutePaths.js";
-import { usePatientLogin, usePatientLoginForm } from "/@/hooks/UsePatientLogin";
-import { TermsAgreementModal } from "/@/components/legal/TermsAgreementModal";
+import {Link, useNavigate} from "react-router-dom";
+import {ROUTES} from "/@/config/RoutePaths.js";
+import {usePatientLogin, usePatientLoginForm} from "/@/hooks/UsePatientLogin";
+import {TermsAgreementModal} from "/@/components/legal/TermsAgreementModal";
+import LoginErrorNotice from "/@/components/login/LoginErrorNotice";
 import {
   AuthLayout,
   fieldClass,
@@ -26,8 +26,8 @@ const switchLinkClass = `rounded font-semibold text-primary transition-colors du
 
 export default function PatientLoginPage() {
   const navigate = useNavigate();
-  const { credentials, handleChange, toRequest } = usePatientLoginForm();
-  const { login, isLoading, isError, error } = usePatientLogin();
+  const {credentials, handleChange, toRequest} = usePatientLoginForm();
+  const {login, isLoading, isError, error} = usePatientLogin();
 
   const homeHref = ROUTES.patient?.dashboard?.overview ?? "/";
 
@@ -84,16 +84,8 @@ export default function PatientLoginPage() {
         noValidate
         className="form-stagger relative mt-8 w-full text-left"
       >
-        {isError && error ? (
-          <div
-            key={String(error)}
-            role="alert"
-            className="shake mb-6 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3.5 text-sm text-danger"
-          >
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={2} />
-            <span>{error}</span>
-          </div>
-        ) : null}
+        {/* Server and network errors from the login request */}
+        <LoginErrorNotice error={isError ? error : null}/>
 
         <div>
           <div className="mb-2 flex items-center justify-between">
@@ -115,7 +107,7 @@ export default function PatientLoginPage() {
           </div>
 
           <div className="group/field relative">
-            <IdCard className={iconClass} strokeWidth={2} />
+            <IdCard className={iconClass} strokeWidth={2}/>
             <input
               ref={idInputRef}
               id="idNumber"
@@ -161,7 +153,7 @@ export default function PatientLoginPage() {
           </div>
 
           <div className="group/field relative">
-            <Lock className={iconClass} strokeWidth={2} />
+            <Lock className={iconClass} strokeWidth={2}/>
             <input
               ref={passwordInputRef}
               id="password"
@@ -186,9 +178,9 @@ export default function PatientLoginPage() {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOff className="h-5 w-5" strokeWidth={2} />
+                <EyeOff className="h-5 w-5" strokeWidth={2}/>
               ) : (
-                <Eye className="h-5 w-5" strokeWidth={2} />
+                <Eye className="h-5 w-5" strokeWidth={2}/>
               )}
             </button>
           </div>
@@ -222,7 +214,7 @@ export default function PatientLoginPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M4 10l4 4 8-8" />
+                <path d="M4 10l4 4 8-8"/>
               </svg>
             </div>
 
@@ -247,14 +239,14 @@ export default function PatientLoginPage() {
         >
           {isLoading ? "Signing in..." : "Sign in"}
           {isLoading ? (
-            <LoaderCircle className="h-5 w-5 animate-spin" />
+            <LoaderCircle className="h-5 w-5 animate-spin"/>
           ) : (
-            <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5"/>
           )}
         </button>
 
         <p className="mt-6 flex items-center justify-center gap-2 text-sm text-textMuted">
-          <ShieldCheck className="h-4 w-4 text-primary" strokeWidth={2} />
+          <ShieldCheck className="h-4 w-4 text-primary" strokeWidth={2}/>
           Records are encrypted and scoped to your role.
         </p>
       </form>

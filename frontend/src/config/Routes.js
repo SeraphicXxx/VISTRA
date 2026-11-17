@@ -4,7 +4,7 @@ import {
     CalendarDays,
     HeartPulse,
     UsersRound,
-    Users,
+    ShieldCheck,
 } from "lucide-react";
 import { TbDental } from "react-icons/tb";
 
@@ -63,8 +63,12 @@ export const AdminRoutes = [
     },
     {
         path: ROUTES.staff.dashboard.accessControl,
-        label: "User Management",
-        icon: Users,
+        label: "Access Management",
+        icon: ShieldCheck,
         component: "members",
+        children: [
+            { path: ROUTES.staff.accessControl.roles, label: "Roles & Permissions" },
+            { path: ROUTES.staff.accessControl.activityLogs, label: "Activity Logs" },
+        ],
     },
 ];

@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
 import {ROUTES} from "/@/config/RoutePaths";
 import PublicLayout from "/@/layouts/PublicLayout";
@@ -33,6 +33,7 @@ import PatientProfilePage from "/@/pages/patient/profile/profile";
 import {AppointmentDetailPage, AppointmentPage} from "/@/pages/admin/appointments/AppointmentPage";
 import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
+import ActivityLogsPage from "/@/pages/admin/user_management/activityLogs";
 import RequireModule from "/@/routes/RequireModule";
 
 function AppRoutes() {
@@ -81,10 +82,21 @@ function AppRoutes() {
                             path={ROUTES.staff.dashboard.patients}
                             element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
                         />
+
+              
                         <Route
                             path={ROUTES.staff.dashboard.accessControl}
+                            element={<Navigate to={ROUTES.staff.accessControl.roles} replace/>}
+                        />
+                        <Route
+                            path={ROUTES.staff.accessControl.roles}
                             element={<RequireModule module="staff_module"><RoleManagementPage/></RequireModule>}
                         />
+                        <Route
+                            path={ROUTES.staff.accessControl.activityLogs}
+                            element={<RequireModule module="staff_module"><ActivityLogsPage/></RequireModule>}
+                        />
+
                         <Route
                             path={ROUTES.staff.patient.createNewRecord}
                             element={<RequireModule module="patient_module"><NewPatientRecordForm/></RequireModule>}

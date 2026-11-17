@@ -1,8 +1,8 @@
-import {forwardRef, useRef, useState, type ComponentType, type Ref} from "react";
+import {forwardRef, useEffect, useRef, useState, type ComponentType, type Ref} from "react";
 
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
 
-import {LogOut, Menu, X, UserRound, ChevronRight} from "lucide-react";
+import {ChevronDown, ChevronRight, LogOut, Menu, X, UserRound} from "lucide-react";
 
 import {useSidebar} from "/@/hooks/UseSidebar";
 import {useStaffInfo} from "/@/hooks/StaffInfo";
@@ -19,6 +19,11 @@ import {LogoClickable} from "/@/components/Button";
 
 import {Modal} from "/@/components/editModal";
 
+interface SidebarChildItem {
+    path: string;
+    label: string;
+}
+
 interface SidebarRouteItem {
     path: string;
     label: string;
@@ -29,6 +34,7 @@ interface SidebarRouteItem {
     isShortcut?: boolean;
     activePaths?: string[];
     component?: string;
+    children?: SidebarChildItem[];
 }
 
 // Route component key -> STAFF_PERMISSIONS flag. Overview has no
@@ -53,43 +59,123 @@ function isRouteActive(
     );
 }
 
+// A child path may carry a query string, such as "/staff/users?view=roles".
+// It is active only when both the path and the query match.
+function isChildActive(child: SidebarChildItem, pathname: string, search: string): boolean {
+    const [basePath, query] = child.path.split("?");
+    if (pathname !== basePath) return false;
+    if (!query) return true;
+    return search === `?${query}`;
+}
+
 interface SidebarLinkProps {
     item: SidebarRouteItem;
     pathname: string;
+    search: string;
     onNavigate: () => void;
     isShortcut?: boolean;
 }
 
 function SidebarLink(
-    {item, pathname, onNavigate, isShortcut = false}: SidebarLinkProps,
+    {item, pathname, search, onNavigate, isShortcut = false}: SidebarLinkProps,
     ref: Ref<HTMLAnchorElement>,
 ) {
     const Icon = item.icon;
-    const isActive = isRouteActive(item, pathname);
+    const hasChildren = !!item.children && item.children.length > 0;
+    const childActive = hasChildren
+        ? item.children!.some((child) => isChildActive(child, pathname, search))
+        : false;
+    const isActive = isRouteActive(item, pathname) || childActive;
 
-    return (
-        <NavLink
-            ref={ref}
-            to={item.path}
-            onClick={onNavigate}
-            className={`group relative flex h-10 items-center gap-3 rounded-lg px-3.5 text-sm font-medium transition-all duration-200 ${
-                isActive
-                    ? "bg-primary text-surface shadow-sm"
-                    : "text-textSecondary hover:bg-primaryLight/15 hover:text-primary"
-            }`}
-        >
+    // Opens by default when one of its sub-items is the current page.
+    const [open, setOpen] = useState<boolean>(childActive);
+
+    useEffect(() => {
+        if (childActive) setOpen(true);
+    }, [childActive]);
+
+    const rowClass = `group relative flex h-10 w-full items-center gap-3 rounded-lg px-3.5 text-sm font-medium transition-all duration-200 ${
+        isActive
+            ? "bg-primary text-surface shadow-sm"
+            : "text-textSecondary hover:bg-primaryLight/15 hover:text-primary"
+    }`;
+
+    const rowContent = (
+        <>
             <Icon
                 className="h-[18px] w-[18px] shrink-0 opacity-85"
                 strokeWidth={2.2}
             />
-            <span className="min-w-0 flex-1 truncate">{item.label}</span>
-            {isActive && !isShortcut && (
-                <ChevronRight
-                    className="h-4 w-4 shrink-0 opacity-60"
+            <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
+
+            {hasChildren ? (
+                <ChevronDown
+                    className={`h-4 w-4 shrink-0 opacity-60 transition-transform duration-200 ${
+                        open ? "rotate-180" : ""
+                    }`}
                     strokeWidth={2.5}
                 />
+            ) : (
+                isActive && !isShortcut && (
+                    <ChevronRight
+                        className="h-4 w-4 shrink-0 opacity-60"
+                        strokeWidth={2.5}
+                    />
+                )
             )}
-        </NavLink>
+        </>
+    );
+
+    if (!hasChildren) {
+        return (
+            <NavLink
+                ref={ref}
+                to={item.path}
+                onClick={onNavigate}
+                className={rowClass}
+            >
+                {rowContent}
+            </NavLink>
+        );
+    }
+
+    return (
+        <div>
+            <button
+                type="button"
+                onClick={() => setOpen((prev) => !prev)}
+                aria-expanded={open}
+                className={rowClass}
+            >
+                {rowContent}
+            </button>
+
+            {open && (
+                // The left rail lines up under the parent icon's center.
+                <ul className="ml-[22px] mt-1 space-y-0.5 border-l border-border py-0.5 pl-3">
+                    {item.children!.map((child) => {
+                        const active = isChildActive(child, pathname, search);
+
+                        return (
+                            <li key={child.path}>
+                                <NavLink
+                                    to={child.path}
+                                    onClick={onNavigate}
+                                    aria-current={active ? "page" : undefined}
+                                    className={`flex h-9 items-center rounded-md px-3 text-[13px] transition-colors duration-200 ${
+                                        active
+                                            ? "bg-primary/10 font-semibold text-primary"
+                                            : "font-medium text-textSecondary hover:bg-primaryLight/15 hover:text-primary"
+                                    }`}
+                                >
+                                    <span className="min-w-0 truncate">{child.label}</span>
+                                </NavLink>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
     );
 }
 
@@ -143,6 +229,7 @@ interface NavSectionProps {
     title?: string;
     items: SidebarRouteItem[];
     pathname: string;
+    search: string;
     onNavigate: () => void;
     isShortcut?: boolean;
     firstLinkRef?: Ref<HTMLAnchorElement>;
@@ -152,6 +239,7 @@ function NavSection({
                         title,
                         items,
                         pathname,
+                        search,
                         onNavigate,
                         isShortcut = false,
                         firstLinkRef,
@@ -170,6 +258,7 @@ function NavSection({
                         key={item.path}
                         item={item}
                         pathname={pathname}
+                        search={search}
                         onNavigate={onNavigate}
                         isShortcut={isShortcut}
                         ref={index === 0 && !title ? firstLinkRef : undefined}
@@ -315,6 +404,7 @@ export default function Sidebar() {
                     <NavSection
                         items={mainRoutes}
                         pathname={location.pathname}
+                        search={location.search}
                         onNavigate={close}
                         firstLinkRef={firstLinkRef}
                     />
@@ -324,6 +414,7 @@ export default function Sidebar() {
                             title="Quick Access"
                             items={shortcuts}
                             pathname={location.pathname}
+                            search={location.search}
                             onNavigate={close}
                             isShortcut={true}
                         />
