@@ -124,6 +124,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [showErrors, setShowErrors] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pendingMedical, setPendingMedical] = useState<MedicalValues | null>(null);
+  const [pendingResultFiles, setPendingResultFiles] = useState<File[]>([]);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmCooldown, setConfirmCooldown] = useState(0);
@@ -262,6 +263,10 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     }
 
     setPendingMedical(formDataToMedical(fd));
+    const resultFiles = fd.getAll("result_attachments").filter(
+      (v): v is File => v instanceof File
+    );
+    setPendingResultFiles(resultFiles);
     setIsAgreementOpen(true);
   };
 
@@ -273,6 +278,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       const details = resolveDetails(values);
       const body = new FormData();
       if (file) body.append("application_form", file);
+      pendingResultFiles.forEach((f) => body.append("result_attachments", f));
       body.append(
         "data",
         JSON.stringify({

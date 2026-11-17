@@ -1,5 +1,6 @@
 import json
 import time
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Form, File, UploadFile
 from supabase import Client
 
@@ -212,9 +213,10 @@ public_patient_router = APIRouter(
 
 
 @public_patient_router.post("/pre_register", response_model=SuccessResponse)
-def register_patient(
+async def register_patient(
     data: str = Form(...),
     application_form: UploadFile | None = File(None),
+    result_attachments: List[UploadFile] | None = File(None),
 ):
     from app.services.auth.user import get_supabase_admin
     from app.services.patient import create_patient as create_patient_service
@@ -233,19 +235,45 @@ def register_patient(
         first = payload.get("first_name") or ""
         middle = payload.get("middle_name") or ""
         last = payload.get("last_name") or ""
-        name = f"{last}, {first} {middle}".strip().strip(",")
+        name = f"{last}, {first}, {middle}".strip().strip(",")
         payload["name"] = name or last or first
 
     # Default classification if missing
     payload.setdefault("classification", "student")
+
+    # Map frontend field name 'year' to schema field 'school_year'
+    if payload.get("school_year") is None and payload.get("year") is not None:
+        payload["school_year"] = payload.pop("year")
 
     try:
         request = CreatePatientRequest(**payload)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
 
+    # Read file contents
+    app_form_content = None
+    app_form_filename = None
+    if application_form:
+        app_form_content = await application_form.read()
+        app_form_filename = application_form.filename or "application_form"
+        await application_form.close()
+
+    result_attachment_payloads = None
+    if result_attachments:
+        result_attachment_payloads = []
+        for fa in result_attachments:
+            content = await fa.read()
+            result_attachment_payloads.append((content, fa.filename or "attachment"))
+            await fa.close()
+
     admin = get_supabase_admin()
-    result = create_patient_service(request, admin)
+    result = create_patient_service(
+        request,
+        admin,
+        application_form_content=app_form_content,
+        application_form_filename=app_form_filename,
+        result_attachments=result_attachment_payloads,
+    )
     return result
 
 

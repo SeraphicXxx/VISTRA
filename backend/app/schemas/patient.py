@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field, field_validator
 from app.enums.civil_status import CivilStatus
 from app.enums.sex import Sex
 from app.enums.personal_history import Results as ResultsEnum
-from app.enums.family_history import Family_history
 from app.utils.name_utils import separate_name
 from app.utils.validator.common import confirm_mobile_number, confirm_not_blank, confirm_birthday
 
@@ -15,6 +14,7 @@ from app.utils.validator.common import confirm_mobile_number, confirm_not_blank,
 class Patient(BaseModel):
     id: UUID
     patient_id: str
+    email: str | None = None
     created_by: str | None = None
     registration_status: str = "approved"
 
@@ -78,6 +78,9 @@ class CreatePatientRequest(BaseModel):
     department: str | None = None
     position: str | None = None
 
+    # Account email (stored on PATIENT table)
+    email: str | None = Field(default=None, max_length=255)
+
     # Medical history form fields (from MedicalHistoryForm component)
     hospitalization_year: int | None = Field(default=None, ge=1900, le=2100)
     hospitalization_operation: str | None = Field(default=None, max_length=255)
@@ -86,13 +89,23 @@ class CreatePatientRequest(BaseModel):
     allergy_food: str | None = Field(default=None, max_length=255)
     smoking: str | None = None
     vaping: str | None = None
-    alcohol: str | None = None
-    contraceptive: str | None = Field(default=None, max_length=255)
+    alcohol_intake: str | None = None
+    contraceptive_method: str | None = Field(default=None, max_length=255)
     sexual_activity: str | None = None
 
-    # Family history
-    family_history: str | None = Field(default=None, max_length=255)
+    # Family history (stored as jsonb "conditions" on FAMILY_MEDICAL_HISTORY)
+    family_history: list[str] | None = Field(default=None, max_length=255)
     family_history_others: str | None = Field(default=None, max_length=255)
+
+    # Vitals (stored on VITAL_SIGNS table)
+    height: float | None = Field(default=None, gt=0, description="Patient height, in centimeters")
+    weight: float | None = Field(default=None, gt=0, description="Patient weight, in kilograms")
+    temperature: float | None = Field(default=None, ge=25, le=45)
+    heart_rate: int | None = Field(default=None, ge=0, le=300)
+    spo2: float | None = Field(default=None, ge=0, le=100)
+    # Frontend field names (mapped to DB columns above in service layer)
+    blood_pressure: str | None = Field(default=None, max_length=20)
+    respiratory_rate: str | None = Field(default=None, max_length=10)
 
     # Results
     chest_xray: str | None = None
@@ -224,43 +237,43 @@ class UpdatePatientProfileRequest(BaseModel):
 
 
 class CreateMedicalhistory(BaseModel):
-    hostpitalization_operation : str = Field(..., min_length=1, max_length=255)
-    hostpitalization_year : int
+    hostpitalization_operation: str | None = Field(default=None, max_length=255)
+    hostpitalization_year: str | None = None
     diagnosis: str = Field(..., min_length=2, max_length=255)
-    allergy_medicine : str =Field(..., min_length=2, max_length=255)
-    allergy_food : str = Field(..., min_length=2, max_length=255)
-    Smoking : str | None = None
+    allergy_medicine: str = Field(..., min_length=2, max_length=255)
+    allergy_food: str = Field(..., min_length=2, max_length=255)
+    Smoking: str | None = None
     Vaping: str | None = None
     alcohol_intake: str | None = None
     family_planning_method: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
-        def _to_freq(val: str | None) -> str | None:
+        def _to_bool(val: str | None) -> bool | None:
             if not val or val in ("None", "none", "NONE"):
                 return None
-            return val
+            return bool(val)
 
         return {
-            "patient_id" : patient_id,
-            "hospitalization_operation" : self.hostpitalization_operation,
-            "hospitalization_year" : self.hostpitalization_year,
-            "diagnosis" : self.diagnosis,
-            "allergy_medicine" : self.allergy_medicine,
-            "allergy_food" : self.allergy_food,
-            "smoking" : _to_freq(self.Smoking),
-            "vaping" : _to_freq(self.Vaping),
-            "alcohol_intake" : _to_freq(self.alcohol_intake),
-            "family_planning_method" : self.family_planning_method,
+            "patient_id": patient_id,
+            "hospitalization_operation": self.hostpitalization_operation or "",
+            "hospitalization_year": self.hostpitalization_year,
+            "diagnosis": self.diagnosis,
+            "allergy_medicine": self.allergy_medicine,
+            "allergy_food": self.allergy_food,
+            "smoking": _to_bool(self.Smoking),
+            "vaping": _to_bool(self.Vaping),
+            "alcohol_intake": _to_bool(self.alcohol_intake),
+            "family_planning_method": self.family_planning_method,
         }
 
 class FamilyHistory(BaseModel):
-    condition: Family_history
+    conditions: list[str] | None = Field(default=None, description="List of family medical conditions")
     other_condition: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
         return {
             "patient_id" : patient_id,
-            "condition" : self.condition.value if self.condition else None,
+            "conditions" : self.conditions if self.conditions else [],
             "other_condition" : self.other_condition if self.other_condition else None,
         }
 

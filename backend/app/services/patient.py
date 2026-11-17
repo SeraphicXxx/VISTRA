@@ -1,11 +1,15 @@
 from fastapi import status, HTTPException
 import secrets
+from pathlib import Path
+from uuid import uuid4
 
 from postgrest.exceptions import APIError
 from supabase import Client
 
 from app.repositories.base import insert_model
 from app.repositories.patient_repositories import PatientRepository
+from app.repositories.vital_signs_repository import VitalSignsRepository
+from app.repositories.attachments_repositories import AttachmentRepository
 from app.schemas.patient import (
     Patient,
     CreatePatientRequest,
@@ -16,6 +20,7 @@ from app.schemas.patient import (
 )
 from app.schemas.query import FilterPatient
 from app.schemas.user import role_for_classification
+from app.schemas.vital_signs import CreateVitalSignsRequest
 from app.services.auth.user import (
     compensate_auth_user,
     delete_auth_or_500,
@@ -26,7 +31,6 @@ from app.utils.email_utils import remove_ucc_domain
 from app.utils.service_helpers import handle_service_errors, ok, or_404
 from app.utils.supabase_query_builder import SupabaseQueryBuilder
 from app.enums.personal_history import Results as ResultsEnum
-from app.enums.family_history import Family_history
 from app.database.database_client import supabase_admin
 
 
@@ -58,7 +62,13 @@ def ensure_patient_not_exists(patient_repo: PatientRepository, patient_id: str) 
 
 
 @handle_service_errors
-def create_patient(request: CreatePatientRequest, supabase: Client):
+def create_patient(
+    request: CreatePatientRequest,
+    supabase: Client,
+    application_form_content: bytes | None = None,
+    application_form_filename: str | None = None,
+    result_attachments: list[tuple[bytes, str]] | None = None,
+):
     patient_id = remove_ucc_domain(request.patient_id)
     patient_repo = PatientRepository(supabase)
 
@@ -76,10 +86,11 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
     )
 
     try:
-        # 3. Insert PATIENT
+        # 3. Insert PATIENT (includes email if provided)
         patient_data = Patient(
             id=user.id,
             patient_id=patient_id,
+            email=request.email,
             created_by=request.created_by,
             registration_status=request.registration_status,
         )
@@ -108,10 +119,23 @@ def create_patient(request: CreatePatientRequest, supabase: Client):
                 "to delete auth user",
             )
 
-        # 6. Insert medical history, family history, and results if any
-        # medical data was provided in the form
+        # 6. Insert medical history, family history, results, and vitals
         _create_personal_records_from_request(
             patient_repo, patient_id, request, supabase_admin
+        )
+
+        # 7. Insert vital signs if provided
+        _create_vital_signs_from_request(
+            patient_id, request, supabase_admin
+        )
+
+        # 8. Save attachments (OCR application form + result attachments) to PATIENT_ATTACHMENTS
+        _save_pre_registration_attachments(
+            patient_id=patient_id,
+            application_form_content=application_form_content,
+            application_form_filename=application_form_filename,
+            result_attachments=result_attachments,
+            supabase=supabase,
         )
 
     except Exception as e:
@@ -155,18 +179,18 @@ def _create_personal_records_from_request(
         request.contraceptive,
     ])
     if medical_fields_present:
-        patient_repo.insert_personal_record(
+        patient_repo_admin.insert_personal_record(
             patient_id,
             CreateMedicalhistory(
                 hostpitalization_operation=request.hospitalization_operation or "",
-                hostpitalization_year=request.hospitalization_year or 0,
+                hostpitalization_year=request.hospitalization_year or "",
                 diagnosis=request.diagnosis or "",
                 allergy_medicine=request.allergy_medicine or "",
                 allergy_food=request.allergy_food or "",
                 Smoking=request.smoking or None,
                 Vaping=request.vaping or None,
-                alcohol_intake=request.alcohol or None,
-                family_planning_method=request.contraceptive or None,
+                alcohol_intake=request.alcohol_intake or None,
+                family_planning_method=request.contraceptive_method or None,
             ),
         )
 
@@ -175,10 +199,10 @@ def _create_personal_records_from_request(
         request.family_history or request.family_history_others
     )
     if family_fields_present:
-        patient_repo.insert_family_history(
+        patient_repo_admin.insert_family_history(
             patient_id,
             FamilyHistory(
-                condition=Family_history(request.family_history) if request.family_history else Family_history.HYPERTENSION,
+                conditions=request.family_history or [],
                 other_condition=request.family_history_others or "",
             ),
         )
@@ -189,7 +213,7 @@ def _create_personal_records_from_request(
         request.recommendation,
     ])
     if results_fields_present:
-        patient_repo.insert_results(
+        patient_repo_admin.insert_results(
             patient_id,
             PatientResults(
                 Chest_Xray=ResultsEnum(request.chest_xray) if request.chest_xray else ResultsEnum.NORMAL,
@@ -198,6 +222,129 @@ def _create_personal_records_from_request(
                 recommendation=request.recommendation or None,
             ),
         )
+
+
+def _create_vital_signs_from_request(
+    patient_id: str,
+    request: CreatePatientRequest,
+    supabase: Client | None,
+) -> None:
+    """Insert vital signs into VITALS_SIGNS if any vitals fields are provided."""
+    if supabase is None:
+        return
+    # Frontend field names map to DB columns:
+    #   blood_pressure  -> heart_rate
+    #   respiratory_rate -> spo2
+    vitals_fields_present = any([
+        request.height is not None,
+        request.weight is not None,
+        request.temperature is not None,
+        request.blood_pressure is not None,
+        request.respiratory_rate is not None,
+    ])
+    if not vitals_fields_present:
+        return
+
+    def _to_int(val: str | None) -> int | None:
+        if not val:
+            return None
+        try:
+            return int(float(val))
+        except (ValueError, TypeError):
+            return None
+
+    def _to_float(val: str | None) -> float | None:
+        if not val:
+            return None
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return None
+
+    repository = VitalSignsRepository(supabase)
+    created = repository.create({
+        "patient_id": patient_id,
+        "height": request.height,
+        "weight": request.weight,
+        "temperature": request.temperature,
+        "heart_rate": _to_int(request.blood_pressure),
+        "spo2": _to_float(request.respiratory_rate),
+    })
+    if not created:
+        raise RuntimeError("Failed to create vital signs record")
+
+
+def _save_pre_registration_attachments(
+    patient_id: str,
+    application_form_content: bytes | None,
+    application_form_filename: str | None,
+    result_attachments: list[tuple[bytes, str]] | None,
+    supabase: Client,
+) -> None:
+    """Save the OCR application form and result attachments to PATIENT_ATTACHMENTS."""
+    repository = AttachmentRepository(supabase)
+
+    # Save the OCR application form file
+    if application_form_content and application_form_filename:
+        attachment_id = str(uuid4())
+        relative_path = (
+            Path(patient_id)
+            / "preregistration"
+            / f"{attachment_id}{Path(application_form_filename).suffix}"
+        ).as_posix()
+
+        metadata = {
+            "id": attachment_id,
+            "patient_id": patient_id,
+            "medical_visit_id": None,
+            "uploaded_by": patient_id,
+            "category": "clinical_photo",
+            "file_name": Path(application_form_filename or "application_form").name,
+            "storage_path": relative_path,
+            "mime_type": "application/pdf",
+            "file_size": len(application_form_content),
+        }
+        repository.save_file(relative_path, application_form_content)
+        try:
+            repository.create(metadata)
+        except Exception:
+            try:
+                repository.delete_file(relative_path)
+            except Exception:
+                pass
+            raise
+
+    # Save result attachments
+    if result_attachments:
+        for content, filename in result_attachments:
+            attachment_id = str(uuid4())
+            ext = Path(filename).suffix if filename else ".bin"
+            relative_path = (
+                Path(patient_id)
+                / "results"
+                / f"{attachment_id}{ext}"
+            ).as_posix()
+
+            metadata = {
+                "id": attachment_id,
+                "patient_id": patient_id,
+                "medical_visit_id": None,
+                "uploaded_by": patient_id,
+                "category": "laboratory_result",
+                "file_name": Path(filename or "attachment").name,
+                "storage_path": relative_path,
+                "mime_type": "application/octet-stream",
+                "file_size": len(content),
+            }
+            repository.save_file(relative_path, content)
+            try:
+                repository.create(metadata)
+            except Exception:
+                try:
+                    repository.delete_file(relative_path)
+                except Exception:
+                    pass
+                raise
 
 
 @handle_service_errors

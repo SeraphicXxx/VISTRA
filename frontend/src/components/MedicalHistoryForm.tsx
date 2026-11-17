@@ -437,6 +437,19 @@ export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryForm
               required
             />
           </div>
+          <div className="mt-4">
+            <label className="block text-xs font-medium text-textSecondary mb-2">
+              Attachments (lab results, X-rays, etc.)
+            </label>
+            <input
+              id="result_attachments"
+              name="result_attachments"
+              type="file"
+              multiple
+              accept=".pdf,.jpg,.jpeg,.png,.webp"
+              className="block w-full text-sm text-textPrimary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primaryDark"
+            />
+          </div>
         </div>
       )}
 
