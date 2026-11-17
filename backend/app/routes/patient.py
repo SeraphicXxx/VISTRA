@@ -245,6 +245,12 @@ async def register_patient(
     if payload.get("school_year") is None and payload.get("year") is not None:
         payload["school_year"] = payload.pop("year")
 
+    # Flatten nested medical_history dict into top-level payload fields
+    medical_history = payload.pop("medical_history", None)
+    if isinstance(medical_history, dict):
+        for key, value in medical_history.items():
+            payload.setdefault(key, value)
+
     try:
         request = CreatePatientRequest(**payload)
     except Exception as e:
