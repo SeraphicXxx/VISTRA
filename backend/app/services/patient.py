@@ -119,6 +119,7 @@ def create_patient(
                 "to delete auth user",
             )
 
+        print(f"[DEBUG] create_patient: supabase_admin={supabase_admin is not None}, patient_id={patient_id}")
         # 6. Insert medical history, family history, results, and vitals
         _create_personal_records_from_request(
             patient_repo, patient_id, request, supabase_admin
@@ -168,8 +169,14 @@ def _create_personal_records_from_request(
 
     # Use supabase_admin to bypass RLS on medical tables
     if supabase_admin is None:
+        print("[DEBUG] _create_personal_records_from_request: supabase_admin is None, skipping")
         return
     patient_repo_admin = PatientRepository(supabase_admin)
+    print(f"[DEBUG] _create_personal_records_from_request: patient_id={patient_id}")
+    print(f"[DEBUG] hospitalization_year={request.hospitalization_year}, diagnosis={request.diagnosis}, allergy_medicine={request.allergy_medicine}")
+    print(f"[DEBUG] smoking={request.smoking}, vaping={request.vaping}, alcohol_intake={request.alcohol_intake}, contraceptive_method={request.contraceptive_method}")
+    print(f"[DEBUG] family_history={request.family_history}, family_history_others={request.family_history_others}")
+    print(f"[DEBUG] chest_xray={request.chest_xray}, cbc={request.cbc}, urinalysis={request.urinalysis}, recommendation={request.recommendation}")
 
     # --- Medical History ---
     medical_fields_present = any([
@@ -178,50 +185,62 @@ def _create_personal_records_from_request(
         request.smoking, request.vaping, request.alcohol_intake,
         request.contraceptive_method,
     ])
+    print(f"[DEBUG] medical_fields_present={medical_fields_present}")
     if medical_fields_present:
-        patient_repo_admin.insert_personal_record(
-            patient_id,
-            CreateMedicalhistory(
-                hostpitalization_operation=request.hospitalization_operation or "",
-                hostpitalization_year=request.hospitalization_year or "",
-                diagnosis=request.diagnosis or "",
-                allergy_medicine=request.allergy_medicine or "",
-                allergy_food=request.allergy_food or "",
-                Smoking=request.smoking or None,
-                Vaping=request.vaping or None,
-                alcohol_intake=request.alcohol_intake or None,
-                family_planning_method=request.contraceptive_method or None,
-            ),
+        medical_data = CreateMedicalhistory(
+            hostpitalization_operation=request.hospitalization_operation or "",
+            hostpitalization_year=request.hospitalization_year or "",
+            diagnosis=request.diagnosis or "",
+            allergy_medicine=request.allergy_medicine or "",
+            allergy_food=request.allergy_food or "",
+            Smoking=request.smoking or None,
+            Vaping=request.vaping or None,
+            alcohol_intake=request.alcohol_intake or None,
+            family_planning_method=request.contraceptive_method or None,
         )
+        print(f"[DEBUG] insert_personal_record data={medical_data.to_db_dict(patient_id)}")
+        result = patient_repo_admin.insert_personal_record(
+            patient_id,
+            medical_data,
+        )
+        print(f"[DEBUG] insert_personal_record result={result}")
 
     # --- Family History ---
     family_fields_present = bool(
         request.family_history or request.family_history_others
     )
+    print(f"[DEBUG] family_fields_present={family_fields_present}")
     if family_fields_present:
-        patient_repo_admin.insert_family_history(
-            patient_id,
-            FamilyHistory(
-                conditions=request.family_history or [],
-                other_condition=request.family_history_others or "",
-            ),
+        fam_data = FamilyHistory(
+            conditions=request.family_history or [],
+            other_condition=request.family_history_others or "",
         )
+        print(f"[DEBUG] insert_family_history data={fam_data.to_db_dict(patient_id)}")
+        result = patient_repo_admin.insert_family_history(
+            patient_id,
+            fam_data,
+        )
+        print(f"[DEBUG] insert_family_history result={result}")
 
     # --- Results ---
     results_fields_present = any([
         request.chest_xray, request.cbc, request.urinalysis,
         request.recommendation,
     ])
+    print(f"[DEBUG] results_fields_present={results_fields_present}")
     if results_fields_present:
-        patient_repo_admin.insert_results(
-            patient_id,
-            PatientResults(
-                Chest_Xray=ResultsEnum(request.chest_xray) if request.chest_xray else ResultsEnum.NORMAL,
-                CBC=ResultsEnum(request.cbc) if request.cbc else ResultsEnum.NORMAL,
-                Urinalysis=ResultsEnum(request.urinalysis) if request.urinalysis else ResultsEnum.NORMAL,
-                recommendation=request.recommendation or None,
-            ),
+        res_data = PatientResults(
+            Chest_Xray=ResultsEnum(request.chest_xray) if request.chest_xray else ResultsEnum.NORMAL,
+            CBC=ResultsEnum(request.cbc) if request.cbc else ResultsEnum.NORMAL,
+            Urinalysis=ResultsEnum(request.urinalysis) if request.urinalysis else ResultsEnum.NORMAL,
+            recommendation=request.recommendation or None,
         )
+        print(f"[DEBUG] insert_results data={res_data.to_db_dict(patient_id)}")
+        result = patient_repo_admin.insert_results(
+            patient_id,
+            res_data,
+        )
+        print(f"[DEBUG] insert_results result={result}")
 
 
 def _create_vital_signs_from_request(
@@ -231,6 +250,7 @@ def _create_vital_signs_from_request(
 ) -> None:
     """Insert vital signs into VITALS_SIGNS if any vitals fields are provided."""
     if supabase is None:
+        print("[DEBUG] _create_vital_signs_from_request: supabase is None, skipping")
         return
     # Frontend field names map to DB columns:
     #   blood_pressure  -> heart_rate
@@ -242,6 +262,8 @@ def _create_vital_signs_from_request(
         request.blood_pressure is not None,
         request.respiratory_rate is not None,
     ])
+    print(f"[DEBUG] _create_vital_signs_from_request: patient_id={patient_id}, vitals_fields_present={vitals_fields_present}")
+    print(f"[DEBUG] height={request.height}, weight={request.weight}, temperature={request.temperature}, blood_pressure={request.blood_pressure}, respiratory_rate={request.respiratory_rate}")
     if not vitals_fields_present:
         return
 
@@ -262,14 +284,17 @@ def _create_vital_signs_from_request(
             return None
 
     repository = VitalSignsRepository(supabase)
-    created = repository.create({
+    vitals_payload = {
         "patient_id": patient_id,
         "height": request.height,
         "weight": request.weight,
         "temperature": request.temperature,
         "heart_rate": _to_int(request.blood_pressure),
         "spo2": _to_float(request.respiratory_rate),
-    })
+    }
+    print(f"[DEBUG] insert vital signs payload={vitals_payload}")
+    created = repository.create(vitals_payload)
+    print(f"[DEBUG] insert vital signs result={created}")
     if not created:
         raise RuntimeError("Failed to create vital signs record")
 
