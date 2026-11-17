@@ -175,8 +175,8 @@ def _create_personal_records_from_request(
     medical_fields_present = any([
         request.hospitalization_year, request.diagnosis,
         request.allergy_medicine, request.allergy_food,
-        request.smoking, request.vaping, request.alcohol,
-        request.contraceptive,
+        request.smoking, request.vaping, request.alcohol_intake,
+        request.contraceptive_method,
     ])
     if medical_fields_present:
         patient_repo_admin.insert_personal_record(
