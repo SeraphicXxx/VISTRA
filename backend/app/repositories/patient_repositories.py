@@ -25,60 +25,29 @@ class PatientRepository(BaseRepository):
         return self.fetch_all("PATIENT")
 
     def get_profiles(self, filters: Any) -> PaginatedResponse:
-        # registration_status lives on PATIENT, while the profile fields live on
-        # PATIENT_PROFILE. PATIENT_PROFILE.patient_id references PATIENT.patient_id,
-        # so we query PATIENT with PATIENT_PROFILE nested (same pattern used by
-        # appointment_repositories and list_registrations), filter registration_status
-        # on PATIENT, then flatten PATIENT_PROFILE to top level so the response shape
-        # stays compatible with the existing PatientProfile consumer.
+        # patient_profiles_view joins PATIENT (registration_status) with
+        # PATIENT_PROFILE (profile fields) on patient_id, so all filters
+        # apply to flat columns with no nested relation syntax.
         query = (
             SupabaseQueryBuilder(
                 self.supabase,
-                "PATIENT",
-                columns="""\
-                    *,
-                    PATIENT_PROFILE!inner(
-                        patient_id,
-                        first_name,
-                        middle_name,
-                        last_name,
-                        birthday,
-                        age,
-                        sex,
-                        complete_address,
-                        barangay,
-                        civil_status,
-                        course,
-                        contact_no,
-                        school_year,
-                        department,
-                        section,
-                        person_type
-                    )
-                """,
+                "patient_profiles_view",
                 count="exact",
             )
             .eq("registration_status", filters.status)
-            .eq("PATIENT_PROFILE.sex", filters.sex)
-            .eq("PATIENT_PROFILE.course", filters.course)
-            .eq("PATIENT_PROFILE.school_year", filters.year_section)
-            .eq("PATIENT_PROFILE.person_type", filters.user_type)
+            .eq("sex", filters.sex)
+            .eq("course", filters.course)
+            .eq("school_year", filters.year_section)
+            .eq("person_type", filters.user_type)
         )
 
         if filters.search:
             like = f"%{filters.search}%"
             query = query.or_(
-                f"patient_id.ilike.{like}"
+                f"patient_id.ilike.{like},first_name.ilike.{like},last_name.ilike.{like}"
             )
 
-        result = self.fetch_page(query, filters.page, filters.page_size)
-
-        result.items = [
-            {**(item.get("PATIENT_PROFILE") or {}), "registration_status": item.get("registration_status")}
-            for item in result.items
-        ]
-
-        return result
+        return self.fetch_page(query, filters.page, filters.page_size)
 
     def get_summary_records(self, patient_id: str) -> Any:
         return (
