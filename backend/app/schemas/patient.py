@@ -238,10 +238,10 @@ class UpdatePatientProfileRequest(BaseModel):
 
 class CreateMedicalhistory(BaseModel):
     hostpitalization_operation: str | None = Field(default=None, max_length=255)
-    hostpitalization_year: str | None = None
+    hostpitalization_year: int | str | None = None
     diagnosis: str = Field(..., min_length=2, max_length=255)
     allergy_medicine: str = Field(..., min_length=2, max_length=255)
-    allergy_food: str = Field(..., min_length=2, max_length=255)
+    allergy_food: str | None = Field(default=None, max_length=255)
     Smoking: str | None = None
     Vaping: str | None = None
     alcohol_intake: str | None = None
@@ -253,10 +253,14 @@ class CreateMedicalhistory(BaseModel):
                 return None
             return bool(val)
 
+        hospitalization_year = self.hostpitalization_year
+        if hospitalization_year is not None:
+            hospitalization_year = str(hospitalization_year)
+
         return {
             "patient_id": patient_id,
             "hospitalization_operation": self.hostpitalization_operation or "",
-            "hospitalization_year": self.hostpitalization_year,
+            "hospitalization_year": hospitalization_year,
             "diagnosis": self.diagnosis,
             "allergy_medicine": self.allergy_medicine,
             "allergy_food": self.allergy_food,
