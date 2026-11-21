@@ -48,6 +48,14 @@ const toSnake = (value: string): string =>
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
 
+// BMI = weight (kg) / height (m)². Returns "" until both values are valid.
+const calculateBmi = (weightKg: string, heightCm: string): string => {
+  const weight = parseFloat(weightKg);
+  const heightM = parseFloat(heightCm) / 100;
+  if (!weight || !heightM || weight <= 0 || heightM <= 0) return "";
+  return (weight / (heightM * heightM)).toFixed(1);
+};
+
 export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryFormProps) {
   const show = { ...DEFAULT_SECTIONS, ...sections };
   const visibleSections = SECTIONS.filter((s) => show[s.key]);
@@ -58,6 +66,10 @@ export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryForm
   );
   const [furthestUnlocked, setFurthestUnlocked] = useState(0);
   const [sectionError, setSectionError] = useState("");
+  const [weight, setWeight] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
+
+  const bmi = calculateBmi(weight, height);
 
   const sectionRefs = useRef<Partial<Record<SectionKey, HTMLDivElement | null>>>({});
 
@@ -353,24 +365,8 @@ export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryForm
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
             III. Vital Signs
           </h2>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <FormInput
-              id="temperature"
-              name="temperature"
-              label="Temperature (°C)"
-              type="text"
-              inputMode="decimal"
-              pattern="[0-9]*\.?[0-9]*"
-              placeholder="e.g. 36.5"
-              required
-            />
-            <FormInput
-              id="blood_pressure"
-              name="blood_pressure"
-              label="Blood pressure"
-              placeholder="e.g. 120/80"
-              required
-            />
             <FormInput
               id="heart_rate"
               name="heart_rate"
@@ -378,27 +374,72 @@ export default function MedicalHistoryForm({ sections, sex }: MedicalHistoryForm
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              placeholder="e.g. 78"
+              placeholder="e.g. 72"
               required
             />
+
             <FormInput
-              id="respiratory_rate"
-              name="respiratory_rate"
-              label="Respiratory rate"
+              id="temperature"
+              name="temperature"
+              label="Temperature (°C)"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              placeholder="e.g. 36.6"
+              required
+            />
+
+            <FormInput
+              id="spo2"
+              name="spo2"
+              label="SpO₂ (%)"
               type="text"
               inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="e.g. 18"
+              pattern="[0-9]{1,3}"
+              placeholder="e.g. 98"
               required
             />
+
             <FormInput
-              id="eyes"
-              name="eyes"
-              label="Eyes"
-              placeholder="e.g. Anicteric, pink conjunctiva"
+              id="weight"
+              name="weight"
+              label="Weight (kg)"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              placeholder="e.g. 62"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
               required
+            />
+
+            <FormInput
+              id="height"
+              name="height"
+              label="Height (cm)"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              placeholder="e.g. 165"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              required
+            />
+
+            <FormInput
+              id="bmi"
+              name="bmi"
+              label="BMI (kg/m²)"
+              type="text"
+              placeholder="Calculated"
+              value={bmi}
+              readOnly
             />
           </div>
+
+          <p className="mt-2 text-xs text-textMuted">
+            BMI is calculated automatically from weight and height.
+          </p>
         </div>
       )}
 

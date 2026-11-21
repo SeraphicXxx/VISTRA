@@ -4,7 +4,7 @@ import { ArrowLeft, Inbox, Pencil } from "lucide-react";
 import { usePatientRecordSummaryQuery, useUpdatePatientProfile } from "/@/hooks/query/PatientQuery";
 import { PatientRecordTab } from "/@/types/types";
 import { formatDate } from "/@/utils/FormatDate";
-import { EditRecordModal, patientEditFields } from "/@/components/editModal";
+import { EditRecordModal, Modal, patientEditFields } from "/@/components/editModal";
 import { getFieldErrorString } from "/@/utils/Formatters";
 import { SaveErrorBanner } from "/@/components/SaveErrorBanner";
 import { PatientAvatar } from "/@/components/PatientAvatar";
@@ -17,6 +17,8 @@ import {
   isStudentPatient,
   sortRecordsByDate,
 } from "/@/utils/PatientRecordUtils";
+
+type RecordItem = ReturnType<typeof sortRecordsByDate>[number];
 
 function InfoGroupLabel({ children }: { children: ReactNode }) {
   return (
@@ -40,6 +42,65 @@ function InfoTile({
       <dt className="text-xs font-medium text-textMuted">{label}</dt>
       <dd className="mt-1.5 break-words text-sm font-semibold text-textPrimary">{value || "—"}</dd>
     </div>
+  );
+}
+
+function RecordDetailModal({
+  record,
+  onClose,
+}: {
+  record: RecordItem;
+  onClose: () => void;
+}) {
+  return (
+    <Modal
+      title="Record details"
+      onClose={onClose}
+      maxWidth="max-w-lg"
+      footer={
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg border border-border bg-white px-4 py-2 text-xs font-medium text-textSecondary transition-colors hover:bg-background hover:text-textPrimary"
+        >
+          Close
+        </button>
+      }
+    >
+      <dl className="space-y-4">
+        <div>
+          <dt className="text-xs font-medium text-textMuted">Date</dt>
+          <dd className="mt-1 text-sm font-semibold text-textPrimary">
+            <time dateTime={record.date}>{formatDate(record.date)}</time>
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-xs font-medium text-textMuted">Title</dt>
+          <dd className="mt-1 whitespace-pre-wrap break-words text-sm font-semibold text-textPrimary">
+            {record.title || "—"}
+          </dd>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <dt className="text-xs font-medium text-textMuted">Provider</dt>
+            <dd className="mt-1 break-words text-sm text-textPrimary">{record.provider || "—"}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-textMuted">Staff ID</dt>
+            <dd className="mt-1 break-words text-sm tabular-nums text-textPrimary">{record.staff_id || "—"}</dd>
+          </div>
+        </div>
+
+        <div>
+          <dt className="text-xs font-medium text-textMuted">Notes</dt>
+          <dd className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-xl bg-background/70 px-4 py-3 text-sm leading-relaxed text-textSecondary">
+            {record.notes || "—"}
+          </dd>
+        </div>
+      </dl>
+    </Modal>
   );
 }
 
@@ -125,6 +186,7 @@ export default function ViewStudentRecord() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<Record<string, any>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<RecordItem | null>(null);
   const updateProfileMutation = useUpdatePatientProfile();
 
   const patient = patientInfo?.data;
@@ -330,12 +392,14 @@ export default function ViewStudentRecord() {
 
             <p className="text-xs text-textMuted">
               {activeRecords.length} {activeLabel.toLowerCase()} {activeRecords.length === 1 ? "entry" : "entries"}
+              {activeRecords.length > 0 && <span> · Click a row for full details</span>}
             </p>
           </div>
 
           {activeRecords.length > 0 ? (
             <div key={activeTab} className="min-h-0 flex-1 overflow-auto">
-              <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+              {/* table-fixed keeps the columns at their set widths; long text is clamped to two lines. */}
+              <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-sm">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wider text-textMuted">
                     <th scope="col" className="w-36 px-6 py-3 font-semibold">
@@ -356,30 +420,42 @@ export default function ViewStudentRecord() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {activeRecords.map((record) => (
-                    <tr
-                      key={record.id}
-                      className="align-top transition-colors hover:bg-primary/[0.03]"
-                    >
-                      <td className="whitespace-nowrap px-6 py-4 tabular-nums text-textSecondary">
-                        <time dateTime={record.date}>
-                          {formatDate(record.date)}
-                        </time>
-                      </td>
-                      <td className="px-4 py-4 font-medium text-textPrimary">
-                        {record.title}
-                      </td>
-                      <td className="px-4 py-4 text-textSecondary">
-                        {record.provider || "—"}
-                      </td>
-                      <td className="px-4 py-4 tabular-nums text-textSecondary">
-                        {record.staff_id || "—"}
-                      </td>
-                      <td className="px-6 py-4 leading-relaxed text-textSecondary">
-                        {record.notes || "—"}
-                      </td>
-                    </tr>
-                  ))}
+                  {activeRecords.map((record) => {
+                    const openDetails = () => setSelectedRecord(record);
+
+                    return (
+                      <tr
+                        key={record.id}
+                        tabIndex={0}
+                        onClick={openDetails}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            openDetails();
+                          }
+                        }}
+                        className="cursor-pointer align-top transition-colors hover:bg-primary/[0.03] focus-visible:bg-primary/[0.05] focus-visible:outline-none"
+                      >
+                        <td className="whitespace-nowrap px-6 py-4 tabular-nums text-textSecondary">
+                          <time dateTime={record.date}>
+                            {formatDate(record.date)}
+                          </time>
+                        </td>
+                        <td className="px-4 py-4 font-medium text-textPrimary">
+                          <p className="line-clamp-2 break-words">{record.title || "—"}</p>
+                        </td>
+                        <td className="px-4 py-4 text-textSecondary">
+                          <p className="line-clamp-2 break-words">{record.provider || "—"}</p>
+                        </td>
+                        <td className="px-4 py-4 tabular-nums text-textSecondary">
+                          <p className="line-clamp-2 break-words">{record.staff_id || "—"}</p>
+                        </td>
+                        <td className="px-6 py-4 leading-relaxed text-textSecondary">
+                          <p className="line-clamp-2 break-words">{record.notes || "—"}</p>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -398,6 +474,10 @@ export default function ViewStudentRecord() {
           )}
         </section>
       </div>
+
+      {selectedRecord && (
+        <RecordDetailModal record={selectedRecord} onClose={() => setSelectedRecord(null)} />
+      )}
 
       {isEditModalOpen && (
         <>
