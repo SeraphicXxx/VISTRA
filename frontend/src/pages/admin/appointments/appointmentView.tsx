@@ -11,6 +11,7 @@ import {
 import type {LucideIcon} from "lucide-react";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
+import {toast} from "react-toastify";
 
 import {toAppointmentPageFormat} from "/@/repository/AppointmentModel";
 import {useAppointmentByIdQuery, useUpdateAppointment} from "/@/hooks/query/AppointmentQuery";
@@ -20,6 +21,9 @@ import {SaveErrorBanner} from "/@/components/SaveErrorBanner";
 import {PatientAvatar} from "/@/components/PatientAvatar";
 import {Modal} from "/@/components/editModal";
 import {getAttachmentsByAppointment, downloadAttachment, type AttachmentRecord} from "/@/api/attachments.api";
+import {sessionManager} from "/@/utils/SessionManager";
+import {FitToWorkSection} from "/@/components/appointments/fitToWork/FitToWorkSection";
+import type {FitToWorkCertificate} from "/@/components/appointments/fitToWork/fitToWorkUtils";
 
 type AdminAppointmentStatus = "pending" | "confirmed" | "declined";
 
@@ -278,6 +282,7 @@ export default function AppointmentDetailView() {
     const [optimisticStatus, setOptimisticStatus] =
         useState<AdminAppointmentStatus | null>(null);
     const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
+    const [fitIssued, setFitIssued] = useState(false);
     const updateAppointmentMutation = useUpdateAppointment();
 
     useEffect(() => {
@@ -372,6 +377,13 @@ export default function AppointmentDetailView() {
     const confirmDecline = (): void => {
         const reason = form.reason.trim();
         setConfirmAction({ status: "declined", decline_reason: reason || undefined });
+    };
+
+    // TODO: replace with the real save call once the backend exposes a fit-to-work endpoint.
+    // Until then, this only marks the certificate as issued on this page.
+    const handleIssueFitToWork = async (certificate: FitToWorkCertificate): Promise<void> => {
+        setFitIssued(true);
+        toast.success(`Fit to work certificate issued for ${certificate.full_name}.`);
     };
 
     return (
@@ -684,6 +696,22 @@ export default function AppointmentDetailView() {
 
                     </div>
 
+                </div>
+
+                <div className="lg:col-span-3">
+                    <FitToWorkSection
+                        appointmentType={appointment.type}
+                        examinationDate={appointment.date ?? ""}
+                        patient={{
+                            name: appointment.student,
+                            studentId: patientId,
+                            courseSection: appointment.course,
+                        }}
+                        physician={sessionManager.getUser()?.user_id ?? ""}
+                        attachments={attachments}
+                        isIssued={fitIssued}
+                        onIssue={handleIssueFitToWork}
+                    />
                 </div>
 
             </div>

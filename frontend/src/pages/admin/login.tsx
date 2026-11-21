@@ -16,6 +16,7 @@ import { FormInput, PasswordInput } from "/@/components/InputCollection";
 import { LoginButton } from "/@/components/Button";
 import { Modal } from "/@/components/editModal";
 import { getStaffById } from "/@/api/staff.api";
+import LoginErrorNotice from "/@/components/login/LoginErrorNotice";
 
 function toStaffId(identifier: string): string {
   return identifier
@@ -101,15 +102,8 @@ export function LoginForm({
         </p>
       </div>
 
-      {isError && error && (
-        <div
-          key={error}
-          role="alert"
-          className="shake mb-5 w-full rounded-lg border border-danger/20 bg-danger/10 p-3 text-sm text-danger"
-        >
-          {error}
-        </div>
-      )}
+      {/* Server and network errors from the login request */}
+      <LoginErrorNotice error={isError ? error : null} className="w-full" />
 
       <div className="mb-5 w-full text-left">
         <FormInput

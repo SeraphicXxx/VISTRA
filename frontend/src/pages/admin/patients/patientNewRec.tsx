@@ -1,5 +1,5 @@
-import {useRef, useState, type FormEvent, type FocusEvent, type ReactNode} from "react";
-import {ArrowLeft, ArrowRight, Check, Save, UserPlus, Info, Eye, EyeOff} from "lucide-react";
+import {useRef, useState, type FormEvent, type FocusEvent} from "react";
+import {ArrowLeft, ArrowRight, Save, UserPlus, Info} from "lucide-react";
 import {FormInput, SelectField} from "/@/components/InputCollection.jsx";
 import {
     COURSE_OPTIONS,
@@ -14,182 +14,21 @@ import {
 } from "/@/utils/NewPatientUtils.jsx";
 import {calculateAge} from "/@/components/register/RegisterDetails";
 import MedicalHistoryForm from "/@/components/MedicalHistoryForm";
-import {
-    FACULTY_ID_PATTERN,
-    validateFacultyId,
-} from "/@/utils/NewPatientValidation.jsx";
 import {useSavePatient} from "/@/hooks/SavePatient";
 import {getFieldErrors, FieldErrors, getFieldErrorString} from "/@/utils/Formatters";
 import {ConfirmModal} from "/@/components/ConfirmModal";
 import {useNotify} from "/@/components/notifications/NotificationProvider";
-
-type Classification = "student" | "faculty" | "university_staff";
-type PatientRecord = Record<string, FormDataEntryValue>;
-type FormControl = HTMLInputElement | HTMLSelectElement;
-
-const BIRTHDAY_ERROR = "Enter a valid birthday that is not in the future.";
-
-const CLASSIFICATION_OPTIONS: {value: Classification; label: string}[] = [
-    {value: "student", label: "Student"},
-    {value: "faculty", label: "Faculty/Professor"},
-    {value: "university_staff", label: "University Staff"},
-];
-
-const STAFF_POSITION_OPTIONS: string[] = [
-    "Maintenance",
-    "Security",
-    "Other University Facilities",
-];
-
-const STAFF_ID_PATTERN = "UF-[0-9]{4}-[0-9]{3}";
-
-const validateStaffId = (value: string): string =>
-    /^UF-[0-9]{4}-[0-9]{3}$/.test(value) ? "" : "Use the format UF-2023-045";
-
-const ID_FIELDS: Record<Classification, {
-    label: string;
-    placeholder: string;
-    pattern: string;
-    validate: (value: string) => string;
-}> = {
-    student: {
-        label: "Student ID",
-        placeholder: "20230786-S",
-        pattern: "[0-9]{8}-S",
-        validate: (value: string) => (/^[0-9]{8}-S$/.test(value) ? "" : "Use the format 20230786-S"),
-    },
-    faculty: {
-        label: "Faculty/Professor ID",
-        placeholder: "F-2023-045",
-        pattern: FACULTY_ID_PATTERN,
-        validate: validateFacultyId,
-    },
-    university_staff: {
-        label: "University Staff ID",
-        placeholder: "UF-2023-045",
-        pattern: STAFF_ID_PATTERN,
-        validate: validateStaffId,
-    },
-};
-
-function PatientTypeToggle({value, onChange}: {value: Classification; onChange: (value: Classification) => void}) {
-    return (
-        <div role="radiogroup" aria-label="Patient type" className="inline-flex flex-wrap gap-1 rounded-xl border border-border bg-background p-1">
-            {CLASSIFICATION_OPTIONS.map((option) => {
-                const selected = value === option.value;
-                return (
-                    <button
-                        key={option.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        onClick={() => onChange(option.value)}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                            selected
-                                ? "bg-primary text-white shadow-sm"
-                                : "text-textSecondary hover:bg-surface hover:text-textPrimary"
-                        }`}
-                    >
-                        {option.label}
-                    </button>
-                );
-            })}
-        </div>
-    );
-}
-
-type StepperProps = {
-    steps: {title: string; description: string}[];
-    current: number;
-    onStepClick: (index: number) => void;
-};
-
-function Stepper({steps, current, onStepClick}: StepperProps) {
-    return (
-        <nav aria-label="Form progress" className="mb-12">
-            <ol className="flex items-start">
-                {steps.map((step, index) => {
-                    const done = index < current;
-                    const active = index === current;
-                    const isLast = index === steps.length - 1;
-
-                    return (
-                        <li key={step.title} className={`flex items-start ${isLast ? "" : "flex-1"}`}>
-                            <button
-                                type="button"
-                                onClick={() => onStepClick(index)}
-                                disabled={!done}
-                                aria-current={active ? "step" : undefined}
-                                className="group flex flex-col items-center gap-2 text-center disabled:cursor-default"
-                            >
-                                <span
-                                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300 ${
-                                        done
-                                            ? "border-primary bg-primary text-white group-hover:bg-primaryDark"
-                                            : active
-                                                ? "border-primary bg-white text-primary ring-4 ring-primary/15"
-                                                : "border-border bg-white text-textMuted"
-                                    }`}
-                                >
-                                    {done ? <Check className="h-4 w-4" strokeWidth={2.5}/> : index + 1}
-                                </span>
-                                <span
-                                    className={`hidden whitespace-nowrap text-xs font-medium transition-colors duration-200 md:block ${
-                                        active
-                                            ? "text-textPrimary"
-                                            : done
-                                                ? "text-textSecondary"
-                                                : "text-textMuted"
-                                    }`}
-                                >
-                                    {step.title}
-                                </span>
-                            </button>
-
-                            {!isLast && (
-                                <span
-                                    className={`mx-3 mt-4 h-0.5 flex-1 rounded-full transition-colors duration-300 ${
-                                        done ? "bg-primary" : "bg-border"
-                                    }`}
-                                />
-                            )}
-                        </li>
-                    );
-                })}
-            </ol>
-
-            <p className="mt-5 text-center text-xs font-medium text-textMuted md:hidden">
-                Step {current + 1} of {steps.length}: {steps[current].title}
-            </p>
-        </nav>
-    );
-}
-
-function StepHeading({title, description}: {title: string; description: string}) {
-    return (
-        <div>
-            <h3 className="font-heading text-lg font-semibold text-textPrimary">{title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-textMuted">{description}</p>
-        </div>
-    );
-}
-
-function FieldGroup({title, children}: {title: string; children: ReactNode}) {
-    return (
-        <section className="space-y-6">
-            <div className="flex items-center gap-3">
-                <h4 className="shrink-0 text-xs font-semibold uppercase tracking-wide text-primary">
-                    {title}
-                </h4>
-                <span className="h-px flex-1 bg-border" />
-            </div>
-
-            <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
-                {children}
-            </div>
-        </section>
-    );
-}
+import {
+    BIRTHDAY_ERROR,
+    STAFF_POSITION_OPTIONS,
+    ID_FIELDS,
+    type Classification,
+    type FormControl,
+    type PatientRecord,
+} from "/@/components/patients/newRecord/newPatientConstants";
+import {Stepper, StepHeading, FieldGroup, PatientTypeToggle} from "/@/components/patients/newRecord/PatientFormParts";
+import {PasswordField} from "/@/components/patients/newRecord/PasswordField";
+import {CourseSelect} from "/@/components/patients/newRecord/CourseSelect";
 
 export default function NewPatientRecordForm() {
     const {
@@ -202,7 +41,6 @@ export default function NewPatientRecordForm() {
     const saveErrorMessage: FieldErrors = getFieldErrors(saveError);
     const [classification, setClassification] = useState<Classification>("student");
     const [idError, setIdError] = useState<string>("");
-    const [showPassword, setShowPassword] = useState<boolean>(false);
     const [pendingRecord, setPendingRecord] = useState<PatientRecord | null>(null);
     const [birthday, setBirthday] = useState<string>("");
     const [emergencyRelation, setEmergencyRelation] = useState<string>("");
@@ -219,7 +57,6 @@ export default function NewPatientRecordForm() {
     const isFaculty = classification === "faculty";
     const isUniversityStaff = classification === "university_staff";
     const idField = ID_FIELDS[classification];
-    const PasswordIcon = showPassword ? EyeOff : Eye;
 
     // Age is calculated from the birthday, so it is never typed by hand.
     const ageValue = (() => {
@@ -310,10 +147,6 @@ export default function NewPatientRecordForm() {
         if (idError) {
             setIdError("");
         }
-    };
-
-    const togglePassword = (): void => {
-        setShowPassword((prev) => !prev);
     };
 
     const handleCancelConfirm = (): void => {
@@ -517,25 +350,15 @@ export default function NewPatientRecordForm() {
                 </FieldGroup>
 
                 <FieldGroup title="Account">
-                    <div>
-                        <FormInput
+                    <div className="sm:col-span-3">
+                        <PasswordField
                             id="password"
                             name="password"
                             label="Password"
-                            type={showPassword ? "text" : "password"}
                             placeholder="Enter password"
                             required
                             minLength={8}
                         />
-
-                        <button
-                            type="button"
-                            onClick={togglePassword}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted transition-colors hover:text-textPrimary"
-                            aria-label={showPassword ? "Hide password" : "Show password"}
-                        >
-                            <PasswordIcon className="h-4 w-4"/>
-                        </button>
 
                         <p className="mt-2 text-xs text-textMuted">
                             Must be at least 8 characters.
@@ -550,9 +373,8 @@ export default function NewPatientRecordForm() {
 
                 {isStudent && (
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
-                        <SelectField
+                        <CourseSelect
                             id="course"
-                            name="course"
                             label="Course"
                             options={COURSE_OPTIONS}
                             error={saveErrorMessage?.course_department}

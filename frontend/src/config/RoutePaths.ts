@@ -5,7 +5,7 @@ export const ROUTES = {
 
     staff: {
         home: "/staff",
-        login: "/login",    
+        login: "/login",
         dashboard: {
             overview: "/staff/dashboard/overview",
             medical: "/staff/dashboard/medical",
@@ -48,6 +48,8 @@ export const ROUTES = {
         },
         accessControl: {
             manageStaff: "/staff/Access-Control-Management/new-staff",
+            roles: "/staff/dashboard/Access-Control-Management/roles",
+            activityLogs: "/staff/dashboard/Access-Control-Management/activity-logs",
         },
     },
 
