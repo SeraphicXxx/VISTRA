@@ -272,13 +272,11 @@ class CreateMedicalhistory(BaseModel):
 
 class FamilyHistory(BaseModel):
     conditions: list[str] | None = Field(default=None, description="List of family medical conditions")
-    other_condition: str | None = Field(default=None, max_length=255)
 
     def to_db_dict(self, patient_id: str) -> dict:
         return {
             "patient_id" : patient_id,
             "conditions" : self.conditions if self.conditions else [],
-            "other_condition" : self.other_condition if self.other_condition else None,
         }
 
 class PatientResults(BaseModel): 

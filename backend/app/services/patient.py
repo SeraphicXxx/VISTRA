@@ -211,10 +211,11 @@ def _create_personal_records_from_request(
     )
     print(f"[DEBUG] family_fields_present={family_fields_present}")
     if family_fields_present:
-        fam_data = FamilyHistory(
-            conditions=request.family_history or [],
-            other_condition=request.family_history_others or "",
-        )
+        # Merge family_history list + family_history_others into one conditions array
+        conditions = list(request.family_history or [])
+        if request.family_history_others and request.family_history_others.strip():
+            conditions.append(request.family_history_others)
+        fam_data = FamilyHistory(conditions=conditions)
         print(f"[DEBUG] insert_family_history data={fam_data.to_db_dict(patient_id)}")
         result = patient_repo_admin.insert_family_history(
             patient_id,
