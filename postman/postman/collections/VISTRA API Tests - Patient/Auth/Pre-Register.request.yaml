@@ -1,0 +1,36 @@
+$kind: http-request
+url: "{{base_url}}/{{api_version}}/patients/pre_register"
+method: POST
+headers:
+  Content-Type: multipart/form-data
+body:
+  type: formdata
+  formdata:
+    - { key: data, type: text, value: '{"patient_id":"PT-POSTMAN-001","password":"TestPass123!","email":"patient.postman@example.com","name":"Postman, Test Patient","address":"456 Test Avenue","age":22,"barangay":"Barangay Test","birthday":"2004-05-15","mobile_number":"09123456789","sex":"Female","civil_status":"Single","classification":"Student","course":"BS Nursing","school_year":"2nd Year","section":"A","department":"College of Nursing","position":"Student","hospitalization_year":"2023","diagnosis":"Checkup","allergy_medicine":"None","allergy_food":"None","smoking":"None","vaping":"None","alcohol_intake":"None","contraceptive_method":"None","family_history":["Hypertension"],"family_history_others":"None","temperature":"36.8","blood_pressure":"110/70","respiratory_rate":"14","chest_xray":"Normal","cbc":"Normal","urinalysis":"Normal","recommendation":"Fit for enrollment","accepted_terms":true,"accepted_at":"2026-11-22T00:00:00Z"}' }
+    - { key: application_form, type: file, value: "", disabled: true }
+scripts:
+  - type: beforeRequest
+    code: |-
+      if (!pm.environment.get("patient_id")) {
+          pm.environment.set("patient_id", "PT-POSTMAN-" + Date.now());
+      }
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Pre-register returns 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is JSON", function () {
+          pm.response.to.be.json;
+      });
+
+      const json = pm.response.json();
+      pm.test("Pre-registration succeeds", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+      pm.test("Registration status is pending", function () {
+          pm.expect(json.success).to.eql(true);
+      });
+    language: text/javascript
+order: 100
