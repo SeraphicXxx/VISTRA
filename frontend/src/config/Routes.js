@@ -78,7 +78,6 @@ export const AdminRoutes = [
         component: "members",
         children: [
             { path: ROUTES.staff.accessControl.roles, label: "Roles & Permissions" },
-            { path: ROUTES.staff.accessControl.manageStaff, label: "User Management" },
             { path: ROUTES.staff.accessControl.activityLogs, label: "Activity Logs" },
         ],
     },

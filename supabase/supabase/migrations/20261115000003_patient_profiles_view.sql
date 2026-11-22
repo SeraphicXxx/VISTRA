@@ -22,5 +22,5 @@ SELECT
     pp.emergency_name,
     pp.emergency_relation,
     pp.emergency_phone
-FROM PATIENT p
-INNER JOIN PATIENT_PROFILE pp ON p.patient_id = pp.patient_id;
+FROM "PATIENT" p
+INNER JOIN "PATIENT_PROFILE" pp ON p.patient_id = pp.patient_id;

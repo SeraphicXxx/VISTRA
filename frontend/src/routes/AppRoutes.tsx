@@ -103,10 +103,6 @@ function AppRoutes() {
                             path={ROUTES.staff.accessControl.activityLogs}
                             element={<RequireModule module="staff_module"><ActivityLogsPage/></RequireModule>}
                         />
-                        <Route
-                            path={ROUTES.staff.accessControl.manageStaff}
-                            element={<RequireModule module="staff_module"><RoleManagementPage/></RequireModule>}
-                        />
 
                         <Route
                             path={ROUTES.staff.patient.createNewRecord}
