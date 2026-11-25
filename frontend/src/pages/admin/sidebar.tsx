@@ -46,7 +46,6 @@ const COMPONENT_MODULES: Record<string, keyof StaffPermissions | null> = {
     dental: "dental_module",
     appointments: "appointment_module",
     patients: "patient_module",
-    registrations: "patient_module",
     members: "staff_module",
 };
 

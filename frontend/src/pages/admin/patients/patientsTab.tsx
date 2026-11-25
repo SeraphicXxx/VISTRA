@@ -12,9 +12,6 @@ interface PatientsTabProps {
     setFilters: (filters: PatientFilters) => void;
 }
 
-// Replace with your real route for the account requests page.
-const ACCOUNT_REQUESTS_ROUTE = "/staff/dashboard/account-requests";
-
 export default function PatientsTab({setFilters}: PatientsTabProps) {
     const navigate = useNavigate();
     const {
@@ -42,7 +39,7 @@ export default function PatientsTab({setFilters}: PatientsTabProps) {
     <AccountRequestButton
         showLabel
         label="Pre-registered Accounts"
-        onClick={() => navigate(ACCOUNT_REQUESTS_ROUTE)}
+        onClick={() => navigate(ROUTES.staff.dashboard.registrations)}
     />
 }
             buildViewLink={(row: patientData) =>
