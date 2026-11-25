@@ -1,4 +1,4 @@
-import {useMemo, type ComponentType} from "react";
+import {useMemo, type ComponentType, type ReactNode} from "react";
 import {ChevronRight, Plus} from "lucide-react";
 import {DefaultTablePreset} from "/@/components/table/TableDesignPreset";
 import {HyperlinkText, LinkButton} from "/@/components/Button";
@@ -20,6 +20,7 @@ interface VisitTabProps<Row extends { id: string }, Item, F extends object> {
     totalPages?: number;
     page?: number;
     createAction?: VisitTabCreateAction;
+    headerActions?: ReactNode;
     buildViewLink?: (row: Row) => string;
     setFilters?: (filters: F) => void;
 }
@@ -34,6 +35,7 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
     totalPages,
     page,
     createAction,
+    headerActions,
     buildViewLink,
     setFilters,
 }: VisitTabProps<Row, Item, F>) {
@@ -41,6 +43,8 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
         () => items.map(toRow),
         [items, toRow]
     );
+
+    const hasPanelActions = Boolean(createAction) || Boolean(headerActions);
 
     return (
         <DefaultTablePreset<Row>
@@ -52,12 +56,17 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
             totalPages={totalPages}
             page={page}
             panelAddon={
-                createAction ? (
-                    <LinkButton
-                        title={createAction.title}
-                        route={createAction.route}
-                        icon={Plus}
-                    />
+                hasPanelActions ? (
+                    <div className="flex items-center gap-2">
+                        {headerActions}
+                        {createAction && (
+                            <LinkButton
+                                title={createAction.title}
+                                route={createAction.route}
+                                icon={Plus}
+                            />
+                        )}
+                    </div>
                 ) : undefined
             }
             renderAction={

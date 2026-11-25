@@ -17,6 +17,7 @@ import ProtectedRoute from "/@/routes/ProtectedRoute";
 import GuestRoute from "/@/routes/GuestRoute";
 import NewPatientRecordForm from "/@/pages/admin/patients/patientNewRec";
 import {PatientsPage, ViewPatientRecord} from "/@/pages/admin/patients/PatientPages";
+import AccountRequests from "/@/pages/admin/patients/AccountRequests";
 import ProtectedPatientRoute from "/@/routes/ProtectedPatientRoute";
 import PatientLayout from "/@/layouts/PatientLayout";
 import PatientLoginPage from "/@/pages/patient/login";
@@ -35,6 +36,10 @@ import {DentalPage} from "/@/pages/admin/dental/DentalPage";
 import {RoleManagementPage} from "/@/pages/admin/user_management/userManagment";
 import ActivityLogsPage from "/@/pages/admin/user_management/activityLogs";
 import RequireModule from "/@/routes/RequireModule";
+
+// Keep in sync with ACCOUNT_REQUESTS_ROUTE in PatientsTab.tsx.
+// Move this into ROUTES.staff.dashboard later.
+const ACCOUNT_REQUESTS_PATH = "/staff/dashboard/account-requests";
 
 function AppRoutes() {
     return (
@@ -82,8 +87,11 @@ function AppRoutes() {
                             path={ROUTES.staff.dashboard.patients}
                             element={<RequireModule module="patient_module"><PatientsPage/></RequireModule>}
                         />
+                        <Route
+                            path={ACCOUNT_REQUESTS_PATH}
+                            element={<RequireModule module="patient_module"><AccountRequests/></RequireModule>}
+                        />
 
-              
                         <Route
                             path={ROUTES.staff.dashboard.accessControl}
                             element={<Navigate to={ROUTES.staff.accessControl.roles} replace/>}

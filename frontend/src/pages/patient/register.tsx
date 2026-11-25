@@ -9,6 +9,7 @@ import { focusRing } from "/@/components/register/authShared";
 export default function PatientRegisterPage() {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [inReview, setInReview] = useState(false);
 
   const goToSignIn = () => navigate(ROUTES.patient.login);
 
@@ -26,13 +27,15 @@ export default function PatientRegisterPage() {
         </div>
 
         <h1 className="mt-8 font-heading text-3xl font-semibold leading-tight tracking-tight text-textPrimary sm:text-4xl">
-          Create your account
+          {inReview ? "Review your information" : "Create your account"}
         </h1>
         <p className="mt-3 text-base leading-relaxed text-textSecondary">
-          Upload your application form and we will fill in your details.
+          {inReview
+            ? "Check everything below before you submit."
+            : "Upload your application form and we will fill in your details."}
         </p>
 
-        <RegisterForm onSuccess={setSuccessMessage} />
+        <RegisterForm onSuccess={setSuccessMessage} onReviewChange={setInReview} />
       </div>
 
       {successMessage && (
