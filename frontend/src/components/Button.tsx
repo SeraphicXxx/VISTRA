@@ -3,6 +3,17 @@ import React, {ComponentType} from "react";
 import {ROUTES} from "/@/config/RoutePaths.js";
 import type {MouseEvent} from "react";
 import {ArrowRight, LoaderCircle} from "lucide-react";
+import {focusRing} from "/@/components/register/authShared";
+
+// Colors, states, and focus only.
+export const primaryButtonBase = `bg-primary font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
+
+export const secondaryButtonBase = `font-semibold text-textSecondary transition-colors duration-200 hover:text-textPrimary disabled:opacity-60 ${focusRing}`;
+
+// Compact sizes used by the register flow.
+export const primaryButton = `${primaryButtonBase} rounded-lg px-5 py-2.5 text-sm`;
+export const secondaryButton = `${secondaryButtonBase} rounded-lg px-4 py-2 text-sm`;
+
 interface LoginButtonProps {
     isLoading: boolean;
 }
@@ -14,7 +25,7 @@ export function LoginButton({
         <button
             type="submit"
             disabled={isLoading}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-card transition-colors duration-200 hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-60"
+            className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm ${primaryButtonBase}`}
         >
             {isLoading ? "Signing in..." : "Sign in"}
 
@@ -26,6 +37,7 @@ export function LoginButton({
         </button>
     );
 }
+
 export function HyperlinkText({link, title, icon: Icon}: {
     link: string,
     title: string,

@@ -20,6 +20,7 @@ interface VisitTabProps<Row extends { id: string }, Item, F extends object> {
     totalPages?: number;
     page?: number;
     createAction?: VisitTabCreateAction;
+    headerActions?: ReactNode;
     buildViewLink?: (row: Row) => string;
     renderAction?: (row: Row) => ReactNode;
     showFilters?: boolean;
@@ -37,6 +38,7 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
     totalPages,
     page,
     createAction,
+    headerActions,
     buildViewLink,
     renderAction,
     showFilters = true,
@@ -48,6 +50,8 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
         [items, toRow]
     );
 
+    const hasPanelActions = Boolean(createAction) || Boolean(headerActions);
+
     return (
         <DefaultTablePreset<Row>
             title={title}
@@ -58,12 +62,17 @@ export function VisitTab<Row extends { id: string }, Item, F extends object = ob
             totalPages={totalPages}
             page={page}
             panelAddon={
-                createAction ? (
-                    <LinkButton
-                        title={createAction.title}
-                        route={createAction.route}
-                        icon={Plus}
-                    />
+                hasPanelActions ? (
+                    <div className="flex items-center gap-2">
+                        {headerActions}
+                        {createAction && (
+                            <LinkButton
+                                title={createAction.title}
+                                route={createAction.route}
+                                icon={Plus}
+                            />
+                        )}
+                    </div>
                 ) : undefined
             }
             renderAction={
