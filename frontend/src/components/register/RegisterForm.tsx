@@ -29,7 +29,7 @@ import {
 } from "/@/components/landinganim";
 import { API_ENDPOINTS, getApiUrl } from "/@/config/ApiConfig";
 import { apiClient } from "/@/api/axios_client";
-import { primaryButton, secondaryButton } from "/@/components/button";
+import { primaryButton, secondaryButton } from "/@/components/Button";
 import RegistrationPreview, {
   buildSummarySections,
 } from "/@/components/register/RegistrationPreview";
@@ -414,7 +414,7 @@ export function RegisterForm({ onSuccess, onReviewChange }: RegisterFormProps) {
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%" }}
+              style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
             />
           </div>
         </div>

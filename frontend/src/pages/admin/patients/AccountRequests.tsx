@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Clock, Eye, Info, UserPlus} from "lucide-react";
-import {primaryButton, secondaryButton} from "/@/components/button";
+import {primaryButton, secondaryButton} from "/@/components/Button";
 import {
     getPending,
     getSections,

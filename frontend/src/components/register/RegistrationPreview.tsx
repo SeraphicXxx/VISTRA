@@ -1,5 +1,5 @@
 import {Clock} from "lucide-react";
-import {primaryButton, secondaryButton} from "/@/components/button";
+import {primaryButton, secondaryButton} from "/@/components/Button";
 import {useState} from "react";
 
 export type SummaryRow = {label: string; value: string};
