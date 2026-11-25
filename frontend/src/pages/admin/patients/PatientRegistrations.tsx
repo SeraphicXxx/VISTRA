@@ -1,6 +1,6 @@
 import {useState} from "react";
-import {UserPlus} from "lucide-react";
-import {usePatientRegistrationsQuery, useReviewPatientRegistration} from "/@/hooks/query/PatientQuery";
+import {UserPlus, Eye} from "lucide-react";
+import {usePatientRegistrationsQuery} from "/@/hooks/query/PatientQuery";
 import {VisitTab} from "/@/components/VisitTab";
 import {registrationColumns, RegistrationTableFormat} from "./registrationData";
 import {joinName} from "/@/utils/joinName";
@@ -27,48 +27,32 @@ function toRegistrationTableRow(p: PendingPatient): RegistrationTableFormat {
 
 export default function PatientRegistrations() {
     const {data, isLoading, isError, error, refetch} = usePatientRegistrationsQuery("pending");
-    const reviewMutation = useReviewPatientRegistration();
-    const [actionError, setActionError] = useState<string | null>(null);
 
     const items: PendingPatient[] = Array.isArray(data) ? data : [];
 
-    const review = async (patientId: string, status: "approved" | "rejected") => {
-        setActionError(null);
-        try {
-            await reviewMutation.mutateAsync({patientId, status});
-        } catch (e) {
-            setActionError(e instanceof Error ? e.message : "Action failed");
-        }
+    const handleView = (patientId: string) => {
+        // Placeholder: collaborator will implement the view page.
+        console.log("View registration:", patientId);
     };
 
     const rowActions = (row: RegistrationTableFormat) => (
-        <div className="flex items-center gap-2">
-            <button
-                className="rounded-xl bg-primary px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
-                disabled={reviewMutation.isPending}
-                onClick={() => review(row.patient_id, "approved")}
-            >
-                Approve
-            </button>
-            <button
-                className="rounded-xl border border-border px-3 py-1 text-xs font-semibold disabled:opacity-50"
-                disabled={reviewMutation.isPending}
-                onClick={() => review(row.patient_id, "rejected")}
-            >
-                Reject
-            </button>
-        </div>
+        <button
+            type="button"
+            className="rounded-xl border border-border px-3 py-1 text-xs font-semibold text-textPrimary hover:bg-primary/5"
+            onClick={() => handleView(row.patient_id)}
+        >
+            <Eye className="mr-1.5 inline h-3.5 w-3.5" strokeWidth={2} />
+            View
+        </button>
     );
 
     return (
         <div className="p-6 space-y-4">
-            <h1 className="text-xl font-semibold">Pending Registrations</h1>
             {isError && (
                 <p className="text-red-600">
                     {error instanceof Error ? error.message : "Failed to load"}
                 </p>
             )}
-            {actionError && <p className="text-red-600">{actionError}</p>}
             <VisitTab
                 title="Pending Registrations"
                 icon={UserPlus}
@@ -83,9 +67,6 @@ export default function PatientRegistrations() {
             {!isLoading && items.length === 0 && (
                 <p className="text-textMuted">No pending registrations.</p>
             )}
-            <button className="text-sm text-primary" onClick={() => refetch()}>
-                Refresh
-            </button>
         </div>
     );
 }
